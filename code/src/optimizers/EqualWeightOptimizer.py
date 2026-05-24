@@ -11,8 +11,7 @@ class EqualWeightOptimizer(BaseOptimizer):
     def __init__(self, hyperparams=None):
         super().__init__(hyperparams)
         self.num_assets = 0
-        self.valid_mask = None
-        
+
     def fit(self, train_bundle):
         """
         The 1/N portfolio doesn't need historical returns to train.
@@ -21,24 +20,17 @@ class EqualWeightOptimizer(BaseOptimizer):
         R_fh = train_bundle.get('R_fh')
         if R_fh is None:
             raise ValueError("train_bundle must contain 'R_fh' (asset returns).")
-            
-        self.valid_mask = ~R_fh.iloc[-1].isna().values
+
         self.num_assets = R_fh.shape[1]
-        
+
     def optimize(self):
         """
         Returns a vector where every asset gets exactly 1/N of the capital.
         """
         if self.num_assets == 0:
             raise ValueError("Optimizer must be fitted before calling optimize().")
-            
-        weights = np.zeros(self.num_assets)
-        valid_count = self.valid_mask.sum()
 
-        if valid_count > 0:
-            weights[self.valid_mask] = 1.0 / valid_count
-        
-        return weights
+        return np.full(self.num_assets, 1.0 / self.num_assets)
         
     def score(self, weights, val_bundle):
         """
