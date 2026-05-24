@@ -193,23 +193,7 @@ class Backtester:
         keys, values = zip(*self.param_grid.items())
         return [dict(zip(keys, v)) for v in product(*values)]
 
-    def _compute_drifted_weights(self, initial_weights: pd.Series, returns_slice: pd.DataFrame) -> pd.DataFrame:
-        """
-        Given the target weights at the start of the holding period, 
-        compound them daily using the asset returns to find the drifted 
-        weights at the end of the period.
-            
-        Returns:
-            pd.DataFrame: A dataframe of the same shape as returns_slice containing the daily drifted weights.
-        """
-        
-        shifted_returns = returns_slice.shift(1).fillna(0)
-        cumulative_growth = (1 + shifted_returns).cumprod()
-        unnormalized_weights = cumulative_growth * initial_weights
-        drifted_weights = unnormalized_weights.div(unnormalized_weights.sum(axis=1), axis=0)
 
-        return drifted_weights
-    
     def _compute_asset_transaction_costs(self, 
                                          drifted_weights: pd.Series, 
                                          new_weights: pd.Series, 
