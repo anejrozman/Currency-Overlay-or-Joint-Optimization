@@ -167,8 +167,8 @@ data_bundle = {
 # Sparse parameter grid with 2 options per hyperparameter
 param_grid = {
     "alpha": [0.80, 0.95],
-    "lambda_l1": [0.0, 0.01, 0.05],
-    "lambda_l2": [0.0, 0.01, 0.05],
+    "lambda_l1": [0.0, 0.02],
+    "lambda_l2": [0.0, 0.02],
     "leverage_limit": [1, 1.5, 2.0]
 }
 
