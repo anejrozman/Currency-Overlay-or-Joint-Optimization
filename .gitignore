@@ -30,5 +30,6 @@ thesis_proposal/
 literature/
 administrative/
 code/scripts/compare_table1.py
+logs/
 
 CLAUDE.md
