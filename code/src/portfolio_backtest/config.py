@@ -18,7 +18,8 @@ RUNS_DIR: Path = RESULTS_DIR / "runs"
 LOGS_DIR: Path = REPO_ROOT / "logs"
 
 # Filenames
-UNIVERSE_FILE: str = "currency_alocation_50_202603081747.csv"
+# UNIVERSE_FILE: str = "currency_alocation_50_202603081747.csv"
+UNIVERSE_FILE: str = "currency_alocation_10_202603081747.csv"
 RF_FILE: str = "us_risk_free_rates.csv"
 LOCAL_RETURNS_FILE: str = "local_asset_returns.csv"
 SPOT_RETURNS_FILE: str = "currency_spot_returns.csv"
