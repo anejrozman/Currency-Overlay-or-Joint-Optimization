@@ -1,0 +1,15 @@
+{
+  "strategy": "equally_weighted",
+  "label": "1/N Equal Weight \u2014 Fully Hedged (3m, top-50)",
+  "run_date": "2026-05-28T16:43:51.579350",
+  "optimizer": "EqualWeightOptimizer",
+  "param_grid": null,
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "universe_file": "currency_alocation_10_202603081747.csv",
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv",
+  "rf_annual": null
+}
