@@ -351,13 +351,26 @@ class Backtester:
         # Expected Shortfall Ratio
         esr = ann_excess_mean / ann_es if ann_es > 0 else float("nan")
 
+        asset_to = (
+            round(float(np.mean(self._asset_turnovers)), 4)
+            if getattr(self, "_asset_turnovers", None)
+            else float("nan")
+        )
+        currency_to = (
+            round(float(np.mean(self._currency_turnovers)), 4)
+            if getattr(self, "_currency_turnovers", None)
+            else float("nan")
+        )
+
         metrics = {
-            "ES_80 (daily, %)":     round(daily_es * 100, 4),
-            "Volatility (ann., %)": round(ann_vol * 100, 4),
-            "Max Drawdown (%)":     round(max_drawdown * 100, 4),
-            "Sharpe Ratio":         round(sr, 4),
-            "Sortino Ratio":        round(sor, 4),
-            "ESR":                  round(esr, 4),
+            "ES_80 (daily, %)":              round(daily_es * 100, 4),
+            "Volatility (ann., %)":          round(ann_vol * 100, 4),
+            "Max Drawdown (%)":              round(max_drawdown * 100, 4),
+            "Sharpe Ratio":                  round(sr, 4),
+            "Sortino Ratio":                 round(sor, 4),
+            "ESR":                           round(esr, 4),
+            "Avg Asset Turnover (per rebal.)":    asset_to,
+            "Avg Currency Turnover (per rebal.)": currency_to,
         }
 
         # Print metrics in a table at the end of the backtest
@@ -425,6 +438,8 @@ class Backtester:
         is_first_period = True
 
         period_returns: list[pd.Series] = []
+        self._asset_turnovers: list[float] = []
+        self._currency_turnovers: list[float] = []
         data_start = full_date_index[0]
         n_periods = len(rebalance_dates) - 1
 
@@ -538,7 +553,7 @@ class Backtester:
             w_t = C.T @ x_t          
             phi_t = w_t - psi_t     
 
-            #Transaction costs 
+            #Transaction costs
             if is_first_period:
                 asset_tc = 0.0
                 currency_tc = 0.0
@@ -552,6 +567,10 @@ class Backtester:
                     new_currency_weights=w_t,
                     full_forward_turnover=full_forward_turnover,
                 )
+                # Track raw turnover (no cost scaling) for performance metrics
+                self._asset_turnovers.append(float((x_t - drifted_x).abs().sum()))
+                phi_t_non_base = phi_t.drop("USD", errors="ignore")
+                self._currency_turnovers.append(float(phi_t_non_base.abs().sum()))
             tc_total = asset_tc + currency_tc
 
             # Returns during holding period 
