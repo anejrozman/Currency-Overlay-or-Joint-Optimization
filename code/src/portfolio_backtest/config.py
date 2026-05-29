@@ -4,7 +4,6 @@ Constants and path configuration for the portfolio_backtest package.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
 from pathlib import Path
 
 # Repository paths
@@ -17,9 +16,11 @@ RESULTS_DIR: Path = REPO_ROOT / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 LOGS_DIR: Path = REPO_ROOT / "logs"
 
-# Filenames
-# UNIVERSE_FILE: str = "currency_alocation_50_202603081747.csv"
-UNIVERSE_FILE: str = "currency_alocation_10_202603081747.csv"
+# Universe filenames — keyed by top-N per economy
+UNIVERSE_FILE_10: str = "currency_alocation_10_202603081747.csv"
+UNIVERSE_FILE_50: str = "currency_alocation_50_202603081747.csv"
+UNIVERSE_FILE_100: str = "currency_alocation_100_202603081747.csv"
+UNIVERSE_FILES: dict[int, str] = {10: UNIVERSE_FILE_10, 50: UNIVERSE_FILE_50, 100: UNIVERSE_FILE_100}
 RF_FILE: str = "us_risk_free_rates.csv"
 LOCAL_RETURNS_FILE: str = "local_asset_returns.csv"
 SPOT_RETURNS_FILE: str = "currency_spot_returns.csv"
@@ -41,23 +42,3 @@ TRADING_DAYS: int = 252
 # Transaction cost assumptions (Appendix C of thesis)
 ASSET_COST_BPS: float = 10.0  # basis points per unit traded for equities
 FX_COST_BPS: float = 1.0      # basis points per unit traded for currencies
-
-
-@dataclass
-class BacktestConfig:
-    """
-    Mutable default configuration for the Backtester.
-    Saved to config.json for each run of a backtest.
-    """
-    window_years: int = 10
-    val_years: int = 1
-    rebalancing_frequency: str = "quarterly"
-    rf_annual: float = 0.0
-    param_grid_es: dict = field(
-        default_factory=lambda: {
-            "alpha": [0.80, 0.95],
-            "lambda_l1": [0.0, 0.02],
-            "lambda_l2": [0.0, 0.02],
-            "leverage_limit": [1, 1.5, 2.0],
-        }
-    )
