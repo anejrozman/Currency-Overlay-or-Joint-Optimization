@@ -316,7 +316,7 @@ class Backtester:
             Dictionary of metrics.
         """
         r = oos_returns.dropna()
-        rf_daily = rf_series.reindex(r.index).fillna(method="ffill").fillna(0.0)
+        rf_daily = rf_series.reindex(r.index).ffill()
         r_excess = r - rf_daily
 
         # Annualized excess mean 
