@@ -6,6 +6,7 @@ auto incrementing run directory function, and RIC to currency mapping function.
 
 from __future__ import annotations
 
+import inspect
 import logging
 from pathlib import Path
 import pandas as pd
@@ -29,21 +30,26 @@ def load_csv(path: Path | str, *, date_col: str = "date") -> pd.DataFrame:
     return df
 
 
-def next_run_dir(strategy_name: str) -> Path:
+def next_run_dir(optimizer_cls: type) -> Path:
     """
-    Return a new incremented +1 run directory for *strategy_name* when a backtest is run.
+    Return a new incremented run directory for *optimizer_cls*.
+
+    Directory structure: RUNS_DIR / <optimizer_filename> / run_<N>
     """
     from portfolio_backtest.config import RUNS_DIR
 
-    RUNS_DIR.mkdir(parents=True, exist_ok=True)
-    prefix = f"{strategy_name}_run_"
+    optimizer_stem = Path(inspect.getfile(optimizer_cls)).stem
+    optimizer_dir = RUNS_DIR / optimizer_stem
+    optimizer_dir.mkdir(parents=True, exist_ok=True)
+
+    prefix = "run_"
     existing = [
-        int(d.name.replace(prefix, ""))
-        for d in RUNS_DIR.iterdir()
+        int(d.name[len(prefix):])
+        for d in optimizer_dir.iterdir()
         if d.is_dir() and d.name.startswith(prefix) and d.name[len(prefix):].isdigit()
     ]
     run_number = max(existing, default=0) + 1
-    run_dir = RUNS_DIR / f"{prefix}{run_number}"
+    run_dir = optimizer_dir / f"{prefix}{run_number}"
     run_dir.mkdir(parents=True, exist_ok=True)
     logger.info("Run directory: %s", run_dir)
     return run_dir

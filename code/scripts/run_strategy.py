@@ -126,7 +126,7 @@ def main() -> None:
     rc_returns_path = config.PROCESSED_DIR / config.RC_RETURNS_FILE
     unhedged_returns_path = config.PROCESSED_DIR / config.UNHEDGED_RETURNS_FILE
 
-    run_dir = next_run_dir(args.strategy)
+    run_dir = next_run_dir(optimizer_cls)
     log.info("Strategy: %s", args.strategy)
     log.info("Universe: top-%d per economy", args.universe)
     log.info("Run directory: %s", run_dir)
