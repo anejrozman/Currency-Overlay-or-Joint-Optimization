@@ -16,16 +16,13 @@ Each entry must have:
 from __future__ import annotations
 
 from portfolio_backtest.backtest_config import (
-    ES_CONFIG, 
-    EW_CONFIG, 
-    MV_CONFIG,
+    ES_CONFIG,
+    EW_CONFIG,
 )
 from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
     RegularizedExpectedShortfallAssetFullOptimizer,
     RegularizedExpectedShortfallAssetZeroOptimizer,
-    RegularizedMeanVarianceAssetFullOptimizer,
-    RegularizedMeanVarianceAssetZeroOptimizer,
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
@@ -42,20 +39,6 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label": "ASSETS-ZERO ES",
         "use_hedging": False,
         "config": ES_CONFIG,
-    },
-    "assets_full_mv": {
-        "optimizer": RegularizedMeanVarianceAssetFullOptimizer,
-        "asset_return_key": "R_fh",
-        "label": "ASSETS-FULL MV (3m)",
-        "use_hedging": True,
-        "config": MV_CONFIG,
-    },
-    "assets_zero_mv": {
-        "optimizer": RegularizedMeanVarianceAssetZeroOptimizer,
-        "asset_return_key": "R_u",
-        "label": "ASSETS-ZERO MV",
-        "use_hedging": False,
-        "config": MV_CONFIG,
     },
     "equally_weighted": {
         "optimizer": EqualWeightOptimizer,

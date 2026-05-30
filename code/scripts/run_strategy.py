@@ -244,7 +244,7 @@ def main() -> None:
         json.dump(metrics, f, indent=2)
     log.info("Metrics saved to %s", run_dir / "metrics.json")
 
-    # Plot cumulative returns
+    #save plot of cumulative returns
     cumulative_returns = (1 + oos_returns).cumprod()
     plt.figure(figsize=(10, 6))
     cumulative_returns.plot(label=label)

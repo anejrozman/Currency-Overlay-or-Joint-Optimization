@@ -30,19 +30,6 @@ ES_CONFIG = BacktestConfig(
     },
 )
 
-MV_CONFIG = BacktestConfig(
-    window_years=10,
-    val_years=1,
-    rebalancing_frequency="quarterly",
-    param_grid={
-        "gamma":           [0.5, 1.0, 2.0],
-        "lambda_l1":       [0.0, 0.02],
-        "lambda_l2":       [0.0, 0.02],
-        "leverage_limit":  [1, 1.5, 2.0],
-        "use_ledoit_wolf": [True],
-    },
-)
-
 EW_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,
