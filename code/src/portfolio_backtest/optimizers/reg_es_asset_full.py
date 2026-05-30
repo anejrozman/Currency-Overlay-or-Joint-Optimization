@@ -32,15 +32,15 @@ class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
             hyperparams: Optional dict with keys:
 
                 * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``lambda_l1``      (float) — L1 penalty weight, default 0.0
-                * ``lambda_l2``      (float) — L2 penalty weight, default 0.0
+                * ``lambda_l1``      (float) — L1 penalty weight, default 0.3
+                * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
                 * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
                 * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI``
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
-        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.0)
-        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.0)
+        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
+        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.3)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", cp.GUROBI)
 
