@@ -1,0 +1,15 @@
+{
+  "strategy": "reg_es_joint",
+  "label": "Regularized ES Joint (top-50)",
+  "run_date": "2026-05-31T18:20:11.474907",
+  "optimizer": "RegularizedExpectedShortfallJointOptimizer",
+  "param_grid": null,
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "universe_file": "currency_alocation_50_202603081747.csv",
+  "universe_size": 50,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
