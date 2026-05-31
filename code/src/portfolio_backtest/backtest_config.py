@@ -36,3 +36,13 @@ EW_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={},
 )
+
+OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          [0.80, 0.95],
+        "leverage_limit": [1.0, 1.5, 2.0],
+    },
+)
