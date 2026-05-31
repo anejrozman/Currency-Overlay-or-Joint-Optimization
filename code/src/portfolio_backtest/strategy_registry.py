@@ -19,12 +19,14 @@ from portfolio_backtest.backtest_config import (
     ES_CONFIG,
     EW_CONFIG,
     OVERLAY_CONFIG,
+    REG_OVERLAY_CONFIG,
 )
 from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
     ExpectedShortfallCurrencyOverlayOptimizer,
     RegularizedExpectedShortfallAssetFullOptimizer,
     RegularizedExpectedShortfallAssetZeroOptimizer,
+    RegularizedExpectedShortfallCurrencyOverlayOptimizer,
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
@@ -48,6 +50,13 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label": "ES Currency Overlay",
         "use_hedging": True,
         "config": OVERLAY_CONFIG,
+    },
+    "reg_es_curr_overlay": {
+        "optimizer": RegularizedExpectedShortfallCurrencyOverlayOptimizer,
+        "asset_return_key": "R_fh",
+        "label": "Regularized ES Currency Overlay",
+        "use_hedging": True,
+        "config": REG_OVERLAY_CONFIG,
     },
     "equally_weighted": {
         "optimizer": EqualWeightOptimizer,
