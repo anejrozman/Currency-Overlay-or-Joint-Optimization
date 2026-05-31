@@ -18,15 +18,19 @@ from __future__ import annotations
 from portfolio_backtest.backtest_config import (
     ES_CONFIG,
     EW_CONFIG,
+    JOINT_CONFIG,
     OVERLAY_CONFIG,
+    REG_JOINT_CONFIG,
     REG_OVERLAY_CONFIG,
 )
 from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
     ExpectedShortfallCurrencyOverlayOptimizer,
+    ExpectedShortfallJointOptimizer,
     RegularizedExpectedShortfallAssetFullOptimizer,
     RegularizedExpectedShortfallAssetZeroOptimizer,
     RegularizedExpectedShortfallCurrencyOverlayOptimizer,
+    RegularizedExpectedShortfallJointOptimizer,
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
@@ -57,6 +61,20 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label": "Regularized ES Currency Overlay",
         "use_hedging": True,
         "config": REG_OVERLAY_CONFIG,
+    },
+    "es_joint": {
+        "optimizer": ExpectedShortfallJointOptimizer,
+        "asset_return_key": "R_fh",
+        "label": "ES Joint",
+        "use_hedging": True,
+        "config": JOINT_CONFIG,
+    },
+    "reg_es_joint": {
+        "optimizer": RegularizedExpectedShortfallJointOptimizer,
+        "asset_return_key": "R_fh",
+        "label": "Regularized ES Joint",
+        "use_hedging": True,
+        "config": REG_JOINT_CONFIG,
     },
     "equally_weighted": {
         "optimizer": EqualWeightOptimizer,

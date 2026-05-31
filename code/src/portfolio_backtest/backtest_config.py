@@ -60,3 +60,25 @@ REG_OVERLAY_CONFIG = BacktestConfig(
         "leverage_limit":  [1.0, 1.5, 2.0],
     },
 )
+
+JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          [0.80, 0.95],
+        "leverage_limit": [1.0, 1.5, 2.0],
+    },
+)
+
+REG_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          [0.80, 0.95],
+        "lambda_l1":      [0.0, 0.02],
+        "lambda_l2":      [0.0, 0.02],
+        "leverage_limit": [1.0, 1.5, 2.0],
+    },
+)
