@@ -96,7 +96,7 @@ class RegularizedMeanVarianceAssetFullOptimizer(BaseOptimizer):
         Y = R_fh.values
         self.N = Y.shape[1]
         self.mu = bayes_stein(Y)
-        self.Sigma = np.cov(Y, rowvar=False, ddof=1)
+        self.Sigma = np.cov(Y, rowvar=False, ddof=1) + 1e-8 * np.eye(self.N) # Add small regularization to ensure positive definiteness
 
     def optimize(self) -> np.ndarray:
         """
@@ -170,5 +170,5 @@ class RegularizedMeanVarianceAssetFullOptimizer(BaseOptimizer):
         R_fh_val = val_bundle["R_fh"]
         if R_fh_val.empty or len(R_fh_val) < 2:
             return float("inf")
-        Sigma_val = np.cov(R_fh_val.values, rowvar=False, ddof=1)
+        Sigma_val = np.cov(R_fh_val.values, rowvar=False, ddof=1) + 1e-8 * np.eye(R_fh_val.shape[1]) # Add small regularization to ensure positive definiteness
         return float(weights @ Sigma_val @ weights)
