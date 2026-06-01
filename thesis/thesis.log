@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  9 MAY 2026 18:14
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  1 JUN 2026 17:09
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1383,51 +1383,58 @@ l.176
        [1
 
 
-] (./chapters/abstract.tex)
-
-[2] (./thesis.toc
-LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 3.
+] (./chapters/abstract.tex
+LaTeX Font Info:    Trying to load font information for OT1+lmr on input line 5.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OML+lmm on input line 3.
+LaTeX Font Info:    Trying to load font information for OML+lmm on input line 5.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 3.
+LaTeX Font Info:    Trying to load font information for OMS+lmsy on input line 5.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 3.
+LaTeX Font Info:    Trying to load font information for OMX+lmex on input line 5.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 5.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 5.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 5.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 5.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
+File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
+)
+LaTeX Font Info:    Trying to load font information for U+msb on input line 5.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+) (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
+File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
+)
+LaTeX Font Info:    Trying to load font information for U+rsfs on input line 5.
+ (/usr/local/texlive/2025/texmf-dist/tex/latex/jknapltx/ursfs.fd
+File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
+))
+
+[2{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}] (./thesis.toc
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <10.95> on input line 3.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <8> on input line 3.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <6> on input line 3.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 3.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2013/01/14 v3.01 AMS symbols A
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msa.cfg
-File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 3.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (/usr/local/texlive/2025/texmf-dist/tex/latex/microtype/mt-msb.cfg
-File: mt-msb.cfg 2005/06/01 v1.0 microtype config. file: AMS symbols (b) (RS)
-)
-LaTeX Font Info:    Trying to load font information for U+rsfs on input line 3.
- (/usr/local/texlive/2025/texmf-dist/tex/latex/jknapltx/ursfs.fd
-File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-))
 
 [3
 
-{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}] (./chapters/student_intro.tex
+] (./chapters/student_intro.tex
 
 [1
 
@@ -1459,10 +1466,6 @@ LaTeX Warning: Reference `ch:conclusion' on page 1 undefined on input line 34.
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on input line 18.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <14.4> on input line 80.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 80.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 80.
 LaTeX Font Info:    Trying to load font information for T1+lmss on input line 106.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/t1lmss.fd
 File: t1lmss.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -1473,8 +1476,6 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             See the microtype manual for details.
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <9> on input line 106.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 106.
 Package hyperref Info: bookmark level for unknown proof defaults to 0 on input line 124.
 
 
@@ -1597,12 +1598,12 @@ LaTeX Warning: Citation `NeelyWellerUlrich2009' on page 24 undefined on input li
 [24] (./thesis.bbl
 bibitemlist
 )
-<declaration-originality.pdf, id=401, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=402, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 206.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=403, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=404, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 206.
@@ -1653,18 +1654,18 @@ Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: 6E9194983C6E0A154903858C05E25110;4775.
  ) 
 Here is how much of TeX's memory you used:
- 39211 strings out of 473190
- 760731 string characters out of 5715800
+ 39223 strings out of 473190
+ 760859 string characters out of 5715800
  1282952 words of memory out of 5000000
  61241 multiletter control sequences out of 15000+600000
- 716756 words of font info for 294 fonts, out of 8000000 for 9000
+ 717254 words of font info for 300 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 102i,17n,125p,1439b,748s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (30 pages, 636038 bytes).
+ 102i,17n,125p,1439b,738s stack positions out of 10000i,1000n,20000p,200000b,200000s
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on thesis.pdf (30 pages, 657481 bytes).
 PDF statistics:
- 582 PDF objects out of 1000 (max. 8388607)
- 460 compressed objects within 5 object streams
+ 587 PDF objects out of 1000 (max. 8388607)
+ 463 compressed objects within 5 object streams
  108 named destinations out of 1000 (max. 500000)
  90454 words of extra memory for PDF output out of 106986 (max. 10000000)
 
