@@ -9,6 +9,7 @@ from .reg_es_asset_zero import RegularizedExpectedShortfallAssetZeroOptimizer
 from .reg_es_curr_overlay import RegularizedExpectedShortfallCurrencyOverlayOptimizer
 from .reg_es_joint import RegularizedExpectedShortfallJointOptimizer
 from .reg_mv_asset_full import RegularizedMeanVarianceAssetFullOptimizer
+from .reg_mv_asset_zero import RegularizedMeanVarianceAssetZeroOptimizer
 
 __all__ = [
     "BaseOptimizer",
@@ -20,4 +21,5 @@ __all__ = [
     "RegularizedExpectedShortfallCurrencyOverlayOptimizer",
     "RegularizedExpectedShortfallJointOptimizer",
     "RegularizedMeanVarianceAssetFullOptimizer",
+    "RegularizedMeanVarianceAssetZeroOptimizer",
 ]
