@@ -13,6 +13,7 @@ from .reg_mv_asset_zero import RegularizedMeanVarianceAssetZeroOptimizer
 from .mv_curr_overlay import MeanVarianceCurrencyOverlayOptimizer
 from .mv_joint import MeanVarianceJointOptimizer
 from .reg_mv_curr_overlay import RegularizedMeanVarianceCurrencyOverlayOptimizer
+from .reg_mv_joint import RegularizedMeanVarianceJointOptimizer
 
 __all__ = [
     "BaseOptimizer",
@@ -28,4 +29,5 @@ __all__ = [
     "RegularizedMeanVarianceAssetFullOptimizer",
     "RegularizedMeanVarianceAssetZeroOptimizer",
     "RegularizedMeanVarianceCurrencyOverlayOptimizer",
+    "RegularizedMeanVarianceJointOptimizer",
 ]
