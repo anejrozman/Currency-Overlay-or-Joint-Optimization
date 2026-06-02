@@ -19,6 +19,7 @@ from portfolio_backtest.backtest_config import (
     ES_CONFIG,
     EW_CONFIG,
     JOINT_CONFIG,
+    MV_OVERLAY_CONFIG,
     OVERLAY_CONFIG,
     REG_JOINT_CONFIG,
     REG_MV_ASSET_FULL_CONFIG,
@@ -29,6 +30,7 @@ from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
     ExpectedShortfallCurrencyOverlayOptimizer,
     ExpectedShortfallJointOptimizer,
+    MeanVarianceCurrencyOverlayOptimizer,
     RegularizedExpectedShortfallAssetFullOptimizer,
     RegularizedExpectedShortfallAssetZeroOptimizer,
     RegularizedExpectedShortfallCurrencyOverlayOptimizer,
@@ -100,5 +102,12 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "Regularized MV (Assets-Zero)",
         "use_hedging":      False,
         "config":           REG_MV_ASSET_ZERO_CONFIG,
+    },
+    "mv_curr_overlay": {
+        "optimizer":        MeanVarianceCurrencyOverlayOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "MV Currency Overlay",
+        "use_hedging":      True,
+        "config":           MV_OVERLAY_CONFIG,
     },
 }

@@ -106,3 +106,13 @@ REG_MV_ASSET_ZERO_CONFIG = BacktestConfig(
         "leverage_limit": [1.0, 1.5, 2.0],
     },
 )
+
+MV_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          [1.0, 3.0, 5.0],
+        "leverage_limit": [1.0, 1.5, 2.0],
+    },
+)

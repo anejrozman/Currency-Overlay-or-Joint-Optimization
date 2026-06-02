@@ -10,12 +10,14 @@ from .reg_es_curr_overlay import RegularizedExpectedShortfallCurrencyOverlayOpti
 from .reg_es_joint import RegularizedExpectedShortfallJointOptimizer
 from .reg_mv_asset_full import RegularizedMeanVarianceAssetFullOptimizer
 from .reg_mv_asset_zero import RegularizedMeanVarianceAssetZeroOptimizer
+from .mv_curr_overlay import MeanVarianceCurrencyOverlayOptimizer
 
 __all__ = [
     "BaseOptimizer",
     "EqualWeightOptimizer",
     "ExpectedShortfallCurrencyOverlayOptimizer",
     "ExpectedShortfallJointOptimizer",
+    "MeanVarianceCurrencyOverlayOptimizer",
     "RegularizedExpectedShortfallAssetFullOptimizer",
     "RegularizedExpectedShortfallAssetZeroOptimizer",
     "RegularizedExpectedShortfallCurrencyOverlayOptimizer",
