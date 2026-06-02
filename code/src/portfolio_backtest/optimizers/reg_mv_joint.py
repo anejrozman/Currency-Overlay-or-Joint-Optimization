@@ -15,7 +15,7 @@ import logging
 import cvxpy as cp
 import numpy as np
 from .base_optimizer import BaseOptimizer
-from .reg_mv_asset_full import bayes_stein
+from ..utils.estimation import bayes_stein
 
 logger = logging.getLogger(__name__)
 
