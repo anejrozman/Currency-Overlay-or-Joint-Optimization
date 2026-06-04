@@ -40,8 +40,8 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
-        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
-        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.3)
+        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.03)
+        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.03)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", cp.GUROBI)
 
