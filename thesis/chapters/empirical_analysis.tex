@@ -10,7 +10,145 @@ We construct our investment universe from the 14 largest developed equity market
 
 For each selected stock, we retrieve daily total return indices, which account for dividend reinvestments, and compute the corresponding local currency returns. The US dollar serves as the base currency for our analysis, we calculate the fully hedged returns for each stock following the model-free return representation in chapter \ref{chap:model-free-returns}.
 
-\section{Results: Small Investment Universe}
+\section{Performance Metrics}
 
-\section{Results: Large Investment Universe}
+\section{Results}
 
+\begin{table}%[htbp]
+  \centering
+  \scalebox{0.82}{%
+  \begin{tabular}{lcccccccc}
+    \toprule
+    \multicolumn{8}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%) & & \\
+    Vol (\%) & & \\
+    MD (\%)  & & \\
+    SR   & & \\
+    SOR  & & \\
+    ESR  & & \\
+    $\text{Turnover}^a$  & & \\
+    $\text{Turnover}^c$  & & \\
+    \midrule
+    \multicolumn{8}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%) & & \\
+    Vol (\%) & & \\
+    MD (\%)  & & \\
+    SR   & & \\
+    SOR  & & \\
+    ESR  & & \\
+    $\text{Turnover}^a$  & & \\
+    $\text{Turnover}^c$  & & \\
+    \midrule
+    \multicolumn{8}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%) & & \\
+    Vol (\%) & & \\
+    MD (\%)  & & \\
+    SR   & & \\
+    SOR  & & \\
+    ESR  & & \\
+    $\text{Turnover}^a$  & & \\
+    $\text{Turnover}^c$  & & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}
+    \label{tab:es-universe-sizes}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:es-universe-sizes} reports out-of-sample performance metrics for the international
+  portfolio optimization under expected shortfall, with portfolios rebalanced
+  quarterly. The realized out-of-sample statistics shown are Expected Shortfall (ES), volatility (Vol),
+  maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), the Expected Shortfall Ratio (ESR), 
+  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. 
+  Each panel corresponds to a different investment universe:
+  Panel A covers the small universe, made up of the 10 largest companies by market
+  capitalization in each economy; Panel B the medium universe, comprising the 50 largest
+  companies per economy; and Panel C the large universe, consisting of the 100 largest
+  companies per economy. The sample period runs from June 1990 to June 2023, and the
+  first out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and 
+    performance metrics are provided in section \ref{todo}.
+  \end{minipage}
+\end{table}
+
+We can see in table \ref{tab:es-universe-sizes} that the performance of the expected shortfall optimization approaches varies across 
+different universe sizes. In the small universe, the optimized portfolios generally outperform the equal weight benchmark in terms of 
+risk-adjusted returns, as measured by the Sharpe Ratio and Sortino Ratio. However, as we increase the universe size to medium and large, 
+the performance of the optimized portfolios relative to the equal weight benchmark deteriorates, with some strategies even underperforming 
+the benchmark in terms of risk-adjusted returns. This suggests that the benefits of optimization may diminish as the investment universe expands, 
+potentially due to increased estimation error and model uncertainty in larger universes. 
+
+\begin{table}[htbp]
+  \centering
+  \scalebox{0.82}{%
+  \begin{tabular}{lcccccccc}
+    \toprule
+    \multicolumn{8}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%) & & \\
+    Vol (\%) & & \\
+    MD (\%)  & & \\
+    SR   & & \\
+    SOR  & & \\
+    ESR  & & \\
+    $\text{Turnover}^a$  & & \\
+    $\text{Turnover}^c$  & & \\
+    \midrule
+    \multicolumn{8}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%) & & \\
+    Vol (\%) & & \\
+    MD (\%)  & & \\
+    SR   & & \\
+    SOR  & & \\
+    ESR  & & \\
+    $\text{Turnover}^a$  & & \\
+    $\text{Turnover}^c$  & & \\
+    \midrule
+    \multicolumn{8}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%) & & \\
+    Vol (\%) & & \\
+    MD (\%)  & & \\
+    SR   & & \\
+    SOR  & & \\
+    ESR  & & \\
+    $\text{Turnover}^a$  & & \\
+    $\text{Turnover}^c$  & & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics for mean-variance optimization approaches on increasing universe sizes}
+  \label{tab:mv-universe-sizes}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:mv-universe-sizes} reports out-of-sample performance metrics for the international
+  portfolio optimization under mean-variance, with portfolios rebalanced
+  quarterly. The realized out-of-sample statistics shown are Expected Shortfall (ES), volatility (Vol),
+  maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), the Expected Shortfall Ratio (ESR), 
+  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. 
+  Each panel corresponds to a different investment universe:
+  Panel A covers the small universe, made up of the 10 largest companies by market
+  capitalization in each economy; Panel B the medium universe, comprising the 50 largest
+  companies per economy; and Panel C the large universe, consisting of the 100 largest
+  companies per economy. The sample period runs from June 1990 to June 2023, and the
+  first out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and 
+    performance metrics are provided in section \ref{todo}.
+  \end{minipage}
+\end{table}

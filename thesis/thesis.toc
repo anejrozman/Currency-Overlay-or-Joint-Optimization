@@ -17,18 +17,18 @@
 \contentsline {section}{\numberline {5.3}Matrix Representation and Decomposition}{13}{section.5.3}%
 \contentsline {chapter}{\chapternumberline {6}Empirical Analysis}{15}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Data}{15}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Results: Small Investment Universe}{15}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Results: Large Investment Universe}{15}{section.6.3}%
-\contentsline {chapter}{\chapternumberline {7}Conclusion}{16}{chapter.7}%
-\contentsline {chapter}{Appendices}{17}{section*.25}%
-\contentsline {appendix}{\chapternumberline {A}ES Optimization Equivalence}{18}{appendix.A}%
-\contentsline {appendix}{\chapternumberline {B}ES Optimization Implementation}{20}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Sample-Based Expected Shortfall}{20}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Linearization of the $L_1$ Penalty and Leverage}{21}{section.B.2}%
-\contentsline {section}{\numberline {B.3}Quadratic Translation of the $L_2$ Penalty}{21}{section.B.3}%
-\contentsline {section}{\numberline {B.4}Separate Optimization (Currency Overlay)}{21}{section.B.4}%
-\contentsline {subsection}{\numberline {B.4.1}Step 1: Asset-Level Optimization}{21}{subsection.B.4.1}%
-\contentsline {subsection}{\numberline {B.4.2}Step 2: Currency-Level Optimization}{22}{subsection.B.4.2}%
-\contentsline {section}{\numberline {B.5}Joint Optimization Framework}{22}{section.B.5}%
-\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{23}{appendix.C}%
-\contentsline {chapter}{Bibliography}{25}{appendix*.27}%
+\contentsline {section}{\numberline {6.2}Performance Metrics}{15}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Results}{15}{section.6.3}%
+\contentsline {chapter}{\chapternumberline {7}Conclusion}{18}{chapter.7}%
+\contentsline {chapter}{Appendices}{19}{section*.25}%
+\contentsline {appendix}{\chapternumberline {A}ES Optimization Equivalence}{20}{appendix.A}%
+\contentsline {appendix}{\chapternumberline {B}ES Optimization Implementation}{22}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Sample-Based Expected Shortfall}{22}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Linearization of the $L_1$ Penalty and Leverage}{23}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Quadratic Translation of the $L_2$ Penalty}{23}{section.B.3}%
+\contentsline {section}{\numberline {B.4}Separate Optimization (Currency Overlay)}{23}{section.B.4}%
+\contentsline {subsection}{\numberline {B.4.1}Step 1: Asset-Level Optimization}{23}{subsection.B.4.1}%
+\contentsline {subsection}{\numberline {B.4.2}Step 2: Currency-Level Optimization}{24}{subsection.B.4.2}%
+\contentsline {section}{\numberline {B.5}Joint Optimization Framework}{24}{section.B.5}%
+\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{25}{appendix.C}%
+\contentsline {chapter}{Bibliography}{27}{appendix*.27}%
