@@ -15,20 +15,27 @@
 \contentsline {section}{\numberline {5.1}Unhedged Portfolio Returns}{12}{section.5.1}%
 \contentsline {section}{\numberline {5.2}Hedged Portfolio Returns}{13}{section.5.2}%
 \contentsline {section}{\numberline {5.3}Matrix Representation and Decomposition}{13}{section.5.3}%
-\contentsline {chapter}{\chapternumberline {6}Empirical Analysis}{15}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Data}{15}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Performance Metrics}{15}{section.6.2}%
-\contentsline {section}{\numberline {6.3}Results}{15}{section.6.3}%
-\contentsline {chapter}{\chapternumberline {7}Conclusion}{18}{chapter.7}%
-\contentsline {chapter}{Appendices}{19}{section*.25}%
-\contentsline {appendix}{\chapternumberline {A}ES Optimization Equivalence}{20}{appendix.A}%
-\contentsline {appendix}{\chapternumberline {B}ES Optimization Implementation}{22}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Sample-Based Expected Shortfall}{22}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Linearization of the $L_1$ Penalty and Leverage}{23}{section.B.2}%
-\contentsline {section}{\numberline {B.3}Quadratic Translation of the $L_2$ Penalty}{23}{section.B.3}%
-\contentsline {section}{\numberline {B.4}Separate Optimization (Currency Overlay)}{23}{section.B.4}%
-\contentsline {subsection}{\numberline {B.4.1}Step 1: Asset-Level Optimization}{23}{subsection.B.4.1}%
-\contentsline {subsection}{\numberline {B.4.2}Step 2: Currency-Level Optimization}{24}{subsection.B.4.2}%
-\contentsline {section}{\numberline {B.5}Joint Optimization Framework}{24}{section.B.5}%
-\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{25}{appendix.C}%
-\contentsline {chapter}{Bibliography}{27}{appendix*.27}%
+\contentsline {chapter}{\chapternumberline {6}Backtesting Framework}{15}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Modular Design}{16}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Rolling Backtest Procedure}{16}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Optimizer Layer}{16}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Optimization Details}{17}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Transaction Costs and Rebalancing}{17}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Output and Evaluation}{18}{section.6.6}%
+\contentsline {chapter}{\chapternumberline {7}Empirical Analysis}{19}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Data}{19}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Performance Metrics}{19}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Results}{19}{section.7.3}%
+\contentsline {chapter}{\chapternumberline {8}Conclusion}{22}{chapter.8}%
+\contentsline {chapter}{Appendices}{23}{section*.25}%
+\contentsline {appendix}{\chapternumberline {A}ES Optimization Equivalence}{24}{appendix.A}%
+\contentsline {appendix}{\chapternumberline {B}ES Optimization Implementation}{26}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Sample-Based Expected Shortfall}{26}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Linearization of the $L_1$ Penalty and Leverage}{27}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Quadratic Translation of the $L_2$ Penalty}{27}{section.B.3}%
+\contentsline {section}{\numberline {B.4}Separate Optimization (Currency Overlay)}{27}{section.B.4}%
+\contentsline {subsection}{\numberline {B.4.1}Step 1: Asset-Level Optimization}{27}{subsection.B.4.1}%
+\contentsline {subsection}{\numberline {B.4.2}Step 2: Currency-Level Optimization}{28}{subsection.B.4.2}%
+\contentsline {section}{\numberline {B.5}Joint Optimization Framework}{28}{section.B.5}%
+\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{29}{appendix.C}%
+\contentsline {chapter}{Bibliography}{31}{appendix*.27}%

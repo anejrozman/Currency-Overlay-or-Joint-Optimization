@@ -1,0 +1,147 @@
+\chapter{Backtesting Framework}
+
+\tikzset{
+  box/.style={
+    draw=blue, fill=blue!10, rounded corners=4pt,
+    align=center, font=\scriptsize, inner sep=5pt
+  },
+  absbox/.style={
+    draw=blue, fill=white, rounded corners=4pt, dashed,
+    align=center, font=\scriptsize, inner sep=5pt
+  },
+  arr/.style={-Stealth, thick, draw=blue},
+  sarr/.style={-Stealth, draw=blue}
+}
+
+This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
+
+\begin{figure}[ht]
+\begin{center}
+\begin{tikzpicture}
+
+  % --- Data Files ---
+  \node[box, text width=1.9cm] (files) at (0, 0) {
+    \textbf{Data Files}\\[3pt]
+    $R_\text{fh}$,\; $R_u$,\; $R_c$,\\
+    Universe Mask, \\
+    Forward Rates
+  };
+
+  % --- DataHandler ---
+  \node[box, text width=2.3cm] (dh) at (0, -2.1) {
+    \textbf{DataHandler}\\[3pt]
+  };
+
+  \draw[arr] (files.south) -- (dh.north);
+
+  % --- Backtester ---
+  \node[box, text width=3.8cm, minimum height=2.7cm] (bt) at (4.7, -1.05) {
+    \textbf{Backtester}\\[5pt]
+    \texttt{run(data\_bundle)}\\[5pt]
+    {\tiny Grid search on est.\ window}\\[2pt]
+    {\tiny Refit on full est.\ window}\\[2pt]
+    {\tiny Transaction costs (10\,/\,1\,bps)}\\[2pt]
+  };
+
+  \draw[arr] (dh.east) -- node[below=1pt, font=\tiny] {\texttt{data\_bundle}}
+             (bt.west |- dh.east);
+
+  % --- BaseOptimizer (abstract) ---
+  \node[absbox, text width=2.9cm] (base) at (10, -1.05) {
+    \textbf{BaseOptimizer}\\[2pt]
+    \textit{abstract}\\[5pt]
+    \texttt{fit(train\_bundle)}\\[1pt]
+    \texttt{optimize()}\\[1pt]
+    \texttt{score(w,\;val\_bundle)}
+  };
+
+  \draw[] (bt.east) -- node[above, font=\tiny] {call at}
+             (base.west);
+  \draw[] (bt.east) -- node[below, font=\tiny] {each rebalance}
+             (base.west);
+
+  % --- Concrete optimisers ---
+  \node[box, text width=2.5cm] (es) at (8.3, 1.3) {
+    \textbf{ES Optimizers}\\[3pt]
+    {\tiny Reg.\ Asset-Full/Zero}\\
+    {\tiny Reg.\ Curr.\ Overlay}\\
+    {\tiny Reg.\ Joint}
+  };
+
+  \node[box, text width=2.5cm] (mv) at (11.5, 1.3) {
+    \textbf{MV Optimizers}\\[3pt]
+    {\tiny Reg.\ Asset-Full/Zero}\\
+    {\tiny Reg.\ Curr.\ Overlay}\\
+    {\tiny Reg.\ Joint}
+  };
+
+  \node[box, text width=1.5cm] (ew) at (10, -3.3) {
+    \textbf{Equal}\\
+    \textbf{Weight Optimizer}
+  };
+
+  \draw[sarr] (es.south)  -- ($(base.north) + (-1cm, 0)$);
+  \draw[sarr] (mv.south)  -- ($(base.north) + ( 1cm, 0)$);
+  \draw[sarr] (ew.north)  -- (base.south);
+
+  % --- OOS Returns ---
+  \node[box, text width=2.5cm, fill=blue!10] (oos) at (4.7, -3.8) {
+    \text{OOS Returns}\\[2pt]
+    {\text{performance metrics}}
+  };
+
+  \draw[arr] (bt.south) -- (oos.north);
+
+\end{tikzpicture}
+\end{center}
+\caption{Schematic of the backtesting framework.}
+\label{fig:backtest}
+\end{figure}
+
+The figure highlights the main design principle of the implementation: the backtester is intentionally kept generic, while the portfolio logic lives in interchangeable optimizer classes. This makes it possible to compare mean-variance and expected shortfall formulations, asset-only and joint asset--currency strategies, and regularized and unregularized variants under the same walk-forward protocol.
+
+\section{Modular Design}
+
+The framework is built around a strict separation of concerns. The \texttt{DataHandler} prepares the inputs required by the backtest. It loads the precomputed return series, constructs the mapping from each asset to its reporting currency, and builds a daily universe mask from the underlying investment universe file. The backtester then receives these objects in a single \texttt{data\_bundle} and does not need to know how they were generated.
+
+The \texttt{Backtester} is responsible only for the evaluation protocol. It determines the rebalancing dates, constructs the estimation and validation windows, performs hyperparameter selection when a grid is provided, and records the resulting out-of-sample returns. All portfolio construction decisions are delegated to subclasses of \texttt{BaseOptimizer}.
+
+This interface is deliberately minimal. Every optimizer implements three methods: \texttt{fit(train\_bundle)}, \texttt{optimize()}, and \texttt{score(weights, val\_bundle)}. As a result, the same backtesting machinery can be reused across portfolio specifications without duplicating the rolling-window logic.
+
+\section{Rolling Backtest Procedure}
+
+The backtest follows a standard walk-forward structure. At each rebalance date, the framework forms a rolling estimation window of fixed length and a separate validation window at the end of that history. Candidate hyperparameters are evaluated on the validation window, and the best configuration is then refitted on the full estimation sample before the resulting portfolio is carried forward into the next holding period.
+
+The implementation makes this procedure explicit in the \texttt{run} method of \texttt{Backtester}. Rebalancing dates are derived from the trading-day index and can be daily, weekly, monthly, quarterly, semi-annual, or annual. For each cycle, the code first restricts the investable universe to the assets that are currently eligible and then checks that every selected asset has a complete return history in the relevant estimation window. This avoids unstable weights caused by missing data inside the optimizer itself and keeps the filtering logic outside the optimization problem.
+
+The chosen window lengths are supplied by the strategy configuration and default to a ten-year estimation window with a one-year validation window. These settings are stored centrally in \texttt{backtest\_config.py} and are passed into the backtester through the strategy registry. Centralizing the configuration in this way makes it easier to reproduce the experimental setup across different strategies.
+
+\section{Optimizer Layer}
+
+All optimizers inherit from \texttt{BaseOptimizer}, which defines a common contract across the entire framework. The class stores a dictionary of hyperparameters and enforces the presence of the three core methods. This keeps the optimizer layer explicit and makes the implementations easy to swap within the backtester.
+
+Two broad optimizer families are implemented. The expected shortfall optimizers minimize a tail-risk objective based on the worst observations in the sample. The mean-variance optimizers instead balance portfolio variance against expected return, with the expected return estimated using Bayes--Stein shrinkage. In both families, the optimizers are further divided into asset-only and joint asset--currency formulations.
+
+The asset-only strategies operate on a single return matrix. In the \emph{assets-full} case, the optimizer uses fully hedged asset returns, so the asset selection problem is solved under the assumption that currency risk is neutralized elsewhere. In the \emph{assets-zero} case, the optimizer uses unhedged returns and therefore absorbs currency risk directly in the asset allocation. The equal-weight benchmark follows the same interface, but simply returns a uniform allocation across all available assets.
+
+The joint strategies extend this setup by introducing a currency overlay. In those optimizers, the asset weights and the currency hedge weights are solved in a single problem. The asset allocation remains fully invested, while the currency overlay is unconstrained and can be used to express active currency views or hedging adjustments. This separation is useful because it allows the thesis to distinguish between the equity selection problem and the currency management problem without forcing both roles into a single weight vector.
+
+\section{Optimization Details}
+
+The expected shortfall formulation is implemented as a convex program with auxiliary variables. For a sample of portfolio returns \(r_t\), the optimizer introduces a threshold variable and slack variables for the tail observations. The objective minimizes the expected shortfall estimate together with optional \(\ell_1\) and \(\ell_2\) regularization terms. A leverage cap is imposed through an \(\ell_1\)-norm constraint on the asset weights.
+
+The mean-variance formulation uses a quadratic objective. On the asset side, the expected return is estimated with Bayes--Stein shrinkage and the covariance matrix is regularized with a small diagonal adjustment to preserve numerical stability. The joint mean-variance optimizer applies the same idea to the combined asset and currency return stream, while the currency overlay can remain unconstrained. Regularization is used in both families to reduce instability in the estimated weights and to prevent extreme allocations when the effective sample size is limited.
+
+All substantive optimizers are solved with CVXPY. When Gurobi is available, the implementation uses it as the default solver and applies fairly tight tolerances. This is mainly a practical choice: the optimization problems are convex, but the rolling backtest repeatedly solves many similar instances, so stable convergence matters more than squeezing out tiny differences in the objective value. The same interface also allows the code to fall back to another CVXPY-compatible solver if necessary.
+
+\section{Transaction Costs and Rebalancing}
+
+Transaction costs are handled explicitly at each rebalance. The framework distinguishes between asset turnover and currency turnover and applies separate cost assumptions of 10 basis points for equities and 1 basis point for FX transactions. Costs are computed using a log-linear approximation of turnover, which is consistent with the model used in the referenced backtesting framework. This is sufficient for comparing strategies because all portfolios are evaluated under the same cost model.
+
+To account for portfolio evolution between rebalances, the backtester carries forward drifted weights from one period to the next. Asset weights are allowed to drift with realized returns, and the resulting drifted positions determine the true turnover when the next rebalance occurs. The same idea is applied to the currency overlay through the asset--currency mapping. This makes the cost calculation and turnover reporting more realistic than a simple target-weight comparison.
+
+\section{Output and Evaluation}
+
+The backtester returns a daily out-of-sample return series for the strategy under evaluation. In addition, it computes summary statistics such as annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, and an expected shortfall ratio. These metrics are stored in the backtesting code because they are part of the evaluation pipeline, but the detailed interpretation of the results is deferred to the empirical chapters.
+
+The main purpose of the framework is therefore not only to generate return series, but to provide a reproducible and extensible mechanism for comparing portfolio constructions under identical data, timing, and cost assumptions. That design choice is what allows the thesis to isolate the effect of the optimization model itself.
