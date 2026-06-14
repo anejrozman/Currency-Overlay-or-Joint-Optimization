@@ -127,7 +127,7 @@
 %% provide compatible symbol definitions; this prevents a \Bbbk clash.
 \usepackage{amsmath,amsfonts,mathrsfs}
 % REMARK
-\crefname{remark}{remark}{remarks}
+\crefname{remark}{remark}{remarks} 
 \Crefname{remark}{Remark}{Remarks}
 
 % RULE - This one is special
@@ -184,20 +184,23 @@ Measures}
 
 %% Content
 \newpage
-\input{chapters/student_intro.tex}
+\input{chapters/introduction.tex}
 \input{chapters/literature_review.tex}
-\input{chapters/student_notation.tex}
-\input{chapters/student_analysis.tex} 
-\input{chapters/model_free_returns.tex}  
-\input{chapters/backtesting_framework.tex}
-\input{chapters/empirical_analysis.tex}
+\input{chapters/optimization_framework.tex}
+\input{chapters/data_and_implementation.tex}
+\input{chapters/empirical_analysis_and_baseline_results.tex}
+\input{chapters/convex_risk_measures.tex}
+\input{chapters/end_to_end_portfolio_optimization.tex}
+\input{chapters/results.tex}
 \input{chapters/conclusion.tex}
-
+ 
 \appendix
 \appendixpage
 \input{chapters/appendixA.tex}
 \input{chapters/appendixB.tex}
 \input{chapters/appendixC.tex}
+
+\input{chapters/appendixD.tex}
 
 \backmatter
  

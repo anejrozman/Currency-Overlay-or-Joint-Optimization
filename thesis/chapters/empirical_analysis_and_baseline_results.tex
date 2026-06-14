@@ -1,18 +1,9 @@
-\chapter{Empirical Analysis}
+\chapter{Empirical Analysis and Baseline Results}\label{chap:empirical-analysis-and-baseline-results}
 
 In this chapter, we present an empirical analysis of the multi-currency portfolio optimization problem using historical data. We apply the model-free return representation derived in chapter \ref{chap:model-free-returns} to compute realized returns for the portfolio strategies derived in section \ref{todo}. We evalutate the performance of the various strategies on two investment universes, a large investment universe consisting of 50 biggest stocks in the 14 largest developed markets and a small investment universe consisting of 10 biggest stocks in the same markets. We compare the performance of the optimized portfolios to a benchmark equally weighted portfolio. 
 
-\section{Data}
 
-Our analysis relies on a comprehensive dataset of international equities, foreign exchange spot rates, and forward exchange rates sourced from Refinitiv Datastream. The dataset covers a period from June 1990 to June 2023, capturing various market regimes, including the dot-com bubble burst, the 2008 Global Financial Crisis, the European debt crisis, and the COVID-19 pandemic. 
-
-We construct our investment universe from the 14 largest developed equity markets: Australia, Canada, France, Germany, Hong Kong, Italy, Japan, the Netherlands, Singapore, Spain, Sweden, Switzerland, the United Kingdom, and the United States. To construct the local equity portfolios, we select the largest stocks in each market based on their market capitalization at the beginning of each year. We consider two distinct cross-sections of stocks to analyze the impact of the investment universe size on portfolio performance, a small universe consisting of the top 10 stocks per market (140 stocks in total) and a large universe consisting of the top 50 stocks per market (700 stocks in total). 
-
-For each selected stock, we retrieve daily total return indices, which account for dividend reinvestments, and compute the corresponding local currency returns. The US dollar serves as the base currency for our analysis, we calculate the fully hedged returns for each stock following the model-free return representation in chapter \ref{chap:model-free-returns}.
-
-\section{Performance Metrics}
-
-\section{Results}
+\section{Backtest Results of Expected Shortfall Optimization Approaches}
 
 \begin{table}%[htbp]
   \centering
@@ -87,6 +78,8 @@ the performance of the optimized portfolios relative to the equal weight benchma
 the benchmark in terms of risk-adjusted returns. This suggests that the benefits of optimization may diminish as the investment universe expands, 
 potentially due to increased estimation error and model uncertainty in larger universes. 
 
+\section{Backtest Results of Mean-Variance Optimization Approaches}
+
 \begin{table}[htbp]
   \centering
   \scalebox{0.82}{%
@@ -152,3 +145,5 @@ potentially due to increased estimation error and model uncertainty in larger un
     performance metrics are provided in section \ref{todo}.
   \end{minipage}
 \end{table}
+
+\section{The Effects of Universe Size on Portfolio Performance}

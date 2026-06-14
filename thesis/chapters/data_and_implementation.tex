@@ -1,0 +1,130 @@
+\chapter{Data and Implementation}\label{chap:data-and-implementation}
+
+\section{Data and Summary Statistics}
+
+Our analysis relies on a comprehensive dataset of international equities, foreign exchange spot rates, and forward exchange rates sourced from Refinitiv Datastream. The dataset covers a period from June 1990 to June 2023, capturing various market regimes, including the dot-com bubble burst, the 2008 Global Financial Crisis, the European debt crisis, and the COVID-19 pandemic. 
+
+We construct our investment universe from the 14 largest developed equity markets: Australia, Canada, France, Germany, Hong Kong, Italy, Japan, the Netherlands, Singapore, Spain, Sweden, Switzerland, the United Kingdom, and the United States. To construct the local equity portfolios, we select the largest stocks in each market based on their market capitalization at the beginning of each year. We consider two distinct cross-sections of stocks to analyze the impact of the investment universe size on portfolio performance, a small universe consisting of the top 10 stocks per market (140 stocks in total) and a large universe consisting of the top 50 stocks per market (700 stocks in total). 
+
+For each selected stock, we retrieve daily total return indices, which account for dividend reinvestments, and compute the corresponding local currency returns. The US dollar serves as the base currency for our analysis, we calculate the fully hedged returns for each stock following the model-free return representation in chapter \ref{chap:model-free-returns}.
+
+
+\section{Modular Backtesting Framework}
+
+\tikzset{
+  box/.style={
+    draw=blue, fill=blue!10, rounded corners=4pt,
+    align=center, font=\scriptsize, inner sep=5pt
+  },
+  absbox/.style={
+    draw=blue, fill=white, rounded corners=4pt, dashed,
+    align=center, font=\scriptsize, inner sep=5pt
+  },
+  arr/.style={-Stealth, thick, draw=blue},
+  sarr/.style={-Stealth, draw=blue}
+}
+
+This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
+
+\begin{figure}[ht]
+\begin{center}
+\begin{tikzpicture}
+ 
+  % --- Data Files ---
+  \node[box, text width=1.9cm] (files) at (0, 0) {
+    \textbf{Data Files}\\[3pt]
+    $R_\text{fh}$,\; $R_u$,\; $R_c$,\\
+    Universe Mask, \\
+    Forward Rates
+  };
+
+  % --- DataHandler ---
+  \node[box, text width=2.3cm] (dh) at (0, -2.1) {
+    \textbf{DataHandler}\\[3pt]
+  };
+
+  \draw[arr] (files.south) -- (dh.north);
+
+  % --- Backtester ---
+  \node[box, text width=3.8cm, minimum height=2.7cm] (bt) at (4.7, -1.05) {
+    \textbf{Backtester}\\[5pt]
+    \texttt{run(data\_bundle)}\\[5pt]
+    {\tiny Grid search on est.\ window}\\[2pt]
+    {\tiny Refit on full est.\ window}\\[2pt]
+    {\tiny Transaction costs (10\,/\,1\,bps)}\\[2pt]
+  };
+
+  \draw[arr] (dh.east) -- node[below=1pt, font=\tiny] {\texttt{data\_bundle}}
+             (bt.west |- dh.east);
+
+  % --- BaseOptimizer (abstract) ---
+  \node[absbox, text width=2.9cm] (base) at (10, -1.05) {
+    \textbf{BaseOptimizer}\\[2pt]
+    \textit{abstract}\\[5pt]
+    \texttt{fit(train\_bundle)}\\[1pt]
+    \texttt{optimize()}\\[1pt]
+    \texttt{score(w,\;val\_bundle)}
+  };
+
+  \draw[] (bt.east) -- node[above, font=\tiny] {call at}
+             (base.west);
+  \draw[] (bt.east) -- node[below, font=\tiny] {each rebalance}
+             (base.west);
+
+  % --- Concrete optimisers ---
+  \node[box, text width=2.5cm] (es) at (8.3, 1.3) {
+    \textbf{ES Optimizers}\\[3pt]
+    {\tiny Reg.\ Asset-Full/Zero}\\
+    {\tiny Reg.\ Curr.\ Overlay}\\
+    {\tiny Reg.\ Joint}
+  };
+
+  \node[box, text width=2.5cm] (mv) at (11.5, 1.3) {
+    \textbf{MV Optimizers}\\[3pt]
+    {\tiny Reg.\ Asset-Full/Zero}\\
+    {\tiny Reg.\ Curr.\ Overlay}\\
+    {\tiny Reg.\ Joint}
+  };
+
+  \node[box, text width=1.5cm] (ew) at (10, -3.3) {
+    \textbf{Equal}\\
+    \textbf{Weight Optimizer}
+  };
+
+  \draw[sarr] (es.south)  -- ($(base.north) + (-1cm, 0)$);
+  \draw[sarr] (mv.south)  -- ($(base.north) + ( 1cm, 0)$);
+  \draw[sarr] (ew.north)  -- (base.south);
+
+  % --- OOS Returns ---
+  \node[box, text width=2.5cm, fill=blue!10] (oos) at (4.7, -3.8) {
+    \text{OOS Returns}\\[2pt]
+    {\text{performance metrics}}
+  };
+
+  \draw[arr] (bt.south) -- (oos.north);
+
+\end{tikzpicture}
+\end{center}
+\caption{Schematic of the backtesting framework.}
+\label{fig:backtest}
+\end{figure}
+
+The figure highlights the main design principle of the implementation: the backtester is intentionally kept generic, while the portfolio logic lives in interchangeable optimizer classes. This makes it possible to compare mean-variance and expected shortfall formulations, asset-only and joint asset--currency strategies, and regularized and unregularized variants under the same walk-forward protocol.
+
+\subsection{Backtesting Workflow and Optimizer Structure}
+
+The framework is built around a strict separation of concerns. The \texttt{DataHandler} prepares the inputs for the backtest by loading precomputed return series, mapping each asset to its reporting currency, and building a daily universe mask from the investment universe file. The backtester receives these objects as a single \texttt{data\_bundle} and does not need to know how they were generated.
+
+The \texttt{Backtester} is responsible for the evaluation protocol. It determines rebalancing dates, constructs estimation and validation windows, performs hyperparameter selection when a grid is supplied, and records the resulting out-of-sample returns. All portfolio construction decisions are delegated to subclasses of \texttt{BaseOptimizer}, which all implement \texttt{fit(train\_bundle)}, \texttt{optimize()}, and \texttt{score(weights, val\_bundle)}.
+
+The backtest follows a standard walk-forward procedure. At each rebalance date, the framework forms a rolling estimation window and a separate validation window, evaluates candidate hyperparameters, refits the best configuration on the full estimation sample, and then carries the portfolio into the next holding period. Rebalancing can be daily, weekly, monthly, quarterly, semi-annual, or annual. Before optimization, the code filters the investable universe to currently eligible assets and checks that each selected asset has a complete return history, which keeps missing-data handling outside the optimization problem. Window lengths are stored centrally in \texttt{backtest\_config.py}; the default setup uses a ten-year estimation window and a one-year validation window.
+
+\subsection{Optimization, Costs, and Outputs}
+
+Two optimizer families are implemented: expected shortfall and mean-variance. Expected shortfall is formulated as a convex program with auxiliary variables, optional \(\ell_1\) and \(\ell_2\) regularization, and an \(\ell_1\)-norm leverage cap. Mean-variance uses Bayes--Stein shrinkage for expected returns and a lightly regularized covariance matrix. Both families are available in asset-only and joint asset--currency variants. The asset-only strategies use either hedged returns (\emph{assets-full}) or unhedged returns (\emph{assets-zero}), while the joint strategies solve for asset weights and currency hedge weights together. The equal-weight benchmark follows the same interface but returns a uniform allocation.
+
+All substantive optimizers are solved with CVXPY. When available, Gurobi is used as the default solver with tight tolerances; otherwise, the code falls back to another compatible solver. Transaction costs are applied at each rebalance using separate assumptions for equities and FX, namely 10 basis points and 1 basis point. Costs are computed with a log-linear turnover approximation, and the backtester tracks drifted weights between rebalances so that turnover reflects actual portfolio evolution. The framework outputs daily out-of-sample returns and summary statistics including annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, and an expected shortfall ratio.
+
+\section{Numerical Implementation of Optimization Problems}
+
+\section{Evaluation Protocol and Performance Metrics}
