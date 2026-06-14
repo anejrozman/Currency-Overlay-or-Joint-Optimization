@@ -129,15 +129,59 @@ R^{h}_{\mathcal{P},t+1}
 
 which we adopt throughout the following portfolio optimization formulations, as it makes the asset weights $\bm{x}_t$ and the net currency exposures $\bm{\psi}_t$ the explicit variables of the optimization.
 
-\section{Mean-Variance Formulation} \label{sec:mv-formulation}
+\section{Mean-Variance Optimization Formulation} \label{sec:mv-formulation}
 
-\section{Expected Shortfall Formulation} \label{sec:es-formulation}
+\subsection{The Mean-Variance Criterion}              \label{subsec:mv-criterion}
+The mean-variance criterion of \cite{Markowitz1952} measures portfolio risk by the
+variance of the portfolio return and selects weights that balance this risk against
+expected return. Using the hedged portfolio return $R^h_{\mathcal{P},t+1}$ defined in
+\eqref{eq:hedged-net} and a relative risk-aversion parameter $\gamma > 0$, the investor
+solves
+\begin{equation}
+\label{eq:mv-objective}
+\min \;\; \frac{\gamma}{2}\,\mathrm{Var}\!\left(R^h_{\mathcal{P},t+1}\right)
+- \mathbb{E}\!\left[R^h_{\mathcal{P},t+1}\right],
+\qquad \text{s.t.} \quad \mathbf{1}_N^\top \bm{x}_t = 1.
+\end{equation}
+The parameter $\gamma$ governs the trade-off between variance and expected return,
+larger values place more weight on risk reduction, and in the limit $\gamma \to \infty$
+the criterion reduces to pure variance minimization.
 
-\section{Regularization} \label{sec:regularization}
+The hedged portfolio return \eqref{eq:hedged-net} is linear in the asset weights
+$\bm{x}_t$ and the net currency exposures $\bm{\psi}_t$. Consequently
+$\mathbb{E}[R^h_{\mathcal{P},t+1}]$ is linear and
+$\mathrm{Var}(R^h_{\mathcal{P},t+1})$ is a quadratic form in these decision variables,
+so that, once the expected-return vector $\bm{\mu}$ and the covariance matrix
+$\bm{\Sigma}$ are estimated, \eqref{eq:mv-objective} is a convex quadratic program.
+Whether the asset and currency weights are chosen sequentially or in a single step
+determines the precise decision vector and the accompanying constraints; these two 
+formulations are developed in Sections~\ref{subsec:mv-overlay}
+and~\ref{subsec:mv-joint}.
 
-\section{Separate (Currency Overlay) Optimization} \label{sec:separate-optimization}
+While analytically convenient, variance is not a coherent risk measure in the sense of 
+\cite{CoherentMeasuresOfRisk}, who characterize a coherent measure by monotonicity,
+subadditivity, positive homogeneity, and translation invariance. Variance violates
+monotonicity: a portfolio whose return dominates another in every state of the world
+need not have lower variance, so variance can rank a uniformly preferable position as
+the riskier one. Equally relevant for international portfolios exposed to regime shifts
+and market stress, variance penalizes upside and downside deviations symmetrically and
+therefore does not isolate the large losses that most concern investors. These
+shortcomings motivate the coherent, downside-focused alternative developed in
+Section~\ref{sec:es-formulation}, where Expected Shortfall replaces variance as the risk
+measure while the surrounding optimization structure is left unchanged.
 
-\section{Joint Optimization} \label{sec:joint-optimization}
+\subsection{Regularized Mean-Variance Problem}        \label{subsec:mv-regularization}
+\subsection{Currency Overlay Optimization}            \label{subsec:mv-overlay}
+\subsection{Joint Optimization}                       \label{subsec:mv-joint}
+
+\section{Expected Shortfall Optimization Formulation} \label{sec:es-formulation}
+\subsection{Expected Shortfall and the Rockafellar--Uryasev Representation}
+                                                      \label{subsec:es-ru}
+\subsection{Regularized Expected Shortfall Problem}   \label{subsec:es-regularization}
+\subsection{Currency Overlay Optimization}            \label{subsec:es-overlay}
+\subsection{Joint Optimization}    
+
+
 
 
 

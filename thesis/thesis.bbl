@@ -1,5 +1,15 @@
 \begin{thebibliography}{1}
 
+\bibitem{CoherentMeasuresOfRisk}
+Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath.
+\newblock Coherent measures of risk.
+\newblock {\em Mathematical Finance}, 9(3):203--228, 1999.
+
+\bibitem{Markowitz1952}
+Harry Markowitz.
+\newblock Portfolio selection.
+\newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
+
 \bibitem{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 Patrick~Lucescu Urban~Ulrych.
 \newblock Regularized multi-currency expected shortfall portfolios, 2026.
