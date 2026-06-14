@@ -1,68 +1,66 @@
 \chapter{Optimization Framework} 
 \label{chap:optimization-framework}
 
-In this chapter we derive a model-free representation of one-period portfolio returns for an investor who holds assets denominated in multiple currencies and can take currency forward positions for hedging. The derivations follow the methodology presented in \cite{BurkhardtUlrych2023} and \cite{LucescuUlrych2026}, use simple returns, and assume that rebalancing occurs at the end of each period. We begin in Section~\ref{sec:returns} by decomposing the unhedged return of a foreign asset into its local, currency, and cross-currency components, introducing the currency-mapping matrix that links assets to their implicit currency exposures, and expressing the hedged portfolio return in terms of net currency exposures. This yields the fully hedged return that serves as the basic building block for the optimization problems that follow.
+This chapter develops the optimization framework used throughout the thesis, building up from a model of multi-currency portfolio returns to the risk objectives, the regularization that stabilizes them, and the two formulations through which asset and currency decisions are combined. The derivations follow the methodology presented in \cite{SparseAndStableInternationalPortfolioOptimization} and \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, use simple returns, and assume that rebalancing occurs at the end of each investment period. We begin in Section~\ref{sec:returns} with a model-free representation of one-period portfolio returns for an investor who holds assets denominated in multiple currencies and can take currency forward positions for hedging, decomposing the unhedged return of a foreign asset into its local, currency, and cross-currency components, introducing the currency-mapping matrix that links assets to their implicit currency exposures, and expressing the hedged portfolio return in terms of net currency exposures.
 
-We then turn to the objective. Section~\ref{sec:mv} states the classical mean-variance criterion, and Section~\ref{sec:es} introduces Expected Shortfall as a coherent downside-risk measure together with the Rockafellar–Uryasev representation that casts its minimization as a tractable linear program. Both are presented as instances of a common mean--risk objective so that the framework treats the risk measure as a swappable component rather than a fixed choice. The regularization section introduces the $L_1$ and $L_2$ penalties and the leverage constraint used to stabilize the optimization and improve out-of-sample performance through a bias--variance trade-off. Finally, Sections~\ref{sec:separate} and~\ref{sec:joint} assemble these elements into the two approaches to multi-currency allocation studied throughout the thesis: the separate (currency overlay) formulation, in which asset and currency decisions are made sequentially, and the joint formulation, in which they are optimized simultaneously. Detailed derivations of the resulting quadratic programs can be found in Appendix~\ref{app:formulations}.
+With the return model in place, we formulate the optimization problem. Section~\ref{sec:mv-formulation} states the classical mean-variance criterion, and Section~\ref{sec:es-formulation} introduces Expected Shortfall as a coherent downside-risk measure, together with the Rockafellar--Uryasev representation that casts its minimization as a tractable linear program. Both are presented as instances of a common mean--risk objective, so that the framework treats the risk measure as a swappable component rather than a fixed choice. Section~\ref{sec:regularization} then introduces the $L_1$ and $L_2$ penalties and the leverage constraint used to stabilize the optimization and improve out-of-sample performance.
 
-\section{Model-Free Multi-Currency Portfolio Returns}
+Finally, Sections~\ref{sec:separate-optimization} and~\ref{sec:joint-optimization} assemble these elements into the two approaches to multi-currency allocation studied throughout the thesis: the separate (currency overlay) formulation, in which asset and currency decisions are made sequentially, and the joint formulation, in which they are optimized simultaneously. The detailed derivations of the resulting quadratic programs are found in Appendix~\ref{app:es_derivation} and Appendix~\ref{app:mv_derivation}.
+ 
+\section{Model-Free Multi-Currency Portfolio Returns}\label{sec:returns}
 \subsection{Unhedged Portfolio Returns}
 
-We consider an international investor that allocates his wealth across $N$ assets denominated in up to $M+1$ currencies.\ We fix a discrete time index $t\in\{0,1,2,\dots\}$ and one investment period from $t$ to $t{+}1$. Let the investor's \emph{domestic currency} be indexed by $0$ and let the rest of the $M$ foreign currencies be indexed by $\mathcal{C} \coloneqq \{1,2,\dots,M\}$.
+We consider an international investor who allocates their wealth across $N$ assets denominated in up to $M+1$ currencies. We fix a discrete time index $t\in\{0,1,2,\dots\}$ and one investment period from $t$ to $t{+}1$. Let the investor's \emph{domestic currency} be indexed by $0$ and let the remaining $M$ foreign currencies be indexed by $\mathcal{C} \coloneqq \{1,2,\dots,M\}$.
 
-Let $P_{i,t}>0$ be the price of asset $i$ at time $t$ in its local currency $c_i \in \mathcal{C}\cup \{0\}$. Define the corresponding \emph{simple local currency asset return} over $(t,t{+}1]$ as
+Let $P_{i,t}>0$ be the price of asset $i$ at time $t$ in its local currency $c_i \in \mathcal{C}\cup \{0\}$. Define the corresponding \emph{simple local-currency asset return} over $(t,t{+}1]$ as
 \begin{equation*}
-R^{\text{LC}}_{i,t+1} \coloneqq \frac{P_{i,t+1}-P_{i,t}}{P_{i,t}}.
+R_{i,t+1} \coloneqq \frac{P_{i,t+1}-P_{i,t}}{P_{i,t}}.
 \end{equation*}
-Thus $P_{i,t+1}=P_{i,t}(1+R^{\text{LC}}_{i,t+1})$.
+Thus $P_{i,t+1}=P_{i,t}(1+R_{i,t+1})$.
 
 For each foreign currency $c\in\mathcal{C}$, let $S_{c,t} > 0$ denote the exchange rate at time $t$, quoted as units of domestic currency per one unit of foreign currency $c$. The associated \emph{simple currency return} over $(t,t{+}1]$ is
 \begin{equation*}
 e_{c,t+1} \coloneqq \frac{S_{c,t+1}-S_{c,t}}{S_{c,t}}.
 \end{equation*}
-Equivalently, $S_{c,t+1} = S_{c,t}(1+e_{c,t+1})$. By definition for the domestic currency, we set $S_{0,t}\equiv 1$ and $e_{0,t+1}\equiv 0$.
+Equivalently, $S_{c,t+1} = S_{c,t}(1+e_{c,t+1})$. For the domestic currency, we set $S_{0,t}\equiv 1$ and $e_{0,t+1}\equiv 0$.
 
-The domestic currency value of holding one unit of asset $i$ at time $t$ is $P_{i,t}\,S_{c_i,t}$. Therefore, the \emph{unhedged domestic currency simple return} of asset $i$ is
+The domestic-currency value of holding one unit of asset $i$ at time $t$ is $P_{i,t}\,S_{c_i,t}$. Therefore, the \emph{unhedged domestic-currency simple return} of asset $i$ is
 \begin{align}
 R^{u}_{i,t+1}
 &=
 \frac{P_{i,t+1}S_{c_i,t+1} - P_{i,t}S_{c_i,t}}{P_{i,t}S_{c_i,t}}
 \nonumber\\
 &=
-\frac{P_{i,t}(1+R^{\text{LC}}_{i,t+1}) S_{c_i,t}(1+e_{c_i,t+1}) - P_{i,t}S_{c_i,t}}{P_{i,t}S_{c_i,t}}
+\frac{P_{i,t}(1+R_{i,t+1})\,S_{c_i,t}(1+e_{c_i,t+1}) - P_{i,t}S_{c_i,t}}{P_{i,t}S_{c_i,t}}
 \nonumber\\
 &=
-R^{\text{LC}}_{i,t+1} + e_{c_i,t+1} + R^{\text{LC}}_{i,t+1}\,e_{c_i,t+1}.
+R_{i,t+1} + e_{c_i,t+1} + R_{i,t+1}\,e_{c_i,t+1}.
 \label{eq:unhedged-asset-return}
 \end{align}
 
 Let $\bm{x}_t\in\R^N$ be the vector of asset portfolio weights chosen at time $t$ and held until $t{+}1$, where $x_{i,t}$ is the fraction of total portfolio value invested in asset $i$ at time $t$. We impose the standard budget constraint $\bm{1}^\T \bm{x}_t = 1$.
 
-Assuming no rebalancing between times $t$ and $t{+}1$, the domestic currency portfolio's unhedged return is given by
+Assuming no rebalancing between times $t$ and $t{+}1$, the domestic-currency portfolio's unhedged return is given by
 \begin{equation*}
 R^{u}_{\mathcal{P},t+1} = \sum_{i=1}^N x_{i,t}\,R^{u}_{i,t+1}.
-\end{equation*} 
+\end{equation*}
 
 \subsection{Hedged Portfolio Returns}
 
-To manage currency risk, the investor can take positions in one-period currency forward contracts. A forward contract on foreign currency $c$ entered at time $t$ settles at time $t{+}1$ with payoff (in domestic currency) of $F_{c,t} - S_{c,t+1}$, where $F_{c,t}$ is the forward rate quoted at time $t$. The forward rate is typically set such that the contract has zero value at inception, i.e.\ $F_{c,t} = S_{c,t}(1+r_t)/(1+r_{c,t})$, where $r_t$ and $r_{c,t}$ are the domestic and foreign risk-free rates, respectively. The \emph{excess currency return} over the period is $e_{c,t+1} - f_{c,t}$, where $f_{c,t} = (F_{c,t} - S_{c,t})/S_{c,t}$ is the forward premium. The investor can choose the forward position $\tau_{c,t}$ (expressed as a fraction of total portfolio value) for each foreign currency $c$ to hedge against currency risk. The \emph{hedged} portfolio return is then the sum of the unhedged asset returns and the payoffs from the forward positions:
-\begin{equation*}
-R^{h}_{\mathcal{P},t+1} = \sum_{i=1}^N x_{i,t}\,R^{u}_{i,t+1} + \sum_{c=1}^M \tau_{c,t}\,(f_{c,t} - e_{c,t+1}).
-\end{equation*}
-For each foreign currency $c\in\mathcal{C}$, assume that at time $t$ the investor can enter a one-period currency forward contract that settles at $t{+}1$, with forward rate $F_{c,t}$ quoted in domestic currency per unit of foreign currency $c$. Define the \emph{forward premium} (simple rate) by
+To manage currency risk, the investor can take positions in one-period currency forward contracts. For each foreign currency $c\in\mathcal{C}$, let $F_{c,t}$ be the forward rate quoted at time $t$ for settlement at $t{+}1$, in units of domestic currency per unit of foreign currency $c$. We define the \emph{forward premium} by
 \begin{equation*}
 f_{c,t} \coloneqq \frac{F_{c,t}-S_{c,t}}{S_{c,t}}.
 \end{equation*}
-Let $\bm{\tau}_t\in\R^M$ denote forward positions expressed as fractions of total portfolio value, where $\tau_{c,t}$ represents the relative notional of the \emph{short} forward in currency $c$ at time $t$. With this sign convention, $\tau_{c,t}>0$ represents hedging (shorting foreign currency forward). The \emph{hedged} portfolio return is
+
+The investor hedges by selling foreign currency forward. Let $\upphi_{c,t}$ denote the relative notional of the \emph{short} forward position in currency $c$ at time $t$, expressed as a fraction of total portfolio value, with the convention that $\upphi_{c,t}>0$ corresponds to hedging. Per unit of notional, the short position pays $f_{c,t}-e_{c,t+1}$ in domestic currency over the period. Adding these forward payoffs to the unhedged asset returns, the \emph{hedged portfolio return} is
 \begin{equation}
-R^{h}_{P,t+1}
+R^{h}_{\mathcal{P},t+1}
 =
-\sum_{i=1}^N x_{i,t}\,R^{u}_{i,t+1}
+\underbrace{\sum_{i=1}^N x_{i,t}\,R^{u}_{i,t+1}}_{R^{u}_{\mathcal{P},t+1}}
 +
-\sum_{c=1}^M \phi_{c,t}\,(f_{c,t}-e_{c,t+1}).
+\sum_{c=1}^M \upphi_{c,t}\,(f_{c,t}-e_{c,t+1}).
 \label{eq:hedged-portfolio-return}
 \end{equation}
-This representation is model-free: it holds pathwise for realized returns and does not assume any distributional structure.
 
 \subsection{Matrix Representation and Decomposition}
 
@@ -74,29 +72,72 @@ C_{i,c} \coloneqq
 0, & \text{otherwise}.
 \end{cases}
 \end{equation*}
-The portfolio's \emph{implicit foreign-currency exposure} is $\bm{w}_t \coloneqq \bm{C}^\T \bm{x}_t \in \R^M$, where $w_{c,t} = \sum_{i:\,c_i=c} x_{i,t}$.
+Each row of $\bm{C}$ has at most one nonzero entry, and the rows corresponding to domestic assets are identically zero. This allows us to define the portfolio's \emph{implicit foreign-currency exposure} as
+\begin{equation*}
+\bm{w}_t \coloneqq \bm{C}^\T \bm{x}_t \in \R^M,
+\qquad
+w_{c,t} = \sum_{i:\,c_i=c} x_{i,t},
+\end{equation*}
+such that $w_{c,t}$ is the total portfolio weight invested in assets denominated in currency $c$. The implicit domestic exposure follows residually as $w_{0,t} = 1 - \bm{1}_M^\T \bm{w}_t$, since the asset weights sum to one.
 
-Collect returns into vectors $\bm{R}^{\text{LC}}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premiums $\bm{f}_t \in \R^M$. Define the currency-return vector aligned to assets via $\bm{C}\bm{e}_{t+1}\in\R^N$, where the $i$th component is $e_{c_i,t+1}$ for foreign assets and $0$ for domestic assets. Using \eqref{eq:unhedged-asset-return}, the vector of \emph{unhedged domestic returns} across assets is
+We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premiums as $\bm{f}_t \in \R^M$. The product $\bm{C}\bm{e}_{t+1}\in\R^N$ aligns currency returns to assets, with $i$th component $e_{c_i,t+1}$ for foreign assets and $0$ for domestic ones. Using \eqref{eq:unhedged-asset-return}, the vector of \emph{unhedged domestic returns} across assets can be written as
 \begin{equation*}
 \bm{R}^{u}_{t+1}
 =
-\bm{R}^{\text{LC}}_{t+1}
+\bm{R}_{t+1}
 +
 \bm{C}\bm{e}_{t+1}
 +
-(\bm{R}^{\text{LC}}_{t+1}\had\bm{C}\bm{e}_{t+1}),
+(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}),
 \end{equation*}
 where $\had$ denotes the Hadamard product. 
 
-\section{Mean-Variance Formulation}
+Expressing the forward positions in vector form as $\bm{\upphi}_t\in\R^M$, the hedged portfolio return \eqref{eq:hedged-portfolio-return} can be written as
+\begin{equation}
+R^{h}_{\mathcal{P},t+1} = \bm{x}_t^\T \bm{R}^{u}_{t+1} + \bm{\upphi}_t^\T(\bm{f}_t-\bm{e}_{t+1}).
+\label{eq:hedged-vector}
+\end{equation}
 
-\section{Expected Shortfall Formulation}
+Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\T\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this together with the unhedged return vector into \eqref{eq:hedged-vector}, the \emph{fully hedged portfolio return} is
+\begin{align*}
+R^{fh}_{\mathcal{P},t+1}
+&= \bm{x}_t^\T\bm{R}^{u}_{t+1} + \big(\bm{C}^\T\bm{x}_t\big)^\T(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
+&= \bm{x}_t^\T\Big[\bm{R}_{t+1} + \bm{C}\bm{e}_{t+1} + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big] + \bm{x}_t^\T\bm{C}(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
+&= \bm{x}_t^\T\Big[\bm{R}_{t+1} + \bm{C}\bm{e}_{t+1} + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big) + \bm{C}\bm{f}_t - \bm{C}\bm{e}_{t+1}\Big]\\[2pt]
+&= \bm{x}_t^\T\Big[\bm{R}_{t+1} + \bm{C}\bm{f}_t + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big]\\[2pt]
+&= \bm{x}_t^\T\bm{R}^{fh}_{t+1}.
+\end{align*}
+The first-order currency terms $\pm\,\bm{x}_t^\T\bm{C}\bm{e}_{t+1}$ cancel, leaving the \emph{fully hedged asset return vector}
+\begin{equation*}
+\bm{R}^{fh}_{t+1}
+=
+\bm{R}_{t+1}
++
+\bm{C}\bm{f}_t
++
+(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}).
+\end{equation*}
 
-\section{Regularization}
+More generally, define the \emph{net currency exposure} $\bm{\psi}_t \coloneqq \bm{w}_t-\bm{\upphi}_t$. Imposing $\sum_{c=0}^M \upphi_{c,t}=1$ gives $\sum_{c=0}^M \psi_{c,t}=0$, so the currency overlay is a zero-investment portfolio. Substituting $\bm{\upphi}_t=\bm{w}_t-\bm{\psi}_t$ into \eqref{eq:hedged-vector} expresses the hedged return in terms of net exposures,
+\begin{align}
+R^{h}_{\mathcal{P},t+1}
+&= \bm{x}_t^\T \bm{R}^{u}_{t+1} + (\bm{w}_t-\bm{\psi}_t)^\T(\bm{f}_t-\bm{e}_{t+1})\nonumber \\[2pt]
+&= \bm{x}_t^\T \bm{R}^{u}_{t+1} + \bm{w}_t^\T(\bm{f}_t-\bm{e}_{t+1}) + \bm{\psi}_t^\T(\bm{e}_{t+1}-\bm{f}_t) \nonumber\\[2pt]
+&= \bm{x}_t^\T \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\T(\bm{e}_{t+1}-\bm{f}_t),
+\label{eq:hedged-net}
+\end{align}
 
-\section{Separate (Currency Overlay) Optimization}
+which we adopt throughout the following portfolio optimization formulations, as it makes the asset weights $\bm{x}_t$ and the net currency exposures $\bm{\psi}_t$ the explicit variables of the optimization.
 
-\section{Joint Optimization}
+\section{Mean-Variance Formulation} \label{sec:mv-formulation}
+
+\section{Expected Shortfall Formulation} \label{sec:es-formulation}
+
+\section{Regularization} \label{sec:regularization}
+
+\section{Separate (Currency Overlay) Optimization} \label{sec:separate-optimization}
+
+\section{Joint Optimization} \label{sec:joint-optimization}
 
 
 

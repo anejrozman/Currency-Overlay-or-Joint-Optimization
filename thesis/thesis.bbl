@@ -1,10 +1,8 @@
 \begin{thebibliography}{1}
 
-\bibitem{blum1973time}
-Manuel Blum, Robert~W Floyd, Vaughan~R Pratt, Ronald~L Rivest, and Robert~E
-  Tarjan.
-\newblock Time bounds for selection.
-\newblock {\em Journal of Computer and System Sciences}, 7(4):448--461, 1973.
+\bibitem{RegularizedMultiCurrencyExpectedShortfallPortfolios}
+Patrick~Lucescu Urban~Ulrych.
+\newblock Regularized multi-currency expected shortfall portfolios, 2026.
 
 \bibitem{SparseAndStableInternationalPortfolioOptimization}
 Raphael~Burkhardt Urban~Ulrych.
