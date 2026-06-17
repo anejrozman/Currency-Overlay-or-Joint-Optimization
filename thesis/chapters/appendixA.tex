@@ -1,15 +1,36 @@
 \chapter{Optimization Derivation: Expected Shortfall} \label{app:es_derivation}
 
-We derive the equivalence between the direct minimization of Expected Shortfall and the auxiliary formulation proposed by Rockafellar and Uryasev (2000) that allows for formulating the optimization as a linear program.
+In this appendix, we derive the optimization problems used in the main text,
+building up from the Expected Shortfall objective to the implementable
+quadratic programs solved in the empirical analysis.
+In \Cref{app:es_auxiliary_formulation} we follow \cite{RockafellarUryasev2000} to derive the equivalence between direct
+minimization of Expected Shortfall and an auxiliary formulation suitable for linear programming.
+Following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, in \Cref{app:linear-program-representation} 
+we embed this equivalence in a mean-ES objective,
+by replacing the conditional expectation with its empirical counterpart, and linearizing the
+terms to assemble the base unregularized portfolio optimization problem as a linear
+program.
+In \Cref{app:regularization} we introduce three regularization techniques, an $L_1$
+penalty, an $L_2$ penalty, and a leverage constraint, giving us the 
+base regularized quadratic program for portfolio optimization.
+In \Cref{app:separate-optimization} we extend the framework to the multi-currency setting
+under the separate (currency overlay) approach, deriving the asset and the currency quadratic programs.
+Finally, in \Cref{app:joint-optimization} we derive the joint quadratic program formulation, 
+in which asset and currency weights are optimized simultaneously
+through a single Expected Shortfall term that captures the combined return distribution.
 
-We assume that the loss distribution is continuous, meaning the loss cumulative distribution function has no jumps and the probability density function $f(l)$ exists. Under these assumptions, Value-at-Risk (VaR) is uniquely defined.
+\section{Derivation of the Auxiliary Expected Shortfall Formulation} \label{app:es_auxiliary_formulation}
 
-Define the loss random variable at time $t+1$ given portfolio weights $x_t$ as $L(x_t) = -x_t^T R_{t+1}$. Let $f(l)$ denote the probability density function of the loss $L(x_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
+We derive the equivalence between the direct minimization of Expected Shortfall and the auxiliary formulation proposed by Rockafellar and Uryasev \cite{RockafellarUryasev2000} that allows for formulating the portfolio optimization as a linear program.
+
+We assume that the loss distribution is continuous, meaning the loss cumulative distribution function has no jumps and the probability density function $f(l)$ exists. Under these assumptions, Value-at-Risk (VaR) is uniquely defined \cite{QuantitativeRiskManagement2016}.
+
+Define the loss random variable at time $t+1$, given portfolio weights $x_t$, as $L(x_t) = -x_t^T R_{t+1}$. Let $f(l)$ denote the probability density function of the loss $L(x_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
 \begin{equation*}
     \text{VaR}_\beta(x_t) = \min \{ \alpha : \mathbb{P}(L(x_t) \le \alpha) \ge \beta \}.
 \end{equation*}
 
-The Expected Shortfall is defined as the conditional expectation of losses exceeding VaR
+The Expected Shortfall at confidence level $\beta$ is defined as the conditional expectation of losses exceeding $\text{VaR}_\beta$
 \begin{equation*}
     \text{ES}_\beta(x_t) = \mathbb{E}[L(x_t) \mid L(x_t) \ge \text{VaR}_\beta(x_t)] = \frac{1}{1-\beta} \int_{\text{VaR}_\beta(x_t)}^\infty l f(l) \, dl.
 \end{equation*}
@@ -64,150 +85,427 @@ Recognizing that $\int_{\text{VaR}_\beta(x_t)}^\infty f(l) \, dl = \mathbb{P}(L(
 \end{align*}
 
 Thus, minimizing $\text{ES}_\beta(x_t)$ with respect to $x_t$ is equivalent to minimizing $F_\beta(x_t, \alpha)$ jointly with respect to $x_t$ and $\alpha$
-\begin{equation*} \label{eq:joint_opt}
+\begin{equation} \label{eq:joint_opt}
     \min_{x_t} \text{ES}_\beta(x_t) = \min_{x_t, \alpha} \left( \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(-x_t^T R_{t+1} - \alpha)^+] \right).
-\end{equation*}
+\end{equation}
 
-Finally, we observe that $F_\beta(x_t, \alpha)$ is jointly convex in $(x_t, \alpha)$. The term $\alpha$ is linear (hence convex). The inner map $(x_t, \alpha) \mapsto (-x_t^\top R_{t+1} - \alpha)$ is affine. The outer function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex nondecreasing function with an affine map is convex. Thus $(-x_t^\top R_{t+1} - \alpha)^+$ is jointly convex in $(x_t, \alpha)$. Taking the expectation preserves convexity.
+Finally, we observe that $F_\beta(x_t, \alpha)$ is jointly convex in $(x_t, \alpha)$. The term $\alpha$ is linear (hence convex). The inner map $(x_t, \alpha) \mapsto (-x_t^\top R_{t+1} - \alpha)$ is affine. The outer function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite{boyd2004convex}. Thus $(-x_t^\top R_{t+1} - \alpha)^+$ is jointly convex in $(x_t, \alpha)$. Taking the expectation preserves convexity.
 
 
 Since the objective function is convex, any local minimum is global, ensuring that optimization algorithms will converge efficiently to the optimal solution.
 
-\section{Walk-Forward Backtesting Framework}
+\section{Linear Program Representation of Portfolio Optimization} \label{app:linear-program-representation} % another possible title: Linear program representation of portfolio optimization
 
-Building upon the continuous equivalence derived in Appendix \ref{app:es_derivation} and following the optimization framework in the original paper (Ulyrch, Lucescu 2026), this section details the precise matrix formulations required to solve the regularized multi-currency Expected Shortfall models. By linearizing the $L_1$ penalty and discretizing the ES computations, we map both the separate overlay and joint optimization frameworks into standard Quadratic Programs of the form
-\begin{equation} \label{eq:standard_qp}
-    \min_{\tilde{z}} \left( \tilde{c}^T \tilde{z} + \frac{1}{2} \tilde{z}^T \tilde{Q} \tilde{z} \right) \quad \text{subject to} \quad \tilde{D} \tilde{z} = \tilde{E}, \quad \tilde{A} \tilde{z} \le b, \quad \tilde{z} \ge 0,
-\end{equation}
-where $\tilde{z}$ is an augmented decision vector containing the portfolio weights and all necessary auxiliary variables.
-
-\section{Sample-Based Expected Shortfall}
-
-In practice, the conditional expectation from the ES objective is approximated using $q$ historical joint return observations. Let $R_{\text{data}} \in \mathbb{R}^{q \times N}$ be the matrix of historical asset returns, where each row $R_k^T$ represents the return vector at time $k$. The sample-based objective becomes:
+The equivalence in \eqref{eq:joint_opt} reduces Expected Shortfall minimization to the
+jointly convex program
 \begin{equation*}
-    \min_{x_t, \alpha} \left( - \mu^T x_t + \gamma \alpha + \frac{\gamma}{q(1-\beta)} \sum_{k=1}^q (-R_k^T x_t - \alpha)^+ \right).
+    \min_{x_t} \text{ES}_\beta(x_t)
+    = \min_{x_t, \alpha} \left( \alpha + \frac{1}{1-\beta}
+    \mathbb{E}_t[(-x_t^\top R_{t+1} - \alpha)^+] \right).
+\end{equation*}
+This formulation is not yet appropriate for portfolio optimization, as it only optimizes for downside risk, without
+taking into account the expected return of the portfolio. It also depends on the unknown
+expectation $\mathbb{E}_t[\cdot]$. We address this by incorporating the expected return into the optimization
+objective and replacing the expectation with its empirical counterpart, which yields a finite dimensional linear program.
+
+Following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} and \cite{goldberg2013minimizingshortfall}, we trade off expected return against %
+downside risk through a relative risk-aversion coefficient $\gamma > 0$,
+\begin{equation} \label{eq:mean_es}
+    x_t^* = \arg\min_{x_t} \left\{ -\mu_t^\top x_t + \frac{\gamma}{2}
+    \text{ES}_\beta(R_{P,t+1}) \right\}, \quad \text{s.t. } x_t^\top \mathbf{1}_N = 1,
+\end{equation}
+where $\mu_t$ denotes the asset return mean estimator and the budget constraint
+$x_t^\top \mathbf{1}_N = 1$ enforces full investment. Substituting the auxiliary
+representation of $\text{ES}_\beta$ into \eqref{eq:mean_es} gives
+\begin{equation*}
+    x_t^*, \alpha^* = \arg\min_{x_t, \alpha} \left\{ -\mu_t^\top x_t
+    + \frac{\gamma}{2} \alpha
+    + \frac{\gamma}{2(1-\beta)} \mathbb{E}_t[(-x_t^\top R_{t+1} - \alpha)^+] \right\}.
 \end{equation*}
 
-To linearize the maximum operator $(\cdot)^+$, Rockafellar and Uryasev (2000) introduce a $q$-dimensional vector of auxiliary variables $u \in \mathbb{R}^q$, where $u_k = (-R_k^T x_t - \alpha)^+$. This implies two conditions for each sample $k$:
+Let $y_1, \dots, y_q \in \mathbb{R}^N$ denote $q$ historical realizations of the joint
+return vector $R_{t+1}$. We approximate the conditional expectation by the empirical
+average over this sample,
+\begin{equation*}
+    \mathbb{E}_t[(-x_t^\top R_{t+1} - \alpha)^+]
+    \approx \frac{1}{q} \sum_{k=1}^q (-x_t^\top y_k - \alpha)^+,
+\end{equation*}
+so that the optimization problem becomes
+\begin{equation} \label{eq:empirical_es}
+    x_t^*, \alpha^* = \arg\min_{x_t, \alpha} \left\{ -\mu_t^\top x_t
+    + \frac{\gamma}{2} \alpha
+    + \frac{\gamma}{2q(1-\beta)} \sum_{k=1}^q (-x_t^\top y_k - \alpha)^+ \right\},
+    \quad \text{s.t. } x_t^\top \mathbf{1}_N = 1.
+\end{equation}
+
+The summand $(-x_t^\top y_k - \alpha)^+$ is convex but non-linear. We linearize it by
+introducing, for each observation $k$, an auxiliary variable $u_k \ge 0$ subject to
+\begin{equation*}
+    u_k \ge -x_t^\top y_k - \alpha
+    \qquad \Longleftrightarrow \qquad
+    x_t^\top y_k + \alpha + u_k \ge 0.
+\end{equation*}
+Since the objective in \eqref{eq:empirical_es} is strictly increasing in each $u_k$
+(its coefficient $\tfrac{\gamma}{2q(1-\beta)} > 0$) and minimized, every $u_k$ is driven
+to its lower bound at the optimum, so $u_k^* = (-x_t^\top y_k - \alpha)^+$. The slack
+constraints therefore reproduce the term $(-x_t^\top y_k - \alpha)^+$ while keeping all
+relations linear.
+
+
+By collecting the decision variables in the vector
+\begin{equation*}
+    \tilde{x}_t = [x_{1,t}, \dots, x_{N,t}, \alpha, u_1, \dots, u_q]^\top
+    = [x_t^\top, \alpha, u^\top]^\top \in \mathbb{R}^{(N+q+1)},
+\end{equation*}
+and constants in the vector
+\begin{equation*}
+    c = \begin{bmatrix} -\mu_t^\top, &  \dfrac{\gamma}{2}, & \dfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
+\end{equation*}
+the optimization problem \eqref{eq:empirical_es} can be written as a linear program
+\begin{equation} \label{eq:base_lp}
+\begin{aligned}
+    & \ \ \tilde{x}_t^* = \arg\min_{\tilde{x}_t} \quad
+     c^\top \tilde{x}_t \\[4pt]
+    \text{s.t.} \quad
+    & D \tilde{x}_t =   
+    \begin{bmatrix} \mathbf{1}_N^\top & 0_{q+1}^\top \end{bmatrix}
+    \tilde{x}_t = E = 1, \\[2pt]
+    & A \tilde{x}_t =
+    \begin{bmatrix} -R^{\text{data}} & -\mathbf{1}_q & -I_q \end{bmatrix}
+    \tilde{x}_t \le b = 0_q, \\[2pt]
+    & \alpha \ge 0, \quad u_j \ge 0 \quad \text{for } j = 1, \dots, q.
+\end{aligned}
+\end{equation}
+Here $D \in \mathbb{R}^{1 \times (N+q+1)}$ encodes the budget constraint, while
+$A \in \mathbb{R}^{q \times (N+q+1)}$ and $b \in \mathbb{R}^{q}$ collect the
+$q$ inequality constraints arising from the Rockafellar and Uryasev (2000)
+representation. The matrix $R^{\text{data}} \in \mathbb{R}^{q \times N}$ stacks the
+sampled return vectors $y_k^\top$ row by row, $0_q$ is the $q$-dimensional zero vector,
+and $I_q$ the $q$-dimensional identity matrix.
+
+Problem \eqref{eq:base_lp} has a linear objective subject to one linear equality and $q$
+linear inequalities, and is thus a linear program solvable with standard methods. This
+formulation serves as the base unregularized portfolio optimization problem under Expected Shortfall. 
+Regularization terms and additional constraints are added in the following section \ref{app:regularization} of the appendix. 
+\section{Regularization} \label{app:regularization}
+
+The base problem \eqref{eq:base_lp} is known to be numerically unstable in
+high-dimensional settings [add citation], producing extreme and concentrated weights. We stabilize it
+with three regularization techniques. An $L_1$-norm penalty that promotes sparsity, an $L_2$-norm penalty
+that promotes shrinkage, and a leverage constraint that bounds gross exposure. Each is
+appended to \eqref{eq:base_lp} while preserving its linear or quadratic structure. The
+$L_1$ penalty and the leverage constraint share a common variable decomposition, which
+we introduce first.
+
+\subsection{$L_1$ Regularization} \label{app:l1}
+
+The $L_1$ penalty $\lambda_1 \|x_t\|_1 = \lambda_1 \sum_{i=1}^N |x_{i,t}|$, with
+$\lambda_1 \ge 0$, is non-linear through the absolute value. Following Roncalli (2013),
+we linearize it by splitting each weight into its positive and negative parts via the
+auxiliary variables $\Delta_{i,t}^+ \ge 0$ and $\Delta_{i,t}^- \ge 0$,
+\begin{equation} \label{eq:l1_decomp}
+    x_{i,t} = \Delta_{i,t}^+ - \Delta_{i,t}^-,
+    \qquad
+    |x_{i,t}| = \Delta_{i,t}^+ + \Delta_{i,t}^-.
+\end{equation}
+The second identity holds at the optimum: minimizing the penalty drives the parts to
+their smallest feasible values, so at most one of $\Delta_{i,t}^+$, $\Delta_{i,t}^-$ is
+non-zero, giving $\Delta_{i,t}^+ = \max(x_{i,t}, 0)$ and
+$\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. The penalty is then linear in the auxiliary
+variables,
+\begin{equation*}
+    \lambda_1 \|x_t\|_1 = \lambda_1 \mathbf{1}_N^\top (\Delta_t^+ + \Delta_t^-).
+\end{equation*}
+
+We extend the decision vector to carry the two parts,
+\begin{equation*}
+    \tilde{x}_t = [\, x_t^\top,\ \alpha,\ u^\top,\ (\Delta_t^-)^\top,\ (\Delta_t^+)^\top \,]^\top
+    \in \mathbb{R}^{3N+q+1},
+\end{equation*}
+and append the penalty coefficients to the cost vector,
+\begin{equation*}
+    \tilde{c} = [\, -\mu_t^\top,\ \tfrac{\gamma}{2},\
+    \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
+    \lambda_1 \mathbf{1}_N^\top,\ \lambda_1 \mathbf{1}_N^\top \,]^\top.
+\end{equation*}
+The decomposition \eqref{eq:l1_decomp} is enforced as $N$ additional linear equality
+constraints, $x_t + \Delta_t^- - \Delta_t^+ = 0_N$, alongside the original budget
+constraint. All relations remain linear, so the optimization problem is still a linear program after the addition of the $L_1$ penalty.
+
+\subsection{$L_2$ Regularization} \label{app:l2}
+
+The $L_2$ penalty $\lambda_2 \|x_t\|_2^2 = \lambda_2 x_t^\top x_t$, with
+$\lambda_2 \ge 0$, is quadratic in the weights and is written as a quadratic form,
+\begin{equation*}
+    \lambda_2 \|x_t\|_2^2 = \tfrac{1}{2}\, x_t^\top Q\, x_t,
+    \qquad Q = 2 \lambda_2 I_N.
+\end{equation*}
+Embedding this in the augmented vector, the penalty becomes
+$\tfrac{1}{2}\, \tilde{x}_t^\top \tilde{Q}\, \tilde{x}_t$ with $\tilde{Q}$ placing the
+block $2\lambda_2 I_N$ on the asset weights and zeros on the auxiliary variables,
+\begin{equation*}
+    \tilde{Q} =
+    \begin{bmatrix}
+        2 \lambda_2 I_N & 0_{N \times (2N+q+1)} \\
+        0_{(2N+q+1) \times N} & 0_{(2N+q+1) \times (2N+q+1)}
+    \end{bmatrix}.
+\end{equation*}
+Adding this term turns the $L_1-$augmented linear objective of the problem \eqref{eq:base_lp} into a quadratic objective
+$\tilde{c}^\top \tilde{x}_t + \tfrac{1}{2}\, \tilde{x}_t^\top \tilde{Q}\, \tilde{x}_t$.
+Since $\tilde{Q}$ is positive semi-definite, the objective remains convex, and the optimization problem becomes a
+quadratic program with linear constraints.
+
+\subsection{Leverage Constraint} \label{app:leverage}
+
+The leverage constraint $\|x_t\|_1 \le \ell$, with $\ell \ge 1$, bounds the portfolio's
+gross exposure and guarantees a bounded feasible region even when $\lambda_1 = 0$. Reusing
+the decomposition \eqref{eq:l1_decomp}, it is expressed as a single linear inequality
+\begin{equation*}
+    \|x_t\|_1 = \mathbf{1}_N^\top (\Delta_t^+ + \Delta_t^-) \le \ell.
+\end{equation*}
+The choice $\ell = 1$ rules out leverage entirely and is equivalent to a hard $L_1$
+constraint. As a linear inequality, it preserves the quadratic program structure.
+
+\subsection{Quadratic Program Representation of the Regularized Portfolio Optimization} \label{app:reg_qp}
+
+Adding all three regularization terms to the base problem \eqref{eq:base_lp}, makes the portfolio optimization problem under Expected Shortfall 
+a quadratic program with linear constraints
+\begin{equation} \label{eq:reg_qp}
+\begin{aligned}
+    \tilde{x}_t^* &= \arg\min_{\tilde{x}_t} \quad
+    \tilde{c}^\top \tilde{x}_t + \tfrac{1}{2}\, \tilde{x}_t^\top \tilde{Q}\, \tilde{x}_t, \\[2pt]
+    \text{s.t.} \quad
+     \tilde{D} \tilde{x}_t &=
+    \begin{bmatrix} \mathbf{1}_N^\top & 0_{q+1}^\top & 0_N^\top & 0_N^\top \\
+    I_N & 0_{N \times (q+1)} & I_N & -I_N \end{bmatrix} \tilde{x}_t
+    = \tilde{E} = \begin{bmatrix} 1 \\ 0_N \end{bmatrix}, \\[6pt]
+     \tilde{A} \tilde{x}_t &=
+    \begin{bmatrix} -R^{\text{data}} & -\mathbf{1}_q & -I_q & O_{q \times N} & O_{q \times N} \\
+    0_N^\top & 0 & 0_q^\top & \mathbf{1}_N^\top & \mathbf{1}_N^\top \end{bmatrix} \tilde{x}_t
+    \le b = \begin{bmatrix} 0_q \\ \ell \end{bmatrix}, \\[6pt]
+    & \alpha \ge 0, \quad u_j \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+    \quad \text{for } i = 1, \dots, N,\ j = 1, \dots, q.
+\end{aligned}
+\end{equation}
+The first row of $\tilde{D}$ enforces the budget constraint and the remaining $N$ rows
+enforce the weight decomposition \eqref{eq:l1_decomp}. The first $q$ rows of $\tilde{A}$
+are the Rockafellar and Uryasev (2000) inequalities extended with zeros for the new
+variables, and the final row imposes the leverage constraint.
+
+\section{Separate (Overlay) Optimization} \label{app:separate-optimization}
+In the separate (currency overlay) approach, the asset and currency allocations are
+optimized in two sequential steps. First, the asset weights $x_t \in \mathbb{R}^N$ are
+chosen on the fully hedged returns, then, conditional on the optimal $x_t^*$, the
+currency exposures $\psi_t \in \mathbb{R}^M$ are optimized.
+Let 
 \begin{align*}
-    u_k &\ge 0 \\
-    u_k &\ge -R_k^T x_t - \alpha.
+\mu^{fh} &= \mathbb{E}[R^{fh}_{t+1}] \in \mathbb{R}^N \\
+\mu^c &= \mathbb{E}[e_{t+1} - f_t] \in \mathbb{R}^M
 \end{align*}
-Rearranging the second condition to isolate the variables yields a standard linear inequality:
-\begin{equation} \label{eq:es_inequality}
-    - R_k^T x_t - \alpha - u_k \le 0 \quad \forall \, k \in \{1, \dots, q\}.
+denote the expected fully hedged asset return and the expected
+excess currency return respectively. The two otimization steps are then given by
+\begin{equation} \label{eq:sep_asset_obj}
+\begin{gathered}
+    x_t^* = \arg\min_{x_t} \left\{ -x_t^\top \mu^{fh}
+    + \tfrac{\gamma}{2} \text{ES}_\beta(x_t^\top R^{fh}_{t+1})
+    + \lambda_1^a \|x_t\|_1 + \lambda_2^a \|x_t\|_2^2 \right\} \\[4pt]
+    \text{s.t. } x_t^\top \mathbf{1}_N = 1,\ \|x_t\|_1 \le \ell,
+\end{gathered}
 \end{equation}
-In block matrix notation across all $q$ samples, this becomes:
-\begin{equation*}
-    -R_{\text{data}} x_t - \mathbf{1}_q \alpha - I_q u \le \mathbf{0}_q,
-\end{equation*}
-where $\mathbf{1}_q$ is a $q$-dimensional vector of ones, $I_q$ is the $q \times q$ identity matrix, and $\mathbf{0}_q$ is a $q$-dimensional vector of zeros. This constructs the first three block columns of the general inequality constraint matrix $\tilde{A}$.
-
-\section{Linearization of the $L_1$ Penalty and Leverage}
-
-The $L_1$ norm $\|x_t\|_1 = \sum_{i=1}^N |x_{i,t}|$ introduces non-differentiability into the objective function. To resolve this, we introduce non-negative auxiliary variables representing the positive and negative components of each asset weight: $\Delta^+_t, \Delta^-_t \in \mathbb{R}^N$ such that $\Delta^+_t \ge 0$ and $\Delta^-_t \ge 0$. 
-
-The weights are decomposed as:
-\begin{equation} \label{eq:weight_decomp}
-    x_t = \Delta^+_t - \Delta^-_t \implies I_N x_t + I_N \Delta^-_t - I_N \Delta^+_t = \mathbf{0}_N.
+\begin{equation}
+    \psi_t^* \mid x_t^* = \arg\min_{\psi_t} \left\{ -\psi_t^\top \mu^c
+    + \tfrac{\gamma}{2} \text{ES}_\beta\!\left( x_t^{*\top} R^{fh}_{t+1}
+    + \psi_t^\top (e_{t+1} - f_t) \right)
+    + \lambda_1^c \|\psi_t\|_1 + \lambda_2^c \|\psi_t\|_2^2 \right\}.
+    \label{eq:sep_curr_obj}
 \end{equation}
-Because the optimization minimizes the penalties, at most one of $\Delta^+_{i,t}$ or $\Delta^-_{i,t}$ will be non-zero for any asset $i$. Therefore, the absolute value is exactly determined by their sum: $|x_{i,t}| = \Delta^+_{i,t} + \Delta^-_{i,t}$.
+The regularization parameters are kept separate across assets ($\lambda_1^a, \lambda_2^a$)
+and currencies ($\lambda_1^c, \lambda_2^c$). 
 
-This allows the $L_1$ penalty term to be formulated linearly in the objective function as $\lambda_1 \mathbf{1}_N^T \Delta^+_t + \lambda_1 \mathbf{1}_N^T \Delta^-_t$. Furthermore, the portfolio leverage constraint $\|x_t\|_1 \le \ell$ transforms into a linear inequality:
-\begin{equation} \label{eq:leverage_inequality}
-    \mathbf{1}_N^T \Delta^+_t + \mathbf{1}_N^T \Delta^-_t \le \ell.
+\subsection{Asset Optimization} \label{app:sep_asset}
+
+The asset step \eqref{eq:sep_asset_obj} is identical to the regularized
+single-currency program \eqref{eq:reg_qp}. It carries a budget constraint, an $L_1$
+and $L_2$ penalty terms, and a leverage constraint.
+It is therefore obtained directly from \eqref{eq:reg_qp} by substituting the matrix of historically sampled fully hedged
+returns $R^{fh}\in \mathbb{R}^{q \times N}$ for $R^{\text{data}}$, the mean $\mu^{fh}$ for $\mu_t$, and the
+asset-specific penalties $\lambda_1^a, \lambda_2^a$. With the augmented vector
+\begin{equation*}
+    \tilde{x}_t = [\, x_t^\top,\ \alpha_x,\ u_x^\top,\
+    (\Delta_{x,t}^-)^\top,\ (\Delta_{x,t}^+)^\top \,]^\top \in \mathbb{R}^{3N+q+1},
+\end{equation*}
+the cost vector and penalty matrix are
+\begin{equation*}
+    \tilde{c} = [\, -(\mu^{fh})^\top,\ \tfrac{\gamma}{2},\
+    \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
+    \lambda_1^a \mathbf{1}_N^\top,\ \lambda_1^a \mathbf{1}_N^\top \,]^\top,
+    \qquad
+    \tilde{Q} =
+    \begin{bmatrix}
+        2 \lambda_2^a I_N & 0_{N \times (2N+q+1)} \\
+        0_{(2N+q+1) \times N} & 0_{(2N+q+1) \times (2N+q+1)}
+    \end{bmatrix},
+\end{equation*}
+and the equality, inequality, and sign constraints are exactly those of
+\eqref{eq:reg_qp} with $R^{fh}$ in place of $R^{\text{data}}$. The step yields the optimal
+asset weights $x_t^*$, which are then fixed in the currency overlay optimization.
+
+\subsection{Currency Overlay Optimization} \label{app:sep_currency}
+
+Conditional on $x_t^*$, the currency step \eqref{eq:sep_curr_obj} minimizes the Expected
+Shortfall of the combined return $x_t^{*\top} R^{fh}_{t+1} + \psi_t^\top (e_{t+1} - f_t)$
+over the currency exposures $\psi_t$. Applying the Rockafellar and Uryasev (2000)
+representation and the empirical approximation as in
+Appendix~\ref{app:linear-program-representation}, we introduce the auxiliary variable
+$\alpha_\psi$ and slacks $u_{k,\psi} \ge 0$. Since the asset leg is now fixed, the
+slack constraint becomes
+\begin{equation*}
+    u_{k,\psi} \ge -\psi_t^\top (e_k - f_t) - x_t^{*\top} R^{fh}_k - \alpha_\psi
+    \quad \Longleftrightarrow \quad
+    -\psi_t^\top (e_k - f_t) - \alpha_\psi - u_{k,\psi} \le x_t^{*\top} R^{fh}_k,
+\end{equation*}
+where $R^{fh}_k$ is the $k$-th sampled fully hedged return vector. The fixed asset-portfolio
+returns therefore appear on the right-hand side. Collecting them in the vector
+$R^{fh}_P = R^{fh} x_t^* \in \mathbb{R}^q$ and linearizing the currency $L_1$ penalty with
+the decomposition $\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in
+Appendix~\ref{app:l1}, we form the augmented vector
+\begin{equation*}
+    \tilde{\psi}_t = [\, \psi_t^\top,\ \alpha_\psi,\ u_\psi^\top,\
+    (\Delta_{\psi,t}^-)^\top,\ (\Delta_{\psi,t}^+)^\top \,]^\top \in \mathbb{R}^{3M+q+1}.
+\end{equation*}
+The currency overlay is then the quadratic program
+\begin{equation} \label{eq:sep_curr_qp}
+\begin{gathered}
+    \psi_t^* = \arg\min_{\tilde{\psi}_t} \quad
+    \tilde{c}^\top \tilde{\psi}_t + \tfrac{1}{2}\, \tilde{\psi}_t^\top \tilde{Q}\, \tilde{\psi}_t, \\[2pt]
+    \tilde{c} = [\, -(\mu^c)^\top,\ \tfrac{\gamma}{2},\
+    \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
+    \lambda_1^c \mathbf{1}_M^\top,\ \lambda_1^c \mathbf{1}_M^\top \,]^\top, \\[4pt]
+    \tilde{Q} =
+    \begin{bmatrix}
+        2 \lambda_2^c I_M & 0_{M \times (2M+q+1)} \\
+        0_{(2M+q+1) \times M} & 0_{(2M+q+1) \times (2M+q+1)}
+    \end{bmatrix}, \\[6pt]
+    \text{s.t.} \quad
+    \tilde{D} \tilde{\psi}_t =
+    \begin{bmatrix} I_M & 0_{M \times (q+1)} & I_M & -I_M \end{bmatrix} \tilde{\psi}_t
+    = \tilde{E} = 0_M, \\[4pt]
+    \tilde{A} \tilde{\psi}_t =
+    \begin{bmatrix} -R^c & -\mathbf{1}_q & -I_q & O_{q \times M} & O_{q \times M} \end{bmatrix}
+    \tilde{\psi}_t \le b = R^{fh}_P = R^{fh} x_t^*, \\[4pt]
+    \alpha_\psi \ge 0, \quad u_{j,\psi} \ge 0, \quad
+    \Delta_{\psi,c,t}^- \ge 0, \quad \Delta_{\psi,c,t}^+ \ge 0
+    \quad \text{for } c = 1, \dots, M,\ j = 1, \dots, q.
+\end{gathered}
 \end{equation}
 
-\section{Quadratic Translation of the $L_2$ Penalty}
+The currency optimization differs from the asset optimization \eqref{eq:reg_qp} in the following ways.
+First, there is no budget constraint, the currency portfolio is a
+zero-investment portfolio, so the domestic exposure $\psi_{0,t}$ is inferred residually and
+the equality block $\tilde{D}$ enforces only the weight decomposition, with right-hand
+side $\tilde{E} = 0_M$ rather than $[1, 0_M^\top]^\top$. Second, the fixed asset leg
+shifts the inequality right-hand side from $0_q$ to $R^{fh}_P = R^{fh} x_t^*$. Third, no
+leverage constraint is imposed on the currency exposures, so $\tilde{A}$ contains only the
+$q$ Rockafellar and Uryasev (2000) rows. The $L_1$ and $L_2$ regularizing terms are
+as before, through the last two blocks of $\tilde{c}$ and the main block of
+$\tilde{Q}$, so the currency overlay remains a convex quadratic program.
 
-Unlike the expected shortfall and $L_1$ terms which map to the linear objective vector $\tilde{c}$, the $L_2$ penalty integrates naturally into the quadratic matrix $\tilde{Q}$. The penalty is defined as:
+\section{Joint Optimization} \label{app:joint-optimization}
+
+In the joint approach, the asset and currency decisions are made simultaneously rather
+than sequentially. We stack them into the combined decision vector
+$\theta_t = (x_t, \psi_t)^\top \in \mathbb{R}^{N+M}$ and the combined return vector
+$R_{t+1} = (R^{fh}_{t+1}, e_{t+1} - f_t)^\top \in \mathbb{R}^{N+M}$, with joint mean
+$\mu = \mathbb{E}[R_{t+1}] \in \mathbb{R}^{N+M}$. The joint problem is
+\begin{equation} \label{eq:joint_obj}
+\begin{gathered}
+    \theta_t^* = \arg\min_{\theta_t} \left\{ -\theta_t^\top \mu
+    + \tfrac{\gamma}{2} \text{ES}_\beta(\theta_t^\top R_{t+1})
+    + \|S_1 \theta_t\|_1 + \|S_2 \theta_t\|_2^2 \right\}, \\[4pt]
+    \text{s.t. } \theta_t^\top q_{N,M} = 1, \quad \|L \theta_t\|_1 \le \ell.
+\end{gathered}
+\end{equation}
+The combined return satisfies
+$\theta_t^\top R_{t+1} = x_t^\top R^{fh}_{t+1} + \psi_t^\top (e_{t+1} - f_t)$, so a single
+Expected Shortfall term now depends jointly on all weights, removing the two-step
+structure of the separate approach.
+
+Four structured objects adapt the single-currency machinery to the joint setting, all
+respecting the asymmetry between assets and currencies:
 \begin{equation*}
-    \lambda_2 \|x_t\|_2^2 = \lambda_2 x_t^T x_t = \frac{1}{2} x_t^T (2 \lambda_2 I_N) x_t.
+    q_{N,M} = \begin{bmatrix} \mathbf{1}_N \\ 0_M \end{bmatrix}, \quad
+    L = \begin{bmatrix} I_N & 0_{N \times M} \\ 0_{M \times N} & 0_{M \times M} \end{bmatrix}, \quad
+    S_1 = \begin{bmatrix} \lambda_1^a I_N & 0 \\ 0 & \lambda_1^c I_M \end{bmatrix}, \quad
+    S_2 = \begin{bmatrix} \sqrt{\lambda_2^a}\, I_N & 0 \\ 0 & \sqrt{\lambda_2^c}\, I_M \end{bmatrix}.
 \end{equation*}
-Thus, the block of $\tilde{Q}$ corresponding to the weights $x_t$ is populated with the diagonal matrix $2 \lambda_2 I_N$, while all auxiliary variables receive zeros.
-
-\section{Separate Optimization (Currency Overlay)}
-
-In the separate approach, asset weights $x_t \in \mathbb{R}^N$ and currency exposures $\psi_t \in \mathbb{R}^M$ are optimized sequentially.
-
-\subsection{Step 1: Asset-Level Optimization}
-The target vector relies on fully hedged asset returns $R^{\text{fh}} \in \mathbb{R}^{q \times N}$. We define the augmented vector of dimension $(3N + q + 1)$:
+The selector $q_{N,M}$ applies the budget constraint to the asset block only, leaving the
+currency exposures as a zero-investment hedge; the diagonal matrix $L$ likewise applies
+the leverage constraint to the assets only, so that $\|L\theta_t\|_1 = \|x_t\|_1$. The
+diagonal regularization matrices $S_1$ and $S_2$ let the asset and currency penalties
+differ within one objective,
 \begin{equation*}
-    \tilde{x}_t = \begin{pmatrix} x_t^T, & \alpha, & u^T, & (\Delta_t^-)^T, & (\Delta_t^+)^T \end{pmatrix}^T.
+    \|S_1 \theta_t\|_1 = \lambda_1^a \|x_t\|_1 + \lambda_1^c \|\psi_t\|_1,
+    \qquad
+    \|S_2 \theta_t\|_2^2 = \lambda_2^a \|x_t\|_2^2 + \lambda_2^c \|\psi_t\|_2^2,
 \end{equation*}
+where the square roots in $S_2$ ensure the squared norm reproduces the intended
+coefficients $\lambda_2^a, \lambda_2^c$.
 
-The objective vector $\tilde{c}$ and quadratic matrix $\tilde{Q}$ are constructed as:
+We apply the Rockafellar and Uryasev (2000) representation and the empirical approximation
+of Appendix~\ref{app:linear-program-representation} once to the joint return
+$\theta_t^\top R_{t+1}$, introducing the auxiliary variable $\alpha$ and slacks
+$u_k \ge 0$, and linearize the $L_1$ penalty by decomposing all $N+M$ components of
+$\theta_t$ into positive and negative parts as in Appendix~\ref{app:l1}. Collecting the
+asset and currency parts separately, we form the augmented vector
 \begin{equation*}
-    \tilde{c} = \begin{pmatrix} -\mu_{\text{fh}} \\ \gamma \\ \frac{\gamma}{q(1-\beta)} \mathbf{1}_q \\ \lambda_1^a \mathbf{1}_N \\ \lambda_1^a \mathbf{1}_N \end{pmatrix}, \quad 
-    \tilde{Q} = \begin{pmatrix} 2\lambda_2^a I_N & O \\ O & O \end{pmatrix},
+    \tilde{\theta}_t = [\, x_t^\top,\ \psi_t^\top,\ \alpha,\ u^\top,\
+    (\Delta_{x,t}^-)^\top,\ (\Delta_{\psi,t}^-)^\top,\
+    (\Delta_{x,t}^+)^\top,\ (\Delta_{\psi,t}^+)^\top \,]^\top
+    \in \mathbb{R}^{3N+3M+q+1}.
 \end{equation*}
-where $O$ represents zero matrices of appropriate dimensions. The equality constraints enforce the budget condition $\mathbf{1}_N^T x_t = 1$ and the variable decomposition from Equation \ref{eq:weight_decomp}:
-\begin{equation*}
-    \tilde{D} = \begin{pmatrix} 
-    \mathbf{1}_N^T & 0 & \mathbf{0}_q^T & \mathbf{0}_N^T & \mathbf{0}_N^T \\ 
-    I_N & \mathbf{0}_N & O_{N \times q} & I_N & -I_N 
-    \end{pmatrix}, \quad 
-    \tilde{E} = \begin{pmatrix} 1 \\ \mathbf{0}_N \end{pmatrix}.
-\end{equation*}
+With $R^{\text{all}} = [\, R^{fh} \ \ R^c \,] \in \mathbb{R}^{q \times (N+M)}$ the matrix of
+jointly sampled asset and currency returns, the joint problem is the quadratic program
+\begin{equation} \label{eq:joint_qp}
+\begin{gathered}
+    \tilde{\theta}_t^* = \arg\min_{\tilde{\theta}_t} \quad
+    \tilde{c}^\top \tilde{\theta}_t + \tfrac{1}{2}\, \tilde{\theta}_t^\top \tilde{Q}\, \tilde{\theta}_t, \\[4pt]
+    \tilde{c} = [\, -\mu^\top,\ \tfrac{\gamma}{2},\
+    \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
+    \lambda_1^a \mathbf{1}_N^\top,\ \lambda_1^c \mathbf{1}_M^\top,\
+    \lambda_1^a \mathbf{1}_N^\top,\ \lambda_1^c \mathbf{1}_M^\top \,]^\top, \\[4pt]
+    \tilde{Q} =
+    \begin{bmatrix}
+        2 \lambda_2^a I_N & 0 & 0 \\
+        0 & 2 \lambda_2^c I_M & 0 \\
+        0 & 0 & 0_{(2N+2M+q+1) \times (2N+2M+q+1)}
+    \end{bmatrix}, \\[6pt]
+    \text{s.t.} \quad
+    \tilde{D} \tilde{\theta}_t =
+    \begin{bmatrix} q_{N,M}^\top & 0_{q+1}^\top & 0_{N+M}^\top & 0_{N+M}^\top \\
+    I_{N+M} & 0_{(N+M) \times (q+1)} & I_{N+M} & -I_{N+M} \end{bmatrix} \tilde{\theta}_t
+    = \tilde{E} = \begin{bmatrix} 1 \\ 0_{N+M} \end{bmatrix}, \\[6pt]
+    \tilde{A} \tilde{\theta}_t =
+    \begin{bmatrix} -R^{\text{all}} & -\mathbf{1}_q & -I_q & O_{q \times (N+M)} & O_{q \times (N+M)} \\
+    0_{N+M}^\top & 0_{q+1}^\top & q_{N,M}^\top & q_{N,M}^\top \end{bmatrix} \tilde{\theta}_t
+    \le b = \begin{bmatrix} 0_q \\ \ell \end{bmatrix}, \\[6pt]
+    \alpha \ge 0, \quad u_j \ge 0, \quad
+    \Delta_{x,i,t}^\pm \ge 0, \quad \Delta_{\psi,c,t}^\pm \ge 0
+    \quad \text{for } i = 1, \dots, N,\ c = 1, \dots, M,\ j = 1, \dots, q.
+\end{gathered}
+\end{equation}
+The first row of $\tilde{D}$ imposes the asset budget through the selector
+$q_{N,M}^\top = [\mathbf{1}_N^\top,\ 0_M^\top]$, and the remaining $N+M$ rows enforce the
+weight decomposition for the combined vector. In $\tilde{A}$, the first $q$ rows are the
+Rockafellar and Uryasev (2000) inequalities on the joint return matrix
+$R^{\text{all}}$, with right-hand side $0_q$ — in contrast to the conditional currency
+step \eqref{eq:sep_curr_qp}, no asset leg is pre-fixed, so nothing shifts to the
+right-hand side. The final row imposes the asset-only leverage constraint, where
+$q_{N,M}^\top$ again selects the asset parts of the decomposition, giving
+$\mathbf{1}_N^\top(\Delta_{x,t}^+ + \Delta_{x,t}^-) = \|x_t\|_1 \le \ell$.
 
-The inequality matrix $\tilde{A}$ and bound vector $b$ encode the shortfall losses from Equation \ref{eq:es_inequality} and the leverage limit from Equation \ref{eq:leverage_inequality}:
-\begin{equation*}
-    \tilde{A} = \begin{pmatrix} 
-    -R^{\text{fh}} & -\mathbf{1}_q & -I_q & O_{q \times N} & O_{q \times N} \\
-    \mathbf{0}_N^T & 0 & \mathbf{0}_q^T & \mathbf{1}_N^T & \mathbf{1}_N^T 
-    \end{pmatrix}, \quad 
-    b = \begin{pmatrix} \mathbf{0}_q \\ \ell \end{pmatrix}.
-\end{equation*}
-
-\subsection{Step 2: Currency-Level Optimization}
-Conditional on the optimal asset weights $x_t^*$, the currency exposures $\psi_t$ are optimized. Using historical excess currency returns $R^c \in \mathbb{R}^{q \times M}$, the augmented vector becomes $\tilde{\psi}_t \in \mathbb{R}^{(3M + q + 1)}$.
-
-Because currency overlays act as zero-investment portfolios, there is no budget constraint. Additionally, the pre-fixed asset portfolio returns ($R^{\text{fh}} x_t^*$) must be subtracted from the shortfall inequality constraint boundaries. Thus, the formulations shift to:
-\begin{equation*}
-    \tilde{D}_{\psi} = \begin{pmatrix} 
-    I_M & \mathbf{0}_M & O_{M \times q} & I_M & -I_M 
-    \end{pmatrix}, \quad \tilde{E}_{\psi} = \mathbf{0}_M,
-\end{equation*}
-\begin{equation*}
-    \tilde{A}_{\psi} = \begin{pmatrix} 
-    -R^c & -\mathbf{1}_q & -I_q & O_{q \times M} & O_{q \times M} 
-    \end{pmatrix}, \quad b_{\psi} = R^{\text{fh}} x_t^*.
-\end{equation*}
-
-\section{Joint Optimization Framework}
-
-The joint formulation merges assets and currencies into a single decision vector $\theta_t = (x_t^T, \psi_t^T)^T \in \mathbb{R}^{N+M}$, evaluated over the joint return block matrix $R^{\text{all}} = \begin{pmatrix} R^{\text{fh}} & R^c \end{pmatrix} \in \mathbb{R}^{q \times (N+M)}$.
-
-We construct an expansive augmented vector $\tilde{\theta}_t \in \mathbb{R}^{(3N + 3M + q + 1)}$:
-\begin{equation*}
-    \tilde{\theta}_t = \begin{pmatrix} x_t^T, & \psi_t^T, & \alpha, & u^T, & (\Delta_{x,t}^-)^T, & (\Delta_{\psi,t}^-)^T, & (\Delta_{x,t}^+)^T, & (\Delta_{\psi,t}^+)^T \end{pmatrix}^T.
-\end{equation*}
-
-The objective vector applies separate $L_1$ penalty parameters ($\lambda_1^a$ for assets, $\lambda_1^c$ for currencies):
-\begin{equation*}
-    \tilde{c} = \begin{pmatrix} -\mu_{\text{fh}} \\ -\mu_c \\ \gamma \\ \frac{\gamma}{q(1-\beta)} \mathbf{1}_q \\ \lambda_1^a \mathbf{1}_N \\ \lambda_1^c \mathbf{1}_M \\ \lambda_1^a \mathbf{1}_N \\ \lambda_1^c \mathbf{1}_M \end{pmatrix}, \quad 
-    \tilde{Q} = \begin{pmatrix} 
-    2\lambda_2^a I_N & O & O \\ 
-    O & 2\lambda_2^c I_M & O \\ 
-    O & O & O 
-    \end{pmatrix}.
-\end{equation*}
-
-The budget constraint applies strictly to the asset weights, while the decomposition constraints apply to both assets and currencies. 
-\begin{equation*}
-    \tilde{D} = \begin{pmatrix} 
-    \mathbf{1}_N^T & \mathbf{0}_M^T & 0 & \mathbf{0}_q^T & \mathbf{0}_{N+M}^T & \mathbf{0}_{N+M}^T \\ 
-    I_{N+M} & & \mathbf{0}_{N+M} & O_{(N+M) \times q} & I_{N+M} & -I_{N+M} 
-    \end{pmatrix}, \quad 
-    \tilde{E} = \begin{pmatrix} 1 \\ \mathbf{0}_{N+M} \end{pmatrix}.
-\end{equation*}
-
-Finally, the inequality matrix binds the unified shortfall distribution and enforces the leverage limit solely on the gross asset exposure:
-\begin{equation*}
-    \tilde{A} = \begin{pmatrix} 
-    -R^{\text{all}} & -\mathbf{1}_q & -I_q & O_{q \times (2N+2M)} \\
-    \mathbf{0}_{N+M}^T & 0 & \mathbf{0}_q^T & \begin{pmatrix} \mathbf{1}_N^T & \mathbf{0}_M^T \end{pmatrix} & \begin{pmatrix} \mathbf{1}_N^T & \mathbf{0}_M^T \end{pmatrix}
-    \end{pmatrix}, \quad 
-    b = \begin{pmatrix} \mathbf{0}_q \\ \ell \end{pmatrix}.
-\end{equation*}
-Solving this comprehensive quadratic program yields the optimal regularized asset and currency allocations concurrently.
+The joint formulation thus solves a single quadratic program over the combined vector,
+capturing the dependencies between asset and currency exposures directly through the
+joint Expected Shortfall term and the off-diagonal return covariation embedded in
+$R^{\text{all}}$. This comes at the cost of a higher-dimensional problem
+($3N + 3M + q + 1$ variables) relative to the two smaller programs of the separate
+approach, which is the trade-off examined empirically in the main text.

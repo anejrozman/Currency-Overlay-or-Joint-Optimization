@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  14 JUN 2026 17:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  17 JUN 2026 15:41
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1364,12 +1364,12 @@ Package hyperref Info: Link coloring ON on input line 162.
 \@outlinefile=\write5
 \openout5 = `thesis.out'.
 
-<logos/UZHlogo.pdf, id=236, 154.5775pt x 49.18375pt>
+<logos/UZHlogo.pdf, id=248, 154.5775pt x 49.18375pt>
 File: logos/UZHlogo.pdf Graphic file (type pdf)
 <use logos/UZHlogo.pdf>
 Package pdftex.def Info: logos/UZHlogo.pdf  used on input line 171.
 (pdftex.def)             Requested size: 154.5771pt x 49.18361pt.
-<logos/ETHlogo.pdf, id=237, 179.67125pt x 45.16875pt>
+<logos/ETHlogo.pdf, id=249, 179.67125pt x 45.16875pt>
 File: logos/ETHlogo.pdf Graphic file (type pdf)
 <use logos/ETHlogo.pdf>
 Package pdftex.def Info: logos/ETHlogo.pdf  used on input line 171.
@@ -1480,14 +1480,74 @@ Package microtype Info: Loading generic protrusion settings for font family
 
 [4{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-mathex.enc}]
 
-[5]) (./chapters/data_and_implementation.tex
+[5]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <9> on input line 166.
+
+
+LaTeX Warning: Citation `Michaud1989' on page 6 undefined on input line 180.
+
+
+LaTeX Warning: Citation `DeMiguel2009b' on page 6 undefined on input line 180.
+
+
+LaTeX Warning: Citation `Tibshirani1996' on page 6 undefined on input line 187.
+
+
+LaTeX Warning: Citation `DeMiguel2009a' on page 6 undefined on input line 187.
+
+
+Overfull \hbox (45.03255pt too wide) detected at line 199
+[]   [] []  [] \OMS/lmsy/m/n/10.95 ^^@ \U/msb/m/n/10.95 E  [] \OT1/lmr/m/n/10.95 + \OML/lmm/m/it/10.95 ^^U[]\OMS/lmsy/m/n/10.95 k\OML/lmm/b/it/10.95 x[]\OMS/lmsy/m/n/10.95 k[] \OT1/lmr/m/n/10.95 + \OML/lmm/m/it/10.95 ^^U[]\OMS/lmsy/m/n/10.95 k\OML/lmm/b/it/10.95 x[]\OMS/lmsy/m/n/10.95 k[] \OT1/lmr/m/n/10.95 + \OML/lmm/m/it/10.95 ^^U[]\OMS/lmsy/m/n/10.95 k\OML/lmm/b/it/10.95  []\OMS/lmsy/m/n/10.95 k[] \OT1/lmr/m/n/10.95 + \OML/lmm/m/it/10.95 ^^U[]\OMS/lmsy/m/n/10.95 k\OML/lmm/b/it/10.95  []\OMS/lmsy/m/n/10.95 k[]\OML/lmm/m/it/10.95 ;  [] \OT1/lmr/bx/n/10.95 1[]\OML/lmm/b/it/10.95 x[] \OT1/lmr/m/n/10.95 = 1\OML/lmm/m/it/10.95 ;   \OMS/lmsy/m/n/10.95 k\OML/lmm/b/it/10.95 x[]\OMS/lmsy/m/n/10.95 k[] ^^T \OML/lmm/m/it/10.95 `;
+ []
+
+
 
 [6]
 
-LaTeX Warning: Reference `chap:model-free-returns' on page 7 undefined on input line 9.
+LaTeX Warning: Citation `Tibshirani1996' on page 7 undefined on input line 208.
 
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <9> on input line 27.
+
+LaTeX Warning: Citation `Brodie2009' on page 7 undefined on input line 211.
+
+
+LaTeX Warning: Citation `Daubechies2004' on page 7 undefined on input line 213.
+
+
+LaTeX Warning: Citation `DeMiguel2009a' on page 7 undefined on input line 213.
+
+
+LaTeX Warning: Citation `Li2015' on page 7 undefined on input line 219.
+
+
+LaTeX Warning: Citation `LedoitWolf2004' on page 7 undefined on input line 221.
+
+
+LaTeX Warning: Citation `Merton1980' on page 7 undefined on input line 226.
+
+
+LaTeX Warning: Citation `DeMiguel2009b' on page 7 undefined on input line 226.
+
+
+LaTeX Warning: Citation `Jorion1986' on page 7 undefined on input line 227.
+
+
+LaTeX Warning: Citation `Li2015' on page 7 undefined on input line 231.
+
+
+LaTeX Warning: Citation `LedoitWolf2004' on page 7 undefined on input line 233.
+
+
+LaTeX Warning: Citation `Ammann2016' on page 7 undefined on input line 240.
+
+) (./chapters/data_and_implementation.tex
+
+[7]
+
+[8]
+
+LaTeX Warning: Reference `chap:model-free-returns' on page 9 undefined on input line 9.
+
 LaTeX Font Info:    Trying to load font information for T1+lmtt on input line 27.
 (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/t1lmtt.fd
 File: t1lmtt.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
@@ -1516,26 +1576,26 @@ Package microtype Info: Loading generic protrusion settings for font family
 (microtype)             See the microtype manual for details.
 
 
-[7
+[9
 
 ]
 
-[8
+[10
 pdfTeX warning (ext4): destination with the same identifier (name{figure.4.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.125 
       ]) (./chapters/empirical_analysis_and_baseline_results.tex
 
-[9]
+[11]
 
-LaTeX Warning: Reference `chap:model-free-returns' on page 10 undefined on input line 3.
-
-
-LaTeX Warning: Reference `todo' on page 10 undefined on input line 3.
+LaTeX Warning: Reference `chap:model-free-returns' on page 12 undefined on input line 3.
 
 
-LaTeX Warning: Reference `todo' on page 10 undefined on input line 70.
+LaTeX Warning: Reference `todo' on page 12 undefined on input line 3.
+
+
+LaTeX Warning: Reference `todo' on page 12 undefined on input line 70.
 
 
 Overfull \hbox (11.55086pt too wide) in paragraph at lines 81--81
@@ -1543,97 +1603,121 @@ Overfull \hbox (11.55086pt too wide) in paragraph at lines 81--81
  []
 
 
-LaTeX Warning: Reference `todo' on page 10 undefined on input line 145.
+LaTeX Warning: Reference `todo' on page 12 undefined on input line 145.
 
 ) (./chapters/convex_risk_measures.tex
 
-[10
+[12
 
 ]
 
-[11
+[13
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.1 \chapter
             {Convex Risk Measures}\label{chap:convex-risk-measures}]
 
-[12
+[14
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.1 \chapter
             {Convex Risk Measures}\label{chap:convex-risk-measures}]) (./chapters/end_to_end_portfolio_optimization.tex
 
-[13
+[15
 
 ]) (./chapters/results.tex) (./chapters/conclusion.tex
 
-[14
-
-])
-
-[15
-
-]
-
 [16
 
-] (./chapters/appendixA.tex
+])
 
 [17
 
 ]
 
-[18]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <14.4> on input line 106.
+[18
 
+] (./chapters/appendixA.tex
 
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 106.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 106.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 106.
+LaTeX Warning: Citation `QuantitativeRiskManagement2016' on page 19 undefined on input line 26.
 
 
 
-[19]
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 121.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `subscript' on input line 121.
-
-
-Package hyperref Warning: Token not allowed in a PDF string (Unicode):
-(hyperref)                removing `math shift' on input line 121.
-
-
-
-[20]) (./chapters/appendixB.tex
-
-[21]) (./chapters/appendixC.tex
-
-[22
+[19
 
 ]
 
-LaTeX Warning: Citation `Li2015' on page 23 undefined on input line 3.
+[20]
+
+LaTeX Warning: Citation `boyd2004convex' on page 21 undefined on input line 92.
 
 
-LaTeX Warning: Reference `chap:model-free-returns' on page 23 undefined on input line 3.
+LaTeX Warning: Citation `goldberg2013minimizingshortfall' on page 21 undefined on input line 111.
 
 
 
-[23
+[21]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <12> on input line 200.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 200.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 200.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 200.
+
+
+
+[22]
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 235.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `subscript' on input line 235.
+
+
+Package hyperref Warning: Token not allowed in a PDF string (Unicode):
+(hyperref)                removing `math shift' on input line 235.
+
+
+
+[23]
+
+[24]
+
+[25]
+Overfull \hbox (2.15044pt too wide) detected at line 440
+\OML/lmm/m/it/10.95 q[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  L \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 :
+ []
+
+
+
+[26]) (./chapters/appendixB.tex
+
+[27]) (./chapters/appendixC.tex
+
+[28
+
+]
+
+LaTeX Warning: Citation `Li2015' on page 29 undefined on input line 3.
+
+
+LaTeX Warning: Reference `chap:model-free-returns' on page 29 undefined on input line 3.
+
+
+
+[29
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{equation.C.1}) has been already used, duplicate ignored
@@ -1642,26 +1726,26 @@ pdfTeX warning (ext4): destination with the same identifier (name{equation.C.1})
 l.26 \begin{align*}
                    ]
 
-LaTeX Warning: Citation `Jones2002' on page 24 undefined on input line 56.
+LaTeX Warning: Citation `Jones2002' on page 30 undefined on input line 56.
 
 
-LaTeX Warning: Citation `NeelyWellerUlrich2009' on page 24 undefined on input line 56.
+LaTeX Warning: Citation `NeelyWellerUlrich2009' on page 30 undefined on input line 56.
 
 ) (./chapters/appendixD.tex
 
-[24])
+[30])
 
-[25
+[31
 
 ] (./thesis.bbl
 bibitemlist
 )
-<declaration-originality.pdf, id=510, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=602, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 212.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=512, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=604, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 212.
@@ -1672,7 +1756,7 @@ Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 
 (pdftex.def)             Requested size: 597.57834pt x 845.1138pt.
 
 
-[26
+[32
 
 
 ]
@@ -1690,7 +1774,7 @@ File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 212.
 (pdftex.def)             Requested size: 597.57834pt x 845.1138pt.
-[27
+[33
 
  <./declaration-originality.pdf>]
 \tf@thm=\write6
@@ -1709,21 +1793,21 @@ L3 programming layer <2020/03/25>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 9EEF509C9702B1665857F708866FC80A;11315.
+(rerunfilecheck)             Checksum: 17490BCC7EF712A067582E8A5E46DFC2;11845.
  ) 
 Here is how much of TeX's memory you used:
- 39494 strings out of 473190
- 765372 string characters out of 5715800
- 1283952 words of memory out of 5000000
- 61506 multiletter control sequences out of 15000+600000
- 736293 words of font info for 311 fonts, out of 8000000 for 9000
+ 39589 strings out of 473190
+ 766786 string characters out of 5715800
+ 1285952 words of memory out of 5000000
+ 61550 multiletter control sequences out of 15000+600000
+ 737667 words of font info for 327 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,17n,125p,1439b,890s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (32 pages, 766225 bytes).
+</usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on thesis.pdf (38 pages, 808286 bytes).
 PDF statistics:
- 723 PDF objects out of 1000 (max. 8388607)
- 582 compressed objects within 6 object streams
- 103 named destinations out of 1000 (max. 500000)
- 100894 words of extra memory for PDF output out of 106986 (max. 10000000)
+ 831 PDF objects out of 1000 (max. 8388607)
+ 678 compressed objects within 7 object streams
+ 122 named destinations out of 1000 (max. 500000)
+ 100918 words of extra memory for PDF output out of 106986 (max. 10000000)
 

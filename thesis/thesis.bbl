@@ -10,6 +10,11 @@ Harry Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
 
+\bibitem{RockafellarUryasev2000}
+R.~Tyrrell Rockafellar and Stanislav Uryasev.
+\newblock Optimization of conditional value-at-risk.
+\newblock {\em Journal of Risk}, None(None):None, None None.
+
 \bibitem{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 Patrick~Lucescu Urban~Ulrych.
 \newblock Regularized multi-currency expected shortfall portfolios, 2026.

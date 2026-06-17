@@ -3,48 +3,58 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesis.aux
 The style file: plain.bst
 Database file #1: refs.bib
+Warning--I didn't find a database entry for "Michaud1989"
+Warning--I didn't find a database entry for "DeMiguel2009b"
+Warning--I didn't find a database entry for "Tibshirani1996"
+Warning--I didn't find a database entry for "DeMiguel2009a"
+Warning--I didn't find a database entry for "Brodie2009"
+Warning--I didn't find a database entry for "Daubechies2004"
 Warning--I didn't find a database entry for "Li2015"
+Warning--I didn't find a database entry for "LedoitWolf2004"
+Warning--I didn't find a database entry for "Merton1980"
+Warning--I didn't find a database entry for "Jorion1986"
+Warning--I didn't find a database entry for "Ammann2016"
 Warning--I didn't find a database entry for "Jones2002"
 Warning--I didn't find a database entry for "NeelyWellerUlrich2009"
-You've used 4 entries,
+You've used 5 entries,
             2118 wiz_defined-function locations,
-            532 strings with 4789 characters,
-and the built_in function-call counts, 1088 in all, are:
-= -- 103
-> -- 44
+            558 strings with 5175 characters,
+and the built_in function-call counts, 1383 in all, are:
+= -- 131
+> -- 57
 < -- 0
-+ -- 18
-- -- 14
-* -- 69
-:= -- 187
-add.period$ -- 10
-call.type$ -- 4
-change.case$ -- 19
++ -- 23
+- -- 18
+* -- 93
+:= -- 238
+add.period$ -- 13
+call.type$ -- 5
+change.case$ -- 24
 chr.to.int$ -- 0
-cite$ -- 4
-duplicate$ -- 36
-empty$ -- 97
-format.name$ -- 14
-if$ -- 222
+cite$ -- 5
+duplicate$ -- 47
+empty$ -- 121
+format.name$ -- 18
+if$ -- 282
 int.to.chr$ -- 0
-int.to.str$ -- 4
-missing$ -- 2
-newline$ -- 21
-num.names$ -- 8
-pop$ -- 25
+int.to.str$ -- 5
+missing$ -- 3
+newline$ -- 26
+num.names$ -- 10
+pop$ -- 28
 preamble$ -- 1
-purify$ -- 15
+purify$ -- 19
 quote$ -- 0
-skip$ -- 30
+skip$ -- 38
 stack$ -- 0
-substring$ -- 64
-swap$ -- 4
+substring$ -- 81
+swap$ -- 5
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 16
+type$ -- 20
 warning$ -- 0
-while$ -- 12
-width$ -- 5
-write$ -- 40
-(There were 3 warnings)
+while$ -- 15
+width$ -- 6
+write$ -- 51
+(There were 13 warnings)
