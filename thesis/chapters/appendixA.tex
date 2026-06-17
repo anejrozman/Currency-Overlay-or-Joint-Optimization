@@ -97,7 +97,7 @@ Since the objective function is convex, any local minimum is global, ensuring th
 \section{Linear Program Representation of Portfolio Optimization} \label{app:linear-program-representation} % another possible title: Linear program representation of portfolio optimization
 
 The equivalence in \eqref{eq:joint_opt} reduces Expected Shortfall minimization to the
-jointly convex program
+minimization of the jointly convex auxiliary function $F_\beta(x_t, \alpha)$
 \begin{equation*}
     \min_{x_t} \text{ES}_\beta(x_t)
     = \min_{x_t, \alpha} \left( \alpha + \frac{1}{1-\beta}
@@ -106,33 +106,33 @@ jointly convex program
 This formulation is not yet appropriate for portfolio optimization, as it only optimizes for downside risk, without
 taking into account the expected return of the portfolio. It also depends on the unknown
 expectation $\mathbb{E}_t[\cdot]$. We address this by incorporating the expected return into the optimization
-objective and replacing the expectation with its empirical counterpart, which yields a finite dimensional linear program.
+objective and replacing the expectation with its empirical estimator.
 
-Following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} and \cite{goldberg2013minimizingshortfall}, we trade off expected return against %
-downside risk through a relative risk-aversion coefficient $\gamma > 0$,
+Following \cite{goldberg2013minimizingshortfall} and \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we trade off expected return against %
+downside risk through a relative risk-aversion coefficient $\gamma > 0$
 \begin{equation} \label{eq:mean_es}
-    x_t^* = \arg\min_{x_t} \left\{ -\mu_t^\top x_t + \frac{\gamma}{2}
-    \text{ES}_\beta(R_{P,t+1}) \right\}, \quad \text{s.t. } x_t^\top \mathbf{1}_N = 1,
+    x_t^* = \argmin_{x_t} \left\{ -\mu_t^\top x_t + \frac{\gamma}{2}
+    \text{ES}_\beta(x_t) \right\}, \quad \text{s.t. } x_t^\top \mathbf{1}_N = 1,
 \end{equation}
 where $\mu_t$ denotes the asset return mean estimator and the budget constraint
 $x_t^\top \mathbf{1}_N = 1$ enforces full investment. Substituting the auxiliary
-representation of $\text{ES}_\beta$ into \eqref{eq:mean_es} gives
+representation \eqref{app:es_auxiliary_formulation} into \eqref{eq:mean_es} gives
 \begin{equation*}
-    x_t^*, \alpha^* = \arg\min_{x_t, \alpha} \left\{ -\mu_t^\top x_t
+    x_t^*, \alpha^* = \argmin_{x_t, \alpha} \left\{ -\mu_t^\top x_t
     + \frac{\gamma}{2} \alpha
     + \frac{\gamma}{2(1-\beta)} \mathbb{E}_t[(-x_t^\top R_{t+1} - \alpha)^+] \right\}.
 \end{equation*}
 
 Let $y_1, \dots, y_q \in \mathbb{R}^N$ denote $q$ historical realizations of the joint
-return vector $R_{t+1}$. We approximate the conditional expectation by the empirical
-average over this sample,
+return vector $R_{t+1}$.\ We approximate the conditional expectation by the empirical
+average over this sample
 \begin{equation*}
     \mathbb{E}_t[(-x_t^\top R_{t+1} - \alpha)^+]
     \approx \frac{1}{q} \sum_{k=1}^q (-x_t^\top y_k - \alpha)^+,
 \end{equation*}
-so that the optimization problem becomes
+so that the portfolio optimization problem becomes
 \begin{equation} \label{eq:empirical_es}
-    x_t^*, \alpha^* = \arg\min_{x_t, \alpha} \left\{ -\mu_t^\top x_t
+    x_t^*, \alpha^* = \argmin_{x_t, \alpha} \left\{ -\mu_t^\top x_t
     + \frac{\gamma}{2} \alpha
     + \frac{\gamma}{2q(1-\beta)} \sum_{k=1}^q (-x_t^\top y_k - \alpha)^+ \right\},
     \quad \text{s.t. } x_t^\top \mathbf{1}_N = 1.
@@ -140,11 +140,11 @@ so that the optimization problem becomes
 
 The summand $(-x_t^\top y_k - \alpha)^+$ is convex but non-linear. We linearize it by
 introducing, for each observation $k$, an auxiliary variable $u_k \ge 0$ subject to
-\begin{equation*}
+\begin{equation} \label{eq:slack_constraint}
     u_k \ge -x_t^\top y_k - \alpha
     \qquad \Longleftrightarrow \qquad
     x_t^\top y_k + \alpha + u_k \ge 0.
-\end{equation*}
+\end{equation}
 Since the objective in \eqref{eq:empirical_es} is strictly increasing in each $u_k$
 (its coefficient $\tfrac{\gamma}{2q(1-\beta)} > 0$) and minimized, every $u_k$ is driven
 to its lower bound at the optimum, so $u_k^* = (-x_t^\top y_k - \alpha)^+$. The slack
@@ -154,39 +154,38 @@ relations linear.
 
 By collecting the decision variables in the vector
 \begin{equation*}
-    \tilde{x}_t = [x_{1,t}, \dots, x_{N,t}, \alpha, u_1, \dots, u_q]^\top
-    = [x_t^\top, \alpha, u^\top]^\top \in \mathbb{R}^{(N+q+1)},
+    \tilde{x}_t = \begin{bmatrix} x_{1,t}, \dots, x_{N,t}, &  \alpha, & u_1, \dots, u_q \end{bmatrix}^\top
+    = \begin{bmatrix} x_t^\top, & \alpha, & u^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
 \end{equation*}
 and constants in the vector
 \begin{equation*}
     c = \begin{bmatrix} -\mu_t^\top, &  \dfrac{\gamma}{2}, & \dfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
 \end{equation*}
-the optimization problem \eqref{eq:empirical_es} can be written as a linear program
+the portfolio optimization problem \eqref{eq:empirical_es} can be written as a linear program
 \begin{equation} \label{eq:base_lp}
 \begin{aligned}
-    & \ \ \tilde{x}_t^* = \arg\min_{\tilde{x}_t} \quad
+    & \ \ \tilde{x}_t^* = \argmin_{\tilde{x}_t} \quad
      c^\top \tilde{x}_t \\[4pt]
     \text{s.t.} \quad
     & D \tilde{x}_t =   
-    \begin{bmatrix} \mathbf{1}_N^\top & 0_{q+1}^\top \end{bmatrix}
+    \begin{bmatrix} \mathbf{1}_N^\top & 0_{q+1}^\top \end{bmatrix} 
     \tilde{x}_t = E = 1, \\[2pt]
     & A \tilde{x}_t =
     \begin{bmatrix} -R^{\text{data}} & -\mathbf{1}_q & -I_q \end{bmatrix}
     \tilde{x}_t \le b = 0_q, \\[2pt]
-    & \alpha \ge 0, \quad u_j \ge 0 \quad \text{for } j = 1, \dots, q.
+    & \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 Here $D \in \mathbb{R}^{1 \times (N+q+1)}$ encodes the budget constraint, while
-$A \in \mathbb{R}^{q \times (N+q+1)}$ and $b \in \mathbb{R}^{q}$ collect the
-$q$ inequality constraints arising from the Rockafellar and Uryasev (2000)
-representation. The matrix $R^{\text{data}} \in \mathbb{R}^{q \times N}$ stacks the
+$A \in \mathbb{R}^{q \times (N+q+1)}$ and $b \in \mathbb{R}^{q}$ encode the
+$q$ inequality constraints arising from the linearization \eqref{eq:slack_constraint}. The matrix $R^{\text{data}} \in \mathbb{R}^{q \times N}$ is comprised of 
 sampled return vectors $y_k^\top$ row by row, $0_q$ is the $q$-dimensional zero vector,
 and $I_q$ the $q$-dimensional identity matrix.
 
 Problem \eqref{eq:base_lp} has a linear objective subject to one linear equality and $q$
 linear inequalities, and is thus a linear program solvable with standard methods. This
 formulation serves as the base unregularized portfolio optimization problem under Expected Shortfall. 
-Regularization terms and additional constraints are added in the following section \ref{app:regularization} of the appendix. 
+Regularization terms and additional constraints are added in \Cref{app:regularization} of the appendix. 
 \section{Regularization} \label{app:regularization}
 
 The base problem \eqref{eq:base_lp} is known to be numerically unstable in
@@ -272,7 +271,7 @@ Adding all three regularization terms to the base problem \eqref{eq:base_lp}, ma
 a quadratic program with linear constraints
 \begin{equation} \label{eq:reg_qp}
 \begin{aligned}
-    \tilde{x}_t^* &= \arg\min_{\tilde{x}_t} \quad
+    \tilde{x}_t^* &= \argmin_{\tilde{x}_t} \quad
     \tilde{c}^\top \tilde{x}_t + \tfrac{1}{2}\, \tilde{x}_t^\top \tilde{Q}\, \tilde{x}_t, \\[2pt]
     \text{s.t.} \quad
      \tilde{D} \tilde{x}_t &=
@@ -306,14 +305,14 @@ denote the expected fully hedged asset return and the expected
 excess currency return respectively. The two otimization steps are then given by
 \begin{equation} \label{eq:sep_asset_obj}
 \begin{gathered}
-    x_t^* = \arg\min_{x_t} \left\{ -x_t^\top \mu^{fh}
+    x_t^* = \argmin_{x_t} \left\{ -x_t^\top \mu^{fh}
     + \tfrac{\gamma}{2} \text{ES}_\beta(x_t^\top R^{fh}_{t+1})
     + \lambda_1^a \|x_t\|_1 + \lambda_2^a \|x_t\|_2^2 \right\} \\[4pt]
     \text{s.t. } x_t^\top \mathbf{1}_N = 1,\ \|x_t\|_1 \le \ell,
 \end{gathered}
 \end{equation}
 \begin{equation}
-    \psi_t^* \mid x_t^* = \arg\min_{\psi_t} \left\{ -\psi_t^\top \mu^c
+    \psi_t^* \mid x_t^* = \argmin_{\psi_t} \left\{ -\psi_t^\top \mu^c
     + \tfrac{\gamma}{2} \text{ES}_\beta\!\left( x_t^{*\top} R^{fh}_{t+1}
     + \psi_t^\top (e_{t+1} - f_t) \right)
     + \lambda_1^c \|\psi_t\|_1 + \lambda_2^c \|\psi_t\|_2^2 \right\}.
@@ -376,7 +375,7 @@ Appendix~\ref{app:l1}, we form the augmented vector
 The currency overlay is then the quadratic program
 \begin{equation} \label{eq:sep_curr_qp}
 \begin{gathered}
-    \psi_t^* = \arg\min_{\tilde{\psi}_t} \quad
+    \psi_t^* = \argmin_{\tilde{\psi}_t} \quad
     \tilde{c}^\top \tilde{\psi}_t + \tfrac{1}{2}\, \tilde{\psi}_t^\top \tilde{Q}\, \tilde{\psi}_t, \\[2pt]
     \tilde{c} = [\, -(\mu^c)^\top,\ \tfrac{\gamma}{2},\
     \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
@@ -419,7 +418,7 @@ $R_{t+1} = (R^{fh}_{t+1}, e_{t+1} - f_t)^\top \in \mathbb{R}^{N+M}$, with joint 
 $\mu = \mathbb{E}[R_{t+1}] \in \mathbb{R}^{N+M}$. The joint problem is
 \begin{equation} \label{eq:joint_obj}
 \begin{gathered}
-    \theta_t^* = \arg\min_{\theta_t} \left\{ -\theta_t^\top \mu
+    \theta_t^* = \argmin_{\theta_t} \left\{ -\theta_t^\top \mu
     + \tfrac{\gamma}{2} \text{ES}_\beta(\theta_t^\top R_{t+1})
     + \|S_1 \theta_t\|_1 + \|S_2 \theta_t\|_2^2 \right\}, \\[4pt]
     \text{s.t. } \theta_t^\top q_{N,M} = 1, \quad \|L \theta_t\|_1 \le \ell.
@@ -467,7 +466,7 @@ With $R^{\text{all}} = [\, R^{fh} \ \ R^c \,] \in \mathbb{R}^{q \times (N+M)}$ t
 jointly sampled asset and currency returns, the joint problem is the quadratic program
 \begin{equation} \label{eq:joint_qp}
 \begin{gathered}
-    \tilde{\theta}_t^* = \arg\min_{\tilde{\theta}_t} \quad
+    \tilde{\theta}_t^* = \argmin_{\tilde{\theta}_t} \quad
     \tilde{c}^\top \tilde{\theta}_t + \tfrac{1}{2}\, \tilde{\theta}_t^\top \tilde{Q}\, \tilde{\theta}_t, \\[4pt]
     \tilde{c} = [\, -\mu^\top,\ \tfrac{\gamma}{2},\
     \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\

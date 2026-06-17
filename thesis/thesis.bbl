@@ -5,10 +5,27 @@ Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath.
 \newblock Coherent measures of risk.
 \newblock {\em Mathematical Finance}, 9(3):203--228, 1999.
 
+\bibitem{boyd2004convex}
+Stephen Boyd and Lieven Vandenberghe.
+\newblock {\em Convex Optimization}.
+\newblock Cambridge University Press, Cambridge, 2004.
+
+\bibitem{goldberg2013minimizingshortfall}
+Lisa~R. Goldberg, Michael~Y. Hayes, and Ola Mahmoud.
+\newblock Minimizing shortfall, 2013.
+
 \bibitem{Markowitz1952}
 Harry Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
+
+\bibitem{QuantitativeRiskManagement2016}
+Johanna~G. NeÅ¡LehovÃ¡.
+\newblock Quantitative risk management: Concepts, techniques and tools , by
+  alexander j. mcneil , rÃ¼diger frey and paul embrechts . revised edition.
+  published by princeton university press , 2015 . total number of pages: 720.
+  isbn: 978-0-691-16627-8 (hardback).
+\newblock {\em Journal of Time Series Analysis}, 37(3):431--432, May 2016.
 
 \bibitem{RockafellarUryasev2000}
 R.~Tyrrell Rockafellar and Stanislav Uryasev.
