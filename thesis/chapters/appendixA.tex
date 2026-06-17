@@ -280,7 +280,7 @@ a quadratic program with linear constraints
     \begin{bmatrix} -R^{\text{data}} & -\mathbf{1}_q & -I_q & O_{q \times N} & O_{q \times N} \\
     0_N^\top & 0 & 0_q^\top & \mathbf{1}_N^\top & \mathbf{1}_N^\top \end{bmatrix} \tilde{x}_t
     \le b = \begin{bmatrix} 0_q \\ \ell \end{bmatrix}, \\[6pt]
-    & \alpha \ge 0, \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+     \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
@@ -289,10 +289,10 @@ enforce the weight decomposition \eqref{eq:l1_decomp}. The first $q$ rows of $\t
 encode the inequality constraints from the linearization \eqref{eq:slack_constraint}, and are extended with zeros for the new
 variables, and the final row of $\tilde{A}$ imposes the leverage constraint \eqref{eq:leverage_constraint}.
 
-\section{Separate (Overlay) Optimization} \label{app:separate-optimization} 
-In the separate (currency overlay) approach, the asset and currency allocations are
+\section{Separate (Currency Overlay) Optimization} \label{app:separate-optimization} 
+In the separate (currency overlay) portfolio optimization approach, the asset and currency allocations are
 optimized in two sequential steps. First, the asset weights $x_t \in \mathbb{R}^N$ are
-chosen on the fully hedged returns, then, conditional on the optimal $x_t^*$, the
+optimized on the fully hedged returns, then, conditional on the optimal $x_t^*$, the
 currency exposures $\psi_t \in \mathbb{R}^M$ are optimized.
 Let 
 \begin{align*}
@@ -304,39 +304,46 @@ excess currency return respectively. The two otimization steps are then given by
 \begin{equation} \label{eq:sep_asset_obj}
 \begin{gathered}
     x_t^* = \argmin_{x_t} \left\{ -x_t^\top \mu^{fh}
-    + \tfrac{\gamma}{2} \text{ES}_\beta(x_t^\top R^{fh}_{t+1})
+    + \tfrac{\gamma}{2} \text{ES}_\beta\left(x_t^\top R^{fh}_{t+1}\right)
     + \lambda_1^a \|x_t\|_1 + \lambda_2^a \|x_t\|_2^2 \right\} \\[4pt]
     \text{s.t. } x_t^\top \mathbf{1}_N = 1,\ \|x_t\|_1 \le \ell,
 \end{gathered}
 \end{equation}
-\begin{equation}
-    \psi_t^* \mid x_t^* = \argmin_{\psi_t} \left\{ -\psi_t^\top \mu^c
-    + \tfrac{\gamma}{2} \text{ES}_\beta\!\left( x_t^{*\top} R^{fh}_{t+1}
-    + \psi_t^\top (e_{t+1} - f_t) \right)
-    + \lambda_1^c \|\psi_t\|_1 + \lambda_2^c \|\psi_t\|_2^2 \right\}.
-    \label{eq:sep_curr_obj}
+\begin{equation} \label{eq:sep_curr_obj}
+\begin{split}
+    \psi_t^* \mid x_t^* = \argmin_{\psi_t} \Big\{\, &
+    {-}\psi_t^\top \mu^c
+    + \tfrac{\gamma}{2}\, \text{ES}_\beta\!\left( x_t^{*\top} R^{fh}_{t+1}
+    + \psi_t^\top (e_{t+1} - f_t) \right) \\
+    & + \lambda_1^c \|\psi_t\|_1 + \lambda_2^c \|\psi_t\|_2^2 \,\Big\}.
+\end{split}
 \end{equation}
 The regularization parameters are kept separate across assets ($\lambda_1^a, \lambda_2^a$)
 and currencies ($\lambda_1^c, \lambda_2^c$). 
 
 \subsection{Asset Optimization} \label{app:sep_asset}
 
-The asset step \eqref{eq:sep_asset_obj} is identical to the regularized
-single-currency program \eqref{eq:reg_qp}. It carries a budget constraint, an $L_1$
+The asset optimization step \eqref{eq:sep_asset_obj} is identical to the regularized
+single-currency program \eqref{eq:reg_qp}. It carries a budget constraint, $L_1$
 and $L_2$ penalty terms, and a leverage constraint.
 It is therefore obtained directly from \eqref{eq:reg_qp} by substituting the matrix of historically sampled fully hedged
 returns $R^{fh}\in \mathbb{R}^{q \times N}$ for $R^{\text{data}}$, the mean $\mu^{fh}$ for $\mu_t$, and the
 asset-specific penalties $\lambda_1^a, \lambda_2^a$. With the augmented vector
 \begin{equation*}
-    \tilde{x}_t = [\, x_t^\top,\ \alpha_x,\ u_x^\top,\
-    (\Delta_{x,t}^-)^\top,\ (\Delta_{x,t}^+)^\top \,]^\top \in \mathbb{R}^{3N+q+1},
+    \tilde{x}_t = \begin{bmatrix} x_t^\top,& \alpha_x,& u_x^\top,&
+    (\Delta_{x,t}^-)^\top,& (\Delta_{x,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3N+q+1},
 \end{equation*}
 the cost vector and penalty matrix are
 \begin{equation*}
-    \tilde{c} = [\, -(\mu^{fh})^\top,\ \tfrac{\gamma}{2},\
-    \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
-    \lambda_1^a \mathbf{1}_N^\top,\ \lambda_1^a \mathbf{1}_N^\top \,]^\top,
-    \qquad
+    \tilde{c} =
+    \begin{bmatrix}
+        -(\mu^{fh})^\top, & \tfrac{\gamma}{2}, &
+        \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top, &
+        \lambda_1^a \mathbf{1}_N^\top, & \lambda_1^a \mathbf{1}_N^\top
+    \end{bmatrix}^\top,
+\end{equation*}
+
+\begin{equation*}
     \tilde{Q} =
     \begin{bmatrix}
         2 \lambda_2^a I_N & 0_{N \times (2N+q+1)} \\
@@ -351,8 +358,7 @@ asset weights $x_t^*$, which are then fixed in the currency overlay optimization
 
 Conditional on $x_t^*$, the currency step \eqref{eq:sep_curr_obj} minimizes the Expected
 Shortfall of the combined return $x_t^{*\top} R^{fh}_{t+1} + \psi_t^\top (e_{t+1} - f_t)$
-over the currency exposures $\psi_t$. Applying the Rockafellar and Uryasev (2000)
-representation and the empirical approximation as in
+over the currency exposures $\psi_t$. Applying the same auxiliary representation and the empirical approximation as in
 Appendix~\ref{app:linear-program-representation}, we introduce the auxiliary variable
 $\alpha_\psi$ and slacks $u_{k,\psi} \ge 0$. Since the asset leg is now fixed, the
 slack constraint becomes

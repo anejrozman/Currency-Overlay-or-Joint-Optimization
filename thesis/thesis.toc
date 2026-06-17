@@ -46,10 +46,10 @@
 \contentsline {subsection}{\numberline {A.3.2}$L_2$ Regularization}{23}{subsection.A.3.2}%
 \contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{23}{subsection.A.3.3}%
 \contentsline {subsection}{\numberline {A.3.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{24}{subsection.A.3.4}%
-\contentsline {section}{\numberline {A.4}Separate (Overlay) Optimization}{24}{section.A.4}%
+\contentsline {section}{\numberline {A.4}Separate (Currency Overlay) Optimization}{24}{section.A.4}%
 \contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{24}{subsection.A.4.1}%
 \contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{25}{subsection.A.4.2}%
-\contentsline {section}{\numberline {A.5}Joint Optimization}{25}{section.A.5}%
+\contentsline {section}{\numberline {A.5}Joint Optimization}{26}{section.A.5}%
 \contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{28}{appendix.B}%
 \contentsline {appendix}{\chapternumberline {C}Transaction Costs}{29}{appendix.C}%
 \contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{31}{appendix.D}%
