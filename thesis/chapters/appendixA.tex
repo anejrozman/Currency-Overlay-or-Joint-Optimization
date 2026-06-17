@@ -189,43 +189,41 @@ Regularization terms and additional constraints are added in \Cref{app:regulariz
 \section{Regularization} \label{app:regularization}
 
 The base problem \eqref{eq:base_lp} is known to be numerically unstable in
-high-dimensional settings [add citation], producing extreme and concentrated weights. We stabilize it
+high-dimensional settings, producing extreme and concentrated weights \citep{ciliberti2007feasibility, kondor2007noise}. We stabilize it
 with three regularization techniques. An $L_1$-norm penalty that promotes sparsity, an $L_2$-norm penalty
 that promotes shrinkage, and a leverage constraint that bounds gross exposure. Each is
 appended to \eqref{eq:base_lp} while preserving its linear or quadratic structure. The
 $L_1$ penalty and the leverage constraint share a common variable decomposition, which
 we introduce first.
 
-\subsection{$L_1$ Regularization} \label{app:l1}
+\subsection{$L_1$ Regularization} \label{app:l1} 
 
 The $L_1$ penalty $\lambda_1 \|x_t\|_1 = \lambda_1 \sum_{i=1}^N |x_{i,t}|$, with
-$\lambda_1 \ge 0$, is non-linear through the absolute value. Following Roncalli (2013),
+$\lambda_1 \ge 0$, is non-linear through the absolute value. Following \cite{roncalli2013introduction},
 we linearize it by splitting each weight into its positive and negative parts via the
-auxiliary variables $\Delta_{i,t}^+ \ge 0$ and $\Delta_{i,t}^- \ge 0$,
+auxiliary variables $\Delta_{i,t}^+ \ge 0$ and $\Delta_{i,t}^- \ge 0$
 \begin{equation} \label{eq:l1_decomp}
     x_{i,t} = \Delta_{i,t}^+ - \Delta_{i,t}^-,
     \qquad
     |x_{i,t}| = \Delta_{i,t}^+ + \Delta_{i,t}^-.
 \end{equation}
-The second identity holds at the optimum: minimizing the penalty drives the parts to
+The second identity holds at the optimum. Minimizing the $L_1$ penalty drives the parts to
 their smallest feasible values, so at most one of $\Delta_{i,t}^+$, $\Delta_{i,t}^-$ is
 non-zero, giving $\Delta_{i,t}^+ = \max(x_{i,t}, 0)$ and
-$\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. The penalty is then linear in the auxiliary
-variables,
+$\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. The $L_1$ penalty is then linear in the auxiliary
+variables
 \begin{equation*}
     \lambda_1 \|x_t\|_1 = \lambda_1 \mathbf{1}_N^\top (\Delta_t^+ + \Delta_t^-).
 \end{equation*}
 
-We extend the decision vector to carry the two parts,
+We extend the decision vector to carry the two parts
 \begin{equation*}
-    \tilde{x}_t = [\, x_t^\top,\ \alpha,\ u^\top,\ (\Delta_t^-)^\top,\ (\Delta_t^+)^\top \,]^\top
+    \tilde{x}_t = \begin{bmatrix} x_t^\top,& \alpha,& u^\top,& (\Delta_t^-)^\top,& (\Delta_t^+)^\top \end{bmatrix}^\top
     \in \mathbb{R}^{3N+q+1},
 \end{equation*}
-and append the penalty coefficients to the cost vector,
+and append the penalty coefficients to the cost vector
 \begin{equation*}
-    \tilde{c} = [\, -\mu_t^\top,\ \tfrac{\gamma}{2},\
-    \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,\
-    \lambda_1 \mathbf{1}_N^\top,\ \lambda_1 \mathbf{1}_N^\top \,]^\top.
+    \tilde{c} = \begin{bmatrix} -\mu_t^\top,& \tfrac{\gamma}{2},& \tfrac{\gamma}{2q(1-\beta)} \mathbf{1}_q^\top,& \lambda_1 \mathbf{1}_N^\top,& \lambda_1 \mathbf{1}_N^\top \end{bmatrix}^\top.
 \end{equation*}
 The decomposition \eqref{eq:l1_decomp} is enforced as $N$ additional linear equality
 constraints, $x_t + \Delta_t^- - \Delta_t^+ = 0_N$, alongside the original budget
@@ -234,14 +232,14 @@ constraint. All relations remain linear, so the optimization problem is still a 
 \subsection{$L_2$ Regularization} \label{app:l2}
 
 The $L_2$ penalty $\lambda_2 \|x_t\|_2^2 = \lambda_2 x_t^\top x_t$, with
-$\lambda_2 \ge 0$, is quadratic in the weights and is written as a quadratic form,
+$\lambda_2 \ge 0$, is quadratic in the weights and is written as a quadratic form
 \begin{equation*}
     \lambda_2 \|x_t\|_2^2 = \tfrac{1}{2}\, x_t^\top Q\, x_t,
     \qquad Q = 2 \lambda_2 I_N.
 \end{equation*}
-Embedding this in the augmented vector, the penalty becomes
+Embedding this in the augmented vector $\tilde{x}_t$, the penalty becomes
 $\tfrac{1}{2}\, \tilde{x}_t^\top \tilde{Q}\, \tilde{x}_t$ with $\tilde{Q}$ placing the
-block $2\lambda_2 I_N$ on the asset weights and zeros on the auxiliary variables,
+block $2\lambda_2 I_N$ on the asset weights and zeros on the auxiliary variables
 \begin{equation*}
     \tilde{Q} =
     \begin{bmatrix}
@@ -259,9 +257,9 @@ quadratic program with linear constraints.
 The leverage constraint $\|x_t\|_1 \le \ell$, with $\ell \ge 1$, bounds the portfolio's
 gross exposure and guarantees a bounded feasible region even when $\lambda_1 = 0$. Reusing
 the decomposition \eqref{eq:l1_decomp}, it is expressed as a single linear inequality
-\begin{equation*}
+\begin{equation} \label{eq:leverage_constraint}
     \|x_t\|_1 = \mathbf{1}_N^\top (\Delta_t^+ + \Delta_t^-) \le \ell.
-\end{equation*}
+\end{equation}
 The choice $\ell = 1$ rules out leverage entirely and is equivalent to a hard $L_1$
 constraint. As a linear inequality, it preserves the quadratic program structure.
 
@@ -282,16 +280,16 @@ a quadratic program with linear constraints
     \begin{bmatrix} -R^{\text{data}} & -\mathbf{1}_q & -I_q & O_{q \times N} & O_{q \times N} \\
     0_N^\top & 0 & 0_q^\top & \mathbf{1}_N^\top & \mathbf{1}_N^\top \end{bmatrix} \tilde{x}_t
     \le b = \begin{bmatrix} 0_q \\ \ell \end{bmatrix}, \\[6pt]
-    & \alpha \ge 0, \quad u_j \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
-    \quad \text{for } i = 1, \dots, N,\ j = 1, \dots, q.
+    & \alpha \ge 0, \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+    \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 The first row of $\tilde{D}$ enforces the budget constraint and the remaining $N$ rows
 enforce the weight decomposition \eqref{eq:l1_decomp}. The first $q$ rows of $\tilde{A}$
-are the Rockafellar and Uryasev (2000) inequalities extended with zeros for the new
-variables, and the final row imposes the leverage constraint.
+encode the inequality constraints from the linearization \eqref{eq:slack_constraint}, and are extended with zeros for the new
+variables, and the final row of $\tilde{A}$ imposes the leverage constraint \eqref{eq:leverage_constraint}.
 
-\section{Separate (Overlay) Optimization} \label{app:separate-optimization}
+\section{Separate (Overlay) Optimization} \label{app:separate-optimization} 
 In the separate (currency overlay) approach, the asset and currency allocations are
 optimized in two sequential steps. First, the asset weights $x_t \in \mathbb{R}^N$ are
 chosen on the fully hedged returns, then, conditional on the optimal $x_t^*$, the

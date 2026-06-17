@@ -1,4 +1,4 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 
 \bibitem{CoherentMeasuresOfRisk}
 Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath.
@@ -10,9 +10,20 @@ Stephen Boyd and Lieven Vandenberghe.
 \newblock {\em Convex Optimization}.
 \newblock Cambridge University Press, Cambridge, 2004.
 
+\bibitem{ciliberti2007feasibility}
+Stefano Ciliberti, Imre Kondor, and Marc M{\'e}zard.
+\newblock On the feasibility of portfolio optimization under expected
+  shortfall.
+\newblock {\em Quantitative Finance}, 7(4):389--396, 2007.
+
 \bibitem{goldberg2013minimizingshortfall}
 Lisa~R. Goldberg, Michael~Y. Hayes, and Ola Mahmoud.
 \newblock Minimizing shortfall, 2013.
+
+\bibitem{kondor2007noise}
+Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
+\newblock Noise sensitivity of portfolio selection under various risk measures.
+\newblock {\em Journal of Banking \& Finance}, 31(5):1545--1573, 2007.
 
 \bibitem{Markowitz1952}
 Harry Markowitz.
@@ -31,6 +42,12 @@ Johanna~G. NeÅ¡LehovÃ¡.
 R.~Tyrrell Rockafellar and Stanislav Uryasev.
 \newblock Optimization of conditional value-at-risk.
 \newblock {\em Journal of Risk}, None(None):None, None None.
+
+\bibitem{roncalli2013introduction}
+Thierry Roncalli.
+\newblock {\em Introduction to Risk Parity and Budgeting}.
+\newblock Chapman \& Hall/CRC Financial Mathematics Series. Chapman \&
+  Hall/CRC, Boca Raton, FL, 2013.
 
 \bibitem{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 Patrick~Lucescu Urban~Ulrych.
