@@ -16,19 +16,49 @@ Stefano Ciliberti, Imre Kondor, and Marc M{\'e}zard.
   shortfall.
 \newblock {\em Quantitative Finance}, 7(4):389--396, 2007.
 
+\bibitem{FrazziniIsraelMoskowitz2018}
+Andrea Frazzini, Ronen Israel, and Tobias~J. Moskowitz.
+\newblock Trading costs.
+\newblock 2018.
+\newblock Working paper, AQR Capital Management / Yale University.
+
 \bibitem{goldberg2013minimizingshortfall}
 Lisa~R. Goldberg, Michael~Y. Hayes, and Ola Mahmoud.
 \newblock Minimizing shortfall, 2013.
+
+\bibitem{Jones2002}
+Charles~M. Jones.
+\newblock A century of stock market liquidity and trading costs.
+\newblock 2002.
+\newblock Working paper, Columbia University.
 
 \bibitem{kondor2007noise}
 Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
 \newblock Noise sensitivity of portfolio selection under various risk measures.
 \newblock {\em Journal of Banking \& Finance}, 31(5):1545--1573, 2007.
 
+\bibitem{Li2015}
+Jiahan Li.
+\newblock Sparse and stable portfolio selection with parameter uncertainty.
+\newblock {\em Journal of Business \& Economic Statistics}, 33(3):381--392,
+  2015.
+
 \bibitem{Markowitz1952}
 Harry Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
+
+\bibitem{MenkhoffSarnoSchmelingSchrimpf2012}
+Lukas Menkhoff, Lucio Sarno, Maik Schmeling, and Andreas Schrimpf.
+\newblock Carry trades and global foreign exchange volatility.
+\newblock {\em The Journal of Finance}, 67(2):681--718, 2012.
+
+\bibitem{NeelyWellerUlrich2009}
+Christopher~J. Neely, Paul~A. Weller, and Joshua~M. Ulrich.
+\newblock The adaptive markets hypothesis: Evidence from the foreign exchange
+  market.
+\newblock {\em Journal of Financial and Quantitative Analysis}, 44(2):467--488,
+  2009.
 
 \bibitem{QuantitativeRiskManagement2016}
 Johanna~G. NeÅ¡LehovÃ¡.

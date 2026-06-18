@@ -9,52 +9,51 @@ Warning--I didn't find a database entry for "Tibshirani1996"
 Warning--I didn't find a database entry for "DeMiguel2009a"
 Warning--I didn't find a database entry for "Brodie2009"
 Warning--I didn't find a database entry for "Daubechies2004"
-Warning--I didn't find a database entry for "Li2015"
 Warning--I didn't find a database entry for "LedoitWolf2004"
 Warning--I didn't find a database entry for "Merton1980"
 Warning--I didn't find a database entry for "Jorion1986"
 Warning--I didn't find a database entry for "Ammann2016"
-Warning--I didn't find a database entry for "Jones2002"
-Warning--I didn't find a database entry for "NeelyWellerUlrich2009"
-You've used 11 entries,
+Warning--empty journal in FrazziniIsraelMoskowitz2018
+Warning--empty journal in Jones2002
+You've used 16 entries,
             2118 wiz_defined-function locations,
-            595 strings with 6300 characters,
-and the built_in function-call counts, 3170 in all, are:
-= -- 305
-> -- 138
+            625 strings with 7144 characters,
+and the built_in function-call counts, 4721 in all, are:
+= -- 460
+> -- 211
 < -- 0
-+ -- 55
-- -- 44
-* -- 218
-:= -- 543
-add.period$ -- 31
-call.type$ -- 11
-change.case$ -- 53
++ -- 86
+- -- 68
+* -- 331
+:= -- 812
+add.period$ -- 48
+call.type$ -- 16
+change.case$ -- 80
 chr.to.int$ -- 0
-cite$ -- 11
-duplicate$ -- 111
-empty$ -- 270
-format.name$ -- 44
-if$ -- 653
+cite$ -- 18
+duplicate$ -- 164
+empty$ -- 385
+format.name$ -- 68
+if$ -- 961
 int.to.chr$ -- 0
-int.to.str$ -- 11
-missing$ -- 10
-newline$ -- 55
-num.names$ -- 22
-pop$ -- 62
+int.to.str$ -- 16
+missing$ -- 15
+newline$ -- 82
+num.names$ -- 32
+pop$ -- 85
 preamble$ -- 1
-purify$ -- 44
+purify$ -- 66
 quote$ -- 0
-skip$ -- 79
+skip$ -- 114
 stack$ -- 0
-substring$ -- 188
-swap$ -- 11
+substring$ -- 290
+swap$ -- 14
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 40
-warning$ -- 0
-while$ -- 32
-width$ -- 13
-write$ -- 115
-(There were 13 warnings)
+type$ -- 60
+warning$ -- 2
+while$ -- 48
+width$ -- 18
+write$ -- 170
+(There were 12 warnings)
