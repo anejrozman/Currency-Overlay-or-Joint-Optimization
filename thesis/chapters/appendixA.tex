@@ -437,9 +437,11 @@ The following matrices and vector adapt the problem to the
 joint optimization setting
 \begin{equation*}
     \bm{q}_{N,M} = \begin{bmatrix} \bm{1}_N \\ \bm{0}_M \end{bmatrix}, \quad
-    \bm{L} = \begin{bmatrix} \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \bm{0}_{M \times M} \end{bmatrix}, \quad
-    \bm{S}_1 = \begin{bmatrix} \lambda_1^a \bm{I}_N & 0 \\ 0 & \lambda_1^c \bm{I}_M \end{bmatrix}, \quad
-    \bm{S}_2 = \begin{bmatrix} \sqrt{\lambda_2^a}\, \bm{I}_N & 0 \\ 0 & \sqrt{\lambda_2^c}\, \bm{I}_M \end{bmatrix}.
+    \bm{L} = \begin{bmatrix} \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \bm{0}_{M \times M} \end{bmatrix},
+\end{equation*}
+\begin{equation*}
+    \bm{S}_1 = \begin{bmatrix} \lambda_1^a \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \lambda_1^c \bm{I}_M \end{bmatrix}, \quad
+    \bm{S}_2 = \begin{bmatrix} \sqrt{\lambda_2^a}\, \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \sqrt{\lambda_2^c}\, \bm{I}_M \end{bmatrix}.
 \end{equation*}
 The vector $\bm{q}_{N,M}$ applies the budget constraint to the asset weights only, so that
 $\bm{\theta}_t^\top \bm{q}_{N,M} = \bm{x}_t^\top \bm{1}_N = 1$, leaving the currency weights as a
@@ -477,9 +479,9 @@ matrix of jointly sampled asset and currency returns. The cost vector and penalt
 \begin{equation*}
     \tilde{\bm{Q}} =
     \begin{bmatrix}
-        2 \lambda_2^a \bm{I}_N & 0 & 0 \\
-        0 & 2 \lambda_2^c \bm{I}_M & 0 \\
-        0 & 0 & \bm{0}_{(2N+2M+q+1) \times (2N+2M+q+1)}
+        2 \lambda_2^a \bm{I}_N & \bm{0}_{N \times M} & \bm{0}_{N\times(2N + 2M + q + 1)} \\
+        \bm{0}_{M \times N} & 2 \lambda_2^c \bm{I}_M & \bm{0}_{M\times(2N + 2M + q + 1)} \\
+        \bm{0}_{(2N+2M+q+1) \times N} & \bm{0}_{(2N+2M+q+1) \times M} & \bm{0}_{(2N+2M+q+1) \times (2N+2M+q+1)}
     \end{bmatrix}.
 \end{equation*}
 The joint portfolio optimization problem is then the quadratic program
