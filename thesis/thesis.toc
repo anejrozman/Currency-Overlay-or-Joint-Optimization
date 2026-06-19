@@ -51,6 +51,16 @@
 \contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{25}{subsection.A.4.2}%
 \contentsline {section}{\numberline {A.5}Joint Optimization}{25}{section.A.5}%
 \contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{28}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{28}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Regularization}{28}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}$L_1$ Regularization}{28}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}$L_2$ Regularization}{28}{subsection.B.2.2}%
+\contentsline {subsection}{\numberline {B.2.3}Leverage Constraint}{28}{subsection.B.2.3}%
+\contentsline {subsection}{\numberline {B.2.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{28}{subsection.B.2.4}%
+\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{28}{section.B.3}%
+\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{28}{subsection.B.3.1}%
+\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{28}{subsection.B.3.2}%
+\contentsline {section}{\numberline {B.4}Joint Optimization}{28}{section.B.4}%
 \contentsline {appendix}{\chapternumberline {C}Transaction Costs}{29}{appendix.C}%
 \contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{31}{appendix.D}%
 \contentsline {chapter}{Bibliography}{32}{appendix*.5}%
