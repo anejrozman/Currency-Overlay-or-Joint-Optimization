@@ -161,6 +161,14 @@ def plot_combined(corrs: dict[int, pd.DataFrame], stem: Path) -> None:
     for ax, (n, corr) in zip(axes, sorted(corrs.items())):
         im = _draw_heatmap(ax, corr, norm, vabs, show_ylabels=True)
         ax.set_title(f"top-{n}")
+        # Drop the per-axis labels; the figure carries a single shared label each.
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+    fig.supxlabel("Excess Currency Return", y=0.075)
+    fig.supylabel("Equally Weighted Economy Fully Hedged Return")
+    fig.suptitle(
+        "Asset-Currency Correlation Across Increasing Universe Sizes", y=0.905
+    )
     fig.colorbar(im, ax=axes, fraction=0.025, pad=0.02, label="Pearson correlation")
     _save(fig, stem)
 

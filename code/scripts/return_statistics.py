@@ -20,7 +20,7 @@ from portfolio_backtest.utils.returns import compute_daily_forward_premium
 def main() -> None:
 
     # File paths
-    universe_file = config.RAW_DIR / config.UNIVERSE_FILE
+    universe_file = config.RAW_DIR / config.UNIVERSE_FILE_50
     local_asset_returns_file = config.PROCESSED_DIR / config.LOCAL_RETURNS_FILE
     currency_returns_file = config.PROCESSED_DIR / config.SPOT_RETURNS_FILE
     forward_premium_file = config.PROCESSED_DIR / config.FWD_PREMIUMS_1M_FILE

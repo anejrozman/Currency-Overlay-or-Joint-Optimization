@@ -10,12 +10,50 @@ We construct our investment universe from 14 prominent global equity markets: Au
 
 The US dollar serves as the base currency for our analysis and we calculate the fully hedged returns for each stock, and the excess currency returns for the currencise, following the model-free return representation in \Cref{chap:optimization-framework}.
 
-In table 1 we analyze annualized average returns and volatilities for fully hedged stock returns and excess currency returns, following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, and also showcase the asset currency dependance between fully hedged equity returns and excess currency returns, by reporting the average correlation between the two series across all stocks in all three universes
+In table 1 we analyze annualized average returns and volatilities for fully hedged stock returns and excess currency returns, following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, and also showcase the asset currency dependance between fully hedged equity returns and excess currency returns, by reporting the average correlation between the two series across all stocks in all three universes    
 % Also add dimensionality framing here State N and M explicitly per universe and note the asset-to-currency ratio (≈11:1 small, ≈54:1 large with their 13 currencies). The currency dimension is essentially fixed while assets grow 5×, which is exactly the mechanism behind the overlay's large-universe advantage — connecting your data straight to the bias–variance story.
 
 % Also mention the The HKD peg. One line noting the Hong Kong dollar is USD-pegged, so its excess-currency return is nearly riskless. Find out from when on the peg is active and check if it holds in the data. 
 
 % Consider this: Datastream cleaning — only if you did it. If you applied screens to the raw return series
+
+\begin{table}[htbp]
+  \centering
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    \multirow{2}{*}{Economies} & \multicolumn{2}{c}{Assets (\%) } & \multicolumn{2}{c}{Currencies (\%)} \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+     & Return & Volatility & Excess Return & Volatility \\
+    \midrule
+    Australia      &  3.10 & 37.72 &  1.31 & 11.59 \\
+    Canada         &  6.58 & 40.24 & -0.03 &  7.63 \\
+    Denmark        &  3.04 & 39.00 & -0.08 &  9.68 \\
+    Eurozone       &  5.05 & 34.01 & -0.40 &  9.58 \\
+    Hong Kong      & -0.15 & 45.77 & -0.16 &  0.56 \\
+    Japan          &  4.41 & 34.01 & -2.07 & 10.47 \\
+    New Zealand    & -1.13 & 37.16 &  2.48 & 11.36 \\
+    Norway         & -1.59 & 50.29 & -0.36 & 11.73 \\
+    Singapore      & -1.99 & 54.57 &  0.18 &  5.35 \\
+    South Africa   &  1.01 & 43.84 &  1.22 & 15.18 \\
+    Sweden         &  6.92 & 42.50 & -1.16 & 11.50 \\
+    Switzerland    &  5.67 & 30.32 & -0.12 & 10.99 \\
+    United Kingdom &  2.63 & 34.71 &  0.12 &  9.42 \\
+    United States  &  7.99 & 39.07 &  0.00 &  0.00 \\
+    \bottomrule
+  \end{tabular}
+    \caption{Summary statistics for fully hedged equity returns and excess currency
+  returns by economy. All figures are annualized and reported in percent, from the
+  perspective of a USD-based investor. Excess currency returns are defined as the
+  currency return net of the forward premium.}
+  \label{tab:summary-statistics}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{../../results/figures/asset_currency_corr_combined.pdf}
+  \caption{Correlation matrix for asset and currency returns by economy.}
+  \label{fig:asset-currency-corr}
+\end{figure}
 
 \section{Modular Backtesting Framework}
 

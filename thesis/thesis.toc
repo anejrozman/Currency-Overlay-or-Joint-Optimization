@@ -24,43 +24,43 @@
 \contentsline {chapter}{\chapternumberline {4}Data and Implementation}{9}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Data}{9}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Modular Backtesting Framework}{9}{section.4.2}%
-\contentsline {subsection}{\numberline {4.2.1}Backtesting Workflow and Optimizer Structure}{10}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Optimization, Costs, and Outputs}{11}{subsection.4.2.2}%
-\contentsline {section}{\numberline {4.3}Numerical Implementation of Optimization Problems}{11}{section.4.3}%
-\contentsline {section}{\numberline {4.4}Evaluation Protocol and Performance Metrics}{11}{section.4.4}%
-\contentsline {chapter}{\chapternumberline {5}Empirical Analysis and Baseline Results}{12}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Backtest Results of Expected Shortfall Optimization Approaches}{12}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Backtest Results of Mean-Variance Optimization Approaches}{12}{section.5.2}%
-\contentsline {section}{\numberline {5.3}The Effects of Universe Size on Portfolio Performance}{12}{section.5.3}%
-\contentsline {chapter}{\chapternumberline {6}Convex Risk Measures}{15}{chapter.6}%
-\contentsline {chapter}{\chapternumberline {7}End To End Portfolio Optimization}{16}{chapter.7}%
-\contentsline {chapter}{\chapternumberline {8}Conclusion}{17}{chapter.8}%
-\contentsline {section}{\numberline {8.1}Findings}{17}{section.8.1}%
-\contentsline {section}{\numberline {8.2}Limitations and Future Research}{17}{section.8.2}%
-\contentsline {chapter}{Appendices}{18}{section*.3}%
-\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall}{19}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Derivation of the Auxiliary Expected Shortfall Formulation}{19}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Linear Program Representation of Portfolio Optimization}{21}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Regularization}{22}{section.A.3}%
-\contentsline {subsection}{\numberline {A.3.1}$L_1$ Regularization}{22}{subsection.A.3.1}%
-\contentsline {subsection}{\numberline {A.3.2}$L_2$ Regularization}{23}{subsection.A.3.2}%
-\contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{23}{subsection.A.3.3}%
-\contentsline {subsection}{\numberline {A.3.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{23}{subsection.A.3.4}%
-\contentsline {section}{\numberline {A.4}Separate (Currency Overlay) Optimization}{24}{section.A.4}%
-\contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{24}{subsection.A.4.1}%
-\contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{25}{subsection.A.4.2}%
-\contentsline {section}{\numberline {A.5}Joint Optimization}{25}{section.A.5}%
-\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{28}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{28}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Regularization}{28}{section.B.2}%
-\contentsline {subsection}{\numberline {B.2.1}$L_1$ Regularization}{28}{subsection.B.2.1}%
-\contentsline {subsection}{\numberline {B.2.2}$L_2$ Regularization}{28}{subsection.B.2.2}%
-\contentsline {subsection}{\numberline {B.2.3}Leverage Constraint}{28}{subsection.B.2.3}%
-\contentsline {subsection}{\numberline {B.2.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{28}{subsection.B.2.4}%
-\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{28}{section.B.3}%
-\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{28}{subsection.B.3.1}%
-\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{28}{subsection.B.3.2}%
-\contentsline {section}{\numberline {B.4}Joint Optimization}{28}{section.B.4}%
-\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{29}{appendix.C}%
-\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{31}{appendix.D}%
-\contentsline {chapter}{Bibliography}{32}{appendix*.5}%
+\contentsline {subsection}{\numberline {4.2.1}Backtesting Workflow and Optimizer Structure}{12}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Optimization, Costs, and Outputs}{12}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Numerical Implementation of Optimization Problems}{12}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Evaluation Protocol and Performance Metrics}{12}{section.4.4}%
+\contentsline {chapter}{\chapternumberline {5}Empirical Analysis and Baseline Results}{13}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Backtest Results of Expected Shortfall Optimization Approaches}{13}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Backtest Results of Mean-Variance Optimization Approaches}{13}{section.5.2}%
+\contentsline {section}{\numberline {5.3}The Effects of Universe Size on Portfolio Performance}{13}{section.5.3}%
+\contentsline {chapter}{\chapternumberline {6}Convex Risk Measures}{16}{chapter.6}%
+\contentsline {chapter}{\chapternumberline {7}End To End Portfolio Optimization}{17}{chapter.7}%
+\contentsline {chapter}{\chapternumberline {8}Conclusion}{18}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Findings}{18}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Limitations and Future Research}{18}{section.8.2}%
+\contentsline {chapter}{Appendices}{19}{section*.3}%
+\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall}{20}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Derivation of the Auxiliary Expected Shortfall Formulation}{20}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Linear Program Representation of Portfolio Optimization}{22}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Regularization}{23}{section.A.3}%
+\contentsline {subsection}{\numberline {A.3.1}$L_1$ Regularization}{23}{subsection.A.3.1}%
+\contentsline {subsection}{\numberline {A.3.2}$L_2$ Regularization}{24}{subsection.A.3.2}%
+\contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{24}{subsection.A.3.3}%
+\contentsline {subsection}{\numberline {A.3.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{24}{subsection.A.3.4}%
+\contentsline {section}{\numberline {A.4}Separate (Currency Overlay) Optimization}{25}{section.A.4}%
+\contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{25}{subsection.A.4.1}%
+\contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{26}{subsection.A.4.2}%
+\contentsline {section}{\numberline {A.5}Joint Optimization}{26}{section.A.5}%
+\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{29}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{29}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Regularization}{29}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}$L_1$ Regularization}{29}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}$L_2$ Regularization}{29}{subsection.B.2.2}%
+\contentsline {subsection}{\numberline {B.2.3}Leverage Constraint}{29}{subsection.B.2.3}%
+\contentsline {subsection}{\numberline {B.2.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{29}{subsection.B.2.4}%
+\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{29}{section.B.3}%
+\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{29}{subsection.B.3.1}%
+\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{29}{subsection.B.3.2}%
+\contentsline {section}{\numberline {B.4}Joint Optimization}{29}{section.B.4}%
+\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{30}{appendix.C}%
+\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{32}{appendix.D}%
+\contentsline {chapter}{Bibliography}{33}{appendix*.5}%
