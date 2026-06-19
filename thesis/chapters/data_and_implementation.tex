@@ -1,13 +1,21 @@
 \chapter{Data and Implementation}\label{chap:data-and-implementation}
 
-\section{Data and Summary Statistics}
+In this chapter...
 
-Our analysis relies on a comprehensive dataset of international equities, foreign exchange spot rates, and forward exchange rates sourced from Refinitiv Datastream. The dataset covers a period from June 1990 to June 2023, capturing various market regimes, including the dot-com bubble burst, the 2008 Global Financial Crisis, the European debt crisis, and the COVID-19 pandemic. 
+\section{Data}
 
-We construct our investment universe from the 14 largest developed equity markets: Australia, Canada, France, Germany, Hong Kong, Italy, Japan, the Netherlands, Singapore, Spain, Sweden, Switzerland, the United Kingdom, and the United States. To construct the local equity portfolios, we select the largest stocks in each market based on their market capitalization at the beginning of each year. We consider two distinct cross-sections of stocks to analyze the impact of the investment universe size on portfolio performance, a small universe consisting of the top 10 stocks per market (140 stocks in total) and a large universe consisting of the top 50 stocks per market (700 stocks in total). 
+Our analysis relies on a comprehensive dataset of international equities, foreign exchange spot rates, and forward exchange rates sourced from Refinitiv Datastream. The dataset covers a period from June 1990 to June 2023, capturing various market regimes, including the dot-com bubble burst, the 2008 Global Financial Crisis, the European debt crisis, and the COVID-19 pandemic.
 
-For each selected stock, we retrieve daily total return indices, which account for dividend reinvestments, and compute the corresponding local currency returns. The US dollar serves as the base currency for our analysis, we calculate the fully hedged returns for each stock following the model-free return representation in chapter \ref{chap:model-free-returns}.
+We construct our investment universe from 14 prominent global equity markets: Australia, Canada, Denmark, Norway, Hong Kong, Japan, New Zealand, Singapore, Southa Africa, Sweden, Switzerland, the Eurozone, the United Kingdom, and the United States. To construct the local equity portfolios, we select the largest stocks in each market based on their market capitalization at the beginning of each year. We consider three distinct cross-sections of stocks to analyze the impact of the investment universe size on portfolio performance, a small universe consisting of the top 10 stocks per market (257 stocks in total) a medium universe consisting of the top 50 stocks per market (1705 stocks in total) and a large universe consisting of the top 100 stocks per market (3408 stocks in total). 
 
+The US dollar serves as the base currency for our analysis and we calculate the fully hedged returns for each stock, and the excess currency returns for the currencise, following the model-free return representation in \Cref{chap:optimization-framework}.
+
+In table 1 we analyze annualized average returns and volatilities for fully hedged stock returns and excess currency returns, following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, and also showcase the asset currency dependance between fully hedged equity returns and excess currency returns, by reporting the average correlation between the two series across all stocks in all three universes
+% Also add dimensionality framing here State N and M explicitly per universe and note the asset-to-currency ratio (≈11:1 small, ≈54:1 large with their 13 currencies). The currency dimension is essentially fixed while assets grow 5×, which is exactly the mechanism behind the overlay's large-universe advantage — connecting your data straight to the bias–variance story.
+
+% Also mention the The HKD peg. One line noting the Hong Kong dollar is USD-pegged, so its excess-currency return is nearly riskless. Find out from when on the peg is active and check if it holds in the data. 
+
+% Consider this: Datastream cleaning — only if you did it. If you applied screens to the raw return series
 
 \section{Modular Backtesting Framework}
 
@@ -24,7 +32,7 @@ For each selected stock, we retrieve daily total return indices, which account f
   sarr/.style={-Stealth, draw=blue}
 }
 
-This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
+This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available on GitHub: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
 
 \begin{figure}[ht]
 \begin{center}

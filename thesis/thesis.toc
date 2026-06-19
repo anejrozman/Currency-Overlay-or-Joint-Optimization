@@ -22,10 +22,10 @@
 \contentsline {subsection}{\numberline {3.3.3}Currency Overlay Optimization}{8}{subsection.3.3.3}%
 \contentsline {subsection}{\numberline {3.3.4}Joint Optimization}{8}{subsection.3.3.4}%
 \contentsline {chapter}{\chapternumberline {4}Data and Implementation}{9}{chapter.4}%
-\contentsline {section}{\numberline {4.1}Data and Summary Statistics}{9}{section.4.1}%
+\contentsline {section}{\numberline {4.1}Data}{9}{section.4.1}%
 \contentsline {section}{\numberline {4.2}Modular Backtesting Framework}{9}{section.4.2}%
 \contentsline {subsection}{\numberline {4.2.1}Backtesting Workflow and Optimizer Structure}{10}{subsection.4.2.1}%
-\contentsline {subsection}{\numberline {4.2.2}Optimization, Costs, and Outputs}{10}{subsection.4.2.2}%
+\contentsline {subsection}{\numberline {4.2.2}Optimization, Costs, and Outputs}{11}{subsection.4.2.2}%
 \contentsline {section}{\numberline {4.3}Numerical Implementation of Optimization Problems}{11}{section.4.3}%
 \contentsline {section}{\numberline {4.4}Evaluation Protocol and Performance Metrics}{11}{section.4.4}%
 \contentsline {chapter}{\chapternumberline {5}Empirical Analysis and Baseline Results}{12}{chapter.5}%
