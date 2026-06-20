@@ -1,61 +1,121 @@
 \chapter{Data and Implementation}\label{chap:data-and-implementation}
 
-In this chapter...
+In this chapter, we describe the dataset used for the empirical evaluation of the portfolio optimization strategies and the implementation of the backtesting framework. 
+In the data section we detail the construction of the investable universe. We follow \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to analyze asset and currency returns and volatillities and expand the analysis to different investable universe sizes, and look at the correlation dependence of asset and currency returns. In the implementation section we describe the modular structure of the backtesting framework, the workflow of the backtest, and the metrics used to evaluate potrfolio performance.
 
-\section{Data}
+\section{Data} 
 
-Our analysis relies on a comprehensive dataset of international equities, foreign exchange spot rates, and forward exchange rates sourced from Refinitiv Datastream. The dataset covers a period from June 1990 to June 2023, capturing various market regimes, including the dot-com bubble burst, the 2008 Global Financial Crisis, the European debt crisis, and the COVID-19 pandemic.
+The empirical evaluation of all portfolio optimization strategies in this thesis relies on
+a comprehensive dataset of international equities, foreign exchange spot rates, and forward
+exchange rates sourced from Refinitiv Datastream. The dataset spans from June 1990 to June 2023,
+covering several different market regimes, including the dot-com crash, the 2008 Global Financial
+Crisis, the European sovereign debt crisis, and the COVID-19 pandemic.
 
-We construct our investment universe from 14 prominent global equity markets: Australia, Canada, Denmark, Norway, Hong Kong, Japan, New Zealand, Singapore, Southa Africa, Sweden, Switzerland, the Eurozone, the United Kingdom, and the United States. To construct the local equity portfolios, we select the largest stocks in each market based on their market capitalization at the beginning of each year. We consider three distinct cross-sections of stocks to analyze the impact of the investment universe size on portfolio performance, a small universe consisting of the top 10 stocks per market (257 stocks in total) a medium universe consisting of the top 50 stocks per market (1705 stocks in total) and a large universe consisting of the top 100 stocks per market (3408 stocks in total). 
+We construct the investable universe from 14 global equity markets: Australia,
+Canada, Denmark, Norway, Sweden, Hong Kong, Japan, New Zealand, Singapore, South
+Africa, Switzerland, the Eurozone, the United Kingdom, and the United States. The universe is
+rebuilt at the beginning of each year from the largest stocks by market capitalization at the time (a rolling-window
+approach that mitigates survivorship bias). At the start of each year we rank stocks within
+each market and restrict the following year's investments to that set. To study how the
+universe size affects the optimization approaches, we form three cross-sections, comprising the
+top 10, top 50, and top 100 stocks per market. Because the constituents turn over each
+year, each universe spans more distinct stocks over the full sample than are held on any
+single date, 407 for the top 10, 1705 for the top 50, and 3189 for the top 100, respectively.
 
-The US dollar serves as the base currency for our analysis and we calculate the fully hedged returns for each stock, and the excess currency returns for the currencise, following the model-free return representation in \Cref{chap:optimization-framework}.
-
-In table 1 we analyze annualized average returns and volatilities for fully hedged stock returns and excess currency returns, following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, and also showcase the asset currency dependance between fully hedged equity returns and excess currency returns, by reporting the average correlation between the two series across all stocks in all three universes    
-% Also add dimensionality framing here State N and M explicitly per universe and note the asset-to-currency ratio (≈11:1 small, ≈54:1 large with their 13 currencies). The currency dimension is essentially fixed while assets grow 5×, which is exactly the mechanism behind the overlay's large-universe advantage — connecting your data straight to the bias–variance story.
-
-% Also mention the The HKD peg. One line noting the Hong Kong dollar is USD-pegged, so its excess-currency return is nearly riskless. Find out from when on the peg is active and check if it holds in the data. 
-
-% Consider this: Datastream cleaning — only if you did it. If you applied screens to the raw return series
+The US dollar is the base currency throughout our analysis. For each stock we compute fully hedged
+returns, and for each currency the excess currency return, following the model-free return
+representation in \Cref{chap:optimization-framework}.
 
 \begin{table}[htbp]
   \centering
-  \begin{tabular}{@{}lrrrr@{}}
+  \small
+  \begin{tabular}{@{}lrrrrrrrr@{}}
     \toprule
-    \multirow{2}{*}{Economies} & \multicolumn{2}{c}{Assets (\%) } & \multicolumn{2}{c}{Currencies (\%)} \\
-    \cmidrule(lr){2-3} \cmidrule(lr){4-5}
-     & Return & Volatility & Excess Return & Volatility \\
+    \multirow{3}{*}{Economies} & \multicolumn{6}{c}{Assets (\%)} & \multicolumn{2}{c}{Currencies (\%)} \\
+    \cmidrule(lr){2-7} \cmidrule(lr){8-9}
+     & \multicolumn{2}{c}{Top 10} & \multicolumn{2}{c}{Top 50} & \multicolumn{2}{c}{Top 100} & & \\
+    \cmidrule(lr){2-3} \cmidrule(lr){4-5} \cmidrule(lr){6-7}
+     & Return & Vol. & Return & Vol. & Return & Vol. & Excess Return & Vol. \\
     \midrule
-    Australia      &  3.10 & 37.72 &  1.31 & 11.59 \\
-    Canada         &  6.58 & 40.24 & -0.03 &  7.63 \\
-    Denmark        &  3.04 & 39.00 & -0.08 &  9.68 \\
-    Eurozone       &  5.05 & 34.01 & -0.40 &  9.58 \\
-    Hong Kong      & -0.15 & 45.77 & -0.16 &  0.56 \\
-    Japan          &  4.41 & 34.01 & -2.07 & 10.47 \\
-    New Zealand    & -1.13 & 37.16 &  2.48 & 11.36 \\
-    Norway         & -1.59 & 50.29 & -0.36 & 11.73 \\
-    Singapore      & -1.99 & 54.57 &  0.18 &  5.35 \\
-    South Africa   &  1.01 & 43.84 &  1.22 & 15.18 \\
-    Sweden         &  6.92 & 42.50 & -1.16 & 11.50 \\
-    Switzerland    &  5.67 & 30.32 & -0.12 & 10.99 \\
-    United Kingdom &  2.63 & 34.71 &  0.12 &  9.42 \\
-    United States  &  7.99 & 39.07 &  0.00 &  0.00 \\
+    Australia      &  4.57 & 29.94 &  3.10 & 37.72 & -1.88 & 58.00 &  1.31 & 11.59 \\
+    Canada         &  9.10 & 32.89 &  6.58 & 40.24 &  1.86 & 59.24 & -0.03 &  7.63 \\
+    Denmark        &  8.35 & 34.05 &  3.04 & 39.00 & -3.47 & 48.52 & -0.08 &  9.68 \\
+    Eurozone       &  5.09 & 32.24 &  5.05 & 34.01 &  3.25 & 35.46 & -0.40 &  9.58 \\
+    Hong Kong      &  4.42 & 37.59 & -0.15 & 45.77 & -3.48 & 52.59 & -0.16 &  0.56 \\
+    Japan          &  5.37 & 33.69 &  4.41 & 34.01 &  4.09 & 35.38 & -2.07 & 10.47 \\
+    New Zealand    &  2.88 & 29.93 & -1.13 & 37.16 & -4.56 & 41.49 &  2.48 & 11.36 \\
+    Norway         &  3.17 & 43.30 & -1.59 & 50.29 & -2.61 & 53.26 & -0.36 & 11.73 \\
+    Singapore      &  3.32 & 35.43 & -1.99 & 54.57 & -4.84 & 62.12 &  0.18 &  5.35 \\
+    South Africa   &  3.53 & 37.72 &  1.01 & 43.84 & -4.39 & 53.94 &  1.22 & 15.18 \\
+    Sweden         &  9.54 & 34.50 &  6.92 & 42.50 &  5.37 & 47.65 & -1.16 & 11.50 \\
+    Switzerland    &  6.38 & 29.04 &  5.67 & 30.32 &  3.97 & 33.65 & -0.12 & 10.99 \\
+    United Kingdom &  2.76 & 31.50 &  2.63 & 34.71 &  1.29 & 36.22 &  0.12 &  9.42 \\
+    United States  & 12.59 & 33.58 &  7.99 & 39.07 &  6.86 & 42.84 &  0.00 &  0.00 \\
     \bottomrule
   \end{tabular}
-    \caption{Summary statistics for fully hedged equity returns and excess currency
-  returns by economy. All figures are annualized and reported in percent, from the
-  perspective of a USD-based investor. Excess currency returns are defined as the
-  currency return net of the forward premium.}
+  \caption{Summary statistics of fully hedged equity returns and excess currency
+  returns by economy. Asset statistics are reported for three investment universes
+  (the top 10, 50, and 100 stocks per economy). Excess currency returns
+  are defined as the currency return net of the forward premium. 
+  All numbers are reported as annualized percentages, from the perspective of a USD-based investor.}
   \label{tab:summary-statistics}
 \end{table}
 
+\Cref{tab:summary-statistics} reports annualized average returns and volatilities for these
+fully hedged equity returns and excess currency returns, by economy. For each economy, the
+asset figures are the cross-sectional average of the daily returns of its individual
+stocks.
+
+We can see that as the investable universe becomes larger, the average returns tend to fall. In the top 10 universe every economy has a positive average return, ranging from
+$2.76\%$ (the United Kingdom) to $12.59\%$ (the United States). In the top 50 universe, the range
+drops downward, from $-1.99\%$ (Singapore) to $7.99\%$ (the United States), and in the
+top 100 universe the range goes from $-4.84\%$ (Singapore) to $6.86\%$ (the United States), with many
+economies now having negative average returns. The
+trend reflects the firm size, the largest stocks post the strongest returns, and the smaller
+firms added pull the average down.
+Volatilities exhibit the opposite pattern, rising with universe size, as smaller, more
+volatile stocks join the investable universe. Switzerland is the least volatile market in every case, 
+its volatility rises from $29.04\%$ to $33.65\%$, and the upper end rises 
+from $43.30\%$ (Norway) in the top 10 to $62.12\%$ (Singapore) in the top 100.
+
+Excess currency returns range between $-2.07\%$ for the Japanese yen and $2.48\%$ for the New
+Zealand dollar, and excess currency volatilities range from $0.56\%$ for the Hong Kong
+dollar, whose peg to the US dollar keeps it stable, up to $15.18\%$ for the
+South African rand.
+
+To quantify the dependence between asset and currency returns, we compute Pearson
+correlations between economy-level fully hedged equity returns and excess currency returns.
+For each economy we form an equally weighted daily portfolio of the fully hedged returns of
+its constituent stocks, resetting the constituents at each annual universe reconstitution. 
+Correlating each economy's series
+with each currency's excess return over the full sample gives a $14 \times 13$ correlation matrix. The
+US dollar is dropped from the currency axis, since its excess return is zero by
+construction. We repeat this for the three universe sizes.
+The resulting heatmaps are shown in \Cref{fig:asset-currency-corr}.
+
+Across all three universes the correlations range from $-0.2$ to
+$0.4$, and are mostly positive. The pattern is intuitive and confirms well known empirical findings. The strongest positive correlations belong to commodity and risk-sensitive currencies such as the AUD, CAD, NZD and ZAR, whose equity markets and
+currencies rise together in good times and fall together in bad \citep{CHEN2003133, common_risk_factors_currency_markets, carry_trades_and_global_foreign_exchange_volatility}. The JPY and CHF are the only negatively correlated currencies with most other economies (ranging from $-0.2$ to $-0.05$), in line with their role as safe havens that strengthen when equities fall \cite{safe_haven_currencies}. The EUR, DKK, and HKD are minimally correlated, reflecting the HKD's peg to the US dollar, the DKK's peg to the EUR. This split between risky and safe-haven currencies is well
+documented \citep{global_currency_hedging, safe_haven_currencies}.
+
+This is the dependence structure the overlay optimization approach discards. It sets asset weights first, using only equity information, and adds the currency hedge afterwards, whereas the joint model can act on it
+directly. The structure barely changes across universe sizes. This matters for the
+results that follow, a shift
+in the relative performance of the joint and overlay approaches in \Cref{chap:empirical-analysis-and-baseline-results} should therefore
+be attributed to estimation error rather than a change in the underlying dependence structure.
+
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.8\linewidth]{../../results/figures/asset_currency_corr_combined.pdf}
-  \caption{Correlation matrix for asset and currency returns by economy.}
+  \includegraphics[width=0.62\linewidth]{../../results/figures/asset_currency_corr_combined.pdf}
+  \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the three investable universes. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
   \label{fig:asset-currency-corr}
 \end{figure}
 
-\section{Modular Backtesting Framework}
+\section{Implementation} \label{sec:implementation}
+
+This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available on GitHub: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
+
+\subsection{Backtesting Framework} \label{sec:backtesting-framework}
 
 \tikzset{
   box/.style={
@@ -69,8 +129,6 @@ In table 1 we analyze annualized average returns and volatilities for fully hedg
   arr/.style={-Stealth, thick, draw=blue},
   sarr/.style={-Stealth, draw=blue}
 }
-
-This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available on GitHub: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
 
 \begin{figure}[ht]
 \begin{center}
@@ -171,6 +229,36 @@ Two optimizer families are implemented: expected shortfall and mean-variance. Ex
 
 All substantive optimizers are solved with CVXPY. When available, Gurobi is used as the default solver with tight tolerances; otherwise, the code falls back to another compatible solver. Transaction costs are applied at each rebalance using separate assumptions for equities and FX, namely 10 basis points and 1 basis point. Costs are computed with a log-linear turnover approximation, and the backtester tracks drifted weights between rebalances so that turnover reflects actual portfolio evolution. The framework outputs daily out-of-sample returns and summary statistics including annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, and an expected shortfall ratio.
 
-\section{Numerical Implementation of Optimization Problems}
+\section{Numerical Implementation} \label{sec:numerical-implementation}
 
-\section{Evaluation Protocol and Performance Metrics}
+\section{Performance Evaluation Metrics} \label{sec:performance-evaluation-metrics}
+
+All backtested portfolios are evaluated on the same set of performance metrics, computed from the out-of-sample return series. These include the expeted shortfall at confidence level 80\%, annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, expected shortfall ratio and the average turnover for both the asset and currency legs. 
+
+To calculate the expected shortfall at confidence level \(\alpha\), we first compute the value-at-risk at that level, which is the \((1-\alpha)\)-quantile of the return distribution. Then, the expected shortfall is the average of all returns that are less than or equal to this VaR threshold.\footnote{The formal definitions of value at risk and expected shortfall at confidence level \(\alpha\) are given in \Cref{app:es_auxiliary_formulation}.}
+
+The annualized volatility is computed as the standard deviation of daily returns multiplied by the square root of the number of trading days in a year (assumed to be 252).
+
+The maximum drawdown is the largest decline in the cumulative return series.
+
+The Sharpe ratio is the ratio of the average excess return to the standard deviation of returns, annualized by multiplying by the square root of 252. It is the standard measure of risk-adjusted return, and is given by 
+\begin{equation*}
+\text{SR} = \frac{\bar{R} - R_f}{\sigma_R} \sqrt{252}.
+\end{equation*}
+
+The Sortino ratio is a variation of the Sharpe ratio that only considers downside volatility. It is calculated as the average excess return divided by the standard deviation of negative returns, annualized by multiplying by the square root of 252
+\begin{equation*}
+\text{SOR} = \frac{\bar{R} - R_f}{\sigma_{\text{down}}} \sqrt{252}.
+\end{equation*}
+
+The expected shortfall ratio is the ratio of the average return to the expected shortfall at confidence level 80\%, and is given by
+\begin{equation*}
+\text{ESR} = \frac{\bar{R}}{\text{ES}_{0.8}}.
+\end{equation*} 
+
+Finally, the average turnover is computed as the average absolute change in weights between rebalances, separately for the asset and currency legs. This metric captures the trading activity and associated transaction costs of the portfolio strategies.
+
+
+
+
+
