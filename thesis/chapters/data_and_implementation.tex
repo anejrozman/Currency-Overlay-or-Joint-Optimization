@@ -6,10 +6,13 @@ In the data section we detail the construction of the investable universe. We fo
 \section{Data} 
 
 The empirical evaluation of all portfolio optimization strategies in this thesis relies on
-a comprehensive dataset of international equities, foreign exchange spot rates, and forward
-exchange rates sourced from Refinitiv Datastream. The dataset spans from June 1990 to June 2023,
-covering several different market regimes, including the dot-com crash, the 2008 Global Financial
-Crisis, the European sovereign debt crisis, and the COVID-19 pandemic.
+a dataset of international equities, foreign exchange spot rates, and forward
+exchange rates sourced from Refinitiv Datastream. The the one-month U.S.\ Treasury bill rate used in the return and
+performance metric calculations is obtained from
+Kenneth R.\ French's online data library.\footnote{\url{https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}}
+The datasets span from June 1990 to June 2023, covering several different market regimes, including
+the dot-com crash, the 2008 Global Financial Crisis, the European sovereign debt crisis, and the
+COVID-19 pandemic.
 
 We construct the investable universe from 14 global equity markets: Australia,
 Canada, Denmark, Norway, Sweden, Hong Kong, Japan, New Zealand, Singapore, South
@@ -106,103 +109,106 @@ be attributed to estimation error rather than a change in the underlying depende
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.62\linewidth]{../../results/figures/asset_currency_corr_combined.pdf}
+  \includegraphics[width=0.57\linewidth]{../../results/figures/asset_currency_corr_combined.pdf}
   \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the three investable universes. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
   \label{fig:asset-currency-corr}
 \end{figure}
 
-\section{Implementation} \label{sec:implementation}
 
-This chapter describes the implementation of the walk-forward backtesting framework used throughout the thesis. The code is organised around a small number of clearly separated components: a data handler that prepares the investment universe and return series, a backtester that orchestrates the rolling evaluation, and a family of optimizers that implement the portfolio construction problem.\footnote{The full codebase for this project is publicly available on GitHub: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.} This modular structure keeps the experimental setup reproducible while allowing different objective functions and portfolio architectures to share the same evaluation pipeline.
 
-\subsection{Backtesting Framework} \label{sec:backtesting-framework}
+\section{Backtesting Framework} \label{sec:backtesting-framework}
+
+In \Cref{chap:empirical-analysis-and-baseline-results} we evaluate a range of optimization strategies under different objectives (mean-variance or Expected Shortfall), their treatment of
+currency exposure (overlay or joint), and the size of the investable
+universe. To keep these comparisons fair, the
+backtesting framework separates between the
+orchestration of the backtest and the optimization logic it evaluates.\footnote{The full codebase with the backtest implementation is publicly available on GitHub: \url{https://github.com/anejrozman/Multi-Currency-Portfolio-Optimization-with-General-Risk-Measures}.}  
+The main backtesting loop that ingests data, rolls the estimation window forward, selects
+hyperparameters, and records performance is fixed, while the optimizer that
+produces portfolio weights is a swappable component. Any optimizer that conforms
+to a common interface is therefore evaluated under identical conditions.
+The framework is composed of three main components, a data handler, the backtester, and a
+family of optimizers under a common abstract base class, whose
+interaction is summarized in \Cref{fig:backtest}.
+
 
 \tikzset{
   box/.style={
-    draw=blue, fill=blue!10, rounded corners=4pt,
+    draw=black, fill=gray!20, rounded corners=4pt,
     align=center, font=\scriptsize, inner sep=5pt
   },
   absbox/.style={
-    draw=blue, fill=white, rounded corners=4pt, dashed,
+    draw=black, fill=white, rounded corners=4pt, dashed,
     align=center, font=\scriptsize, inner sep=5pt
   },
-  arr/.style={-Stealth, thick, draw=blue},
-  sarr/.style={-Stealth, draw=blue}
+  arr/.style={-Stealth, thick, draw=black},
+  biarr/.style={Stealth-Stealth, thick, draw=black},
+  sarr/.style={-Stealth, draw=black}
 }
 
 \begin{figure}[ht]
 \begin{center}
 \begin{tikzpicture}
- 
-  % --- Data Files ---
-  \node[box, text width=1.9cm] (files) at (0, 0) {
+
+  % --- Data Files (elevated, upper-left) ---
+  \node[box, text width=3cm] (files) at (-0.65, 2.85) {
     \textbf{Data Files}\\[3pt]
-    $R_\text{fh}$,\; $R_u$,\; $R_c$,\\
-    Universe Mask, \\
-    Forward Rates
+    $R^u$,\; $R^c$,\; $f_t$,\\
+    Universe Mask \\
   };
 
   % --- DataHandler ---
-  \node[box, text width=2.3cm] (dh) at (0, -2.1) {
-    \textbf{DataHandler}\\[3pt]
+  \node[box, text width=2.3cm] (dh) at (-0.65, 0.7) {
+    \textbf{\texttt{DataHandler}}\\[3pt]
   };
 
   \draw[arr] (files.south) -- (dh.north);
 
-  % --- Backtester ---
-  \node[box, text width=3.8cm, minimum height=2.7cm] (bt) at (4.7, -1.05) {
-    \textbf{Backtester}\\[5pt]
-    \texttt{run(data\_bundle)}\\[5pt]
-    {\tiny Grid search on est.\ window}\\[2pt]
-    {\tiny Refit on full est.\ window}\\[2pt]
-    {\tiny Transaction costs (10\,/\,1\,bps)}\\[2pt]
+  % --- Backtester (centre container) ---
+  \node[box, text width=4.8cm, minimum height=4cm] (bt) at (5, -0.4) {};
+
+  \node[align=center, font=\scriptsize, anchor=north] (bttitle) at ([yshift=-6pt]bt.north) {%
+    \textbf{\texttt{Backtester}}\\[5pt]
+    \texttt{run(data\_bundle)}%
   };
 
-  \draw[arr] (dh.east) -- node[below=1pt, font=\tiny] {\texttt{data\_bundle}}
+  \node[box, fill=white, text width=4cm] (btinner) at (5, -0.9) {%
+    {\tiny \textbf{Backtest loop}}\\[2pt]
+    {\tiny Grid search on est.\ window}\\[2pt]
+    {\tiny Select best hyperparams on val.\ window}\\[2pt]
+    {\tiny Refit on est.\ window + val. window}%
+  };
+
+  \draw[arr] (dh.east) -- node[above=1pt, font=\tiny] {\texttt{data\_bundle}}
              (bt.west |- dh.east);
 
-  % --- BaseOptimizer (abstract) ---
-  \node[absbox, text width=2.9cm] (base) at (10, -1.05) {
-    \textbf{BaseOptimizer}\\[2pt]
-    \textit{abstract}\\[5pt]
+  % --- BaseOptimizer (abstract hub, right) ---
+  \node[absbox, text width=2.9cm] (base) at (11.3, -0.9) {
+    \textbf{\texttt{BaseOptimizer}}\\[2pt]
     \texttt{fit(train\_bundle)}\\[1pt]
     \texttt{optimize()}\\[1pt]
     \texttt{score(w,\;val\_bundle)}
   };
 
-  \draw[] (bt.east) -- node[above, font=\tiny] {call at}
-             (base.west);
-  \draw[] (bt.east) -- node[below, font=\tiny] {each rebalance}
-             (base.west);
+  \draw[biarr] (base.west) -- node[above, font=\tiny] {\ \ \ call at}
+                                node[below, font=\tiny] {\ \ \ each rebalance}
+               (btinner.east);
 
-  % --- Concrete optimisers ---
-  \node[box, text width=2.5cm] (es) at (8.3, 1.3) {
-    \textbf{ES Optimizers}\\[3pt]
-    {\tiny Reg.\ Asset-Full/Zero}\\
-    {\tiny Reg.\ Curr.\ Overlay}\\
-    {\tiny Reg.\ Joint}
+  % --- Optimizers (single block above BaseOptimizer) ---
+  \node[box, text width=3.5cm] (opt) at (11.3, 2.5) {
+    \textbf{Optimizers}\\[3pt]
+    \texttt{Equal Weight Optimizer}\\
+    \texttt{ES Optimizer}\\
+    \texttt{MV Optimizer}\\
+    \texttt{General Convex Optimizer}
   };
 
-  \node[box, text width=2.5cm] (mv) at (11.5, 1.3) {
-    \textbf{MV Optimizers}\\[3pt]
-    {\tiny Reg.\ Asset-Full/Zero}\\
-    {\tiny Reg.\ Curr.\ Overlay}\\
-    {\tiny Reg.\ Joint}
-  };
+  \draw[arr] (opt.south) -- (base.north);
 
-  \node[box, text width=1.5cm] (ew) at (10, -3.3) {
-    \textbf{Equal}\\
-    \textbf{Weight Optimizer}
-  };
-
-  \draw[sarr] (es.south)  -- ($(base.north) + (-1cm, 0)$);
-  \draw[sarr] (mv.south)  -- ($(base.north) + ( 1cm, 0)$);
-  \draw[sarr] (ew.north)  -- (base.south);
-
-  % --- OOS Returns ---
-  \node[box, text width=2.5cm, fill=blue!10] (oos) at (4.7, -3.8) {
+  % --- OOS Returns (below backtester) ---
+  \node[box, text width=2.8cm] (oos) at (5, -3.4) {
     \text{OOS Returns}\\[2pt]
-    {\text{performance metrics}}
+    {\text{Performance metrics}}
   };
 
   \draw[arr] (bt.south) -- (oos.north);
@@ -211,52 +217,277 @@ This chapter describes the implementation of the walk-forward backtesting framew
 \end{center}
 \caption{Schematic of the backtesting framework.}
 \label{fig:backtest}
-\end{figure}
+\end{figure} 
 
-The figure highlights the main design principle of the implementation: the backtester is intentionally kept generic, while the portfolio logic lives in interchangeable optimizer classes. This makes it possible to compare mean-variance and expected shortfall formulations, asset-only and joint asset--currency strategies, and regularized and unregularized variants under the same walk-forward protocol.
+Data ingestion and alignment are implemetned in the \texttt{DataHandler}.
+It reads the raw inputs, the local unhedged asset returns $R^u$, the currency returns
+$R^c$, the forward premia $f_t$, and the universe mask that identifies which
+assets constitute the investable universe at each date, and aligns them into a
+\texttt{data\_bundle} which is passed to the backtester. The optimizers operate only on the
+bundled series, and the construction of returns from
+these inputs follows \Cref{sec:returns}.
 
-\subsection{Backtesting Workflow and Optimizer Structure}
+All implemented optimizers inherit from an abstract base class, \texttt{BaseOptimizer}, that
+defines the three-method interface through which the backtester drives them. The
+\texttt{fit} method receives a training data bundle and estimates and stores the
+quantities the optimizer requires for its objective (e.g. covariance matrix for the mean-variance optimizer), so that estimation is
+performed entirely within each optimizer.
+The \texttt{optimize} method solves the specific optimization problem. The \texttt{score} method takes a set of weights and a
+validation bundle and returns the validation performance used for hyperparameter
+selection. Concrete subclasses implement this interface for each strategy, an
+equal-weight optimizer that serves as the naive benchmark, the mean-variance and
+Expected Shortfall optimizers, and a general convex optimizer TODO: Update this when done implementing generalization.
+The estimators and solver internals invoked inside \texttt{fit} and
+\texttt{optimize} are described in \Cref{sec:numerical-implementation}.
 
-The framework is built around a strict separation of concerns. The \texttt{DataHandler} prepares the inputs for the backtest by loading precomputed return series, mapping each asset to its reporting currency, and building a daily universe mask from the investment universe file. The backtester receives these objects as a single \texttt{data\_bundle} and does not need to know how they were generated.
+The backtest itself is implemented in the \texttt{Backtester.run} method, which
+advances through the data sample on a set rebalancing frequency (daily, weekly, monthly, quarterly, or annual). The
+empirical analysis in \Cref{chap:empirical-analysis-and-baseline-results} and Appendix \ref{app:additional-results} uses monthly and quarterly rebalancing on the daily data. At each
+rebalancing date, the optimizer is calibrated and deployed using a fixed rolling lookback window, partitioned into  an estimation window and a validation window. Hyperparameters are selected by a grid search over
+this partition. Each configuration is fitted on the estimation window
+via \texttt{fit}, used to produce weights via \texttt{optimize}, and evaluated on
+the validation window via \texttt{score}, and the configuration with the
+best validation score is retained on both the estimation and validation windows and finally used to 
+produce the portfolio weights for the next out-of-sample period. 
+These weights are held until the next rebalancing date, and the
+portfolio's realized return over the holding period is recorded as a single
+out-of-sample observation. The window then rolls forward and the procedure
+repeats. Because we keep the estimation, validation, and total lookback window lengths
+fixed throughout the backtest (10 years split into 9 for estimation and 1 for validation) and across universe sizes, every strategy is evaluated on the same out-of-sample dataset.
 
-The \texttt{Backtester} is responsible for the evaluation protocol. It determines rebalancing dates, constructs estimation and validation windows, performs hyperparameter selection when a grid is supplied, and records the resulting out-of-sample returns. All portfolio construction decisions are delegated to subclasses of \texttt{BaseOptimizer}, which all implement \texttt{fit(train\_bundle)}, \texttt{optimize()}, and \texttt{score(weights, val\_bundle)}.
+Each invocation of the backtester for a given optimizer produces a self-contained
+run directory. A new \texttt{run\_<n>} folder is created under
+\texttt{run/<optimizer\_name>/} and collects the full record of that run. The
+out-of-sample return series \texttt{oos\_returns.csv}, the performance
+metrics \texttt{metrics.json}, a cumulative-return plot
+\texttt{cum\_returns\_plot.png}, and a configuration file \texttt{config.json}
+recording the run specification. Storing the configuration alongside its outputs
+makes each result reproducible and attributable to the settings
+that generated it.
 
-The backtest follows a standard walk-forward procedure. At each rebalance date, the framework forms a rolling estimation window and a separate validation window, evaluates candidate hyperparameters, refits the best configuration on the full estimation sample, and then carries the portfolio into the next holding period. Rebalancing can be daily, weekly, monthly, quarterly, semi-annual, or annual. Before optimization, the code filters the investable universe to currently eligible assets and checks that each selected asset has a complete return history, which keeps missing-data handling outside the optimization problem. Window lengths are stored centrally in \texttt{backtest\_config.py}; the default setup uses a ten-year estimation window and a one-year validation window.
+% MAYBE INCLUDE
 
-\subsection{Optimization, Costs, and Outputs}
+% This design also anticipates the methodological extension of 
+% \Cref{chap:general}. Because the backtester treats the optimizer as an opaque
+% component behind the \texttt{fit}--\texttt{optimize}--\texttt{score} interface,
+% generalizing the objective to an arbitrary convex risk measure requires no
+% modification to the harness: the general convex optimizer already appears in the
+% same class hierarchy and is evaluated under exactly the protocol described here.
+% The orchestration is held constant not only across the baseline strategies but
+% also across the generalized objectives studied later, so that any difference in
+% performance is attributable to the objective itself rather than to the evaluation
+% procedure.
 
-Two optimizer families are implemented: expected shortfall and mean-variance. Expected shortfall is formulated as a convex program with auxiliary variables, optional \(\ell_1\) and \(\ell_2\) regularization, and an \(\ell_1\)-norm leverage cap. Mean-variance uses Bayes--Stein shrinkage for expected returns and a lightly regularized covariance matrix. Both families are available in asset-only and joint asset--currency variants. The asset-only strategies use either hedged returns (\emph{assets-full}) or unhedged returns (\emph{assets-zero}), while the joint strategies solve for asset weights and currency hedge weights together. The equal-weight benchmark follows the same interface but returns a uniform allocation.
 
-All substantive optimizers are solved with CVXPY. When available, Gurobi is used as the default solver with tight tolerances; otherwise, the code falls back to another compatible solver. Transaction costs are applied at each rebalance using separate assumptions for equities and FX, namely 10 basis points and 1 basis point. Costs are computed with a log-linear turnover approximation, and the backtester tracks drifted weights between rebalances so that turnover reflects actual portfolio evolution. The framework outputs daily out-of-sample returns and summary statistics including annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, and an expected shortfall ratio.
 
 \section{Numerical Implementation} \label{sec:numerical-implementation}
 
-\section{Performance Evaluation Metrics} \label{sec:performance-evaluation-metrics}
+The optimization problems derived in \Cref{chap:optimization-framework} are
+not assembled in their explicit matrix form in code. Each problem is instead
+expressed directly in the high-level modeling syntax of \texttt{CVXPY} and
+canonicalized automatically into the standard form passed to the solver; the
+matrix derivations in the appendices serve to make the structure of each program
+transparent rather than to describe the implementation literally. In particular,
+the $\ell_1$ penalty is written with CVXPY's \texttt{norm1} atom, so the
+positive--negative variable split used in the derivation is internal to the
+canonicalization and never appears explicitly in the code. The resulting problem
+class depends only on the regularization in force: the Expected Shortfall
+optimizer is a linear program when it is left unregularized, since both the
+Rockafellar--Uryasev objective and its constraints are linear, whereas the
+$\ell_2$ ridge penalty introduces a quadratic term that turns every regularized
+Expected Shortfall problem into a quadratic program. The mean--variance problems
+are quadratic programs by construction, through the variance term in their
+objective.
 
-All backtested portfolios are evaluated on the same set of performance metrics, computed from the out-of-sample return series. These include the expeted shortfall at confidence level 80\%, annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, expected shortfall ratio and the average turnover for both the asset and currency legs. 
+All programs are solved with Gurobi, a state-of-the-art solver for linear and
+quadratic programs, accessed through CVXPY. The solver is configured to use the
+barrier (interior-point) method with tight convergence and accuracy tolerances,
+so that the large number of problems solved across rebalancing dates, universes,
+and hyperparameter configurations return precise and reproducible optima. The
+exact configuration is:
 
-To calculate the expected shortfall at confidence level \(\alpha\), we first compute the value-at-risk at that level, which is the \((1-\alpha)\)-quantile of the return distribution. Then, the expected shortfall is the average of all returns that are less than or equal to this VaR threshold.\footnote{The formal definitions of value at risk and expected shortfall at confidence level \(\alpha\) are given in \Cref{app:es_auxiliary_formulation}.}
+\begin{lstlisting}[language=Python]
+problem.solve(
+    solver=cp.GUROBI,
+    verbose=False,
+    BarConvTol=1e-8,
+    Method=2,
+    ScaleFlag=0,
+    AggFill=0,
+    PreDual=1,
+    Presolve=1,
+    Threads=3,
+    FeasibilityTol=1e-9,
+    OptimalityTol=1e-9,
+)
+\end{lstlisting}
 
-The annualized volatility is computed as the standard deviation of daily returns multiplied by the square root of the number of trading days in a year (assumed to be 252).
+The barrier method (\texttt{Method=2}) is paired with a barrier convergence
+tolerance of $10^{-8}$ and feasibility and optimality tolerances of $10^{-9}$;
+the remaining flags pin down the presolve, scaling, and threading behavior so that
+solver results remain reproducible across the many runs.
 
-The maximum drawdown is the largest decline in the cumulative return series.
+What each optimizer estimates before solving depends on its objective. The
+mean--variance optimizers require the first two moments of returns over the
+estimation window: the mean vector is estimated with Bayes--Stein shrinkage
+\citep{jorion1986}, which pulls the noisy sample means toward a common grand mean,
+and the return covariance is estimated with the Ledoit--Wolf shrinkage estimator
+\citep{ledoitwolf2004}, which shrinks the sample covariance toward a structured
+target and is therefore far better conditioned than the raw sample estimate. The
+shrunk mean enters the explicit return-maximization term of the mean--variance
+objective, and the shrunk covariance enters the variance term. The Expected
+Shortfall optimizers, by contrast, require no moment estimation: the
+sample-average approximation of \Cref{app:es-derivation} uses the empirical return
+observations in the estimation window directly as the scenario set over which tail
+risk is evaluated, so the historical returns themselves are the only input.
 
-The Sharpe ratio is the ratio of the average excess return to the standard deviation of returns, annualized by multiplying by the square root of 252. It is the standard measure of risk-adjusted return, and is given by 
+A specific instability arises in the joint mean--variance optimizer. Because its
+objective rewards expected return while penalizing variance, and the currency
+covariance can remain close to singular even after shrinkage, the optimizer is
+prone to taking unboundedly large net currency positions: it loads onto currency
+directions that combine a favorable estimated mean with a near-zero estimated
+variance, where the risk term fails to restrain it. Two elements of the
+formulation together render the problem well-posed. First, the
+net-currency-exposure box constraint introduced in \Cref{sec:regularization} bounds
+each net currency position component-wise, so the feasible set is compact and no
+exposure can diverge. Second, the $\ell_2$ ridge penalty conditions the currency
+covariance, removing the near-singular directions the optimizer would otherwise
+exploit and ensuring the quadratic objective is strictly convex. With a strictly
+convex objective over a compact feasible region the optimum is unique and finite,
+and the runaway positions no longer occur.
+
+Hyperparameter selection follows the walk-forward grid search described in
+\Cref{sec:backtest}. The tuned hyperparameters are the four elastic-net
+penalties---the $\ell_1$ and $\ell_2$ coefficients applied separately to the asset
+and currency blocks, $\lambda_1^a$, $\lambda_2^a$, $\lambda_1^c$, and
+$\lambda_2^c$---and the grid is the full Cartesian product of their individual
+ranges. Each candidate configuration is scored on its own terms: the weights it
+produces are evaluated by computing, on the validation window, the same objective
+the optimizer minimizes, so that each strategy is tuned against the criterion it
+is designed to optimize rather than against a common external metric. The
+structural and modeling parameters that define the problem itself---the
+risk-aversion coefficient, the leverage budget, and the net-currency-exposure box
+bounds---are fixed a priori rather than tuned. The penalty grids are reported in
+\Cref{tab:hypergrid}; the full numerical specification, including the per-universe
+selected values, is collected in \Cref{app:hyperparams}.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\toprule
+Hyperparameter & Description & Grid \\
+\midrule
+$\lambda_1^a$ & Asset $\ell_1$ (sparsity) penalty    & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
+$\lambda_2^a$ & Asset $\ell_2$ (ridge) penalty       & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
+$\lambda_1^c$ & Currency $\ell_1$ (sparsity) penalty & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
+$\lambda_2^c$ & Currency $\ell_2$ (ridge) penalty    & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
+\bottomrule
+\end{tabular}
+\caption{Hyperparameter grids for the elastic-net penalties. The grid searched at
+each rebalancing date is the Cartesian product of the four ranges.}
+\label{tab:hypergrid}
+\end{table}
+
+The general convex optimizer that supports the methodological extension of
+\Cref{chap:general} is implemented within the same machinery---expressed in
+CVXPY, solved with the identical Gurobi configuration, and calibrated under the
+same protocol. Its objectives and the estimation they require are specific to that
+extension and are deferred to \Cref{chap:general}.
+
+\section{Performance Evaluation Metrics}
+\label{sec:performance-evaluation-metrics}
+
+All strategies are evaluated on a common set of performance metrics computed from
+their out-of-sample return series. Evaluating performance out of sample is
+essential here: in sample, the joint optimizer can only weakly improve on the
+overlay, since it optimizes over the full asset-and-currency space rather than
+the overlay's sequential decomposition, so a meaningful comparison must use data
+not seen during estimation. Because each optimizer minimizes a different
+objective, the strategies cannot be ranked by their in-sample objective values
+and are instead judged on the same realized metrics, each capturing a distinct
+facet of risk and reward. All metrics are computed on USD returns net of the
+transaction costs detailed in \Cref{app:transaction-costs}, so that reported
+performance reflects implementation cost. Throughout, $R_{\mathcal P,t}$ denotes
+the realized daily out-of-sample portfolio return, $\bar R_{\mathcal P}$ its
+sample mean, $\sigma$ its sample standard deviation, and $R_f$ the risk-free
+rate; daily figures are annualized using $252$ trading days per year (means
+scaled by $252$, standard deviations by $\sqrt{252}$). The reported metrics are
+the expected shortfall at the $80\%$ confidence level, annualized volatility,
+maximum drawdown, the Sharpe ratio, the Sortino ratio, the expected shortfall
+ratio, and asset and currency turnover.
+
+Expected shortfall at confidence level $\beta$ measures the average loss in the
+worst $(1-\beta)$ tail of the return distribution, and is the realized
+counterpart of the very objective the ES strategies minimize, so it reports tail
+risk on the same footing as the optimization criterion. We first compute the
+value at risk $\mathrm{VaR}_\beta$ as the $(1-\beta)$-quantile of the
+out-of-sample returns; the expected shortfall is then the negative of the average
+of all returns at or below this threshold, reported as a positive loss magnitude.
+We evaluate it at $\beta = 0.80$, the same confidence level used in the optimizer,
+and report the daily figure.\footnote{Formal definitions of value at risk and
+expected shortfall at confidence level $\beta$ are given in Appendix
+\ref{app:es_auxiliary_formulation}.}
+
+Annualized volatility is the standard deviation of daily returns scaled by
+$\sqrt{252}$. It is the classical dispersion measure of returns and the quantity
+the mean--variance strategies control directly, making it the natural
+common-scale risk figure across objectives.
+
+Maximum drawdown is the largest peak-to-trough decline of the cumulative wealth
+curve over the out-of-sample period, capturing the worst cumulative loss an
+investor would have sustained---a path-dependent risk that the distributional
+measures do not reflect. Letting $V_t = \prod_{s \le t}(1 + R_{\mathcal P,s})$
+denote the cumulative wealth, with $V_0 = 1$, and $P_t = \max_{s \le t} V_s$ its
+running peak, the maximum drawdown is
 \begin{equation*}
-\text{SR} = \frac{\bar{R} - R_f}{\sigma_R} \sqrt{252}.
+\mathrm{MD} = \max_{t} \frac{P_t - V_t}{P_t}.
 \end{equation*}
 
-The Sortino ratio is a variation of the Sharpe ratio that only considers downside volatility. It is calculated as the average excess return divided by the standard deviation of negative returns, annualized by multiplying by the square root of 252
+The Sharpe ratio is the annualized ratio of average excess return to total
+volatility, the standard measure of risk-adjusted return used to rank strategies
+on a common scale,
 \begin{equation*}
-\text{SOR} = \frac{\bar{R} - R_f}{\sigma_{\text{down}}} \sqrt{252}.
+\mathrm{SR} = \frac{\bar{R}_{\mathcal P} - R_f}{\sigma}\sqrt{252}.
 \end{equation*}
 
-The expected shortfall ratio is the ratio of the average return to the expected shortfall at confidence level 80\%, and is given by
+The Sortino ratio replaces total volatility with downside volatility, so that
+strategies are not penalized for upside dispersion---appropriate for
+downside-risk-focused portfolios. It is the annualized ratio of average excess
+return to the standard deviation of the negative returns $\sigma_{\text{down}}$,
 \begin{equation*}
-\text{ESR} = \frac{\bar{R}}{\text{ES}_{0.8}}.
-\end{equation*} 
+\mathrm{SOR} = \frac{\bar{R}_{\mathcal P} - R_f}{\sigma_{\text{down}}}\sqrt{252}.
+\end{equation*}
 
-Finally, the average turnover is computed as the average absolute change in weights between rebalances, separately for the asset and currency legs. This metric captures the trading activity and associated transaction costs of the portfolio strategies.
+The expected shortfall ratio is the tail-risk analogue of the Sharpe ratio,
+reporting average return per unit of downside risk \citep{lucescu_ulrych_2026}.
+It is computed from the annualized average return and the annualized expected
+shortfall, which places it on the same comparable footing as the Sharpe and
+Sortino ratios,
+\begin{equation*}
+\mathrm{ESR} = \frac{\bar{R}^{\,\text{ann}}_{\mathcal P}}{\mathrm{ES}^{\,\text{ann}}_{\beta}}.
+\end{equation*}
+
+Finally, turnover proxies the trading activity---and hence the implementation
+cost---of each strategy, and indicates whether performance is sustained by
+excessive rebalancing. It is reported separately for the asset and currency legs,
+since the two are traded through different instruments. Asset turnover is the
+average rebalancing volume over the out-of-sample period
+\citep{demiguel2009generalized, kondor2015contour},
+\begin{equation*}
+\mathrm{Turnover}^{a} = \frac{1}{T}\sum_{t=1}^{T}\sum_{i=1}^{N}
+\bigl| x_{i,t} - x_{i,t}^{-} \bigr|,
+\end{equation*}
+where $x_{i,t}^{-}$ is the asset weight just before rebalancing at $t$ and
+$x_{i,t}$ the weight set at the rebalance, and $T$ is the number of out-of-sample
+rebalancing dates. Currency turnover is the average absolute notional of the
+forward positions \citep{burkhardt_ulrych_2023, polak_ulrych_2024},
+\begin{equation*}
+\mathrm{Turnover}^{c} = \frac{1}{T}\sum_{t=1}^{T}\sum_{c=1}^{M}
+\bigl| \upphi_{c,t} \bigr|,
+\end{equation*}
+which, unlike the asset leg, is measured on the level of the forward positions
+because the one-period forward contracts are entered afresh at each rebalancing
+date.
 
 
 
