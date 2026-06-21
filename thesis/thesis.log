@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  21 JUN 2026 14:49
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  21 JUN 2026 17:45
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1564,58 +1564,14 @@ File: lstlang1.sty 2024/09/23 1.10c listings language file
 
 [11]
 
-Package natbib Warning: Citation `jorion1986' on page 12 undefined on input line 333.
-
-
-Package natbib Warning: Citation `ledoitwolf2004' on page 12 undefined on input line 335.
-
-
-LaTeX Warning: Reference `app:es-derivation' on page 1 undefined on input line 340.
-
-
-LaTeX Warning: Reference `sec:regularization' on page 1 undefined on input line 351.
-
-
-LaTeX Warning: Reference `sec:backtest' on page 1 undefined on input line 360.
-
-
-LaTeX Warning: Reference `app:hyperparams' on page 1 undefined on input line 372.
-
-
-LaTeX Warning: Reference `chap:general' on page 1 undefined on input line 392.
-
-
-LaTeX Warning: Reference `chap:general' on page 1 undefined on input line 395.
-
-
-LaTeX Warning: Reference `app:transaction-costs' on page 1 undefined on input line 409.
-
-
-
-[12]
-
-[13
+[12
 pdfTeX warning (ext4): destination with the same identifier (name{table.4.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.457 \begin{equation*}
-                       ]
+l.402 
+      ]
 
-Package natbib Warning: Citation `lucescu_ulrych_2026' on page 14 undefined on input line 462.
-
-
-Package natbib Warning: Citation `demiguel2009generalized' on page 14 undefined on input line 475.
-
-
-Package natbib Warning: Citation `kondor2015contour' on page 14 undefined on input line 475.
-
-
-Package natbib Warning: Citation `burkhardt_ulrych_2023' on page 14 undefined on input line 483.
-
-
-Package natbib Warning: Citation `polak_ulrych_2024' on page 14 undefined on input line 483.
-
-) (./chapters/empirical_analysis_and_baseline_results.tex
+[13]) (./chapters/empirical_analysis_and_baseline_results.tex
 
 [14]
 
@@ -1763,7 +1719,7 @@ l.26 \begin{align*}
 [34
 
 ] (./thesis.bbl
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 77.
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 82.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
@@ -1772,12 +1728,12 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 
 
 {/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}])
-<declaration-originality.pdf, id=789, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=796, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 215.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=791, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=798, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 215.
@@ -1809,14 +1765,10 @@ Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 
 \tf@thm=\write6
 \openout6 = `thesis.thm'.
 
-
-
-Package natbib Warning: There were undefined citations.
-
 \tf@toc=\write7
 \openout7 = `thesis.toc'.
 
-(./thesis.aux)
+ (./thesis.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2020/03/25>
@@ -1829,18 +1781,18 @@ Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: 287AF8FAB7CB0C1AC8E5931750F26E9C;13280.
  ) 
 Here is how much of TeX's memory you used:
- 40631 strings out of 473190
- 781593 string characters out of 5715800
- 1468287 words of memory out of 5000000
- 62507 multiletter control sequences out of 15000+600000
- 735284 words of font info for 341 fonts, out of 8000000 for 9000
+ 40630 strings out of 473190
+ 781588 string characters out of 5715800
+ 1468447 words of memory out of 5000000
+ 62504 multiletter control sequences out of 15000+600000
+ 735349 words of font info for 341 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 102i,19n,125p,1440b,2201s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 102i,19n,125p,1440b,2199s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (42 pages, 989936 bytes).
+Output written on thesis.pdf (42 pages, 991470 bytes).
 PDF statistics:
- 1027 PDF objects out of 1200 (max. 8388607)
- 808 compressed objects within 9 object streams
- 166 named destinations out of 1000 (max. 500000)
+ 1034 PDF objects out of 1200 (max. 8388607)
+ 815 compressed objects within 9 object streams
+ 168 named destinations out of 1000 (max. 500000)
  101499 words of extra memory for PDF output out of 106986 (max. 10000000)
 

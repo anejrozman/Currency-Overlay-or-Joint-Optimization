@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: thesis.aux
+The style file: plain.bst
+Database file #1: refs.bib
+Warning--I didn't find a database entry for "lucescu_ulrych_2026"
+Warning--I didn't find a database entry for "demiguel2009generalized"
+Warning--I didn't find a database entry for "kondor2015contour"
+Warning--I didn't find a database entry for "burkhardt_ulrych_2023"
+Warning--I didn't find a database entry for "polak_ulrych_2024"
+Warning--empty journal in FrazziniIsraelMoskowitz2018
+Warning--empty journal in Jones2002
+You've used 20 entries,
+            2118 wiz_defined-function locations,
+            639 strings with 7649 characters,
+and the built_in function-call counts, 6200 in all, are:
+= -- 601
+> -- 289
+< -- 0
++ -- 116
+- -- 94
+* -- 459
+:= -- 1062
+add.period$ -- 61
+call.type$ -- 20
+change.case$ -- 105
+chr.to.int$ -- 0
+cite$ -- 22
+duplicate$ -- 208
+empty$ -- 495
+format.name$ -- 94
+if$ -- 1267
+int.to.chr$ -- 0
+int.to.str$ -- 20
+missing$ -- 19
+newline$ -- 103
+num.names$ -- 40
+pop$ -- 101
+preamble$ -- 1
+purify$ -- 87
+quote$ -- 0
+skip$ -- 144
+stack$ -- 0
+substring$ -- 399
+swap$ -- 18
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 76
+warning$ -- 2
+while$ -- 59
+width$ -- 22
+write$ -- 216
+(There were 7 warnings)

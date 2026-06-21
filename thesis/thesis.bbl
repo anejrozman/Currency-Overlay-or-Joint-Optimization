@@ -1,5 +1,10 @@
 \begin{thebibliography}{10}
 
+\bibitem{CoherentMeasuresOfRisk}
+Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath.
+\newblock Coherent measures of risk.
+\newblock {\em Mathematical Finance}, 9(3):203--228, 1999.
+
 \bibitem{boyd2004convex}
 Stephen Boyd and Lieven Vandenberghe.
 \newblock {\em Convex Optimization}.

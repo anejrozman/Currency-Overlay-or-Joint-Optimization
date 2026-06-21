@@ -284,27 +284,24 @@ that generated it.
 
 The optimization problems derived in \Cref{chap:optimization-framework} are
 not assembled in their explicit matrix form in code. Each problem is instead
-expressed directly in the high-level modeling syntax of \texttt{CVXPY} and
-canonicalized automatically into the standard form passed to the solver; the
-matrix derivations in the appendices serve to make the structure of each program
-transparent rather than to describe the implementation literally. In particular,
-the $\ell_1$ penalty is written with CVXPY's \texttt{norm1} atom, so the
-positive--negative variable split used in the derivation is internal to the
-canonicalization and never appears explicitly in the code. The resulting problem
-class depends only on the regularization in force: the Expected Shortfall
+expressed directly in the high-level modeling syntax of \texttt{CVXPY},
+converted automatically into the standard form, and finally passed to the solver. For example,
+the $L_1$ penalty is written with \texttt{CVXPY}'s \texttt{norm1} atom, so the
+positive-negative variable split used in the derivation is internal to the solver and never appears explicitly in the code. The resulting problem
+class depends only on the regularization. The Expected Shortfall
 optimizer is a linear program when it is left unregularized, since both the
 Rockafellar--Uryasev objective and its constraints are linear, whereas the
-$\ell_2$ ridge penalty introduces a quadratic term that turns every regularized
+$L_2$ ridge penalty introduces a quadratic term that turns every regularized
 Expected Shortfall problem into a quadratic program. The mean--variance problems
 are quadratic programs by construction, through the variance term in their
 objective.
 
 All programs are solved with Gurobi, a state-of-the-art solver for linear and
-quadratic programs, accessed through CVXPY. The solver is configured to use the
-barrier (interior-point) method with tight convergence and accuracy tolerances,
+quadratic programs, accessed through \texttt{CVXPY}.\footnote{Gurobi is a commercial solver and requires a license for use, a fallback solver is available in the project codebase.} The solver is configured to use the
+barrier (interior point) method with tight convergence and accuracy tolerances,
 so that the large number of problems solved across rebalancing dates, universes,
-and hyperparameter configurations return precise and reproducible optima. The
-exact configuration is:
+and hyperparameter configurations return reproducible results. The
+exact configuration is
 
 \begin{lstlisting}[language=Python]
 problem.solve(
@@ -323,156 +320,151 @@ problem.solve(
 \end{lstlisting}
 
 The barrier method (\texttt{Method=2}) is paired with a barrier convergence
-tolerance of $10^{-8}$ and feasibility and optimality tolerances of $10^{-9}$;
-the remaining flags pin down the presolve, scaling, and threading behavior so that
-solver results remain reproducible across the many runs.
-
-What each optimizer estimates before solving depends on its objective. The
-mean--variance optimizers require the first two moments of returns over the
-estimation window: the mean vector is estimated with Bayes--Stein shrinkage
-\citep{jorion1986}, which pulls the noisy sample means toward a common grand mean,
-and the return covariance is estimated with the Ledoit--Wolf shrinkage estimator
-\citep{ledoitwolf2004}, which shrinks the sample covariance toward a structured
-target and is therefore far better conditioned than the raw sample estimate. The
-shrunk mean enters the explicit return-maximization term of the mean--variance
-objective, and the shrunk covariance enters the variance term. The Expected
-Shortfall optimizers, by contrast, require no moment estimation: the
-sample-average approximation of \Cref{app:es-derivation} uses the empirical return
-observations in the estimation window directly as the scenario set over which tail
-risk is evaluated, so the historical returns themselves are the only input.
-
-A specific instability arises in the joint mean--variance optimizer. Because its
-objective rewards expected return while penalizing variance, and the currency
-covariance can remain close to singular even after shrinkage, the optimizer is
-prone to taking unboundedly large net currency positions: it loads onto currency
-directions that combine a favorable estimated mean with a near-zero estimated
-variance, where the risk term fails to restrain it. Two elements of the
-formulation together render the problem well-posed. First, the
-net-currency-exposure box constraint introduced in \Cref{sec:regularization} bounds
-each net currency position component-wise, so the feasible set is compact and no
-exposure can diverge. Second, the $\ell_2$ ridge penalty conditions the currency
-covariance, removing the near-singular directions the optimizer would otherwise
-exploit and ensuring the quadratic objective is strictly convex. With a strictly
-convex objective over a compact feasible region the optimum is unique and finite,
-and the runaway positions no longer occur.
+tolerance of $10^{-8}$ and feasibility and optimality tolerances of $10^{-9}$,
+the remaining flags specify the presolve, scaling, and threading behavior, which were optimized for the problem sizes considered in the thesis.
 
 Hyperparameter selection follows the walk-forward grid search described in
-\Cref{sec:backtest}. The tuned hyperparameters are the four elastic-net
-penalties---the $\ell_1$ and $\ell_2$ coefficients applied separately to the asset
-and currency blocks, $\lambda_1^a$, $\lambda_2^a$, $\lambda_1^c$, and
-$\lambda_2^c$---and the grid is the full Cartesian product of their individual
-ranges. Each candidate configuration is scored on its own terms: the weights it
-produces are evaluated by computing, on the validation window, the same objective
-the optimizer minimizes, so that each strategy is tuned against the criterion it
-is designed to optimize rather than against a common external metric. The
-structural and modeling parameters that define the problem itself---the
-risk-aversion coefficient, the leverage budget, and the net-currency-exposure box
-bounds---are fixed a priori rather than tuned. The penalty grids are reported in
-\Cref{tab:hypergrid}; the full numerical specification, including the per-universe
-selected values, is collected in \Cref{app:hyperparams}.
+\Cref{sec:backtesting-framework}. The tuned hyperparameters are the $L_1$ and
+$L_2$ regularization coefficients applied separately to the asset and currency
+weights, $\lambda_1^a$, $\lambda_2^a$, $\lambda_1^c$, and $\lambda_2^c$, and the
+grid is the full Cartesian product of their individual ranges. Each candidate
+configuration is scored by computing, on the validation window, the objective the
+optimizer minimizes, evaluated at the weights that configuration produces. The
+other parameters specific to the optimziation problems (these include the
+risk-aversion coefficient, the leverage budget, and the net currency exposure
+bounds) are fixed a priori rather than tuned. For each penalty the lower bound is
+zero, corresponding to the absence of that regularization term, while the upper bounds
+differ across parameters and are chosen so that larger values leave the optimal
+weights essentially unchanged. The resulting grids are reported in
+\Cref{tab:hypergrid}.
 
 \begin{table}[ht]
 \centering
 \begin{tabular}{lll}
 \toprule
-Hyperparameter & Description & Grid \\
+Hyperparameter & Description & Grid range \\
 \midrule
-$\lambda_1^a$ & Asset $\ell_1$ (sparsity) penalty    & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
-$\lambda_2^a$ & Asset $\ell_2$ (ridge) penalty       & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
-$\lambda_1^c$ & Currency $\ell_1$ (sparsity) penalty & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
-$\lambda_2^c$ & Currency $\ell_2$ (ridge) penalty    & 6 points, log-spaced in $[10^{-4}, 10^{0}]$ \\
+$\lambda_1^a$ & Asset $L_1$ penalty    & $[0,\ 5\times10^{-3}]$ \\
+$\lambda_2^a$ & Asset $L_2$ penalty       & $[0,\ 3]$ \\
+$\lambda_1^c$ & Currency $L_1$ penalty & $[0,\ 5\times10^{-4}]$ \\
+$\lambda_2^c$ & Currency $L_2$ penalty    & $[0,\ 5\times10^{-5}]$ \\
 \bottomrule
 \end{tabular}
-\caption{Hyperparameter grids for the elastic-net penalties. The grid searched at
-each rebalancing date is the Cartesian product of the four ranges.}
+\caption{Hyperparameter grids for the regularization penalties. Each parameter is
+searched over a range spanning from zero up to the reported maximum,
+with the positive values placed on a log-spaced grid. The grid searched at each
+rebalancing date is the Cartesian product of the four ranges.}
 \label{tab:hypergrid}
 \end{table}
 
-The general convex optimizer that supports the methodological extension of
-\Cref{chap:general} is implemented within the same machinery---expressed in
-CVXPY, solved with the identical Gurobi configuration, and calibrated under the
-same protocol. Its objectives and the estimation they require are specific to that
-extension and are deferred to \Cref{chap:general}.
+% MAYBE INCLUDE THIS PARAGRAPH
+
+% The general convex optimizer that supports the methodological extension of
+% \Cref{chap:general} is implemented within the same machinery---expressed in
+% CVXPY, solved with the identical Gurobi configuration, and calibrated under the
+% same protocol. Its objectives and the estimation they require are specific to that
+% extension and are deferred to \Cref{chap:general}.
 
 \section{Performance Evaluation Metrics}
 \label{sec:performance-evaluation-metrics}
 
-All strategies are evaluated on a common set of performance metrics computed from
-their out-of-sample return series. Evaluating performance out of sample is
-essential here: in sample, the joint optimizer can only weakly improve on the
-overlay, since it optimizes over the full asset-and-currency space rather than
-the overlay's sequential decomposition, so a meaningful comparison must use data
-not seen during estimation. Because each optimizer minimizes a different
-objective, the strategies cannot be ranked by their in-sample objective values
-and are instead judged on the same realized metrics, each capturing a distinct
-facet of risk and reward. All metrics are computed on USD returns net of the
-transaction costs detailed in \Cref{app:transaction-costs}, so that reported
-performance reflects implementation cost. Throughout, $R_{\mathcal P,t}$ denotes
+All portfolio optimization strategies are evaluated on a common set of performance metrics computed from
+their out-of-sample return series. Because each optimizer minimizes a different
+objective, the strategies cannot be ranked solely by their in-sample objective values
+and are instead judged on the same realized metrics, each capturing a different view of the performance. All metrics are computed on USD returns net of the
+transaction costs detailed in Appendix \ref{app:transaction_costs}. 
+Throughout this section, $R_{\mathcal P,t}$ denotes
 the realized daily out-of-sample portfolio return, $\bar R_{\mathcal P}$ its
 sample mean, $\sigma$ its sample standard deviation, and $R_f$ the risk-free
-rate; daily figures are annualized using $252$ trading days per year (means
-scaled by $252$, standard deviations by $\sqrt{252}$). The reported metrics are
-the expected shortfall at the $80\%$ confidence level, annualized volatility,
+rate. Daily figures are annualized using the standard $252$ trading days per year assumption. The reported metrics are
+the expected shortfall at the $80\%$ and $95\%$ confidence levels, annualized volatility,
 maximum drawdown, the Sharpe ratio, the Sortino ratio, the expected shortfall
 ratio, and asset and currency turnover.
 
 Expected shortfall at confidence level $\beta$ measures the average loss in the
-worst $(1-\beta)$ tail of the return distribution, and is the realized
-counterpart of the very objective the ES strategies minimize, so it reports tail
-risk on the same footing as the optimization criterion. We first compute the
-value at risk $\mathrm{VaR}_\beta$ as the $(1-\beta)$-quantile of the
-out-of-sample returns; the expected shortfall is then the negative of the average
-of all returns at or below this threshold, reported as a positive loss magnitude.
-We evaluate it at $\beta = 0.80$, the same confidence level used in the optimizer,
-and report the daily figure.\footnote{Formal definitions of value at risk and
-expected shortfall at confidence level $\beta$ are given in Appendix
-\ref{app:es_auxiliary_formulation}.}
+worst $(1-\beta)$ tail of the return distribution. It is preferred to value at
+risk because it is coherent \cite{CoherentMeasuresOfRisk} and, rather than
+reporting only the loss threshold, averages the losses beyond it, so it reflects
+how severe the tail outcomes are and not merely how often they occur.\footnote{Formal
+definitions of value at risk and expected shortfall at confidence level $\beta$ are
+given in Appendix \ref{app:es_auxiliary_formulation}.} For the expected shortfall
+strategies it is the realized value captures quantity the optimizer minimizes,
+which makes it the most direct out-of-sample test of whether the expected shortfall
+strategy delivers on its objective. Because every strategy, including the
+mean--variance and naive benchmarks, is evaluated on the same measure, it also
+reveals whether explicitly targeting expected shortfall minimization produces lower
+realized tail risk than controlling variance alone. We evaluate it at
+$\beta = 0.80$ (the same confidence level used in the optimizer) and $\beta = 0.95$,
+which captures a more extreme region of the loss distribution. Reporting both levels
+separates a strategy's realized tail risk at the quantile it was optimized for from
+its tail risk at a deeper quantile it was not, showing whether (how much) the downside
+protection generalizes beyond the optimization level. 
 
-Annualized volatility is the standard deviation of daily returns scaled by
-$\sqrt{252}$. It is the classical dispersion measure of returns and the quantity
-the mean--variance strategies control directly, making it the natural
-common-scale risk figure across objectives.
+Annualized volatility is the standard deviation of daily returns. It is the classical measure of risk in the portfolio optimization literature, but does have limitations. It is symmetric, meaning it penalizes
+favorable and adverse deviations equally, which is the limitation that
+motivates the downside and tail-risk measures reported alongside it. For the
+mean--variance strategies it plays the role that expected shortfall plays for the
+expected shortfall strategies. It is the objective the mean--variance optimizers minimize, and so it is the most direct out-of-sample test of whether they deliver on their objective.
+Because a portfolio can
+achieve low volatility while still suffering severe cumulative losses over time, it is informative
+only when interpretedtogether with the maximum drawdown and other tail-risk measures.
 
-Maximum drawdown is the largest peak-to-trough decline of the cumulative wealth
-curve over the out-of-sample period, capturing the worst cumulative loss an
-investor would have sustained---a path-dependent risk that the distributional
-measures do not reflect. Letting $V_t = \prod_{s \le t}(1 + R_{\mathcal P,s})$
-denote the cumulative wealth, with $V_0 = 1$, and $P_t = \max_{s \le t} V_s$ its
-running peak, the maximum drawdown is
+Maximum drawdown is the largest decline of the cumulative return
+path over the out-of-sample period. Unlike expected shortfall and volatility,
+which summarize the one-period return distribution, drawdown is a property of the
+realized wealth path, capturing the cumulative and sequential experience of losses
+that an investor goes through.\ Such path-dependent losses matter
+in practice.\ For example, deep drawdowns can breach margin requirements. 
+Importantly, none of the optimizers considered in the thesis targets drawdown
+directly, so it serves as an out-of-sample robustness check on a metric the
+strategies were not built to control. Letting $V_t = \prod_{s \le t}(1 + R_{\mathcal P,s})$ denote
+the cumulative wealth of portfolio $\mathcal{P}$, with $V_0 = 1$, and $P_t = \max_{s \le t} V_s$ its running
+maximum, the maximum drawdown is defined as
 \begin{equation*}
 \mathrm{MD} = \max_{t} \frac{P_t - V_t}{P_t}.
 \end{equation*}
 
-The Sharpe ratio is the annualized ratio of average excess return to total
-volatility, the standard measure of risk-adjusted return used to rank strategies
-on a common scale,
+The Sharpe ratio is the annualized ratio of the average excess portfolio return relative to its total
+volatility. It is the standard measure of return per unit of total risk. The Sharpe ratio is given by
 \begin{equation*}
 \mathrm{SR} = \frac{\bar{R}_{\mathcal P} - R_f}{\sigma}\sqrt{252}.
 \end{equation*}
 
-The Sortino ratio replaces total volatility with downside volatility, so that
-strategies are not penalized for upside dispersion---appropriate for
-downside-risk-focused portfolios. It is the annualized ratio of average excess
-return to the standard deviation of the negative returns $\sigma_{\text{down}}$,
+The Sortino ratio replaces volatility in the Sharpe ratio with downside volatility, so that a
+strategy is not penalized for upside dispersion. By measuring volatility only
+over adverse outcomes it addresses the main downside of the Sharpe
+ratio. It is therefore the risk-adjusted measure most consistent with the expected shortfall
+objective, since both consider only the downside, and it tends to credit strategies
+that reduce risk by trimming losses rather than by minimizing variance. Read against the Sharpe ratio, it indicates whether a strategy's risk-adjusted performance stems from downside protection or from
+lower overall variability. It is the annualized ratio of average excess return to
+the standard deviation of the negative returns $\sigma_{\text{down}}$, given by
 \begin{equation*}
 \mathrm{SOR} = \frac{\bar{R}_{\mathcal P} - R_f}{\sigma_{\text{down}}}\sqrt{252}.
 \end{equation*}
 
 The expected shortfall ratio is the tail-risk analogue of the Sharpe ratio,
-reporting average return per unit of downside risk \citep{lucescu_ulrych_2026}.
-It is computed from the annualized average return and the annualized expected
-shortfall, which places it on the same comparable footing as the Sharpe and
-Sortino ratios,
+reporting average return per unit of downside risk \citep{RegularizedMultiCurrencyExpectedShortfallPortfolios}.
+Where the Sharpe ratio scales return by total volatility and the Sortino ratio by
+downside deviation, the expected shortfall ratio scales it by the tail loss
+itself.
+A strategy scores well only if it earns return efficiently relative to
+its realized tail risk, so the ratio rewards the trade-off the expected shortfall optimizers
+are solving. Reported in annualized units alongside the Sharpe and Sortino ratios,
+the three can be read together to trace how the ranking of strategies shifts as the
+risk moves from total, to downside, to tail risk. It is computed from the
+annualized average return and the annualized expected shortfall
 \begin{equation*}
-\mathrm{ESR} = \frac{\bar{R}^{\,\text{ann}}_{\mathcal P}}{\mathrm{ES}^{\,\text{ann}}_{\beta}}.
+\mathrm{ESR} = \frac{\bar{R}_{\mathcal P}}{\mathrm{ES}_{\beta}}.
 \end{equation*}
 
-Finally, turnover proxies the trading activity---and hence the implementation
-cost---of each strategy, and indicates whether performance is sustained by
-excessive rebalancing. It is reported separately for the asset and currency legs,
-since the two are traded through different instruments. Asset turnover is the
-average rebalancing volume over the out-of-sample period
-\citep{demiguel2009generalized, kondor2015contour},
+We use the expected shortfall ratio at the $\beta = 0.80$ confidencelevel.
+
+Finally, turnover proxies the trading activity, and the implementation
+costs, of each strategy. Although the reported returns are already net of
+proportional transaction costs, turnover remains informative because it
+measures how much the portfolio must trade to maintain its positions, its capacity to scale, and its exposure to frictions such as slippage and market impact that our model does not capture. A strategy whose performance depends on heavy rebalancing can be hard to implement, so low and stable turnover is a desirable property. Turnover is reported separately for the asset and currency legs,
+since the two are traded through different instruments with different cost levels.
+Asset turnover is the average rebalancing volume over the out-of-sample period
 \begin{equation*}
 \mathrm{Turnover}^{a} = \frac{1}{T}\sum_{t=1}^{T}\sum_{i=1}^{N}
 \bigl| x_{i,t} - x_{i,t}^{-} \bigr|,
@@ -480,14 +472,12 @@ average rebalancing volume over the out-of-sample period
 where $x_{i,t}^{-}$ is the asset weight just before rebalancing at $t$ and
 $x_{i,t}$ the weight set at the rebalance, and $T$ is the number of out-of-sample
 rebalancing dates. Currency turnover is the average absolute notional of the
-forward positions \citep{burkhardt_ulrych_2023, polak_ulrych_2024},
+forward positions
 \begin{equation*}
 \mathrm{Turnover}^{c} = \frac{1}{T}\sum_{t=1}^{T}\sum_{c=1}^{M}
-\bigl| \upphi_{c,t} \bigr|,
+\bigl| \upphi_{c,t} \bigr|.
 \end{equation*}
-which, unlike the asset leg, is measured on the level of the forward positions
-because the one-period forward contracts are entered afresh at each rebalancing
-date.
+
 
 
 
