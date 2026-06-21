@@ -1,7 +1,8 @@
 \chapter{Data and Implementation}\label{chap:data-and-implementation}
 
 In this chapter, we describe the dataset used for the empirical evaluation of the portfolio optimization strategies and the implementation of the backtesting framework. 
-In the data section we detail the construction of the investable universe. We follow \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to analyze asset and currency returns and volatillities and expand the analysis to different investable universe sizes, and look at the correlation dependence of asset and currency returns. In the implementation section we describe the modular structure of the backtesting framework, the workflow of the backtest, and the metrics used to evaluate potrfolio performance.
+In the data section we detail the construction of the investable universe. We follow \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to analyze asset and currency returns and volatillities and expand the analysis to different investable universe sizes, and look at the correlation dependence of asset and currency returns. In the implementation section we describe the modular structure of the backtesting framework,
+the workflow of the backtest, numerical considerations in the implementation, and the metrics used to evaluate potrfolio performance.
 
 \section{Data} 
 
@@ -25,7 +26,7 @@ top 10, top 50, and top 100 stocks per market. Because the constituents turn ove
 year, each universe spans more distinct stocks over the full sample than are held on any
 single date, 407 for the top 10, 1705 for the top 50, and 3189 for the top 100, respectively.
 
-The US dollar is the base currency throughout our analysis. For each stock we compute fully hedged
+The US dollar serves as the base currency throughout our analysis. For each stock we compute fully hedged
 returns, and for each currency the excess currency return, following the model-free return
 representation in \Cref{chap:optimization-framework}.
 
@@ -57,17 +58,17 @@ representation in \Cref{chap:optimization-framework}.
     \bottomrule
   \end{tabular}
   \caption{Summary statistics of fully hedged equity returns and excess currency
-  returns by economy. Asset statistics are reported for three investment universes
+  returns by economy. Asset statistics are reported for three investable universes
   (the top 10, 50, and 100 stocks per economy). Excess currency returns
   are defined as the currency return net of the forward premium. 
   All numbers are reported as annualized percentages, from the perspective of a USD-based investor.}
   \label{tab:summary-statistics}
 \end{table}
 
-\Cref{tab:summary-statistics} reports annualized average returns and volatilities for these
+\Cref{tab:summary-statistics} reports annualized average returns and volatilities for the
 fully hedged equity returns and excess currency returns, by economy. For each economy, the
 asset figures are the cross-sectional average of the daily returns of its individual
-stocks.
+stocks. 
 
 We can see that as the investable universe becomes larger, the average returns tend to fall. In the top 10 universe every economy has a positive average return, ranging from
 $2.76\%$ (the United Kingdom) to $12.59\%$ (the United States). In the top 50 universe, the range
@@ -98,7 +99,7 @@ The resulting heatmaps are shown in \Cref{fig:asset-currency-corr}.
 
 Across all three universes the correlations range from $-0.2$ to
 $0.4$, and are mostly positive. The pattern is intuitive and confirms well known empirical findings. The strongest positive correlations belong to commodity and risk-sensitive currencies such as the AUD, CAD, NZD and ZAR, whose equity markets and
-currencies rise together in good times and fall together in bad \citep{CHEN2003133, common_risk_factors_currency_markets, carry_trades_and_global_foreign_exchange_volatility}. The JPY and CHF are the only negatively correlated currencies with most other economies (ranging from $-0.2$ to $-0.05$), in line with their role as safe havens that strengthen when equities fall \cite{safe_haven_currencies}. The EUR, DKK, and HKD are minimally correlated, reflecting the HKD's peg to the US dollar, the DKK's peg to the EUR. This split between risky and safe-haven currencies is well
+currencies rise together in good times and fall together in bad \citep{CHEN2003133, common_risk_factors_currency_markets, carry_trades_and_global_foreign_exchange_volatility}. The JPY and CHF are the only negatively correlated currencies with most other economies (ranging from $-0.2$ to $-0.05$), in line with their role as safe havens that strengthen when equities fall \cite{safe_haven_currencies}. The EUR, DKK, and HKD are minimally correlated, reflecting the HKD's peg to the US dollar, and the DKK's peg to the EUR. This split between risky and safe-haven currencies is well
 documented \citep{global_currency_hedging, safe_haven_currencies}.
 
 This is the dependence structure the overlay optimization approach discards. It sets asset weights first, using only equity information, and adds the currency hedge afterwards, whereas the joint model can act on it
@@ -126,7 +127,7 @@ orchestration of the backtest and the optimization logic it evaluates.\footnote{
 The main backtesting loop that ingests data, rolls the estimation window forward, selects
 hyperparameters, and records performance is fixed, while the optimizer that
 produces portfolio weights is a swappable component. Any optimizer that conforms
-to a common interface is therefore evaluated under identical conditions.
+to a common interface is therefore evaluated under the same conditions.
 The framework is composed of three main components, a data handler, the backtester, and a
 family of optimizers under a common abstract base class, whose
 interaction is summarized in \Cref{fig:backtest}.
@@ -228,7 +229,7 @@ bundled series, and the construction of returns from
 these inputs follows \Cref{sec:returns}.
 
 All implemented optimizers inherit from an abstract base class, \texttt{BaseOptimizer}, that
-defines the three-method interface through which the backtester drives them. The
+defines the three-method interface through which the backtester runs them. The
 \texttt{fit} method receives a training data bundle and estimates and stores the
 quantities the optimizer requires for its objective (e.g. covariance matrix for the mean-variance optimizer), so that estimation is
 performed entirely within each optimizer.
@@ -237,7 +238,7 @@ validation bundle and returns the validation performance used for hyperparameter
 selection. Concrete subclasses implement this interface for each strategy, an
 equal-weight optimizer that serves as the naive benchmark, the mean-variance and
 Expected Shortfall optimizers, and a general convex optimizer TODO: Update this when done implementing generalization.
-The estimators and solver internals invoked inside \texttt{fit} and
+The estimators and solver internals invoked inside the methods \texttt{fit} and
 \texttt{optimize} are described in \Cref{sec:numerical-implementation}.
 
 The backtest itself is implemented in the \texttt{Backtester.run} method, which
@@ -247,7 +248,7 @@ rebalancing date, the optimizer is calibrated and deployed using a fixed rolling
 this partition. Each configuration is fitted on the estimation window
 via \texttt{fit}, used to produce weights via \texttt{optimize}, and evaluated on
 the validation window via \texttt{score}, and the configuration with the
-best validation score is retained on both the estimation and validation windows and finally used to 
+best validation score is retrained on both the estimation and validation windows and finally used to 
 produce the portfolio weights for the next out-of-sample period. 
 These weights are held until the next rebalancing date, and the
 portfolio's realized return over the holding period is recorded as a single
@@ -297,7 +298,7 @@ are quadratic programs by construction, through the variance term in their
 objective.
 
 All programs are solved with Gurobi, a state-of-the-art solver for linear and
-quadratic programs, accessed through \texttt{CVXPY}.\footnote{Gurobi is a commercial solver and requires a license for use, a fallback solver is available in the project codebase.} The solver is configured to use the
+quadratic programs, accessed through \texttt{CVXPY}.\footnote{Gurobi is a commercial solver and requires a license to use, a free fallback solver is available in the project codebase.} The solver is configured to use the
 barrier (interior point) method with tight convergence and accuracy tolerances,
 so that the large number of problems solved across rebalancing dates, universes,
 and hyperparameter configurations return reproducible results. The
@@ -371,8 +372,8 @@ rebalancing date is the Cartesian product of the four ranges.}
 All portfolio optimization strategies are evaluated on a common set of performance metrics computed from
 their out-of-sample return series. Because each optimizer minimizes a different
 objective, the strategies cannot be ranked solely by their in-sample objective values
-and are instead judged on the same realized metrics, each capturing a different view of the performance. All metrics are computed on USD returns net of the
-transaction costs detailed in Appendix \ref{app:transaction_costs}. 
+and are instead judged on the same realized metrics, each capturing a different view of the performance. All metrics are computed on USD out-of-sample returns net of the
+transaction costs (Derivation detailed in Appendix \ref{app:transaction_costs}). 
 Throughout this section, $R_{\mathcal P,t}$ denotes
 the realized daily out-of-sample portfolio return, $\bar R_{\mathcal P}$ its
 sample mean, $\sigma$ its sample standard deviation, and $R_f$ the risk-free
@@ -388,7 +389,7 @@ reporting only the loss threshold, averages the losses beyond it, so it reflects
 how severe the tail outcomes are and not merely how often they occur.\footnote{Formal
 definitions of value at risk and expected shortfall at confidence level $\beta$ are
 given in Appendix \ref{app:es_auxiliary_formulation}.} For the expected shortfall
-strategies it is the realized value captures quantity the optimizer minimizes,
+strategies, it is the quantity the optimizer minimizes,
 which makes it the most direct out-of-sample test of whether the expected shortfall
 strategy delivers on its objective. Because every strategy, including the
 mean--variance and naive benchmarks, is evaluated on the same measure, it also
@@ -400,7 +401,7 @@ separates a strategy's realized tail risk at the quantile it was optimized for f
 its tail risk at a deeper quantile it was not, showing whether (how much) the downside
 protection generalizes beyond the optimization level. 
 
-Annualized volatility is the standard deviation of daily returns. It is the classical measure of risk in the portfolio optimization literature, but does have limitations. It is symmetric, meaning it penalizes
+Annualized volatility is the standard deviation of portfolio returns. It is the classical measure of risk in the portfolio optimization literature, but does have some limitations. It is symmetric, meaning it penalizes
 favorable and adverse deviations equally, which is the limitation that
 motivates the downside and tail-risk measures reported alongside it. For the
 mean--variance strategies it plays the role that expected shortfall plays for the
@@ -433,9 +434,7 @@ volatility. It is the standard measure of return per unit of total risk. The Sha
 The Sortino ratio replaces volatility in the Sharpe ratio with downside volatility, so that a
 strategy is not penalized for upside dispersion. By measuring volatility only
 over adverse outcomes it addresses the main downside of the Sharpe
-ratio. It is therefore the risk-adjusted measure most consistent with the expected shortfall
-objective, since both consider only the downside, and it tends to credit strategies
-that reduce risk by trimming losses rather than by minimizing variance. Read against the Sharpe ratio, it indicates whether a strategy's risk-adjusted performance stems from downside protection or from
+ratio. Read against the Sharpe ratio, it indicates whether a strategy's risk-adjusted performance stems from downside protection or from
 lower overall variability. It is the annualized ratio of average excess return to
 the standard deviation of the negative returns $\sigma_{\text{down}}$, given by
 \begin{equation*}

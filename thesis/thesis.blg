@@ -3,16 +3,11 @@ Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesis.aux
 The style file: plain.bst
 Database file #1: refs.bib
-Warning--I didn't find a database entry for "lucescu_ulrych_2026"
-Warning--I didn't find a database entry for "demiguel2009generalized"
-Warning--I didn't find a database entry for "kondor2015contour"
-Warning--I didn't find a database entry for "burkhardt_ulrych_2023"
-Warning--I didn't find a database entry for "polak_ulrych_2024"
 Warning--empty journal in FrazziniIsraelMoskowitz2018
 Warning--empty journal in Jones2002
 You've used 20 entries,
             2118 wiz_defined-function locations,
-            639 strings with 7649 characters,
+            634 strings with 7552 characters,
 and the built_in function-call counts, 6200 in all, are:
 = -- 601
 > -- 289
@@ -51,4 +46,4 @@ warning$ -- 2
 while$ -- 59
 width$ -- 22
 write$ -- 216
-(There were 7 warnings)
+(There were 2 warnings)
