@@ -1,11 +1,90 @@
 \chapter{Optimization Derivation: Mean-Variance} \label{app:mv_derivation}
 
+In this appendix, we derive the optimization problems used in the main text for mean-variance portfolio 
+optimization. We start with the standard mean-variance formulation and then introduce regularization techniques, 
+separate optimization for assets and currency overlay, and finally the joint optimization problem.
+In \Cref{app:mv_qp_representation}, we follow \citep{SparseAndStableInternationalPortfolioOptimization, Markowitz1952} and 
+present the quadratic program representation of the mean-variance portfolio optimization problem.
+
+
+
+
+
 \section{Quadratic Program Representation of the Mean-Variance Portfolio Optimization} \label{app:mv_qp_representation}
 
-\section{Regularization} \label{app:mv_regularization}
-\subsection{$L_1$ Regularization} \label{app:mv_l1}
-\subsection{$L_2$ Regularization} \label{app:mv_l2}
-\subsection{Leverage Constraint} \label{app:mv_leverage}
+The mean-variance portfolio optimization of \cite{Markowitz1952} trades off the expected
+portfolio return against its return variance. The portfolio return
+$\bm{x}_t^\top \bm{R}_{t+1}$ is linear in the asset weights, so its variance is the
+quadratic form $\mathrm{Var}(\bm{x}_t^\top \bm{R}_{t+1}) = \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$,
+where $\bm{R}_{t+1} \in \mathbb{R}^N$ is the asset return vector and $\bm{\Sigma}_t$
+its covariance matrix. Following the international mean-variance formulation of
+\cite{SparseAndStableInternationalPortfolioOptimization}, we write the problem as a minimization and trade off
+expected return against variance through a relative risk-aversion coefficient
+$\gamma > 0$
+\begin{equation} \label{eq:mv_objective}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ -\bm{\mu}_t^\top \bm{x}_t
+    + \frac{\gamma}{2} \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t \right\},
+    \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+\end{equation}
+where $\bm{\mu}_t$ denotes the asset return mean estimator, $\bm{\Sigma}_t$ the asset
+return covariance estimator, and the budget constraint $\bm{x}_t^\top \bm{1}_N = 1$
+enforces full investment.
+
+In contrast to the Expected Shortfall objective \eqref{eq:mean_es}, which depends on
+the unknown conditional expectation $\mathbb{E}_t[\cdot]$ and requires the auxiliary
+representation of \Cref{app:es_auxiliary_formulation} together with a sample
+approximation to obtain a tractable form, the variance term in \eqref{eq:mv_objective}
+is already expressed in closed quadratic form. Problem \eqref{eq:mv_objective} is
+therefore already formulated as a quadratic program.
+
+The objective in \eqref{eq:mv_objective} is convex. The first term
+$-\bm{\mu}_t^\top \bm{x}_t$ is linear, hence convex, and the quadratic term
+$\tfrac{\gamma}{2} \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$ has Hessian
+$\gamma \bm{\Sigma}_t$. Since a covariance matrix is positive semi-definite and
+$\gamma > 0$, this Hessian is positive semi-definite, so the quadratic term, and with
+it the full objective, is convex \cite{boyd2004convex}. Any local minimum is therefore
+global, ensuring the problem can be solved reliably with standard convex optimization
+methods.
+
+The population mean and covariance are unknown and replaced by their time-$t$ sample
+estimators $\bm{\mu}_t$ and $\bm{\Sigma}_t$. Because the variance enters in closed form
+through $\bm{\Sigma}_t$, this plug-in step introduces no auxiliary variables and leaves
+the decision vector at dimension $N$, independent of the number of historical
+observations $q$. This is different from the empirical approximation of the Expected
+Shortfall objective in \Cref{app:linear-program-representation}, where the conditional
+expectation is replaced by an average over $q$ historical return samples and $q$ slack
+variables $u_k$ enlarge the problem to dimension $N + q + 1$. The sample covariance
+estimator is positive semi-definite, so the convexity established above is preserved
+under estimation. The choice of estimators is discussed in \Cref{app:mv_bayes_stein}.
+
+Collecting the asset weights in the decision vector $\bm{x}_t \in \mathbb{R}^N$ and
+defining the cost vector and the penalty matrix
+\begin{equation*}
+    \bm{c} = -\bm{\mu}_t \in \mathbb{R}^N, \qquad
+    \bm{Q} = \gamma \bm{\Sigma}_t \in \mathbb{R}^{N \times N},
+\end{equation*}
+the mean-variance problem \eqref{eq:mv_objective} is written as the quadratic program
+\begin{equation} \label{eq:mv_base_qp}
+\begin{aligned}
+    \bm{x}_t^* &= \argmin_{\bm{x}_t} \quad
+    \bm{c}^\top \bm{x}_t + \tfrac{1}{2}\, \bm{x}_t^\top \bm{Q}\, \bm{x}_t, \\[2pt]
+    \text{s.t.} \quad \bm{D} \bm{x}_t &= \bm{1}_N^\top \bm{x}_t = E = 1.
+\end{aligned}
+\end{equation}
+Here $\bm{D} = \bm{1}_N^\top \in \mathbb{R}^{1 \times N}$ encodes the budget constraint
+with right-hand side $E = 1$.
+
+Problem \eqref{eq:mv_base_qp} has a convex quadratic objective subject to a single
+linear equality constraint, and is thus a quadratic program solvable with standard
+methods.
+This formulation serves as the base unregularized portfolio optimization problem under
+the mean-variance criterion. Regularization terms and additional constraints are added
+in \Cref{app:mv_regularization}.
+
+
+\section{Regularization} \label{app:mv_regularization} 
+\subsection{$L_1$, $L_2$ Regularization and Leverage Constraint} \label{app:mv_l1_l2_lev_reg}
+\subsection{Bayes Stein Shrinkage, other techniques} \label{app:mv_bayes_stein}
 \subsection{Quadratic Program Representation of the Regularized Portfolio Optimization} \label{app:mv_reg_qp}
 
 \section{Separate (Currency Overlay) Optimization} \label{app:mv_separate}

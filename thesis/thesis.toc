@@ -51,15 +51,14 @@
 \contentsline {section}{\numberline {A.5}Joint Optimization}{28}{section.A.5}%
 \contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{31}{appendix.B}%
 \contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{31}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Regularization}{31}{section.B.2}%
-\contentsline {subsection}{\numberline {B.2.1}$L_1$ Regularization}{31}{subsection.B.2.1}%
-\contentsline {subsection}{\numberline {B.2.2}$L_2$ Regularization}{31}{subsection.B.2.2}%
-\contentsline {subsection}{\numberline {B.2.3}Leverage Constraint}{31}{subsection.B.2.3}%
-\contentsline {subsection}{\numberline {B.2.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{31}{subsection.B.2.4}%
-\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{31}{section.B.3}%
-\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{31}{subsection.B.3.1}%
-\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{31}{subsection.B.3.2}%
-\contentsline {section}{\numberline {B.4}Joint Optimization}{31}{section.B.4}%
-\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{32}{appendix.C}%
-\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{34}{appendix.D}%
-\contentsline {chapter}{Bibliography}{35}{appendix*.5}%
+\contentsline {section}{\numberline {B.2}Regularization}{32}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{32}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}Bayes Stein Shrinkage, other techniques}{32}{subsection.B.2.2}%
+\contentsline {subsection}{\numberline {B.2.3}Quadratic Program Representation of the Regularized Portfolio Optimization}{32}{subsection.B.2.3}%
+\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{32}{section.B.3}%
+\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{32}{subsection.B.3.1}%
+\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{32}{subsection.B.3.2}%
+\contentsline {section}{\numberline {B.4}Joint Optimization}{32}{section.B.4}%
+\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{33}{appendix.C}%
+\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{35}{appendix.D}%
+\contentsline {chapter}{Bibliography}{36}{appendix*.5}%

@@ -209,6 +209,10 @@
 \newlabel{eq:joint_obj@cref}{{[equation][12][1]A.12}{[1][28][]28}{}{}{}}
 \newlabel{eq:joint_qp}{{A.13}{29}{Joint Optimization}{equation.A.13}{}}
 \newlabel{eq:joint_qp@cref}{{[equation][13][1]A.13}{[1][29][]29}{}{}{}}
+\citation{SparseAndStableInternationalPortfolioOptimization,Markowitz1952}
+\citation{Markowitz1952}
+\citation{SparseAndStableInternationalPortfolioOptimization}
+\citation{boyd2004convex}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
 \@writefile{toc}{\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{31}{appendix.B}\protected@file@percent }
@@ -217,48 +221,49 @@
 \@writefile{toc}{\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{31}{section.B.1}\protected@file@percent }
 \newlabel{app:mv_qp_representation}{{B.1}{31}{Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{section.B.1}{}}
 \newlabel{app:mv_qp_representation@cref}{{[section][1][2]B.1}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {B.2}Regularization}{31}{section.B.2}\protected@file@percent }
-\newlabel{app:mv_regularization}{{B.2}{31}{Regularization}{section.B.2}{}}
-\newlabel{app:mv_regularization@cref}{{[section][2][2]B.2}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.1}$L_1$ Regularization}{31}{subsection.B.2.1}\protected@file@percent }
-\newlabel{app:mv_l1}{{B.2.1}{31}{$L_1$ Regularization}{subsection.B.2.1}{}}
-\newlabel{app:mv_l1@cref}{{[subsection][1][2,2]B.2.1}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.2}$L_2$ Regularization}{31}{subsection.B.2.2}\protected@file@percent }
-\newlabel{app:mv_l2}{{B.2.2}{31}{$L_2$ Regularization}{subsection.B.2.2}{}}
-\newlabel{app:mv_l2@cref}{{[subsection][2][2,2]B.2.2}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.3}Leverage Constraint}{31}{subsection.B.2.3}\protected@file@percent }
-\newlabel{app:mv_leverage}{{B.2.3}{31}{Leverage Constraint}{subsection.B.2.3}{}}
-\newlabel{app:mv_leverage@cref}{{[subsection][3][2,2]B.2.3}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{31}{subsection.B.2.4}\protected@file@percent }
-\newlabel{app:mv_reg_qp}{{B.2.4}{31}{Quadratic Program Representation of the Regularized Portfolio Optimization}{subsection.B.2.4}{}}
-\newlabel{app:mv_reg_qp@cref}{{[subsection][4][2,2]B.2.4}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{31}{section.B.3}\protected@file@percent }
-\newlabel{app:mv_separate}{{B.3}{31}{Separate (Currency Overlay) Optimization}{section.B.3}{}}
-\newlabel{app:mv_separate@cref}{{[section][3][2]B.3}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{31}{subsection.B.3.1}\protected@file@percent }
-\newlabel{app:mv_sep_asset}{{B.3.1}{31}{Asset Optimization}{subsection.B.3.1}{}}
-\newlabel{app:mv_sep_asset@cref}{{[subsection][1][2,3]B.3.1}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{31}{subsection.B.3.2}\protected@file@percent }
-\newlabel{app:mv_sep_currency}{{B.3.2}{31}{Currency Overlay Optimization}{subsection.B.3.2}{}}
-\newlabel{app:mv_sep_currency@cref}{{[subsection][2][2,3]B.3.2}{[1][31][]31}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {B.4}Joint Optimization}{31}{section.B.4}\protected@file@percent }
-\newlabel{app:mv_joint}{{B.4}{31}{Joint Optimization}{section.B.4}{}}
-\newlabel{app:mv_joint@cref}{{[section][4][2]B.4}{[1][31][]31}{}{}{}}
+\newlabel{eq:mv_objective}{{B.1}{31}{Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{equation.B.1}{}}
+\newlabel{eq:mv_objective@cref}{{[equation][1][2]B.1}{[1][31][]31}{}{}{}}
+\newlabel{eq:mv_base_qp}{{B.2}{32}{Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{equation.B.2}{}}
+\newlabel{eq:mv_base_qp@cref}{{[equation][2][2]B.2}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B.2}Regularization}{32}{section.B.2}\protected@file@percent }
+\newlabel{app:mv_regularization}{{B.2}{32}{Regularization}{section.B.2}{}}
+\newlabel{app:mv_regularization@cref}{{[section][2][2]B.2}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{32}{subsection.B.2.1}\protected@file@percent }
+\newlabel{app:mv_l1_l2_lev_reg}{{B.2.1}{32}{$L_1$, $L_2$ Regularization and Leverage Constraint}{subsection.B.2.1}{}}
+\newlabel{app:mv_l1_l2_lev_reg@cref}{{[subsection][1][2,2]B.2.1}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.2}Bayes Stein Shrinkage, other techniques}{32}{subsection.B.2.2}\protected@file@percent }
+\newlabel{app:mv_bayes_stein}{{B.2.2}{32}{Bayes Stein Shrinkage, other techniques}{subsection.B.2.2}{}}
+\newlabel{app:mv_bayes_stein@cref}{{[subsection][2][2,2]B.2.2}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.2.3}Quadratic Program Representation of the Regularized Portfolio Optimization}{32}{subsection.B.2.3}\protected@file@percent }
+\newlabel{app:mv_reg_qp}{{B.2.3}{32}{Quadratic Program Representation of the Regularized Portfolio Optimization}{subsection.B.2.3}{}}
+\newlabel{app:mv_reg_qp@cref}{{[subsection][3][2,2]B.2.3}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{32}{section.B.3}\protected@file@percent }
+\newlabel{app:mv_separate}{{B.3}{32}{Separate (Currency Overlay) Optimization}{section.B.3}{}}
+\newlabel{app:mv_separate@cref}{{[section][3][2]B.3}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{32}{subsection.B.3.1}\protected@file@percent }
+\newlabel{app:mv_sep_asset}{{B.3.1}{32}{Asset Optimization}{subsection.B.3.1}{}}
+\newlabel{app:mv_sep_asset@cref}{{[subsection][1][2,3]B.3.1}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{32}{subsection.B.3.2}\protected@file@percent }
+\newlabel{app:mv_sep_currency}{{B.3.2}{32}{Currency Overlay Optimization}{subsection.B.3.2}{}}
+\newlabel{app:mv_sep_currency@cref}{{[subsection][2][2,3]B.3.2}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {B.4}Joint Optimization}{32}{section.B.4}\protected@file@percent }
+\newlabel{app:mv_joint}{{B.4}{32}{Joint Optimization}{section.B.4}{}}
+\newlabel{app:mv_joint@cref}{{[section][4][2]B.4}{[1][32][]32}{}{}{}}
 \citation{SparseAndStableInternationalPortfolioOptimization,RegularizedMultiCurrencyExpectedShortfallPortfolios,Li2015}
 \citation{SparseAndStableInternationalPortfolioOptimization}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
-\@writefile{toc}{\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{32}{appendix.C}\protected@file@percent }
-\newlabel{app:transaction_costs}{{C}{32}{Transaction Costs}{appendix.C}{}}
-\newlabel{app:transaction_costs@cref}{{[chapter][3][]C}{[1][32][]32}{}{}{}}
-\newlabel{eq:hedged-portfolio-return-net}{{C.1}{32}{Transaction Costs}{equation.C.1}{}}
-\newlabel{eq:hedged-portfolio-return-net@cref}{{[equation][1][3]C.1}{[1][32][]32}{}{}{}}
+\@writefile{toc}{\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{33}{appendix.C}\protected@file@percent }
+\newlabel{app:transaction_costs}{{C}{33}{Transaction Costs}{appendix.C}{}}
+\newlabel{app:transaction_costs@cref}{{[chapter][3][]C}{[1][33][]33}{}{}{}}
+\newlabel{eq:hedged-portfolio-return-net}{{C.1}{33}{Transaction Costs}{equation.C.1}{}}
+\newlabel{eq:hedged-portfolio-return-net@cref}{{[equation][1][3]C.1}{[1][33][]33}{}{}{}}
 \citation{Jones2002,NeelyWellerUlrich2009,MenkhoffSarnoSchmelingSchrimpf2012,FrazziniIsraelMoskowitz2018}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
-\@writefile{toc}{\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{34}{appendix.D}\protected@file@percent }
-\newlabel{app:hyperparameter-tuning-and-additional-results}{{D}{34}{Hyperparameter Tuning and Additional Results}{appendix.D}{}}
-\newlabel{app:hyperparameter-tuning-and-additional-results@cref}{{[chapter][4][]D}{[1][34][]34}{}{}{}}
+\@writefile{toc}{\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{35}{appendix.D}\protected@file@percent }
+\newlabel{app:hyperparameter-tuning-and-additional-results}{{D}{35}{Hyperparameter Tuning and Additional Results}{appendix.D}{}}
+\newlabel{app:hyperparameter-tuning-and-additional-results@cref}{{[chapter][4][]D}{[1][35][]35}{}{}{}}
 \bibstyle{plain}
 \bibdata{refs}
 \bibcite{CoherentMeasuresOfRisk}{{1}{}{{}}{{}}}
@@ -272,17 +277,18 @@
 \bibcite{kondor2007noise}{{9}{}{{}}{{}}}
 \bibcite{Li2015}{{10}{}{{}}{{}}}
 \bibcite{common_risk_factors_currency_markets}{{11}{}{{}}{{}}}
-\bibcite{carry_trades_and_global_foreign_exchange_volatility}{{12}{}{{}}{{}}}
-\bibcite{MenkhoffSarnoSchmelingSchrimpf2012}{{13}{}{{}}{{}}}
-\bibcite{NeelyWellerUlrich2009}{{14}{}{{}}{{}}}
-\bibcite{QuantitativeRiskManagement2016}{{15}{}{{}}{{}}}
-\@writefile{toc}{\contentsline {chapter}{Bibliography}{35}{appendix*.5}\protected@file@percent }
-\bibcite{safe_haven_currencies}{{16}{}{{}}{{}}}
-\bibcite{RockafellarUryasev2000}{{17}{}{{}}{{}}}
-\bibcite{roncalli2013introduction}{{18}{}{{}}{{}}}
-\bibcite{RegularizedMultiCurrencyExpectedShortfallPortfolios}{{19}{}{{}}{{}}}
-\bibcite{SparseAndStableInternationalPortfolioOptimization}{{20}{}{{}}{{}}}
+\bibcite{Markowitz1952}{{12}{}{{}}{{}}}
+\bibcite{carry_trades_and_global_foreign_exchange_volatility}{{13}{}{{}}{{}}}
+\bibcite{MenkhoffSarnoSchmelingSchrimpf2012}{{14}{}{{}}{{}}}
+\bibcite{NeelyWellerUlrich2009}{{15}{}{{}}{{}}}
+\bibcite{QuantitativeRiskManagement2016}{{16}{}{{}}{{}}}
+\@writefile{toc}{\contentsline {chapter}{Bibliography}{36}{appendix*.5}\protected@file@percent }
+\bibcite{safe_haven_currencies}{{17}{}{{}}{{}}}
+\bibcite{RockafellarUryasev2000}{{18}{}{{}}{{}}}
+\bibcite{roncalli2013introduction}{{19}{}{{}}{{}}}
+\bibcite{RegularizedMultiCurrencyExpectedShortfallPortfolios}{{20}{}{{}}{{}}}
+\bibcite{SparseAndStableInternationalPortfolioOptimization}{{21}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\memsetcounter{lastsheet}{42}
-\memsetcounter{lastpage}{37}
-\gdef \@abspage@last{42}
+\memsetcounter{lastsheet}{43}
+\memsetcounter{lastpage}{38}
+\gdef \@abspage@last{43}
