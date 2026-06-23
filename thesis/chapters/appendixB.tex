@@ -278,7 +278,7 @@ The two optimization steps are then given by
      -\bm{\psi}_t^\top \bm{\mu}^c
     + \tfrac{\gamma}{2}\, \mathrm{Var}_t\!\left( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1}
     + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \right) \right. \label{eq:mv_sep_curr_obj} \\
-    & \qquad \quad \left. + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}. \notag
+    & \qquad \qquad \qquad \left. + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}. \notag
 \end{align}
 The regularization parameters are kept separate across assets ($\lambda_1^a, \lambda_2^a$)
 and currencies ($\lambda_1^c, \lambda_2^c$).
@@ -328,7 +328,7 @@ of \Cref{app:sep_currency}, the variance decomposes in closed form
     + \bm{\psi}_t^\top \bm{\Sigma}^c \bm{\psi}_t.
 \end{equation*}
 The term $\bm{x}_t^{*\top} \bm{\Sigma}^a \bm{x}_t^*$ does not depend on $\bm{\psi}_t$ and
-drops from the minimization. Substituting the remaining terms into
+is therefore dropped from the minimization. Substituting the remaining terms into
 \eqref{eq:mv_sep_curr_obj}, the currency overlay objective becomes
 \begin{equation} \label{eq:mv_curr_expanded}
     \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \left\{
@@ -337,17 +337,14 @@ drops from the minimization. Substituting the remaining terms into
     + \gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t
     + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}.
 \end{equation}
-The fixed asset leg enters through the linear cross-covariance term
-$\gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t$, whose coefficient is $\gamma$
-rather than $\tfrac{\gamma}{2}$, since the cross-term carries a factor of two in the
-variance expansion. Collecting the two linear terms shows that the coupling is
-equivalent to shifting the effective currency mean,
+The fixed asset weights are present through the linear cross-covariance term
+$\gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t$. Collecting the two linear terms shows that the coupling is
+equivalent to shifting the currency mean,
 $-\bm{\psi}_t^\top \bm{\mu}^c + \gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t
 = -\bm{\psi}_t^\top (\bm{\mu}^c - \gamma\, (\bm{\Sigma}^{ac})^\top \bm{x}_t^*)$.
 The fixed asset portfolio therefore lowers the effective expected currency return by
-$\gamma\, (\bm{\Sigma}^{ac})^\top \bm{x}_t^*$, the covariance of the excess currency
-returns with the fixed asset-portfolio return. This is the mean-variance counterpart of
-the mechanism in \Cref{app:sep_currency}, where the fixed asset leg instead shifts the
+$\gamma\, (\bm{\Sigma}^{ac})^\top \bm{x}_t^*$. This effect is similar to the one in \Cref{app:sep_currency}, 
+where the fixed asset weights shift the
 right-hand side of the slack constraints to $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^*$.
 
 We linearize the currency $L_1$ penalty with the decomposition
@@ -368,10 +365,9 @@ The cost vector and penalty matrix are
     \begin{bmatrix}
         \gamma \bm{\Sigma}^c + 2 \lambda_2^c \bm{I}_M & \bm{0}_{M \times 2M} \\
         \bm{0}_{2M \times M} & \bm{0}_{2M \times 2M}
-    \end{bmatrix},
+    \end{bmatrix}.
 \end{equation*}
-where the cross-covariance is absorbed into the first block of $\tilde{\bm{c}}$. The
-currency overlay optimization is then the quadratic program
+The currency overlay optimization is then the quadratic program
 \begin{equation} \label{eq:mv_sep_curr_qp}
 \begin{aligned}
     \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
@@ -388,26 +384,16 @@ The currency optimization differs from the asset optimization \eqref{eq:mv_sep_a
 in the same ways as in the Expected Shortfall case. First, there is no budget constraint,
 as the currency portfolio is a zero-investment portfolio, so the domestic exposure
 $\psi_{0,t}$ is inferred residually and the equality block $\tilde{\bm{D}}$ enforces only
-the weight decomposition, with right-hand side $\tilde{\bm{E}} = \bm{0}_M$. Second, no
-leverage constraint is imposed on the currency exposures. The single substantive
-difference relative to \Cref{app:sep_currency} is that the fixed asset leg enters the
+the weight decomposition. Second, no
+leverage constraint is imposed on the currency exposures. The biggest
+difference relative to \Cref{app:sep_currency} is that the fixed asset weights enter the
 mean-variance currency step through the linear cross-covariance term in $\tilde{\bm{c}}$,
-rather than through a shifted inequality right-hand side; correspondingly,
-\eqref{eq:mv_sep_curr_qp} carries no inequality block at all, in contrast to the $q$
-linearization inequalities of the Expected Shortfall currency program
-\eqref{eq:sep_curr_qp}. Since $\gamma \bm{\Sigma}^c + 2\lambda_2^c \bm{I}_M$ is positive
-semi-definite, the currency overlay remains a convex quadratic program.
+rather than through a shifted inequality constraint. 
 
-The asset and currency covariances $\bm{\Sigma}^a$ and $\bm{\Sigma}^c$ are the
-Ledoit--Wolf estimators of \Cref{app:estimators}, applied to the fully hedged asset
-returns and the excess currency returns respectively. The cross-covariance enters
-\eqref{eq:mv_curr_expanded} only through the fixed $(1 \times M)$ contraction
-$\bm{x}_t^{*\top} \bm{\Sigma}^{ac}$, for which the sample cross-covariance is used; being
-low-dimensional once $\bm{x}_t^*$ is fixed, it does not require separate shrinkage. As
-noted by \cite{BurkhardtUlrych2023}, the cross-covariance could alternatively be shrunk
+As noted by \cite{SparseAndStableInternationalPortfolioOptimization}, the cross-covariance could alternatively be shrunk
 by augmenting the currency overlay problem with the fixed asset portfolio as an
-additional dimension; we retain the direct formulation over $\bm{\psi}_t$, which keeps
-the currency step parallel to both the asset program \eqref{eq:mv_reg_qp} and the
+additional dimension. We use the direct formulation over $\bm{\psi}_t$, which keeps
+the currency step as both the asset program \eqref{eq:mv_reg_qp} and the
 Expected Shortfall currency overlay \eqref{eq:sep_curr_qp}.
 
 \section{Joint Optimization} \label{app:mv_joint}
