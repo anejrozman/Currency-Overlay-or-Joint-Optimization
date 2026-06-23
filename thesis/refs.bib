@@ -6,6 +6,63 @@
   publisher={Elsevier}
 }
 
+@article{Michaud1989,
+author = {Michaud, Richard},
+year = {1989},
+month = {01},
+pages = {31-42},
+title = {The Markowitz Optimization Enigma: Is ‘Optimized’ Optimal?},
+volume = {45},
+journal = {Financial Analysts Journal - FINANC ANAL J},
+doi = {10.2469/faj.v45.n1.31}
+}
+
+@article{Jorion1986BayesStein,
+ ISSN = {00221090, 17566916},
+ URL = {http://www.jstor.org/stable/2331042},
+ abstract = {In portfolio analysis, uncertainty about parameter values leads to suboptimal portfolio choices. The resulting loss in the investor's utility is a function of the particular estimator chosen for expected returns. So, this is a problem of simultaneous estimation of normal means under a well-specified loss function. In this situation, as Stein has shown, the classical sample mean is inadmissible. This paper presents a simple empirical Bayes estimator that should outperform the sample mean in the context of a portfolio. Simulation analysis shows that these Bayes-Stein estimators provide significant gains in portfolio selection problems.},
+ author = {Philippe Jorion},
+ journal = {The Journal of Financial and Quantitative Analysis},
+ number = {3},
+ pages = {279--292},
+ publisher = {[Cambridge University Press, University of Washington School of Business Administration]},
+ title = {Bayes-Stein Estimation for Portfolio Analysis},
+ urldate = {2026-06-23},
+ volume = {21},
+ year = {1986}
+}
+
+@article{LedoitWolf2004,
+title = {A well-conditioned estimator for large-dimensional covariance matrices},
+journal = {Journal of Multivariate Analysis},
+volume = {88},
+number = {2},
+pages = {365-411},
+year = {2004},
+issn = {0047-259X},
+doi = {https://doi.org/10.1016/S0047-259X(03)00096-4},
+url = {https://www.sciencedirect.com/science/article/pii/S0047259X03000964},
+author = {Olivier Ledoit and Michael Wolf},
+keywords = {Condition number, Covariance matrix estimation, Empirical Bayes, General asymptotics, Shrinkage},
+abstract = {Many applied problems require a covariance matrix estimator that is not only invertible, but also well-conditioned (that is, inverting it does not amplify estimation error). For large-dimensional covariance matrices, the usual estimator—the sample covariance matrix—is typically not well-conditioned and may not even be invertible. This paper introduces an estimator that is both well-conditioned and more accurate than the sample covariance matrix asymptotically. This estimator is distribution-free and has a simple explicit formula that is easy to compute and interpret. It is the asymptotically optimal convex linear combination of the sample covariance matrix with the identity matrix. Optimality is meant with respect to a quadratic loss function, asymptotically as the number of observations and the number of variables go to infinity together. Extensive Monte Carlo confirm that the asymptotic results tend to hold well in finite sample.}
+}
+
+
+@TechReport{LedoitWolf2003,
+type={Economics Working Papers},
+institution={Department of Economics and Business, Universitat Pompeu Fabra},
+author={Olivier Ledoit and Michael Wolf},
+title={Honey, I shrunk the sample covariance matrix},
+year={2003},
+month={Jun},
+number={691},
+abstract={The central message of this paper is that nobody should be using the sample covariance matrix for the purpose of portfolio optimization. It contains estimation error of the kind most likely to perturb a mean-variance optimizer. In its place, we suggest using the matrix obtained from the sample covariance matrix through a transformation called shrinkage. This tends to pull the most extreme coefficients towards more central values, thereby systematically reducing estimation error where it matters most. Statistically, the challenge is to know the optimal shrinkage intensity, and we give the formula for that. Without changing any other step in the portfolio optimization process, we show on actual stock market data that shrinkage reduces tracking error relative to a benchmark index, and substantially increases the realized information ratio of the active portfolio manager.},
+keywords={Covariance matrix; Markovitz optimization; shrinkage; tracking error},
+doi={None},
+url={https://ideas.repec.org/p/upf/upfgen/691.html},
+}
+
+
 @misc{RegularizedMultiCurrencyExpectedShortfallPortfolios,
   title={Regularized Multi-Currency Expected Shortfall Portfolios},
   author={Urban Ulrych, Patrick Lucescu},

@@ -43,10 +43,28 @@ Charles~M. Jones.
 \newblock 2002.
 \newblock Working paper, Columbia University.
 
+\bibitem{Jorion1986BayesStein}
+Philippe Jorion.
+\newblock Bayes-stein estimation for portfolio analysis.
+\newblock {\em The Journal of Financial and Quantitative Analysis},
+  21(3):279--292, 1986.
+
 \bibitem{kondor2007noise}
 Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
 \newblock Noise sensitivity of portfolio selection under various risk measures.
 \newblock {\em Journal of Banking \& Finance}, 31(5):1545--1573, 2007.
+
+\bibitem{LedoitWolf2003}
+Olivier Ledoit and Michael Wolf.
+\newblock Honey, i shrunk the sample covariance matrix.
+\newblock Economics Working Papers 691, Department of Economics and Business,
+  Universitat Pompeu Fabra, Jun 2003.
+
+\bibitem{LedoitWolf2004}
+Olivier Ledoit and Michael Wolf.
+\newblock A well-conditioned estimator for large-dimensional covariance
+  matrices.
+\newblock {\em Journal of Multivariate Analysis}, 88(2):365--411, 2004.
 
 \bibitem{Li2015}
 Jiahan Li.
@@ -73,6 +91,11 @@ LUKAS MENKHOFF, Lucio Sarno, MAIK SCHMELING, and Andreas Schrimpf.
 Lukas Menkhoff, Lucio Sarno, Maik Schmeling, and Andreas Schrimpf.
 \newblock Carry trades and global foreign exchange volatility.
 \newblock {\em The Journal of Finance}, 67(2):681--718, 2012.
+
+\bibitem{Michaud1989}
+Richard Michaud.
+\newblock The markowitz optimization enigma: Is ‘optimized’ optimal?
+\newblock {\em Financial Analysts Journal - FINANC ANAL J}, 45:31--42, 01 1989.
 
 \bibitem{NeelyWellerUlrich2009}
 Christopher~J. Neely, Paul~A. Weller, and Joshua~M. Ulrich.
