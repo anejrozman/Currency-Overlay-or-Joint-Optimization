@@ -189,7 +189,7 @@ $\bm{\Sigma}_t^{LW}$ is positive semi-definite and the convexity established in
 The estimators above are stated for a single asset block. In the multi-currency setting,
 the asset and currency means and covariances, and in the separate approach the
 covariance of the augmented currency-overlay problem, are constructed analogously, we
-defer their specification to \Cref{app:mv_separate} and \Cref{app:mv_joint}.
+defer their specification to \Cref{app:mv_separate} and \Cref{app:mv_joint}. % Delete this later
 
 \subsection{Quadratic Program Representation of the Regularized Portfolio Optimization} \label{app:mv_reg_qp}
 
@@ -397,6 +397,133 @@ the currency step as both the asset program \eqref{eq:mv_reg_qp} and the
 Expected Shortfall currency overlay \eqref{eq:sep_curr_qp}.
 
 \section{Joint Optimization} \label{app:mv_joint}
+
+In the joint portfolio optimization approach, asset and currency weights are optimized
+simultaneously rather than sequentially. We stack them into the combined decision vector
+$\bm{\theta}_t = [\bm{x}_t^\top, \bm{\psi}_t^\top]^\top \in \mathbb{R}^{N+M}$ and the combined
+return vector
+$\bm{R}_{t+1} = [\bm{R}^{fh\top}_{t+1},\, (\bm{e}_{t+1} - \bm{f}_t)^\top]^\top \in \mathbb{R}^{N+M}$,
+with joint mean $\bm{\mu} = \mathbb{E}_t[\bm{R}_{t+1}] \in \mathbb{R}^{N+M}$ and joint
+covariance $\bm{\Sigma} = \mathrm{Var}_t(\bm{R}_{t+1}) \in \mathbb{R}^{(N+M) \times (N+M)}$.
+The joint optimization problem is
+\begin{equation} \label{eq:mv_joint_obj}
+\begin{gathered}
+    \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \left\{ -\bm{\theta}_t^\top \bm{\mu}
+    + \tfrac{\gamma}{2}\, \bm{\theta}_t^\top \bm{\Sigma}\, \bm{\theta}_t
+    + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \right\}, \\[4pt]
+    \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L} \bm{\theta}_t\|_1 \le \ell.
+\end{gathered}
+\end{equation}
+The following matrices and vector adapt the problem to the joint optimization setting
+\begin{equation*}
+    \bm{q}_{N,M} = \begin{bmatrix} \bm{1}_N \\ \bm{0}_M \end{bmatrix}, \quad
+    \bm{L} = \begin{bmatrix} \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \bm{0}_{M \times M} \end{bmatrix}, \quad
+    \bm{S}_1 = \begin{bmatrix} \lambda_1^a \bm{I}_N & 0 \\ 0 & \lambda_1^c \bm{I}_M \end{bmatrix}, \quad
+    \bm{S}_2 = \begin{bmatrix} \sqrt{\lambda_2^a}\, \bm{I}_N & 0 \\ 0 & \sqrt{\lambda_2^c}\, \bm{I}_M \end{bmatrix},
+\end{equation*}
+like in the Expected Shortfall problem \eqref{eq:joint_obj}. The vector
+$\bm{q}_{N,M}$ applies the budget constraint to the asset weights only, so that
+$\bm{\theta}_t^\top \bm{q}_{N,M} = \bm{x}_t^\top \bm{1}_N = 1$, leaving the currency weights as a
+zero-investment overlay. The matrix $\bm{L}$ applies the leverage constraint to the asset
+weights only, giving $\|\bm{L}\bm{\theta}_t\|_1 = \|\bm{x}_t\|_1$. The diagonal regularization
+matrices $\bm{S}_1$ and $\bm{S}_2$ allow the asset and currency penalties to differ within a
+single objective,
+\begin{equation*}
+    \|\bm{S}_1 \bm{\theta}_t\|_1 = \lambda_1^a \|\bm{x}_t\|_1 + \lambda_1^c \|\bm{\psi}_t\|_1,
+    \qquad
+    \|\bm{S}_2 \bm{\theta}_t\|_2^2 = \lambda_2^a \|\bm{x}_t\|_2^2 + \lambda_2^c \|\bm{\psi}_t\|_2^2.
+\end{equation*}
+
+The joint covariance is
+\begin{equation*}
+    \bm{\Sigma} =
+    \begin{bmatrix} \bm{\Sigma}^a & \bm{\Sigma}^{ac} \\ (\bm{\Sigma}^{ac})^\top & \bm{\Sigma}^c \end{bmatrix},
+\end{equation*}
+with the asset, currency, and cross-covariance matrices $\bm{\Sigma}^a$, $\bm{\Sigma}^c$, and
+$\bm{\Sigma}^{ac}$ defined as in \Cref{app:mv_separate}. The portfolio variance then expands as
+\begin{equation} \label{eq:mv_joint_var}
+    \bm{\theta}_t^\top \bm{\Sigma}\, \bm{\theta}_t
+    = \bm{x}_t^\top \bm{\Sigma}^a \bm{x}_t
+    + 2\, \bm{x}_t^\top \bm{\Sigma}^{ac} \bm{\psi}_t
+    + \bm{\psi}_t^\top \bm{\Sigma}^c \bm{\psi}_t.
+\end{equation}
+This is the same decomposition that appears in the currency overlay step
+\eqref{eq:mv_curr_expanded}. There, however, the asset weights are fixed at $\bm{x}_t^*$, so
+the first term is constant and drops from the objective, while the cross term simplifies to 
+the linear form $\gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t$. In the joint
+problem both $\bm{x}_t$ and $\bm{\psi}_t$ are free. This is how thejoint approach captures the
+asset--currency dependence.
+
+The joint mean $\bm{\mu}$ and covariance $\bm{\Sigma}$ are the Bayes--Stein and Ledoit--Wolf
+estimators of \Cref{app:estimators}, here applied to the combined return vector
+$\bm{R}_{t+1}$. Because the Ledoit--Wolf shrinkage acts on the full combined covariance, the
+cross-covariance matrix $\bm{\Sigma}^{ac}$ is shrunk together with the asset and currency matrices. This is
+in contrast to the separate approach, where the cross-covariance enters the currency overlay
+only through the fixed asset weights $\bm{x}_t^{*\top} \bm{\Sigma}^{ac}$ and is not
+shrunk \citep{SparseAndStableInternationalPortfolioOptimization}.
+
+Applying the $L_1$ decomposition to all $N+M$ components of $\bm{\theta}_t$,
+and collecting the asset and currency parts separately, we form the augmented vector
+\begin{equation*}
+    \tilde{\bm{\theta}}_t = \begin{bmatrix}\, \bm{x}_t^\top,& \bm{\psi}_t^\top,&
+    (\bm{\Delta}_{x,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^-)^\top,&
+    (\bm{\Delta}_{x,t}^+)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \,\end{bmatrix}^\top
+    \in \mathbb{R}^{3N+3M}.
+\end{equation*}
+The cost vector and penalty matrix are
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix}\, -\bm{\mu}^\top,&
+    \lambda_1^a \bm{1}_N^\top,& \lambda_1^c \bm{1}_M^\top,&
+    \lambda_1^a \bm{1}_N^\top,& \lambda_1^c \bm{1}_M^\top \,\end{bmatrix}^\top,
+\end{equation*}
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \gamma \bm{\Sigma}^a + 2\lambda_2^a \bm{I}_N & \gamma \bm{\Sigma}^{ac} & \bm{0}_{N \times (2N+2M)} \\
+        \gamma (\bm{\Sigma}^{ac})^\top & \gamma \bm{\Sigma}^c + 2\lambda_2^c \bm{I}_M & \bm{0}_{M \times (2N+2M)} \\
+        \bm{0}_{(2N+2M) \times N} & \bm{0}_{(2N+2M) \times M} & \bm{0}_{(2N+2M) \times (2N+2M)}
+    \end{bmatrix}.
+\end{equation*}
+The active block of $\tilde{\bm{Q}}$ combines the joint covariance with the $L_2$ penalty as
+$\gamma \bm{\Sigma} + 2 \bm{S}_2^2$, where the off-diagonal $\gamma \bm{\Sigma}^{ac}$ couples the
+asset and currency weights. The joint portfolio
+optimization problem is then the quadratic program
+\begin{equation} \label{eq:mv_joint_qp}
+\begin{aligned}
+    \tilde{\bm{\theta}}_t^* &= \argmin_{\tilde{\bm{\theta}}_t} \quad
+    \tilde{\bm{c}}^\top \tilde{\bm{\theta}}_t + \tfrac{1}{2}\, \tilde{\bm{\theta}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\theta}}_t, \\[2pt]
+    \text{s.t.} \quad
+    \tilde{\bm{D}} \tilde{\bm{\theta}}_t &=
+    \begin{bmatrix} \bm{q}_{N,M}^\top & \bm{0}_{N+M}^\top & \bm{0}_{N+M}^\top \\
+    \bm{I}_{N+M} & \bm{I}_{N+M} & -\bm{I}_{N+M} \end{bmatrix} \tilde{\bm{\theta}}_t
+    = \tilde{\bm{E}} = \begin{bmatrix} 1 \\ \bm{0}_{N+M} \end{bmatrix}, \\[6pt]
+    \tilde{\bm{A}} \tilde{\bm{\theta}}_t &=
+    \begin{bmatrix} \bm{0}_{N+M}^\top & \bm{q}_{N,M}^\top & \bm{q}_{N,M}^\top \end{bmatrix} \tilde{\bm{\theta}}_t
+    \le b = \ell, \\[6pt]
+    \Delta_{x,i,t}^\pm &\ge 0, \quad \Delta_{\psi,c,t}^\pm \ge 0,
+    \quad \text{for}\ i = 1, \dots, N, \ c = 1, \dots, M.
+\end{aligned}
+\end{equation}
+In $\tilde{\bm{D}}$, the first row enforces the asset budget constraint
+$\bm{x}_t^\top \bm{1}_N = 1$, and the remaining $N+M$ rows enforce the weight decomposition
+\eqref{eq:l1_decomp} for all components of $\bm{\theta}_t$. The single row of $\tilde{\bm{A}}$
+imposes the asset-only leverage constraint \eqref{eq:leverage_constraint}, giving
+$\bm{1}_N^\top(\bm{\Delta}_{x,t}^+ + \bm{\Delta}_{x,t}^-) = \|\bm{x}_t\|_1 \le \ell$.
+
+The joint formulation solves a single quadratic program over $\tilde{\bm{\theta}}_t$,
+capturing the interaction between asset and currency exposures through the
+cross-covariance matrix $\bm{\Sigma}^{ac}$ in $\tilde{\bm{Q}}$. Compared with the joint Expected
+Shortfall program \eqref{eq:joint_qp}, the mean-variance program is again smaller
+its decision vector has dimension $3N+3M$ rather than $3N+3M+q+1$, and its only inequality is the leverage constraint.
+As in the Expected Shortfall case, the joint program is of higher dimension than the two separate
+programs of \Cref{app:mv_separate}.
+
+All quadratic programs derived in this appendix share the same convex structure and are
+solvable with the same quadratic programming solver. Each extension of the program, from the
+base regularized single-currency formulation \eqref{eq:mv_reg_qp} to the joint multi-currency
+program \eqref{eq:mv_joint_qp}, modifies only the covariance and cost matrices and the constraint
+blocks that encode the budget, leverage, and weight decomposition, without changing the program
+structure.
 
 
 

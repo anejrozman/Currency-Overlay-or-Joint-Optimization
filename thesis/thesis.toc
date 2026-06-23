@@ -59,6 +59,6 @@
 \contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{35}{subsection.B.3.1}%
 \contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{35}{subsection.B.3.2}%
 \contentsline {section}{\numberline {B.4}Joint Optimization}{36}{section.B.4}%
-\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{37}{appendix.C}%
-\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{39}{appendix.D}%
-\contentsline {chapter}{Bibliography}{40}{appendix*.5}%
+\contentsline {appendix}{\chapternumberline {C}Transaction Costs}{39}{appendix.C}%
+\contentsline {appendix}{\chapternumberline {D}Hyperparameter Tuning and Additional Results}{41}{appendix.D}%
+\contentsline {chapter}{Bibliography}{42}{appendix*.5}%
