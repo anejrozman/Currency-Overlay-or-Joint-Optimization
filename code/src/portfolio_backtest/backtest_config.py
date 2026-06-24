@@ -88,7 +88,7 @@ REG_MV_ASSET_FULL_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [1.0, 3.0, 5.0],
+        "gamma":          [10.0, 25.0, 50.0, 100.0],
         "lambda_l1":      [0.0, 5e-5, 1e-4, 3e-4],
         "lambda_l2":      [0.0, 5e-5, 1e-4, 3e-4],
         "leverage_limit": [1.0, 1.5, 2.0],
@@ -100,7 +100,7 @@ REG_MV_ASSET_ZERO_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [1.0, 3.0, 5.0],
+        "gamma":          [10.0, 25.0, 50.0, 100.0],
         "lambda_l1":      [0.0, 5e-5, 1e-4, 3e-4],
         "lambda_l2":      [0.0, 5e-5, 1e-4, 3e-4],
         "leverage_limit": [1.0, 1.5, 2.0],
@@ -112,7 +112,7 @@ MV_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [1.0, 3.0, 5.0],
+        "gamma":          [10.0, 25.0, 50.0, 100.0],
         "leverage_limit": [1.0, 1.5, 2.0],
     },
 )
@@ -122,7 +122,7 @@ REG_MV_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":            [1.0, 3.0, 5.0],
+        "gamma":            [10.0, 25.0, 50.0, 100.0],
         "lambda_l1_asset":  [0.0, 1e-4, 3e-4],
         "lambda_l2_asset":  [0.0, 1e-4, 3e-4],
         "lambda_l1_curr":   [0.0, 1e-5, 5e-5],
@@ -136,7 +136,7 @@ MV_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [1.0, 3.0, 5.0],
+        "gamma":          [10.0, 25.0, 50.0, 100.0],
         "leverage_limit": [1.0, 1.5, 2.0],
     },
 )
@@ -146,7 +146,7 @@ REG_MV_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":            [1.0, 3.0, 5.0],
+        "gamma":            [10.0, 25.0, 50.0, 100.0],
         "lambda_l1_asset":  [0.0, 1e-4, 3e-4],
         "lambda_l2_asset":  [0.0, 1e-4, 3e-4],
         "lambda_l1_curr":   [0.0, 1e-5, 5e-5],

@@ -33,14 +33,14 @@ class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
         Args:
             hyperparams: Optional dict with keys:
 
-                * ``gamma``          (float) — risk aversion coefficient, default 3.0
+                * ``gamma``          (float) — risk aversion coefficient, default 50.0
                 * ``lambda_l1``      (float) — L1 penalty weight, default 1e-4
                 * ``lambda_l2``      (float) — L2 penalty weight, default 1e-4
                 * ``leverage_limit`` (float) — L1 norm constraint, default 1.5
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
         """
         super().__init__(hyperparams)
-        self.gamma: float = self.hyperparams.get("gamma", 3.0)
+        self.gamma: float = self.hyperparams.get("gamma", 50.0)
         self.lambda_l1: float = self.hyperparams.get("lambda_l1", 1e-4)
         self.lambda_l2: float = self.hyperparams.get("lambda_l2", 1e-4)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 1.5)
@@ -125,19 +125,24 @@ class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
         val_bundle: dict[str, object],
     ) -> float:
         """
-        Evaluate validation portfolio variance of the candidate weights.
+        Evaluate the validation mean-variance utility of the candidate weights.
+
+        Returns the optimization objective ``(gamma/2) Var(r) - E[r]`` on the
+        validation window, where ``r`` is the realized portfolio return. Lower is
+        better. This matches the optimizer objective, so model selection trades off
+        return against risk rather than minimizing variance alone.
 
         Args:
             weights: 1-D array of portfolio weights from :meth:`optimize`.
             val_bundle: Must contain ``"R_u"``.
 
         Returns:
-            Portfolio variance ``w' Sigma_val w`` on the validation window.
+            Mean-variance utility on the validation window (lower is better).
         """
         if "R_u" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_u'.")
         R_u_val = val_bundle["R_u"]
         if R_u_val.empty or len(R_u_val) < 2:
             return float("inf")
-        Sigma_val = np.cov(R_u_val.values, rowvar=False, ddof=1) + 1e-8 * np.eye(R_u_val.shape[1]) # Add small regularization to ensure positive definiteness
-        return float(weights @ Sigma_val @ weights)
+        r_val = R_u_val.values @ weights
+        return float((self.gamma / 2) * np.var(r_val, ddof=1) - np.mean(r_val))

@@ -34,7 +34,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
         Args:
             hyperparams: Optional dict with keys:
 
-                * ``gamma``           (float) — risk aversion coefficient, default 3.0
+                * ``gamma``           (float) — risk aversion coefficient, default 50.0
                 * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 1e-4
                 * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 1e-4 (floored at 1e-8)
                 * ``lambda_l1_curr``  (float) — L1 penalty for currency overlay, default 2e-5
@@ -43,7 +43,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
                 * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
         """
         super().__init__(hyperparams)
-        self.gamma: float = self.hyperparams.get("gamma", 3.0)
+        self.gamma: float = self.hyperparams.get("gamma", 50.0)
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 1e-4)
         self.lambda_l2_asset: float = max(self.hyperparams.get("lambda_l2_asset", 1e-4), 1e-8)
         self.lambda_l1_curr: float = self.hyperparams.get("lambda_l1_curr", 2e-5)

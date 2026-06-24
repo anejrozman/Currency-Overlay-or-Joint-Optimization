@@ -11,19 +11,39 @@ def bayes_stein(returns: np.ndarray) -> np.ndarray:
     """
     Bayes-Stein shrinkage estimator for the mean.
 
-    Shrinks each assets sample mean toward the minimum variance portfolio
-    mean with a shrinkage intensity.
+    Shrinks each asset's sample mean toward the minimum-variance portfolio mean
+    with a data-driven shrinkage intensity. The precision matrix uses the
+    Ledoit-Wolf covariance :func:`ledoit_wolf_cc` rather than the raw sample
+    covariance, so the shrinkage target and intensity stay well-defined when the
+    number of assets is large relative to the window — including ``N >= T``, where
+    the sample covariance is singular and the raw mean would otherwise be returned
+    unshrunk.
+
+    Zero-variance columns (e.g. a base-currency excess return that is identically
+    zero) carry no covariance information: their raw mean is returned unchanged and
+    the remaining columns are shrunk on their own sub-block.
 
     Args:
-        (T, N) array of asset returns.
+        returns: (T, N) array of asset returns.
 
     Returns:
         1-D array of shape *(N,)* with shrunk mean estimates.
     """
     T, N = returns.shape
     mu = returns.mean(axis=0)
+
+    # Shrink only the informative (non-degenerate) columns; keep raw means for any
+    # zero-variance columns so the precision matrix below stays non-singular.
+    nz = returns.var(axis=0) > 0.0
+    if not nz.all():
+        out = mu.copy()
+        idx = np.where(nz)[0]
+        if idx.size:
+            out[idx] = bayes_stein(returns[:, idx])
+        return out
+
     try:
-        Sigma = np.cov(returns, rowvar=False, ddof=1)
+        Sigma = ledoit_wolf_cc(returns)
         Sigma_inv = np.linalg.inv(Sigma)
     except np.linalg.LinAlgError:
         return mu
