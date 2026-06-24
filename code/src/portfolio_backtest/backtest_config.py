@@ -89,8 +89,8 @@ REG_MV_ASSET_FULL_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "gamma":          [1.0, 3.0, 5.0],
-        "lambda_l1":      [0.1, 0.3, 0.5],
-        "lambda_l2":      [0.1, 0.3, 0.5],
+        "lambda_l1":      [0.0, 5e-5, 1e-4, 3e-4],
+        "lambda_l2":      [0.0, 5e-5, 1e-4, 3e-4],
         "leverage_limit": [1.0, 1.5, 2.0],
     },
 )
@@ -101,8 +101,8 @@ REG_MV_ASSET_ZERO_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "gamma":          [1.0, 3.0, 5.0],
-        "lambda_l1":      [0.1, 0.3, 0.5],
-        "lambda_l2":      [0.1, 0.3, 0.5],
+        "lambda_l1":      [0.0, 5e-5, 1e-4, 3e-4],
+        "lambda_l2":      [0.0, 5e-5, 1e-4, 3e-4],
         "leverage_limit": [1.0, 1.5, 2.0],
     },
 )
@@ -123,10 +123,10 @@ REG_MV_OVERLAY_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "gamma":            [1.0, 3.0, 5.0],
-        "lambda_l1_asset":  [0.1, 0.3, 0.5],
-        "lambda_l2_asset":  [0.1, 0.3, 0.5],
-        "lambda_l1_curr":   [0.1, 0.3, 0.5],
-        "lambda_l2_curr":   [0.1, 0.3, 0.5],
+        "lambda_l1_asset":  [0.0, 1e-4, 3e-4],
+        "lambda_l2_asset":  [0.0, 1e-4, 3e-4],
+        "lambda_l1_curr":   [0.0, 1e-5, 5e-5],
+        "lambda_l2_curr":   [5e-5, 2e-4, 5e-4],
         "leverage_limit":   [1.0, 1.5, 2.0],
     },
 )
@@ -147,10 +147,10 @@ REG_MV_JOINT_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "gamma":            [1.0, 3.0, 5.0],
-        "lambda_l1_asset":  [0.1, 0.3, 0.5],
-        "lambda_l2_asset":  [0.1, 0.3, 0.5],
-        "lambda_l1_curr":   [0.1, 0.3, 0.5],
-        "lambda_l2_curr":   [0.1, 0.3, 0.5],
+        "lambda_l1_asset":  [0.0, 1e-4, 3e-4],
+        "lambda_l2_asset":  [0.0, 1e-4, 3e-4],
+        "lambda_l1_curr":   [0.0, 1e-5, 5e-5],
+        "lambda_l2_curr":   [5e-5, 2e-4, 5e-4],
         "leverage_limit":   [1.0, 1.5, 2.0],
     },
 )

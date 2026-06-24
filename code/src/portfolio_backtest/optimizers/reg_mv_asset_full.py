@@ -34,16 +34,16 @@ class RegularizedMeanVarianceAssetFullOptimizer(BaseOptimizer):
             hyperparams: Optional dict with keys:
 
                 * ``gamma``          (float) — risk aversion coefficient, default 3.0
-                * ``lambda_l1``      (float) — L1 penalty weight, default 0.3
-                * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
-                * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
+                * ``lambda_l1``      (float) — L1 penalty weight, default 1e-4
+                * ``lambda_l2``      (float) — L2 penalty weight, default 1e-4
+                * ``leverage_limit`` (float) — L1 norm constraint, default 1.5
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
         """
         super().__init__(hyperparams)
         self.gamma: float = self.hyperparams.get("gamma", 3.0)
-        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
-        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.3)
-        self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 1e-4)
+        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 1e-4)
+        self.leverage_limit: float = self.hyperparams.get("leverage_limit", 1.5)
         self.solver = self.hyperparams.get("solver", cp.GUROBI)
 
         self.mu: np.ndarray | None = None
