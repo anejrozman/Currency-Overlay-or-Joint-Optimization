@@ -15,7 +15,7 @@ import logging
 import cvxpy as cp
 import numpy as np
 from .base_optimizer import BaseOptimizer
-from ..utils.estimation import bayes_stein
+from ..utils.estimation import bayes_stein, ledoit_wolf_cc
 
 logger = logging.getLogger(__name__)
 
@@ -102,34 +102,39 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
     def _optimize_joint(
         self, Y_fh: np.ndarray, Y_c: np.ndarray
     ) -> dict[str, np.ndarray]:
-        """Jointly minimize regularized MV objective of (R_fh @ x + R_c @ psi) over x and psi."""
-        q, N = Y_fh.shape
+        """Jointly minimize regularized MV objective of (R_fh @ x + R_c @ psi) over x and psi.
+
+        The joint mean (Bayes-Stein) and joint covariance (Ledoit-Wolf) are estimated on the
+        stacked return vector [R_fh, R_c], so the asset-currency cross-covariance is shrunk
+        together with the asset and currency blocks (appendix B, eq:mv_joint_obj)."""
+        N = Y_fh.shape[1]
         K = Y_c.shape[1]
-        mu = bayes_stein(Y_fh)
-        mu_c = bayes_stein(Y_c)
+        Y = np.hstack([Y_fh, Y_c])  # q x (N + K) combined return matrix
+        mu_joint = bayes_stein(Y)
+        Sigma_joint = ledoit_wolf_cc(Y)
 
         x = cp.Variable(N)
         psi = cp.Variable(K)
-        r = Y_fh @ x + Y_c @ psi
-        mean_r = cp.sum(r) / q
-        var_r = cp.sum_squares(r - mean_r) / (q - 1)
+        theta = cp.hstack([x, psi])
         obj = (
-            (self.gamma / 2) * var_r
-            - mu @ x
-            - mu_c @ psi
+            (self.gamma / 2) * cp.quad_form(theta, cp.psd_wrap(Sigma_joint))
+            - mu_joint @ theta
             + self.lambda_l1_asset * cp.norm(x, 1)
             + self.lambda_l2_asset * cp.sum_squares(x)
             + self.lambda_l1_curr * cp.norm(psi, 1)
             + self.lambda_l2_curr * cp.sum_squares(psi)
         )
         l1_norm = cp.norm(x, 1)
-        problem = cp.Problem(
-            cp.Minimize(obj),
-            [
-                cp.sum(x) == 1,
-                l1_norm <= self.leverage_limit,
-            ],
-        )
+        constraints = [
+            cp.sum(x) == 1,
+            l1_norm <= self.leverage_limit,
+        ]
+        # Base currency (zero-variance excess return) is the residual numeraire,
+        # not an overlay decision variable; pin its weight to zero.
+        base = np.where(Y_c.var(axis=0) <= 0.0)[0]
+        if base.size:
+            constraints.append(psi[base] == 0)
+        problem = cp.Problem(cp.Minimize(obj), constraints)
         self._solve(problem)
 
         weights = x.value

@@ -16,6 +16,7 @@ import logging
 import cvxpy as cp
 import numpy as np
 from .base_optimizer import BaseOptimizer
+from ..utils.estimation import bayes_stein, ledoit_wolf_cc, sample_cross_cov
 
 logger = logging.getLogger(__name__)
 
@@ -92,14 +93,14 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """Step 1 in optimization: unregularized mean-variance on R_fh with leverage constraint and full investment."""
-        q, N = Y_fh.shape
+        """Step 1 in optimization: unregularized mean-variance on R_fh with Bayes-Stein
+        mean, Ledoit-Wolf covariance, leverage constraint, and full investment."""
+        N = Y_fh.shape[1]
+        mu = bayes_stein(Y_fh)
+        Sigma_a = ledoit_wolf_cc(Y_fh)
 
         x = cp.Variable(N)
-        r = Y_fh @ x
-        mean_r = cp.sum(r) / q
-        var_r = cp.sum_squares(r - mean_r) / (q - 1)
-        mv_obj = (self.gamma / 2) * var_r - mean_r
+        mv_obj = (self.gamma / 2) * cp.quad_form(x, cp.psd_wrap(Sigma_a)) - mu @ x
         problem = cp.Problem(
             cp.Minimize(mv_obj),
             [
@@ -115,16 +116,33 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray
     ) -> np.ndarray:
-        """Step 2 in optimization: minimize mean-variance of (R_fh @ x_fixed + R_c @ psi) over unconstrained psi."""
-        q, K = Y_c.shape
+        """Step 2 in optimization: unregularized mean-variance currency overlay over
+        unconstrained psi.
 
-        c = Y_fh @ x_fixed  
+        Minimizes (gamma/2) psi' Sigma_c psi + gamma x*' Sigma_ac psi - mu_c' psi, the
+        expansion of Var(x*' R_fh + psi' R_c) with the constant asset-only term dropped
+        (appendix B, eq:mv_curr_expanded). Sigma_c is Ledoit-Wolf shrunk; the
+        cross-covariance Sigma_ac is the un-shrunk sample estimate.
+        """
+        K = Y_c.shape[1]
+        mu_c = bayes_stein(Y_c)
+        Sigma_c = ledoit_wolf_cc(Y_c)
+        Sigma_ac = sample_cross_cov(Y_fh, Y_c)  # N x K, not shrunk
+        cross = self.gamma * (x_fixed @ Sigma_ac)  # length-K constant vector
+
         psi = cp.Variable(K)
-        r = c + Y_c @ psi
-        mean_r = cp.sum(r) / q
-        var_r = cp.sum_squares(r - mean_r) / (q - 1)
-        mv_obj = (self.gamma / 2) * var_r - mean_r
-        problem = cp.Problem(cp.Minimize(mv_obj))
+        mv_obj = (
+            (self.gamma / 2) * cp.quad_form(psi, cp.psd_wrap(Sigma_c))
+            + cross @ psi
+            - mu_c @ psi
+        )
+        # Base currency (zero-variance excess return) is the residual numeraire,
+        # not an overlay decision variable; pin its weight to zero.
+        constraints = []
+        base = np.where(Y_c.var(axis=0) <= 0.0)[0]
+        if base.size:
+            constraints.append(psi[base] == 0)
+        problem = cp.Problem(cp.Minimize(mv_obj), constraints)
         self._solve(problem)
 
         return psi.value.flatten()

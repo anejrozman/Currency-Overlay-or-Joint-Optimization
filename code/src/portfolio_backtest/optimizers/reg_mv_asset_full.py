@@ -14,7 +14,7 @@ import logging
 import cvxpy as cp
 import numpy as np
 from .base_optimizer import BaseOptimizer
-from ..utils.estimation import bayes_stein
+from ..utils.estimation import bayes_stein, ledoit_wolf_cc
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class RegularizedMeanVarianceAssetFullOptimizer(BaseOptimizer):
         Y = R_fh.values
         self.N = Y.shape[1]
         self.mu = bayes_stein(Y)
-        self.Sigma = np.cov(Y, rowvar=False, ddof=1) + 1e-8 * np.eye(self.N) # Add small regularization to ensure positive definiteness
+        self.Sigma = ledoit_wolf_cc(Y)  # Ledoit-Wolf shrinkage toward constant-correlation target (appendix B)
 
     def optimize(self) -> np.ndarray:
         """
