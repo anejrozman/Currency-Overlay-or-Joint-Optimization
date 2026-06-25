@@ -300,6 +300,7 @@ class Backtester:
         Calculate and print the backtest performace metrics.
 
         * **ES_80** — Daily Expected Shortfall at 80 % confidence level
+        * **ES_95** — Daily Expected Shortfall at 95 % confidence level
         * **VOL**   — Annualized volatility
         * **MD**    — Maximum drawdown
         * **SR**    — Sharpe Ratio = annualized excess mean / annualized volatility
@@ -327,10 +328,14 @@ class Backtester:
         # Annualized volatility
         ann_vol = r.std(ddof=1) * math.sqrt(trading_days)
 
-        # Daily ES at 80% confidence level
-        es_threshold = r.quantile(0.20)
-        daily_es = -r[r <= es_threshold].mean()
-        ann_es = daily_es * math.sqrt(trading_days)
+        # Daily Expected Shortfall: mean of the worst tail returns.
+        # ES_80 averages the worst 20% of days, ES_95 the worst 5%.
+        es_threshold_80 = r.quantile(0.20)
+        daily_es_80 = -r[r <= es_threshold_80].mean()
+        ann_es_80 = daily_es_80 * math.sqrt(trading_days)
+
+        es_threshold_95 = r.quantile(0.05)
+        daily_es_95 = -r[r <= es_threshold_95].mean()
 
         # Maximum Drawdown
         cum = (1.0 + r).cumprod()
@@ -348,8 +353,8 @@ class Backtester:
         else:
             sor = float("nan")
 
-        # Expected Shortfall Ratio
-        esr = ann_excess_mean / ann_es if ann_es > 0 else float("nan")
+        # Expected Shortfall Ratio (based on ES_80)
+        esr = ann_excess_mean / ann_es_80 if ann_es_80 > 0 else float("nan")
 
         asset_to = (
             round(float(np.mean(self._asset_turnovers)), 4)
@@ -363,7 +368,8 @@ class Backtester:
         )
 
         metrics = {
-            "ES_80 (daily, %)":              round(daily_es * 100, 4),
+            "ES_80 (daily, %)":              round(daily_es_80 * 100, 4),
+            "ES_95 (daily, %)":              round(daily_es_95 * 100, 4),
             "Volatility (ann., %)":          round(ann_vol * 100, 4),
             "Max Drawdown (%)":              round(max_drawdown * 100, 4),
             "Sharpe Ratio":                  round(sr, 4),
