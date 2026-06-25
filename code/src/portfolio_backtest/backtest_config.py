@@ -3,6 +3,7 @@ Backtest configuration: per-strategy defaults for window, validation period,
 rebalancing frequency, and hyperparameter grids.
 
 Override individual fields at runtime via CLI flags (--window-years, --val-years). #TODO: Consider adding a --rebalancing-frequency flag as well.
+
 """
 
 from __future__ import annotations
@@ -18,15 +19,28 @@ class BacktestConfig:
     param_grid: dict = field(default_factory=dict)
 
 
+# Regularization grids
+LAMBDA_L1_ASSET_GRID = [0.001, 0.002, 0.003]
+LAMBDA_L2_ASSET_GRID = [0.1, 0.5, 1.0]
+LAMBDA_L1_CURR_GRID = [0.0001, 0.0002, 0.0003]
+LAMBDA_L2_CURR_GRID = [0.00001, 0.00002, 0.00003]
+
+
+# Fixed
+LEVERAGE = [1.5]
+ALPHA = [0.80]
+GAMMA = [50.0]
+
+
 ES_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "alpha":          [0.80, 0.95],
-        "lambda_l1":      [0.0, 0.02],
-        "lambda_l2":      [0.0, 0.02],
-        "leverage_limit": [1, 1.5, 2.0],
+        "alpha":          ALPHA,
+        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -42,8 +56,8 @@ OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "alpha":          [0.80, 0.95],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "alpha":          ALPHA,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -52,12 +66,12 @@ REG_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "alpha":           [0.80, 0.95],
-        "lambda_l1_asset": [0.0, 0.02],
-        "lambda_l2_asset": [0.0, 0.02],
-        "lambda_l1_curr":  [0.0, 0.02],
-        "lambda_l2_curr":  [0.0, 0.02],
-        "leverage_limit":  [1.0, 1.5, 2.0],
+        "alpha":           ALPHA,
+        "lambda_l1_asset": LAMBDA_L1_ASSET_GRID,
+        "lambda_l2_asset": LAMBDA_L2_ASSET_GRID,
+        "lambda_l1_curr":  LAMBDA_L1_CURR_GRID,
+        "lambda_l2_curr":  LAMBDA_L2_CURR_GRID,
+        "leverage_limit":  LEVERAGE,
     },
 )
 
@@ -66,8 +80,8 @@ JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "alpha":          [0.80, 0.95],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "alpha":          ALPHA,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -76,10 +90,10 @@ REG_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "alpha":          [0.80, 0.95],
-        "lambda_l1":      [0.0, 0.02],
-        "lambda_l2":      [0.0, 0.02],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "alpha":          ALPHA,
+        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -88,10 +102,10 @@ REG_MV_ASSET_FULL_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [10.0, 25.0, 50.0, 100.0],
-        "lambda_l1":      [0.0, 5e-5, 1e-4, 3e-4],
-        "lambda_l2":      [0.0, 5e-5, 1e-4, 3e-4],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "gamma":          GAMMA,
+        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -100,10 +114,10 @@ REG_MV_ASSET_ZERO_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [10.0, 25.0, 50.0, 100.0],
-        "lambda_l1":      [0.0, 5e-5, 1e-4, 3e-4],
-        "lambda_l2":      [0.0, 5e-5, 1e-4, 3e-4],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "gamma":          GAMMA,
+        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -112,8 +126,8 @@ MV_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [10.0, 25.0, 50.0, 100.0],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "gamma":          GAMMA,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -122,12 +136,12 @@ REG_MV_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":            [10.0, 25.0, 50.0, 100.0],
-        "lambda_l1_asset":  [0.0, 1e-4, 3e-4],
-        "lambda_l2_asset":  [0.0, 1e-4, 3e-4],
-        "lambda_l1_curr":   [0.0, 1e-5, 5e-5],
-        "lambda_l2_curr":   [5e-5, 2e-4, 5e-4],
-        "leverage_limit":   [1.0, 1.5, 2.0],
+        "gamma":            GAMMA,
+        "lambda_l1_asset":  LAMBDA_L1_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
     },
 )
 
@@ -136,8 +150,8 @@ MV_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          [10.0, 25.0, 50.0, 100.0],
-        "leverage_limit": [1.0, 1.5, 2.0],
+        "gamma":          GAMMA,
+        "leverage_limit": LEVERAGE,
     },
 )
 
@@ -146,11 +160,11 @@ REG_MV_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":            [10.0, 25.0, 50.0, 100.0],
-        "lambda_l1_asset":  [0.0, 1e-4, 3e-4],
-        "lambda_l2_asset":  [0.0, 1e-4, 3e-4],
-        "lambda_l1_curr":   [0.0, 1e-5, 5e-5],
-        "lambda_l2_curr":   [5e-5, 2e-4, 5e-4],
-        "leverage_limit":   [1.0, 1.5, 2.0],
+        "gamma":            GAMMA,
+        "lambda_l1_asset":  LAMBDA_L1_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
     },
 )
