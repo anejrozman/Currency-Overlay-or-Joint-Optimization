@@ -16,7 +16,7 @@
 #   --universe N        Top-N universe: 10, 50, or 100 (default: 10)
 #   --time HH:MM:SS     SLURM time limit (default: 24:00:00, max 720:00:00)
 #   --cpus N            CPUs per task (default: 4 -> Gurobi runs 3 threads)
-#   --mem SIZE          Total memory, e.g. 16G (default: 16G)
+#   --mem-per-cpu SIZE  Memory per CPU, e.g. 4G (default: 4G)
 #   --no-grid           Skip grid search (passthrough to run_strategy.py)
 #   --window-years N    Override estimation window (passthrough)
 #   --val-years N       Override validation window (passthrough)
@@ -28,7 +28,7 @@ STRATEGY=""
 UNIVERSE=10
 TIME_LIMIT="24:00:00"
 CPUS=4
-MEM="16G"
+MEM_PER_CPU="4G"
 PASSTHROUGH=()
 MAX_HOURS=720
 
@@ -43,7 +43,7 @@ Usage:
   --universe N        Top-N universe: 10, 50, or 100 (default: 10)
   --time HH:MM:SS     SLURM time limit (default: 24:00:00, max 720:00:00)
   --cpus N            CPUs per task (default: 4 -> Gurobi runs 3 threads)
-  --mem SIZE          Total memory, e.g. 16G (default: 16G)
+  --mem-per-cpu SIZE  Memory per CPU, e.g. 4G (default: 4G)
   --no-grid           Skip grid search (passthrough to run_strategy.py)
   --window-years N    Override estimation window (passthrough)
   --val-years N       Override validation window (passthrough)
@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
         --universe)     UNIVERSE="$2"; shift 2 ;;
         --time)         TIME_LIMIT="$2"; shift 2 ;;
         --cpus)         CPUS="$2"; shift 2 ;;
-        --mem)          MEM="$2"; shift 2 ;;
+        --mem-per-cpu)  MEM_PER_CPU="$2"; shift 2 ;;
         --no-grid)      PASSTHROUGH+=("--no-grid"); shift ;;
         --window-years) PASSTHROUGH+=("--window-years" "$2"); shift 2 ;;
         --val-years)    PASSTHROUGH+=("--val-years" "$2"); shift 2 ;;
@@ -88,11 +88,11 @@ fi
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 SCRIPTS_DIR="$ROOT_DIR/code/scripts"
 LOGS_DIR="$ROOT_DIR/logs"
-VENV="$ROOT_DIR/.venv/bin/activate"
+VENV="$ROOT_DIR/code/.venv/bin/activate" 
 mkdir -p "$LOGS_DIR"
 
 JOB_NAME="${STRATEGY}_u${UNIVERSE}"
-echo "Submitting: ${JOB_NAME}  (time=${TIME_LIMIT}, cpus=${CPUS}, mem=${MEM})"
+echo "Submitting: ${JOB_NAME}  (time=${TIME_LIMIT}, cpus=${CPUS}, mem-per-cpu=${MEM_PER_CPU})"
 
 sbatch <<EOF
 #!/bin/bash
@@ -100,11 +100,12 @@ sbatch <<EOF
 #SBATCH --time=${TIME_LIMIT}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=${CPUS}
-#SBATCH --mem=${MEM}
+#SBATCH --mem-per-cpu=${MEM_PER_CPU}
 #SBATCH --output=${LOGS_DIR}/${JOB_NAME}_%j.out
 #SBATCH --error=${LOGS_DIR}/${JOB_NAME}_%j.err
 #SBATCH --chdir=${SCRIPTS_DIR}
 
+module load stack/2024-06 gcc/12.2.0 python/3.12.8
 module load gurobi/13.0.0
 source ${VENV}
 

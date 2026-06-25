@@ -71,7 +71,7 @@ submit() {  # submit <strategy> <universe>
     if (( DRY_RUN )); then
         printf '  %-22s u%-3s  time=%-9s mem=%-4s cpus=4\n' "$strat" "$uni" "$t" "$m"
     else
-        "$RUN_ONE" --strategy "$strat" --universe "$uni" --time "$t" --mem "$m" --cpus 4
+        "$RUN_ONE" --strategy "$strat" --universe "$uni" --time "$t" --mem-per-cpu "$m" --cpus 4
     fi
 }
 
