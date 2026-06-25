@@ -48,9 +48,17 @@ def next_run_dir(optimizer_cls: type) -> Path:
         for d in optimizer_dir.iterdir()
         if d.is_dir() and d.name.startswith(prefix) and d.name[len(prefix):].isdigit()
     ]
+    # Atomically claim the next free run number. mkdir(exist_ok=False) is the
+    # lock: if a concurrent job already took this number the create fails and we
+    # try the next one, so parallel runs never share a directory.
     run_number = max(existing, default=0) + 1
-    run_dir = optimizer_dir / f"{prefix}{run_number}"
-    run_dir.mkdir(parents=True, exist_ok=True)
+    while True:
+        run_dir = optimizer_dir / f"{prefix}{run_number}"
+        try:
+            run_dir.mkdir(parents=True, exist_ok=False)
+            break
+        except FileExistsError:
+            run_number += 1
     logger.info("Run directory: %s", run_dir)
     return run_dir
 

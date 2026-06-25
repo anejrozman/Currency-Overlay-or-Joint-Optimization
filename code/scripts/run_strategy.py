@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import logging
+import os
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -122,9 +123,21 @@ def main() -> None:
     local_returns_path = config.PROCESSED_DIR / config.LOCAL_RETURNS_FILE
     spot_returns_path = config.PROCESSED_DIR / config.SPOT_RETURNS_FILE
     fwd_premiums_path = config.PROCESSED_DIR / config.FWD_PREMIUMS_3M_FILE
-    fh_returns_path = config.PROCESSED_DIR / config.FH_RETURNS_FILE
-    rc_returns_path = config.PROCESSED_DIR / config.RC_RETURNS_FILE
-    unhedged_returns_path = config.PROCESSED_DIR / config.UNHEDGED_RETURNS_FILE
+
+    # The fully-hedged / excess-currency / unhedged returns are recomputed here
+    # and immediately read back by the DataHandler. They are written to a private
+    # scratch directory when BACKTEST_SCRATCH_DIR is set (one per cluster job), so
+    # concurrent jobs never clobber each other's intermediate files. When unset the
+    # shared processed/ directory is used, preserving the local single-run behaviour.
+    scratch_env = os.environ.get("BACKTEST_SCRATCH_DIR")
+    if scratch_env:
+        scratch_dir = Path(scratch_env)
+        scratch_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        scratch_dir = config.PROCESSED_DIR
+    fh_returns_path = scratch_dir / config.FH_RETURNS_FILE
+    rc_returns_path = scratch_dir / config.RC_RETURNS_FILE
+    unhedged_returns_path = scratch_dir / config.UNHEDGED_RETURNS_FILE
 
     run_dir = next_run_dir(optimizer_cls)
     log.info("Strategy: %s", args.strategy)
