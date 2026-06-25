@@ -59,8 +59,8 @@ mem_for() {  # mem_for <strategy> <universe>
 
 time_for() {  # time_for <strategy> <universe>
     if is_heavy "$1" && [[ "$2" == 100 ]]; then echo "336:00:00"
-    elif is_heavy "$1" || [[ "$2" == 100 ]];  then echo "96:00:00"
-    else echo "24:00:00"; fi
+    elif is_heavy "$1" || [[ "$2" == 100 ]];  then echo "336:00:00"
+    else echo "150:00:00"; fi
 }
 
 submit() {  # submit <strategy> <universe>
