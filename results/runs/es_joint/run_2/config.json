@@ -1,9 +1,16 @@
 {
   "strategy": "es_joint",
   "label": "ES Joint (top-50)",
-  "run_date": "2026-05-31T17:47:34.230254",
+  "run_date": "2026-06-25T16:05:09.261233",
   "optimizer": "ExpectedShortfallJointOptimizer",
-  "param_grid": null,
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "leverage_limit": [
+      1.5
+    ]
+  },
   "window_years": 10,
   "val_years": 1,
   "rebalancing_frequency": "quarterly",

@@ -1,7 +1,7 @@
 {
   "strategy": "reg_mv_asset_zero",
-  "label": "Regularized MV (Assets-Zero) (top-10)",
-  "run_date": "2026-06-25T16:04:22.226624",
+  "label": "Regularized MV (Assets-Zero) (top-100)",
+  "run_date": "2026-06-25T16:05:45.794587",
   "optimizer": "RegularizedMeanVarianceAssetZeroOptimizer",
   "param_grid": {
     "gamma": [
@@ -25,8 +25,8 @@
   "val_years": 1,
   "rebalancing_frequency": "quarterly",
   "asset_return_key": "R_u",
-  "universe_file": "currency_alocation_10_202603081747.csv",
-  "universe_size": 10,
+  "universe_file": "currency_alocation_100_202603081747.csv",
+  "universe_size": 100,
   "return_filter": 1.0,
   "rf_source": "us_risk_free_rates.csv"
 }

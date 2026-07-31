@@ -1,9 +1,16 @@
 {
   "strategy": "es_curr_overlay",
   "label": "ES Currency Overlay (top-50)",
-  "run_date": "2026-05-31T13:16:09.822530",
+  "run_date": "2026-06-25T16:05:09.223559",
   "optimizer": "ExpectedShortfallCurrencyOverlayOptimizer",
-  "param_grid": null,
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "leverage_limit": [
+      1.5
+    ]
+  },
   "window_years": 10,
   "val_years": 1,
   "rebalancing_frequency": "quarterly",

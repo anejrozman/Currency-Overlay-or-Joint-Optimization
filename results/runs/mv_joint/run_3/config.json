@@ -1,7 +1,7 @@
 {
   "strategy": "mv_joint",
-  "label": "MV Joint (top-10)",
-  "run_date": "2026-06-25T16:04:49.995878",
+  "label": "MV Joint (top-100)",
+  "run_date": "2026-06-25T16:04:54.585462",
   "optimizer": "MeanVarianceJointOptimizer",
   "param_grid": {
     "gamma": [
@@ -15,8 +15,8 @@
   "val_years": 1,
   "rebalancing_frequency": "quarterly",
   "asset_return_key": "R_fh",
-  "universe_file": "currency_alocation_10_202603081747.csv",
-  "universe_size": 10,
+  "universe_file": "currency_alocation_100_202603081747.csv",
+  "universe_size": 100,
   "return_filter": 1.0,
   "rf_source": "us_risk_free_rates.csv"
 }

@@ -1,11 +1,11 @@
 {
-  "ES_80 (daily, %)": 0.5458,
-  "ES_95 (daily, %)": 1.0946,
-  "Volatility (ann., %)": 6.732,
-  "Max Drawdown (%)": 47.4527,
-  "Sharpe Ratio": 0.6332,
-  "Sortino Ratio": 0.8153,
-  "ESR": 0.492,
-  "Avg Asset Turnover (per rebal.)": 0.1403,
-  "Avg Currency Turnover (per rebal.)": 1.036
+  "ES_80 (daily, %)": 0.8604,
+  "ES_95 (daily, %)": 1.5852,
+  "Volatility (ann., %)": 10.213,
+  "Max Drawdown (%)": 43.2889,
+  "Sharpe Ratio": 0.1224,
+  "Sortino Ratio": 0.1662,
+  "ESR": 0.0915,
+  "Avg Asset Turnover (per rebal.)": 0.1429,
+  "Avg Currency Turnover (per rebal.)": 1.3793
 }
