@@ -1,0 +1,22 @@
+{
+  "strategy": "es_curr_overlay",
+  "label": "ES Currency Overlay (top-50)",
+  "run_date": "2026-06-25T16:05:09.223559",
+  "optimizer": "ExpectedShortfallCurrencyOverlayOptimizer",
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "leverage_limit": [
+      1.5
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "universe_file": "currency_alocation_50_202603081747.csv",
+  "universe_size": 50,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
