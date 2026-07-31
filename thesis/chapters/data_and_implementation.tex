@@ -110,13 +110,27 @@ be attributed to estimation error rather than a change in the underlying depende
 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=0.57\linewidth]{../../results/figures/asset_currency_corr_combined.pdf}
+  \includegraphics[width=0.8\linewidth]{../../results/figures/asset_currency_corr_top10.pdf}
+  \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the three investable universes. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
+  \label{fig:asset-currency-corr}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{../../results/figures/asset_currency_corr_top50.pdf}
+  \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the three investable universes. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
+  \label{fig:asset-currency-corr}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.8\linewidth]{../../results/figures/asset_currency_corr_top100.pdf}
   \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the three investable universes. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
   \label{fig:asset-currency-corr}
 \end{figure}
 
 
-
+\newpage
 \section{Backtesting Framework} \label{sec:backtesting-framework}
 
 In \Cref{chap:empirical-analysis-and-baseline-results} we evaluate a range of optimization strategies under different objectives (mean-variance or Expected Shortfall), their treatment of
