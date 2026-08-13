@@ -1,12 +1,9 @@
 #!/bin/bash
-# Submit ONE backtest to the Euler cluster.
+# Submit one backtest to the Euler cluster.
 #
 # Runs a single strategy on a single universe over its parameter grid (defined in
 # code/src/portfolio_backtest/backtest_config.py), mirroring the local
 # code/scripts/run_strategy.py interface but wrapped in an sbatch submission.
-#
-# These are CPU-bound Gurobi QP/LP solves — GPUs do not accelerate them, so no
-# GPU is requested and the job lands on the high-throughput CPU nodes.
 #
 # Usage:
 #   ./run_backtest.sh --strategy <name> --universe <10|50|100> [options]
