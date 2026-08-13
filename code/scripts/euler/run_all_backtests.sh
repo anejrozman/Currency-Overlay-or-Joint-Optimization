@@ -38,7 +38,7 @@ DRY_RUN=0
 # All strategies (strategy_registry.py). Heavy ones (large grids / large programs)
 # are listed first so they are submitted first.
 HEAVY=(reg_mv_curr_overlay reg_mv_joint reg_es_curr_overlay reg_es_joint reg_mv_asset_full reg_mv_asset_zero)
-LIGHT=(assets_full assets_zero es_curr_overlay es_joint mv_curr_overlay mv_joint equally_weighted)
+LIGHT=(reg_es_asset_full reg_es_asset_zero es_curr_overlay es_joint mv_curr_overlay mv_joint equally_weighted)
 
 UNIVERSES=(100 50 10)   # heaviest universe first
 
