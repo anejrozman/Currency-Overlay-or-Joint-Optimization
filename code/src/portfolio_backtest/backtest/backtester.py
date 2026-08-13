@@ -446,6 +446,7 @@ class Backtester:
         period_returns: list[pd.Series] = []
         self._asset_turnovers: list[float] = []
         self._currency_turnovers: list[float] = []
+        self._selected_params: list[dict] = []
         data_start = full_date_index[0]
         n_periods = len(rebalance_dates) - 1
 
@@ -531,6 +532,13 @@ class Backtester:
                     if s < best_score:
                         best_score = s
                         best_params = params
+
+            self._selected_params.append({
+                    "date": t,
+                    "n_assets": len(valid_assets),
+                    "val_score": best_score,
+                    **best_params,
+                })
 
             # Refit on full estimation window with best hyperparameters
             opt_final = self.optimizer(hyperparams=best_params)

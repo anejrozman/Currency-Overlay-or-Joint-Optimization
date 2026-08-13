@@ -247,6 +247,11 @@ def main() -> None:
     oos_df.to_csv(run_dir / "oos_returns.csv")
     log.info("OOS returns saved to %s", run_dir / "oos_returns.csv")
 
+    # Save selected hyperparameters
+    params_df = pd.DataFrame(backtester._selected_params)
+    params_df.to_csv(run_dir / "selected_params.csv", index=False)
+    log.info("Selected params saved to %s", run_dir / "selected_params.csv")
+
     # Performance metrics
     metrics = backtester.compute_performance_metrics(
         oos_returns,
