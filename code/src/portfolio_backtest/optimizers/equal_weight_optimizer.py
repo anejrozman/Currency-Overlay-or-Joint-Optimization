@@ -10,7 +10,6 @@ Author: Anej Rozman
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 from .base_optimizer import BaseOptimizer
 
 
