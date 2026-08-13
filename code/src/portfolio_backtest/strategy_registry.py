@@ -46,14 +46,14 @@ from portfolio_backtest.optimizers import (
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
-    "assets_full": {
+    "reg_es_asset_full": {
         "optimizer": RegularizedExpectedShortfallAssetFullOptimizer,
         "asset_return_key": "R_fh",
         "label": "ASSETS-FULL ES (3m)",
         "use_hedging": True,
         "config": ES_CONFIG,
     },
-    "assets_zero": {
+    "reg_es_asset_zero": {
         "optimizer": RegularizedExpectedShortfallAssetZeroOptimizer,
         "asset_return_key": "R_u",
         "label": "ASSETS-ZERO ES",
