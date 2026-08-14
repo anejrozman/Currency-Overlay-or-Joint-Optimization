@@ -168,7 +168,9 @@ def main() -> None:
         asset_returns_path = fh_returns_path
         excess_currency_path = rc_returns_path
     else:
-        R_asset = compute_unhedged_returns(R_local, e, asset_to_currency)
+        f_raw = load_csv(fwd_premiums_path)
+        f_daily_shifted = compute_daily_forward_premium(f_raw, config.TENOR_DAYS_3M)
+        R_asset = compute_unhedged_returns(R_local, e, f_daily_shifted, asset_to_currency)
         R_asset.index.name = "date"
         R_asset.to_csv(unhedged_returns_path)
         R_c = None

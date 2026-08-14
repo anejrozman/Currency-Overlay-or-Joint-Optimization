@@ -66,13 +66,18 @@ def compute_fully_hedged_returns(
 def compute_unhedged_returns(
     R_local: pd.DataFrame,
     e: pd.DataFrame,
+    f_daily_shifted: pd.DataFrame,
     asset_to_currency: dict[str, str],
 ) -> pd.DataFrame:
     """
     Compute unhedged asset returns R_u = R_local + e + R_local * e
     """
     known_assets = [a for a in R_local.columns if a in asset_to_currency]
-    all_dates = R_local.index.intersection(e.index)
+    all_dates = (
+        R_local.index
+        .intersection(e.index)
+        .intersection(f_daily_shifted.index)
+    )
 
     R_local_a = R_local.loc[all_dates, known_assets]
     e_asset = pd.DataFrame(index=all_dates, columns=known_assets, dtype=float)
