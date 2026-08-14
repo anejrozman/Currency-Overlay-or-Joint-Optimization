@@ -22,8 +22,8 @@ class BacktestConfig:
 # Regularization grids
 LAMBDA_L1_ASSET_GRID = [0.0, 5e-5, 5e-4, 5e-3]
 LAMBDA_L2_ASSET_GRID = [0.0, 0.03, 0.3, 3.0]
-LAMBDA_L1_CURR_GRID = [0.0001, 0.0002, 0.0003]
-LAMBDA_L2_CURR_GRID = [0.00001, 0.00002, 0.00003]
+LAMBDA_L1_CURR_GRID = [0.0, 5e-6, 5e-5, 5e-4]
+LAMBDA_L2_CURR_GRID = [0.0, 5e-7, 5e-6, 5e-5]
 
 
 # Fixed
