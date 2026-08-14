@@ -1,0 +1,46 @@
+{
+  "strategy": "reg_es_curr_overlay",
+  "label": "Regularized ES Currency Overlay (top-10)",
+  "run_date": "2026-08-14T17:14:40.419376",
+  "optimizer": "RegularizedExpectedShortfallCurrencyOverlayOptimizer",
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "lambda_l1_asset": [
+      0.0,
+      5e-05,
+      0.0005,
+      0.005
+    ],
+    "lambda_l2_asset": [
+      0.0,
+      0.03,
+      0.3,
+      3.0
+    ],
+    "lambda_l1_curr": [
+      0.0,
+      5e-06,
+      5e-05,
+      0.0005
+    ],
+    "lambda_l2_curr": [
+      0.0,
+      5e-07,
+      5e-06,
+      5e-05
+    ],
+    "leverage_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "universe_file": "currency_alocation_10_202603081747.csv",
+  "universe_size": 10,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
