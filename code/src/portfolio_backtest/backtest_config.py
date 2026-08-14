@@ -90,10 +90,12 @@ REG_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "alpha":          ALPHA,
-        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
-        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
-        "leverage_limit": LEVERAGE,
+        "alpha":           ALPHA,
+        "lambda_l1_asset": LAMBDA_L1_ASSET_GRID,
+        "lambda_l2_asset": LAMBDA_L2_ASSET_GRID,
+        "lambda_l1_curr":  LAMBDA_L1_CURR_GRID,
+        "lambda_l2_curr":  LAMBDA_L2_CURR_GRID,
+        "leverage_limit":  LEVERAGE,
     },
 )
 
