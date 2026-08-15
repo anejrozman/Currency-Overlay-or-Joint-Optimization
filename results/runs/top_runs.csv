@@ -2,12 +2,12 @@ strategy_name, top_10_run, top_50_run, top_100_run
 
 equal_weight_optimizer, 1, 2, 3
 
-reg_es_asset_full, 8, 7, 6    Have to rerun for top 50 and top 100 with leverage limit 2   
-reg_es_asset_zero, 9, 8, 7    Have to rerun for top 50 and top 100 with leverage limit 2
-es_curr_overlay, 5,,          Have to run top 50 and top 100 for leverage limit 2 
-reg_es_curr_overlay, 4      run on top 50 and top 100
-es_joint, 4                 Run on top 50 and top 100
-reg_es_joint, 
+reg_es_asset_full, 8, 9, 10      
+reg_es_asset_zero, 9, 10, 11    
+es_curr_overlay, 5, 6, 7   
+reg_es_curr_overlay, 4, 6, 5      
+es_joint, 4, 6, 5                
+reg_es_joint, 6, 5, 4  
 
 reg_mv_asset_full, 
 reg_mv_asset_zero,
