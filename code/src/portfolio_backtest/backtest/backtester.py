@@ -390,6 +390,18 @@ class Backtester:
 
         return metrics
 
+    def get_weight_records(self) -> tuple[pd.DataFrame, pd.DataFrame]:
+        """
+        Return the portfolio weights recorded at each rebalancing date.
+        """
+        asset_weights = pd.DataFrame(
+            self._asset_weight_records, columns=["date", "asset", "weight"]
+        )
+        currency_weights = pd.DataFrame(
+            self._currency_weight_records, columns=["date", "currency", "psi"]
+        )
+        return asset_weights, currency_weights
+
     def run(self, data_bundle: dict) -> pd.Series:
         """
         Execute the backtest.
@@ -447,6 +459,8 @@ class Backtester:
         self._asset_turnovers: list[float] = []
         self._currency_turnovers: list[float] = []
         self._selected_params: list[dict] = []
+        self._asset_weight_records: list[dict] = []
+        self._currency_weight_records: list[dict] = []
         data_start = full_date_index[0]
         n_periods = len(rebalance_dates) - 1
 
@@ -562,6 +576,16 @@ class Backtester:
             x_t = pd.Series(0.0, index=all_assets)
             x_t[valid_assets] = x_sub
             psi_t = pd.Series(psi_sub, index=all_currencies)
+
+            # Record the solver output for the weights, before any cost or drift adjustment.
+            for asset, weight in zip(valid_assets, x_sub):
+                self._asset_weight_records.append(
+                    {"date": t, "asset": asset, "weight": float(weight)}
+                )
+            for currency, overlay in zip(all_currencies, psi_sub):
+                self._currency_weight_records.append(
+                    {"date": t, "currency": currency, "psi": float(overlay)}
+                )
 
             # Implied currency exposure and forward hedge positions
             w_t = C.T @ x_t          

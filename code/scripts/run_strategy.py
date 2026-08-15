@@ -254,6 +254,16 @@ def main() -> None:
     params_df.to_csv(run_dir / "selected_params.csv", index=False)
     log.info("Selected params saved to %s", run_dir / "selected_params.csv")
 
+    # Save portfolio weights per rebalancing date.
+    asset_weights, currency_weights = backtester.get_weight_records()
+    asset_weights.to_csv(run_dir / "weights_assets.csv", index=False)
+    currency_weights.to_csv(run_dir / "weights_currencies.csv", index=False)
+    log.info(
+        "Weights saved to %s (%d asset rows) and %s (%d currency rows)",
+        run_dir / "weights_assets.csv", len(asset_weights),
+        run_dir / "weights_currencies.csv", len(currency_weights),
+    )
+
     # Performance metrics
     metrics = backtester.compute_performance_metrics(
         oos_returns,
