@@ -1,9 +1,6 @@
 """
 Cumulative out-of-sample wealth plots, one figure per universe size.
 
-Runs are taken from results/runs/top_runs.csv.  Only the regularized, fully
-hedged variant of each optimizer family is plotted, alongside the 1/N benchmark.
-
 Usage:
     python results/generate_cumulative_plots.py es
     python results/generate_cumulative_plots.py mv
@@ -78,8 +75,6 @@ def _read_top_runs() -> tuple[list[int], list[tuple[str, dict[int, int | None]]]
 
 
 def _classify(strategy: str) -> tuple[str | None, str | None, bool]:
-    """Return the measure, the optimizer family, and whether it is regularized
-    and fully hedged (``*_asset_zero`` holds no forwards, so it is unhedged)."""
     tokens = strategy.split("_")
     measure = next((m for m in MEASURE_TITLES if m in tokens), None)
     family = next((f for f in STRATEGY_COLORS if f in tokens), None)
@@ -155,7 +150,6 @@ def _collect_series(
 
 
 def _align_series(series: list[dict]) -> None:
-    """Put every curve on the common trading-day index, re-anchored at 1.0."""
     common = series[0]["wealth"].index
     for spec in series[1:]:
         common = common.intersection(spec["wealth"].index)
@@ -203,7 +197,6 @@ def _plot(series: list[dict], measure: str, universe: int) -> None:
             framealpha=1.0, borderpad=0.6,
         )
         legend.get_frame().set_linewidth(0.6)
-        # Above the benchmark's zorder, or its line is drawn across the box.
         legend.set_zorder(200)
 
     fig.tight_layout()
@@ -217,9 +210,7 @@ def _plot(series: list[dict], measure: str, universe: int) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Plot cumulative out-of-sample wealth, one figure per universe size.",
-    )
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "measure",
         choices=sorted(MEASURE_TITLES),
