@@ -1,0 +1,33 @@
+{
+  "strategy": "reg_es_joint",
+  "optimizer": "RegularizedExpectedShortfallJointOptimizer",
+  "universe_size": 10,
+  "universe_file": "currency_alocation_10_202603081747.csv",
+  "asset_return_key": "R_fh",
+  "solver": "CLARABEL",
+  "rebalancing_date": "2000-06-30",
+  "window_start": "1990-07-02",
+  "window_end": "2000-06-30",
+  "n_observations": 2610,
+  "n_assets": 101,
+  "n_currencies": 14,
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "fixed_hyperparams": {
+    "alpha": 0.8,
+    "leverage_limit": 2.0
+  },
+  "penalty_bounds": {
+    "lambda_l1_asset": 0.005,
+    "lambda_l2_asset": 3.0,
+    "lambda_l1_curr": 0.0005,
+    "lambda_l2_curr": 5e-05
+  },
+  "points_per_decade": 8,
+  "decades_below": 3,
+  "decades_above": 2,
+  "active_tol": 1e-06,
+  "currency_excluded_from_norm": "USD",
+  "total_solve_seconds": 318.08413484791527
+}
