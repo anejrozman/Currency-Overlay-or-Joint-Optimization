@@ -49,7 +49,7 @@ STRATEGY_REGISTRY: dict[str, dict] = {
     "reg_es_asset_full": {
         "optimizer": RegularizedExpectedShortfallAssetFullOptimizer,
         "asset_return_key": "R_fh",
-        "label": "ASSETS-FULL ES (3m)",
+        "label": "ASSETS-FULL ES",
         "use_hedging": True,
         "config": ES_CONFIG,
     },
@@ -91,21 +91,21 @@ STRATEGY_REGISTRY: dict[str, dict] = {
     "equally_weighted": {
         "optimizer": EqualWeightOptimizer,
         "asset_return_key": "R_fh",
-        "label": "1/N Equal Weight (3m)",
+        "label": "1/N Equal Weight",
         "use_hedging": True,
         "config": EW_CONFIG,
     },
     "reg_mv_asset_full": {
         "optimizer":        RegularizedMeanVarianceAssetFullOptimizer,
         "asset_return_key": "R_fh",
-        "label":            "Regularized MV (Assets-Full)",
+        "label":            "ASSETS-FULL MV",
         "use_hedging":      True,
         "config":           REG_MV_ASSET_FULL_CONFIG,
     },
     "reg_mv_asset_zero": {
         "optimizer":        RegularizedMeanVarianceAssetZeroOptimizer,
         "asset_return_key": "R_u",
-        "label":            "Regularized MV (Assets-Zero)",
+        "label":            "ASSETS-ZERO MV",
         "use_hedging":      False,
         "config":           REG_MV_ASSET_ZERO_CONFIG,
     },
