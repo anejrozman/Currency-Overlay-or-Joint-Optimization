@@ -52,5 +52,5 @@
 \contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{38}{subsection.B.3.2}%
 \contentsline {section}{\numberline {B.4}Joint Optimization}{39}{section.B.4}%
 \contentsline {appendix}{\chapternumberline {C}Transaction Costs}{42}{appendix.C}%
-\contentsline {appendix}{\chapternumberline {D}Hyperparameter Sensitivity Analysis and Additional Results}{44}{appendix.D}%
+\contentsline {appendix}{\chapternumberline {D}Hyperparameter Sensitivity and Portfolio Sparsity Analysis}{44}{appendix.D}%
 \contentsline {chapter}{Bibliography}{45}{appendix*.5}%
