@@ -4,7 +4,7 @@ equal_weight_optimizer, 1, 2, 3
 
 reg_es_asset_full, 8, 9, 10      
 reg_es_asset_zero, 9, 10, 11    
-es_curr_overlay, 5, 6, 7   
+es_curr_overlay, 8, 9, 7   
 reg_es_curr_overlay, 4, 6, 5      
 es_joint, 4, 6, 5                
 reg_es_joint, 6, 5, 4  
