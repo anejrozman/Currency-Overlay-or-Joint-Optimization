@@ -56,6 +56,10 @@ STRATEGY_REGISTRY: dict[str, dict] = {
     "reg_es_asset_zero": {
         "optimizer": RegularizedExpectedShortfallAssetZeroOptimizer,
         "asset_return_key": "R_u",
+        # Paper definition (Lucescu & Ulrych 2026, Sec. 4.2): weights are
+        # optimized on fully hedged returns (same asset problem as
+        # ASSETS-FULL) and realized unhedged.
+        "training_return_key": "R_fh",
         "label": "ASSETS-ZERO ES",
         "use_hedging": False,
         "config": ES_CONFIG,

@@ -106,6 +106,7 @@ def main() -> None:
     strategy_cfg = STRATEGY_REGISTRY[args.strategy]
     optimizer_cls = strategy_cfg["optimizer"]
     asset_return_key: str = strategy_cfg["asset_return_key"]
+    training_return_key: str | None = strategy_cfg.get("training_return_key")
     use_hedging: bool = strategy_cfg["use_hedging"]
 
     # Compose label with universe size at runtime
@@ -152,7 +153,8 @@ def main() -> None:
     # Build asset to currency mapping
     asset_to_currency = build_asset_to_currency(universe_path)
 
-    # Compute returns 
+    # Compute returns
+    R_train = None
     if use_hedging:
         f_raw = load_csv(fwd_premiums_path)
         f_daily_shifted = compute_daily_forward_premium(f_raw, config.TENOR_DAYS_3M)
@@ -174,6 +176,11 @@ def main() -> None:
         R_asset.index.name = "date"
         R_asset.to_csv(unhedged_returns_path)
         R_c = None
+
+        # Training frame for strategies that optimize on R_fh but realize
+        # unhedged (paper's ASSETS-ZERO definition).
+        if training_return_key == "R_fh":
+            R_train = compute_fully_hedged_returns(R_local, e, f_daily_shifted, asset_to_currency)
 
         # DataHandler needs a file for excess_currency_returns
         asset_returns_path = unhedged_returns_path
@@ -210,6 +217,12 @@ def main() -> None:
     }
     if R_c_filtered is not None:
         data_bundle["R_c"] = R_c_filtered
+    if not use_hedging and R_train is not None:
+        # Align the training frame to the realization frame's calendar and
+        # universe so both slices stay column/row consistent in the engine.
+        data_bundle[training_return_key] = R_train.reindex(
+            index=R_asset_filtered.index, columns=R_asset_filtered.columns
+        )
 
     # Save config before running 
     run_config = {
@@ -222,6 +235,7 @@ def main() -> None:
         "val_years": val_years,
         "rebalancing_frequency": rebalancing_frequency,
         "asset_return_key": asset_return_key,
+        "training_return_key": training_return_key,
         "universe_file": universe_path.name,
         "universe_size": args.universe,
         "return_filter": config.RETURN_FILTER_BACKTEST,
@@ -239,6 +253,7 @@ def main() -> None:
         val_years=val_years,
         rebalancing_frequency=rebalancing_frequency,
         asset_return_key=asset_return_key,
+        training_return_key=training_return_key,
         logging=True,
     )
     oos_returns = backtester.run(data_bundle)

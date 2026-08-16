@@ -29,6 +29,7 @@ class Backtester:
         val_years: int = 1,
         rebalancing_frequency: str = "quarterly",
         asset_return_key: str = "R_fh",
+        training_return_key: Optional[str] = None,
         logging: bool = False,
     ) -> None:
         """
@@ -51,6 +52,12 @@ class Backtester:
                               transaction costs consist only of the spot
                               conversions implied by changes in currency
                               allocations at each rebalance.
+            training_return_key: Bundle key holding the return DataFrame used
+                              for estimation, validation, and universe
+                              filtering.  Defaults to ``asset_return_key``.
+                              Set to ``"R_fh"`` with ``asset_return_key="R_u"``
+                              for the paper's ASSETS-ZERO: weights optimized
+                              on fully hedged returns, realized unhedged.
             logging: Emit progress messages via the logging module.
         """
         self.optimizer = optimizer
@@ -59,6 +66,7 @@ class Backtester:
         self.val_years = val_years
         self.rebalancing_frequency = rebalancing_frequency
         self.asset_return_key = asset_return_key
+        self.training_return_key = training_return_key or asset_return_key
         self._is_unhedged = asset_return_key == "R_u"
         self._logging = logging
 
@@ -437,6 +445,11 @@ class Backtester:
         """
 
         R_fh: pd.DataFrame = data_bundle[self.asset_return_key]
+        R_train_frame: pd.DataFrame = (
+            data_bundle[self.training_return_key]
+            if self.training_return_key != self.asset_return_key
+            else R_fh
+        )
         R_c: Optional[pd.DataFrame] = data_bundle.get("R_c")
         asset_to_currency: dict = data_bundle["asset_to_currency"]
         universe_mask: Optional[pd.DataFrame] = data_bundle.get("universe_mask", None)
@@ -516,12 +529,12 @@ class Backtester:
                     if t in universe_mask.index
                     else pd.Series(dtype=float)
                 )
-                current_universe = [a for a in mask_row[mask_row.notna()].index if a in R_fh.columns]
+                current_universe = [a for a in mask_row[mask_row.notna()].index if a in R_train_frame.columns]
                 if not current_universe:
                     continue
-                full_est_slice = R_fh.loc[full_est_start:full_est_end, current_universe]
+                full_est_slice = R_train_frame.loc[full_est_start:full_est_end, current_universe]
             else:
-                full_est_slice = R_fh.loc[full_est_start:full_est_end]
+                full_est_slice = R_train_frame.loc[full_est_start:full_est_end]
 
             try:
                 valid_assets = self._filter_universe(full_est_slice)
@@ -542,7 +555,7 @@ class Backtester:
                 for params in param_combinations:
                     opt = self.optimizer(hyperparams=params)
                     train_bundle_inner = {
-                        self.asset_return_key: R_fh.loc[train_start:train_end, valid_assets],
+                        self.training_return_key: R_train_frame.loc[train_start:train_end, valid_assets],
                         "R_c": R_c_train,
                         "C": C_sub,
                     }
@@ -550,7 +563,7 @@ class Backtester:
                     candidate_weights = opt.optimize()
 
                     val_bundle_inner = {
-                        self.asset_return_key: R_fh.loc[validation_start:validation_end, valid_assets],
+                        self.training_return_key: R_train_frame.loc[validation_start:validation_end, valid_assets],
                         "R_c": R_c_val,
                         "C": C_sub,
                     }
@@ -569,7 +582,7 @@ class Backtester:
             # Refit on full estimation window with best hyperparameters
             opt_final = self.optimizer(hyperparams=best_params)
             full_train_bundle = {
-                self.asset_return_key: R_fh.loc[full_est_start:full_est_end, valid_assets],
+                self.training_return_key: R_train_frame.loc[full_est_start:full_est_end, valid_assets],
                 "R_c": R_c_full,
                 "C": C_sub,
             }

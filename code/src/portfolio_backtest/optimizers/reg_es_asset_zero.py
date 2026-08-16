@@ -1,7 +1,14 @@
 """
-Asset-only Regularized Expected Shortfall optimizer — ASSETS-ZERO strategy (Ulrych & Lucescu 2026, Section 3).
+Asset-only Regularized Expected Shortfall optimizer — ASSETS-ZERO strategy (Lucescu & Ulrych 2026, Section 4.2).
 
-Uses unhedged asset returns (R_u). The investor holds no forward positions in currencies. 
+ASSETS-ZERO is the *zero hedged* regularized asset portfolio: the asset
+weights are optimized on fully hedged returns (R_fh) — the same asset-level
+problem as ASSETS-FULL (Section 3.3 / Appendix A.3 of the paper, which
+defines the asset optimization exclusively on R_fh) — and the portfolio is
+then implemented WITHOUT currency hedging, so realized returns are unhedged
+(R_u).  The realization on R_u is handled by the Backtester via its
+``training_return_key`` / ``asset_return_key`` split; this class only ever
+sees R_fh.
 
 Author: Anej Rozman
 """
@@ -15,15 +22,27 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
+# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
+# gurobipy is not installed; weight differences are ~1e-6.
+try:
+    import gurobipy  # noqa: F401
+    _DEFAULT_SOLVER = cp.GUROBI
+except ImportError:
+    _DEFAULT_SOLVER = cp.CLARABEL
+
+_warned_fallback = False
+
 
 class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
     """
-    Asset-only Regularized Expected Shortfall optimizer.
+    Regularized ES asset optimizer for the ASSETS-ZERO strategy.
 
-    Minimizes Expected Shortfall at a given confidence level with L1 and L2
-    regularization penalties, subject to a leverage limit and a full investment constraint.  
-    Uses unhedged asset returns (R_u) for optimization, so
-    the investor bears full currency risk and holds no forward positions.
+    Minimizes Expected Shortfall of the fully hedged asset returns (R_fh) at
+    a given confidence level with L1 and L2 regularization penalties, subject
+    to a leverage limit and a full investment constraint — identical to the
+    ASSETS-FULL asset problem.  The zero-hedging policy is applied at
+    realization: the Backtester evaluates the resulting weights on unhedged
+    returns (R_u) and the investor holds no forward positions.
     """
 
     def __init__(self, hyperparams: dict | None = None) -> None:
@@ -35,14 +54,20 @@ class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
                 * ``lambda_l1``      (float) — L1 penalty weight, default 0.3
                 * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
                 * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
-                * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI`
+                * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI``
+                                               (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
         self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.3)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
-        self.solver = self.hyperparams.get("solver", cp.GUROBI)
+        self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
+
+        global _warned_fallback
+        if self.solver is not cp.GUROBI and _DEFAULT_SOLVER is not cp.GUROBI and not _warned_fallback:
+            logger.warning("gurobipy not installed — falling back to Clarabel solver.")
+            _warned_fallback = True
 
         self.Y: np.ndarray | None = None
         self.N: int = 0
@@ -50,17 +75,17 @@ class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
 
     def fit(self, train_bundle: dict[str, object]) -> None:
         """
-        Extract and store the unhedged return matrix for optimization.
+        Extract and store the fully hedged return matrix for optimization.
 
         Args:
-            train_bundle: Must contain ``"R_u"`` mapped to a non-empty DataFrame.
+            train_bundle: Must contain ``"R_fh"`` mapped to a non-empty DataFrame.
         """
-        if "R_u" not in train_bundle:
-            raise ValueError("train_bundle must contain 'R_u'.")
-        R_u = train_bundle["R_u"]
-        if R_u.empty:
-            raise ValueError("'R_u' in train_bundle is empty.")
-        self.Y = R_u.values
+        if "R_fh" not in train_bundle:
+            raise ValueError("train_bundle must contain 'R_fh'.")
+        R_fh = train_bundle["R_fh"]
+        if R_fh.empty:
+            raise ValueError("'R_fh' in train_bundle is empty.")
+        self.Y = R_fh.values
         self.q, self.N = self.Y.shape
 
     def optimize(self) -> np.ndarray:
@@ -134,20 +159,24 @@ class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
         """
         Evaluate validation Expected Shortfall of the candidate weights.
 
+        Scored on fully hedged returns, mirroring the training objective
+        (hyperparameter selection is part of the asset-level problem and is
+        therefore identical to ASSETS-FULL).
+
         Args:
             weights: 1-D array of portfolio weights from :meth:`optimize`.
-            val_bundle: Must contain ``"R_u"``.
+            val_bundle: Must contain ``"R_fh"``.
 
         Returns:
             Negative mean of the worst ``(1-alpha)`` fraction of portfolio
             returns.
         """
-        if "R_u" not in val_bundle:
-            raise ValueError("val_bundle must contain 'R_u'.")
-        R_u_val = val_bundle["R_u"]
-        if R_u_val.empty:
+        if "R_fh" not in val_bundle:
+            raise ValueError("val_bundle must contain 'R_fh'.")
+        R_fh_val = val_bundle["R_fh"]
+        if R_fh_val.empty:
             return float("inf")
-        port_rets = R_u_val.values @ weights
+        port_rets = R_fh_val.values @ weights
         threshold = np.quantile(port_rets, 1.0 - self.alpha)
         tail = port_rets[port_rets <= threshold]
         return float(-np.mean(tail)) if len(tail) > 0 else float(-np.mean(port_rets))
