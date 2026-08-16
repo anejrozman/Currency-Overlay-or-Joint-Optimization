@@ -21,8 +21,8 @@
 \contentsline {section}{\numberline {4.4}Performance Evaluation Metrics}{13}{section.4.4}%
 \contentsline {chapter}{\chapternumberline {5}Empirical Analysis: The Joint--Overlay Crossover}{16}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Backtest Results of Expected Shortfall Optimization Approaches}{16}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Backtest Results of Mean-Variance Optimization Approaches}{19}{section.5.2}%
-\contentsline {section}{\numberline {5.3}The Effects of Universe Size on Portfolio Performance}{19}{section.5.3}%
+\contentsline {section}{\numberline {5.2}Backtest Results of Mean-Variance Optimization Approaches}{20}{section.5.2}%
+\contentsline {section}{\numberline {5.3}The Effects of Universe Size on Portfolio Performance}{20}{section.5.3}%
 \contentsline {chapter}{\chapternumberline {6}Convex Risk Measures}{21}{chapter.6}%
 \contentsline {chapter}{\chapternumberline {7}Empirical Analysis: End To End Portfolio Optimization}{22}{chapter.7}%
 \contentsline {chapter}{\chapternumberline {8}Conclusion}{23}{chapter.8}%

@@ -54,7 +54,7 @@ In this chapter, we present an empirical analysis of the multi-currency portfoli
   \caption{Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}
     \label{tab:es-universe-sizes}
    \vspace{0.5em}
-  \begin{minipage}{\textwidth}
+  \begin{minipage}{\textwidth}  
   \raggedright\small
     Table \ref{tab:es-universe-sizes} reports out-of-sample performance metrics for the international
   portfolio optimization under expected shortfall, with portfolios rebalanced
@@ -118,6 +118,25 @@ potentially due to increased estimation error and model uncertainty in larger un
 \end{figure}
 
 \newpage
+% checklist of what to compare 
+List of results interpretations to write up
+\begin{itemize}
+  \item \textbf{Optimizers vs 1/N} All strategies outperform 1/N on all risk metrics and SR, SOR and ESR in all 3 universe sizes. The risk reduction is larger in ES and Vol than in MD, suggesting that the optimized portfolios are better at controlling tail risk and volatility, but may still be sucseptible to large drawdowns.
+  
+  \item \textbf{Risk metrics with increasing universe size} 
+  We can observe that the risk metrics for the 1/N portfolio do not improve by much as the universe size increases. They do increase substantially for the optimized portfolios. They drop by around 50\% from the small to the large universe, while the 1/N portfolio only drops by around 15\%. This suggests that the benefits of optimization are more pronounced in larger universes, where there is more opportunity to diversify and reduce risk.
+
+  \item \textbf{Joint-Reg vs.\ Overlay-Reg} In the small universe, Joint-Reg is ahead on SR, SOR and ESR  at slightly higher. Still waiting for results on the medium and large universes. Hypothesis: with the large universe there is no more benefit to the joint optimization. 
+
+  \item \textbf{Regularized vs.\ unregularized.} Overlay vs.\ Overlay-Reg and Joint vs.\ Joint-Reg. Regularization does not improve risk metrics but does improve ER, SOR and ESR. It typically reduces turnover, but not in every situation. 
+
+  \item \textbf{Plots} TODO: Compare drawdown depth of the optimizers against 1/N around 2002, 2008--09 and 2020, and compare how that gap changes based on universe size.
+
+\end{itemize}
+
+\newpage
+
+
 \section{Backtest Results of Mean-Variance Optimization Approaches}
 
 \begin{table}[htbp]
