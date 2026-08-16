@@ -46,7 +46,12 @@ class Backtester:
             asset_return_key: Key used to look up the asset return DataFrame
                               inside ``data_bundle``.  Use ``"R_fh"`` for
                               fully-hedged returns  or ``"R_u"`` for unhedged returns.
-            logging: Emit progress messages via the logging module. 
+                              With ``"R_u"`` the strategy is treated as unhedged:
+                              no forward positions are held, and currency
+                              transaction costs consist only of the spot
+                              conversions implied by changes in currency
+                              allocations at each rebalance.
+            logging: Emit progress messages via the logging module.
         """
         self.optimizer = optimizer
         self.param_grid = param_grid if param_grid else {}
@@ -54,6 +59,7 @@ class Backtester:
         self.val_years = val_years
         self.rebalancing_frequency = rebalancing_frequency
         self.asset_return_key = asset_return_key
+        self._is_unhedged = asset_return_key == "R_u"
         self._logging = logging
 
 
@@ -436,7 +442,13 @@ class Backtester:
         universe_mask: Optional[pd.DataFrame] = data_bundle.get("universe_mask", None)
 
         all_assets = R_fh.columns.tolist()
-        all_currencies = R_c.columns.tolist() if R_c is not None else []
+        if R_c is not None:
+            all_currencies = R_c.columns.tolist()
+        else:
+            # No excess-currency data (unhedged strategies): build the currency
+            # universe from the asset mapping so spot conversion costs can be
+            # computed from the implied currency allocations.
+            all_currencies = sorted(set(asset_to_currency.values()))
         n_currencies = len(all_currencies)
 
         # Build asset-to-currency indicator matrix C
@@ -587,9 +599,15 @@ class Backtester:
                     {"date": t, "currency": currency, "psi": float(overlay)}
                 )
 
-            # Implied currency exposure and forward hedge positions
-            w_t = C.T @ x_t          
-            phi_t = w_t - psi_t     
+            # Implied currency exposure and forward hedge positions.
+            # Unhedged strategies hold no forward contracts: phi stays zero,
+            # so the currency cost below reduces to spot conversions on the
+            # change in currency allocations.
+            w_t = C.T @ x_t
+            if self._is_unhedged:
+                phi_t = pd.Series(0.0, index=all_currencies)
+            else:
+                phi_t = w_t - psi_t
 
             #Transaction costs
             if is_first_period:
@@ -605,10 +623,16 @@ class Backtester:
                     new_currency_weights=w_t,
                     full_forward_turnover=full_forward_turnover,
                 )
-                # Track raw turnover (no cost scaling) for performance metrics
+                # Track raw turnover (no cost scaling) for performance metrics.
+                # Hedged: forward notional traded. Unhedged: spot conversion
+                # volume implied by the change in currency allocations.
                 self._asset_turnovers.append(float((x_t - drifted_x).abs().sum()))
-                phi_t_non_base = phi_t.drop("USD", errors="ignore")
-                self._currency_turnovers.append(float(phi_t_non_base.abs().sum()))
+                if self._is_unhedged:
+                    spot_delta = (w_t - drifted_w).drop("USD", errors="ignore")
+                    self._currency_turnovers.append(float(spot_delta.abs().sum()))
+                else:
+                    phi_t_non_base = phi_t.drop("USD", errors="ignore")
+                    self._currency_turnovers.append(float(phi_t_non_base.abs().sum()))
             tc_total = asset_tc + currency_tc
 
             # Returns during holding period 
@@ -616,7 +640,7 @@ class Backtester:
             R_c_hold = (
                 R_c.loc[holding_start:holding_end].fillna(0.0)
                 if R_c is not None
-                else pd.DataFrame(index=R_fh_hold.index, columns=[])
+                else pd.DataFrame(0.0, index=R_fh_hold.index, columns=all_currencies)
             )
 
             x_vec = x_t[valid_assets].values     
@@ -641,7 +665,10 @@ class Backtester:
             drifted_x = pd.Series(0.0, index=all_assets)
             drifted_x[valid_assets] = drifted_x_values
             drifted_w = C.T @ drifted_x
-            drifted_phi = drifted_w - psi_t  #psi_t does not drift. #TODO: Reset it each period
+            if self._is_unhedged:
+                drifted_phi = pd.Series(0.0, index=all_currencies)
+            else:
+                drifted_phi = drifted_w - psi_t  #psi_t does not drift. #TODO: Reset it each period
 
             period_returns.append(period_ret)
 
