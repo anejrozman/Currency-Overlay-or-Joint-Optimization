@@ -23,7 +23,11 @@ class BacktestConfig:
 LAMBDA_L1_ASSET_GRID = [0.0, 5e-5, 5e-4, 5e-3]
 LAMBDA_L2_ASSET_GRID = [0.0, 0.03, 0.3, 3.0]
 LAMBDA_L1_CURR_GRID = [0.0, 5e-6, 5e-5, 5e-4]
-LAMBDA_L2_CURR_GRID = [0.0, 5e-7, 5e-6, 5e-5]
+# L2 on the overlay shrinks as a power law rather than to a corner, so the bound is
+# set where the overlay is economically spent (~2% of unpenalized gross psi) instead
+# of where the weights stop moving. The old 5e-5 top was selected by the validation
+# search on 26-47% of rebalancing dates while psi was only ~47% shrunk.
+LAMBDA_L2_CURR_GRID = [0.0, 5e-5, 5e-4, 5e-3, 5e-2]
 
 
 # Fixed
