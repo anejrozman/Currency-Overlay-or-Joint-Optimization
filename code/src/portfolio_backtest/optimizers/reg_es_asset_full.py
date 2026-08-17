@@ -16,6 +16,16 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
+# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
+# gurobipy is not installed; weight differences are ~1e-6.
+try:
+    import gurobipy  # noqa: F401
+    _DEFAULT_SOLVER = cp.GUROBI
+except ImportError:
+    _DEFAULT_SOLVER = cp.CLARABEL
+
+_warned_fallback = False
+
 
 class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
     """
@@ -36,13 +46,19 @@ class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
                 * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
                 * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
                 * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI``
+                                               (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
         self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.3)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
-        self.solver = self.hyperparams.get("solver", cp.GUROBI)
+        self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
+
+        global _warned_fallback
+        if self.solver is not cp.GUROBI and _DEFAULT_SOLVER is not cp.GUROBI and not _warned_fallback:
+            logger.warning("gurobipy not installed — falling back to Clarabel solver.")
+            _warned_fallback = True
 
         self.Y: np.ndarray | None = None
         self.N: int = 0
