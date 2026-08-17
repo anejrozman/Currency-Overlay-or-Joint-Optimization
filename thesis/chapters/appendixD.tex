@@ -1,4 +1,4 @@
-\chapter{Hyperparameter Sensitivity and Portfolio Sparsity Analysis}\label{app:hyperparameter-sensitivity-and-sparsity-analysis}
+\chapter{Additional Results}\label{app:additional-results}
 
 In this appendix, we justify the bounded hyperparameter grids over which the
 regularization penalties are selected in the empirical analysis of
@@ -46,7 +46,7 @@ interpretable quantity, and is the one that we use to determine the upper bound 
 The analysis is done on the first estimation window spanning July 1990 to June 2000. To
 account for sampling error, each reported quantity is averaged over 5 bootstraped replicates of the estimation window. The results are reported for the small investable universe. 
 
-\subsection{Expected Shortfall Analysis} \label{app:hyperparameter-sensitivity-es}
+\subsection*{Expected Shortfall Hyperparameter Sensitivity Analysis} \label{app:hyperparameter-sensitivity-es}
 
 \begin{figure}[ht]
     \centering
@@ -82,12 +82,19 @@ analysis instead.
 
 For both asset penalties, exposure falls from the leverage limit in the unpenalized
 problem to $1$. The budget constraint $\bm{x}_t^\top \bm{1}_N = 1$ implies
-$\|\bm{x}_t\|_1 \geq 1$, with the equality reached when the portfolio holds no short
-positions/ is long only. Once it is reached, the penalty term is
-constant in $\bm{x}_t$ and can no longer influence the solution.
+$\|\bm{x}_t\|_1 \geq 1$, with equality precisely when the portfolio holds no short
+positions. The two penalties reach this floor for different reasons, and only the
+$L_1$ penalty ceases to act once it is there. Under $\lambda_1^a$ the penalty term
+equals $\|\bm{x}_t\|_1 = 1$ everywhere on the long-only set and is therefore constant
+in $\bm{x}_t$, so the solution freezes exactly. Under $\lambda_2^a$ the penalty
+$\|\bm{x}_t\|_2^2$ is not constant on that set: exposure stays pinned at its floor
+while the weights keep spreading toward the equally weighted portfolio, which is the
+limiting allocation as $\lambda_2^a \to \infty$. For the asset $L_2$ penalty we
+therefore read the bound as the point at which the short positions have been
+eliminated and any further movement is a redistribution within a long-only book.
 
 The overlay weights carry neither a budget nor a leverage constraint, so $\bm{\psi}_t$
-shrinks to zero.
+shrinks to zero, exactly under $\lambda_1^c$ and asymptotically under $\lambda_2^c$.
 
 On the basis of this analysis we fix the ranges reported in
 \Cref{tab:hypergrid-es}. Each range is discretised on a log-spaced grid that includes
@@ -112,27 +119,69 @@ endpoint corresponds to the unregularized problem and the upper endpoint is the 
 \end{table}
 
 \newpage
-\subsection{Mean-Variance Analysis} \label{app:hyperparameter-sensitivity-mv}
+\subsection*{Mean-Variance Hyperparameter Sensitivity Analysis} \label{app:hyperparameter-sensitivity-mv}
 
-% MEAN VARIANCE PLOT
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[width=1\textwidth]{../../results/figures/boundary_plots/mv_top10_gross.pdf}
-%     \caption{Gross exposure of the penalized weight block as a function of each
-%     regularization penalty, for the regularized mean-variance currency overlay and
-%     joint optimizers.}
-%     \label{fig:hyperparameter-sensitivity-mv}
-% \end{figure}
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{../../results/figures/boundary_plots/mv_top10_dinf.pdf}
+    \caption{Marginal effect of each regularization penalty, for the regularized
+    mean-variance currency overlay and joint optimizers. The dashed line marks the
+    upper bound of the hyperparameter grid reported in \Cref{tab:hypergrid-mv}. The
+    upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged
+    over five bootstrap replicates of the first estimation window on the small
+    investment universe.}
+    \label{fig:hyperparameter-sensitivity-mv-marginal}
+\end{figure}
 
-% TODO: interpret the mean-variance sensitivity curves and state the final grids.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{../../results/figures/boundary_plots/mv_top10_gross.pdf}
+    \caption{Portfolio exposure as a function of each regularization penalty, for the
+    regularized mean-variance currency overlay and joint optimizers. The dashed line
+    marks the upper bound of the validation grid reported in \Cref{tab:hypergrid-mv}.
+    The upper panels report $\|\bm{x}_t\|_1$ and the lower panels $\|\bm{\psi}_t\|_1$.
+    Estimates are averaged over five bootstrap replicates of the first estimation
+    window on the small investment universe.}
+    \label{fig:hyperparameter-sensitivity-mv}
+\end{figure}
+
+\Cref{fig:hyperparameter-sensitivity-mv-marginal} and
+\Cref{fig:hyperparameter-sensitivity-mv} repeat the analysis for the regularized
+mean-variance optimizers. What differs is the scale. The
+penalties are added to a risk term measured in units of daily variance rather than
+daily expected shortfall, and the two differ by roughly two orders of magnitude. On the
+first estimation window the equally weighted portfolio has a daily variance on the order of
+$10^{-4}$ against a daily expected shortfall (at 80\% level) of approximately $\times 10^{-2}$. 
+
+We fix the hyperparameter ranges reported in \Cref{tab:hypergrid-mv} for the
+regularized mean-variance optimizers, which are discretized on a log-spaced grid the same way as for the Expected Shortfall optimizers.
+
+\begin{table}[ht]
+\centering
+\begin{tabular}{lll}
+\toprule
+Hyperparameter & Description & Range \\
+\midrule
+$\lambda_1^a$ & Asset $L_1$ penalty       & $[0,\ 5\times10^{-5}]$ \\
+$\lambda_2^a$ & Asset $L_2$ penalty       & $[0,\ 10^{-2}]$ \\
+$\lambda_1^c$ & Currency $L_1$ penalty    & $[0,\ 5\times10^{-5}]$ \\
+$\lambda_2^c$ & Currency $L_2$ penalty    & $[0,\ 2\times10^{-3}]$ \\
+\bottomrule
+\end{tabular}
+\caption{Hyperparameter ranges for the regularized mean-variance optimizers. Each
+penalty is searched over a log-spaced grid spanning the reported range, where the lower
+endpoint corresponds to the unregularized problem and the upper endpoint is the bound
+established in \Cref{app:hyperparameter-sensitivity-mv}.}
+\label{tab:hypergrid-mv}
+\end{table}
 
 % \section{Portfolio Sparsity Analysis} \label{app:portfolio-sparsity}
 
-\subsection{Mean Absolute Deviation Analysis} \label{app:mean-absolute-deviation}
+\subsection*{Mean Absolute Deviation Hyperparameter Sensitivity Analysis} \label{app:mean-absolute-deviation}
 
 \section{Portfolio Sparsity Analysis} \label{app:portfolio-sparsity}
 
-\subsection{Sparsity of the Regularized Expected Shortfall Optimizers} \label{app:sparsity-es}
+\subsection*{Sparsity of the Regularized Expected Shortfall Optimizers} \label{app:sparsity-es}
 
 \begin{figure}[httb]
     \centering
@@ -152,6 +201,6 @@ The number of active positions is sensitive to this recalibration, an L1-dominan
  across quarters, not instability in the optimizer itself. The unregularized problem has no such 
  degree of freedom. Its support is determined primarily by the leverage limit.
 
-\subsection{Sparsity of the Regularized Mean-Variance Optimizers} \label{app:sparsity-mv}
+\subsection*{Sparsity of the Regularized Mean-Variance Optimizers} \label{app:sparsity-mv}
 
-\subsection{Sparsity of the Regularized Mean Absolute Deviation Optimizers} \label{app:sparsity-mad}
+\subsection*{Sparsity of the Regularized Mean Absolute Deviation Optimizers} \label{app:sparsity-mad}

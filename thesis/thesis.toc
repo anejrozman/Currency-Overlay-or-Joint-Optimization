@@ -52,13 +52,7 @@
 \contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{38}{subsection.B.3.2}%
 \contentsline {section}{\numberline {B.4}Joint Optimization}{39}{section.B.4}%
 \contentsline {appendix}{\chapternumberline {C}Transaction Costs}{42}{appendix.C}%
-\contentsline {appendix}{\chapternumberline {D}Hyperparameter Sensitivity and Portfolio Sparsity Analysis}{44}{appendix.D}%
+\contentsline {appendix}{\chapternumberline {D}Additional Results}{44}{appendix.D}%
 \contentsline {section}{\numberline {D.1}Hyperparameter Sensitivity Analysis}{44}{section.D.1}%
-\contentsline {subsection}{\numberline {D.1.1}Expected Shortfall Analysis}{45}{subsection.D.1.1}%
-\contentsline {subsection}{\numberline {D.1.2}Mean-Variance Analysis}{46}{subsection.D.1.2}%
-\contentsline {subsection}{\numberline {D.1.3}Mean Absolute Deviation Analysis}{46}{subsection.D.1.3}%
-\contentsline {section}{\numberline {D.2}Portfolio Sparsity Analysis}{46}{section.D.2}%
-\contentsline {subsection}{\numberline {D.2.1}Sparsity of the Regularized Expected Shortfall Optimizers}{46}{subsection.D.2.1}%
-\contentsline {subsection}{\numberline {D.2.2}Sparsity of the Regularized Mean-Variance Optimizers}{47}{subsection.D.2.2}%
-\contentsline {subsection}{\numberline {D.2.3}Sparsity of the Regularized Mean Absolute Deviation Optimizers}{47}{subsection.D.2.3}%
-\contentsline {chapter}{Bibliography}{48}{appendix*.5}%
+\contentsline {section}{\numberline {D.2}Portfolio Sparsity Analysis}{48}{section.D.2}%
+\contentsline {chapter}{Bibliography}{50}{appendix*.11}%
