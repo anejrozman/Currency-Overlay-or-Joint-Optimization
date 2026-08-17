@@ -1,9 +1,26 @@
 """
-Asset only Regularized Mean-Variance optimizer — ASSETS-ZERO strategy (Ulrych & Lucescu 2026, Section 3 and Ulrych & Burkhardt 2023).
+Asset-only Regularized Mean-Variance optimizer — ASSETS-ZERO strategy (Ulrych & Lucescu 2026, Section 3 and Ulrych & Burkhardt 2023).
 
-Uses unhedged asset returns R_u. The investor makes no currency hedging
-and optimizes only the asset allocation over unhedged returns.
-The mean is estimated via the Bayes-Stein shrinkage estimator (Jorion 1986).
+ASSETS-ZERO is the *zero hedged* regularized asset portfolio: the asset
+weights are optimized on fully hedged returns (R_fh) — the same asset-level
+problem as ASSETS-FULL — and the portfolio is then implemented WITHOUT
+currency hedging, so realized returns are unhedged (R_u).  The realization on
+R_u is handled by the Backtester via its ``training_return_key`` /
+``asset_return_key`` split; this class only ever sees R_fh.
+
+The objective carries no mean term.  The sample mean is estimated far too
+imprecisely at these window lengths to be worth its variance cost: with it in
+the objective the program spends its whole risk budget chasing the highest
+estimated mean, collapsing onto a handful of names at the leverage bound.
+Dropping it leaves a regularized minimum-variance problem, mirroring the
+ES optimizers, which likewise penalize a risk measure alone.  This also removes
+the need for a shrinkage estimator of the mean (Bayes-Stein, Jorion 1986); only
+the covariance is estimated, via Ledoit-Wolf shrinkage toward the
+constant-correlation target (Appendix B).
+
+With the mean gone the risk-aversion coefficient gamma would be pure scaling on
+the risk term — exactly equivalent to dividing both penalties by gamma/2 — so it
+is dropped as a redundant knob and the penalty grids carry the tradeoff alone.
 
 Author: Anej Rozman
 """
@@ -14,18 +31,31 @@ import logging
 import cvxpy as cp
 import numpy as np
 from .base_optimizer import BaseOptimizer
-from ..utils.estimation import bayes_stein, ledoit_wolf_cc
+from ..utils.estimation import ledoit_wolf_cc
 
 logger = logging.getLogger(__name__)
+
+# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
+# gurobipy is not installed; weight differences are ~1e-6.
+try:
+    import gurobipy  # noqa: F401
+    _DEFAULT_SOLVER = cp.GUROBI
+except ImportError:
+    _DEFAULT_SOLVER = cp.CLARABEL
+
+_warned_fallback = False
 
 
 class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
     """
-    Asset only Regularized Mean-Variance optimizer.
+    Regularized MV asset optimizer for the ASSETS-ZERO strategy.
 
-    Minimizes a penalized mean-variance objective with L1 and L2
-    regularization penalties, subject to a leverage limit and a full investment
-    constraint.
+    Minimizes the variance of the fully hedged asset returns (R_fh) with L1 and
+    L2 regularization penalties, subject to a leverage limit and a full
+    investment constraint — identical to the ASSETS-FULL asset problem.  The
+    zero-hedging policy is applied at realization: the Backtester evaluates the
+    resulting weights on unhedged returns (R_u) and the investor holds no
+    forward positions.
     """
 
     def __init__(self, hyperparams: dict | None = None) -> None:
@@ -33,43 +63,45 @@ class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
         Args:
             hyperparams: Optional dict with keys:
 
-                * ``gamma``          (float) — risk aversion coefficient, default 50.0
-                * ``lambda_l1``      (float) — L1 penalty weight, default 1e-4
-                * ``lambda_l2``      (float) — L2 penalty weight, default 1e-4
-                * ``leverage_limit`` (float) — L1 norm constraint, default 1.5
+                * ``lambda_l1``      (float) — L1 penalty weight, default 5e-6
+                * ``lambda_l2``      (float) — L2 penalty weight, default 1e-3
+                * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
+                                               (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
-        self.gamma: float = self.hyperparams.get("gamma", 50.0)
-        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 1e-4)
-        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 1e-4)
-        self.leverage_limit: float = self.hyperparams.get("leverage_limit", 1.5)
-        self.solver = self.hyperparams.get("solver", cp.GUROBI)
+        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 5e-6)
+        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 1e-3)
+        self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
 
-        self.mu: np.ndarray | None = None
+        global _warned_fallback
+        if self.solver is not cp.GUROBI and _DEFAULT_SOLVER is not cp.GUROBI and not _warned_fallback:
+            logger.warning("gurobipy not installed — falling back to Clarabel solver.")
+            _warned_fallback = True
+
         self.Sigma: np.ndarray | None = None
         self.N: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
         """
-        Extract and store the unhedged return matrix for optimization.
+        Estimate the covariance of the fully hedged returns for optimization.
 
         Args:
-            train_bundle: Must contain ``"R_u"``.
+            train_bundle: Must contain ``"R_fh"``.
         """
-        if "R_u" not in train_bundle:
-            raise ValueError("train_bundle must contain 'R_u'.")
-        R_u = train_bundle["R_u"]
-        if R_u.empty:
-            raise ValueError("'R_u' in train_bundle is empty.")
-        Y = R_u.values
+        if "R_fh" not in train_bundle:
+            raise ValueError("train_bundle must contain 'R_fh'.")
+        R_fh = train_bundle["R_fh"]
+        if R_fh.empty:
+            raise ValueError("'R_fh' in train_bundle is empty.")
+        Y = R_fh.values
         self.N = Y.shape[1]
-        self.mu = bayes_stein(Y)
         self.Sigma = ledoit_wolf_cc(Y)  # Ledoit-Wolf shrinkage toward constant-correlation target (appendix B)
 
     def optimize(self) -> np.ndarray:
         """
-        Solve the regularized mean-variance minimization problem.
+        Solve the regularized minimum-variance problem.
 
         Returns:
             1-D numpy array of shape *(N,)* summing to 1.
@@ -77,15 +109,14 @@ class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
         Raises:
             RuntimeError: If :meth:`fit` was not called, or the solver fails.
         """
-        if self.mu is None or self.N == 0:
+        if self.Sigma is None or self.N == 0:
             raise RuntimeError("fit() must be called before optimize().")
 
         x = cp.Variable(self.N)
         l1 = cp.norm(x, 1)
 
         objective = cp.Minimize(
-            (self.gamma / 2) * cp.quad_form(x, cp.psd_wrap(self.Sigma))
-            - self.mu @ x
+            cp.quad_form(x, cp.psd_wrap(self.Sigma))
             + self.lambda_l1 * l1
             + self.lambda_l2 * cp.sum_squares(x)
         )
@@ -116,7 +147,10 @@ class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
         weights = x.value
+        if weights is None:
+            raise RuntimeError("Solver returned None weights.")
 
+        # Normalize to correct numerical inaccuracy from the solver
         return (weights / weights.sum()).flatten()
 
     def score(
@@ -125,24 +159,25 @@ class RegularizedMeanVarianceAssetZeroOptimizer(BaseOptimizer):
         val_bundle: dict[str, object],
     ) -> float:
         """
-        Evaluate the validation mean-variance utility of the candidate weights.
+        Evaluate the validation variance of the candidate weights.
 
-        Returns the optimization objective ``(gamma/2) Var(r) - E[r]`` on the
-        validation window, where ``r`` is the realized portfolio return. Lower is
-        better. This matches the optimizer objective, so model selection trades off
-        return against risk rather than minimizing variance alone.
+        Scored on fully hedged returns, mirroring the training objective — the
+        risk measure alone, without the penalties — exactly as the ES optimizers
+        score on validation ES.  Hyperparameter selection is part of the
+        asset-level problem and is therefore identical to ASSETS-FULL.
 
         Args:
             weights: 1-D array of portfolio weights from :meth:`optimize`.
-            val_bundle: Must contain ``"R_u"``.
+            val_bundle: Must contain ``"R_fh"``.
 
         Returns:
-            Mean-variance utility on the validation window (lower is better).
+            Variance of the realized portfolio return on the validation
+            window (lower is better).
         """
-        if "R_u" not in val_bundle:
-            raise ValueError("val_bundle must contain 'R_u'.")
-        R_u_val = val_bundle["R_u"]
-        if R_u_val.empty or len(R_u_val) < 2:
+        if "R_fh" not in val_bundle:
+            raise ValueError("val_bundle must contain 'R_fh'.")
+        R_fh_val = val_bundle["R_fh"]
+        if R_fh_val.empty or len(R_fh_val) < 2:
             return float("inf")
-        r_val = R_u_val.values @ weights
-        return float((self.gamma / 2) * np.var(r_val, ddof=1) - np.mean(r_val))
+        r_val = R_fh_val.values @ weights
+        return float(np.var(r_val, ddof=1))
