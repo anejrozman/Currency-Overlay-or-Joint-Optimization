@@ -31,6 +31,18 @@ LAMBDA_L2_CURR_GRID = [0.0, 5e-7, 5e-6, 5e-5]
 # LAMBDA_L2_CURR_GRID = [0.0, 5e-5, 5e-4, 5e-3, 5e-2]
 
 
+# Asset-level MV penalty grids, for the mean-free (minimum-variance) asset
+# problem. The MV risk term is ~3 orders of magnitude smaller than the ES one
+# (daily variance ~2e-5 against daily ES_80 ~1.2e-2), so the ES asset grids
+# above do not bite here at all. Bounds were calibrated by sweeping each
+# penalty on real estimation windows of the top-10 universe: L1 starts moving
+# the solution at ~3e-7 and is saturated at a corner (gross = 1) from ~2e-5 on;
+# L2 decays smoothly and reaches the equal-weight floor (||x||^2 = 1/N exactly,
+# gross = 1) at ~1e-2. Verified stable across five windows spanning 2000-2018.
+LAMBDA_L1_MV_ASSET_GRID = [0.0, 1e-6, 5e-6, 5e-5]
+LAMBDA_L2_MV_ASSET_GRID = [0.0, 1e-4, 1e-3, 1e-2]
+
+
 # Fixed
 LEVERAGE = [2.0]
 ALPHA = [0.80]
@@ -104,14 +116,17 @@ REG_JOINT_CONFIG = BacktestConfig(
     },
 )
 
+# The two asset-level MV configs are deliberately identical: ASSETS-ZERO solves
+# the same problem on R_fh and differs only at realization (unhedged, via the
+# backtester's training_return_key / asset_return_key split). Neither carries a
+# gamma — the mean term is gone, so gamma would only rescale the penalties.
 REG_MV_ASSET_FULL_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          GAMMA,
-        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
-        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
+        "lambda_l1":      LAMBDA_L1_MV_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_MV_ASSET_GRID,
         "leverage_limit": LEVERAGE,
     },
 )
@@ -121,9 +136,8 @@ REG_MV_ASSET_ZERO_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          GAMMA,
-        "lambda_l1":      LAMBDA_L1_ASSET_GRID,
-        "lambda_l2":      LAMBDA_L2_ASSET_GRID,
+        "lambda_l1":      LAMBDA_L1_MV_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_MV_ASSET_GRID,
         "leverage_limit": LEVERAGE,
     },
 )
