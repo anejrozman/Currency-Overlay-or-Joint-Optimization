@@ -1,0 +1,32 @@
+{
+  "strategy": "reg_mv_asset_full",
+  "label": "ASSETS-FULL MV (top-100)",
+  "run_date": "2026-08-17T15:04:03.353623",
+  "optimizer": "RegularizedMeanVarianceAssetFullOptimizer",
+  "param_grid": {
+    "lambda_l1": [
+      0.0,
+      1e-06,
+      5e-06,
+      5e-05
+    ],
+    "lambda_l2": [
+      0.0,
+      0.0001,
+      0.001,
+      0.01
+    ],
+    "leverage_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_100_202603081747.csv",
+  "universe_size": 100,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
