@@ -42,11 +42,28 @@ LAMBDA_L2_CURR_GRID = [0.0, 5e-7, 5e-6, 5e-5]
 LAMBDA_L1_MV_ASSET_GRID = [0.0, 1e-6, 5e-6, 5e-5]
 LAMBDA_L2_MV_ASSET_GRID = [0.0, 1e-4, 1e-3, 1e-2]
 
+# Currency-block MV penalty grids, for the mean-free overlay. psi carries no budget
+# or leverage constraint, so L1 extinguishes it outright while L2 shrinks it
+# smoothly. Calibrated on windows at 2000, 2007 and 2015, where unpenalized gross
+# psi is 0.93, 1.28 and 0.96: L1 halves the overlay by ~2e-7, spends 98% of it by
+# ~1e-5 and zeroes it by ~5e-5; L2 halves it by ~5e-6 and reaches ~2% by ~2e-3.
+LAMBDA_L1_MV_CURR_GRID = [0.0, 5e-7, 5e-6, 5e-5]
+LAMBDA_L2_MV_CURR_GRID = [0.0, 5e-6, 1e-4, 2e-3]
+
 
 # Fixed
 LEVERAGE = [2.0]
 ALPHA = [0.80]
 GAMMA = [50.0]
+# GAMMA applies only to the joint MV programs below, which still carry a mean term.
+# The asset and overlay MV programs are mean-free, so a risk-aversion coefficient
+# there would be pure scaling on the penalties; it was dropped from both.
+#
+# The mean-bearing versions were kept just long enough to record why: at gamma = 3
+# the asset program collapses onto 19 of 101 names at the leverage bound
+# (results/runs/reg_mv_asset_zero/run_1) and the overlay reaches a gross psi of up
+# to 98x the portfolio notional (results/runs/reg_mv_curr_overlay/run_1). The grids
+# those two runs used are recorded in their own config.json.
 
 
 ES_CONFIG = BacktestConfig(
@@ -147,7 +164,6 @@ MV_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          GAMMA,
         "leverage_limit": LEVERAGE,
     },
 )
@@ -157,11 +173,10 @@ REG_MV_OVERLAY_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":            GAMMA,
-        "lambda_l1_asset":  LAMBDA_L1_ASSET_GRID,
-        "lambda_l2_asset":  LAMBDA_L2_ASSET_GRID,
-        "lambda_l1_curr":   LAMBDA_L1_CURR_GRID,
-        "lambda_l2_curr":   LAMBDA_L2_CURR_GRID,
+        "lambda_l1_asset":  LAMBDA_L1_MV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_MV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_MV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_MV_CURR_GRID,
         "leverage_limit":   LEVERAGE,
     },
 )

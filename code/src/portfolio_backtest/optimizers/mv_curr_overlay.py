@@ -1,11 +1,19 @@
 """
 Unregularized Mean-Variance optimizer with currency overlay.
 
-Step 1: Minimizes the mean-variance objective over fully hedged asset returns (R_fh),
-        subject to full investment and a leverage cap on asset weights.
-Step 2: With asset weights fixed, minimizes the mean-variance objective of the
-        combined portfolio return (R_fh @ x_opt + R_c @ psi) by optimizing the
-        currency overlay weights psi.
+Step 1: Minimizes the variance of fully hedged asset returns (R_fh), subject to
+        full investment and a leverage cap on asset weights.
+Step 2: With asset weights fixed, minimizes the variance of the combined portfolio
+        return (R_fh @ x_opt + R_c @ psi) by optimizing the currency overlay weights psi.
+        psi is unconstrained; forward contracts are zero-investment instruments, so no
+        slack weight is needed to fund the overlay.
+
+The objective carries no mean term.  The variance coefficient is normalized to one,
+which is the gamma -> infinity limit of the paper's objective after dividing through
+by gamma / 2: the mean term vanishes and the cross-covariance term picks up its
+factor of two directly from the expansion of Var(x' R_fh + psi' R_c).  This mirrors
+the ES optimizers, which likewise minimize a risk measure alone, and removes the need
+for a shrinkage estimator of the mean (Bayes-Stein, Jorion 1986).
 
 Author: Anej Rozman
 """
@@ -16,17 +24,28 @@ import logging
 import cvxpy as cp
 import numpy as np
 from .base_optimizer import BaseOptimizer
-from ..utils.estimation import bayes_stein, ledoit_wolf_cc, sample_cross_cov
+from ..utils.estimation import ledoit_wolf_cc, sample_cross_cov
 
 logger = logging.getLogger(__name__)
+
+# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
+# gurobipy is not installed; weight differences are ~1e-6.
+try:
+    import gurobipy  # noqa: F401
+    _DEFAULT_SOLVER = cp.GUROBI
+except ImportError:
+    _DEFAULT_SOLVER = cp.CLARABEL
+
+_warned_fallback = False
 
 
 class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
     """
     Unregularized mean-variance optimizer with separate currency overlay.
 
-    Step 1 minimizes the mean-variance objective on R_fh subject to full investment and leverage constraints.
-    Step 2 fixes the asset weights and minimizes the mean-variance objective of the combined portfolio return.
+    Step 1 minimizes the variance of R_fh subject to full investment and leverage
+    constraints. Step 2 fixes the asset weights and minimizes the variance of the
+    combined portfolio return.
     """
 
     def __init__(self, hyperparams: dict | None = None) -> None:
@@ -34,14 +53,18 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         Args:
             hyperparams: Optional dict with keys:
 
-                * ``gamma``          (float) — risk aversion coefficient, default 50.0
                 * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
+                                               (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
-        self.gamma: float = self.hyperparams.get("gamma", 50.0)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
-        self.solver = self.hyperparams.get("solver", cp.GUROBI)
+        self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
+
+        global _warned_fallback
+        if self.solver is not cp.GUROBI and _DEFAULT_SOLVER is not cp.GUROBI and not _warned_fallback:
+            logger.warning("gurobipy not installed — falling back to Clarabel solver.")
+            _warned_fallback = True
 
         self.Y_fh: np.ndarray | None = None
         self.Y_c: np.ndarray | None = None
@@ -93,16 +116,14 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """Step 1 in optimization: unregularized mean-variance on R_fh with Bayes-Stein
-        mean, Ledoit-Wolf covariance, leverage constraint, and full investment."""
+        """Step 1 in optimization: minimum variance on R_fh with Ledoit-Wolf
+        covariance, leverage constraint, and full investment."""
         N = Y_fh.shape[1]
-        mu = bayes_stein(Y_fh)
         Sigma_a = ledoit_wolf_cc(Y_fh)
 
         x = cp.Variable(N)
-        mv_obj = (self.gamma / 2) * cp.quad_form(x, cp.psd_wrap(Sigma_a)) - mu @ x
         problem = cp.Problem(
-            cp.Minimize(mv_obj),
+            cp.Minimize(cp.quad_form(x, cp.psd_wrap(Sigma_a))),
             [
                 cp.sum(x) == 1,
                 cp.norm(x, 1) <= self.leverage_limit,
@@ -116,33 +137,28 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray
     ) -> np.ndarray:
-        """Step 2 in optimization: unregularized mean-variance currency overlay over
+        """Step 2 in optimization: minimum-variance currency overlay over
         unconstrained psi.
 
-        Minimizes (gamma/2) psi' Sigma_c psi + gamma x*' Sigma_ac psi - mu_c' psi, the
-        expansion of Var(x*' R_fh + psi' R_c) with the constant asset-only term dropped
+        Minimizes psi' Sigma_c psi + 2 x*' Sigma_ac psi, the expansion of
+        Var(x*' R_fh + psi' R_c) with the constant asset-only term dropped
         (appendix B, eq:mv_curr_expanded). Sigma_c is Ledoit-Wolf shrunk; the
         cross-covariance Sigma_ac is the un-shrunk sample estimate.
         """
         K = Y_c.shape[1]
-        mu_c = bayes_stein(Y_c)
         Sigma_c = ledoit_wolf_cc(Y_c)
         Sigma_ac = sample_cross_cov(Y_fh, Y_c)  # N x K, not shrunk
-        cross = self.gamma * (x_fixed @ Sigma_ac)  # length-K constant vector
+        cross = 2.0 * (x_fixed @ Sigma_ac)  # length-K constant vector
 
         psi = cp.Variable(K)
-        mv_obj = (
-            (self.gamma / 2) * cp.quad_form(psi, cp.psd_wrap(Sigma_c))
-            + cross @ psi
-            - mu_c @ psi
-        )
+        obj = cp.quad_form(psi, cp.psd_wrap(Sigma_c)) + cross @ psi
         # Base currency (zero-variance excess return) is the residual numeraire,
         # not an overlay decision variable; pin its weight to zero.
         constraints = []
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
-        problem = cp.Problem(cp.Minimize(mv_obj), constraints)
+        problem = cp.Problem(cp.Minimize(obj), constraints)
         self._solve(problem)
 
         return psi.value.flatten()
@@ -178,17 +194,19 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         val_bundle: dict[str, object],
     ) -> float:
         """
-        Evaluate the mean-variance objective on validation data.
+        Evaluate the variance of the combined portfolio on validation data.
 
         Uses ``self.x_opt`` (fixed from :meth:`optimize`), re-runs step 2 on validation
-        returns to get psi_val, then evaluates ``(gamma/2) * var(r_val, ddof=1) - mean(r_val)``.
+        returns to get psi_val, then evaluates ``var(r_val, ddof=1)``. Mirrors the
+        unregularized ES overlay, which likewise re-solves step 2 on the validation
+        window.
 
         Args:
             weights: Not used, asset weights are taken from ``self.x_opt``.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
 
         Returns:
-            Mean-variance objective of the portfolio.
+            Variance of the combined portfolio return (lower is better).
         """
         if self.x_opt is None:
             raise RuntimeError("optimize() must be called before score().")
@@ -204,4 +222,4 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
 
         psi_val = self._optimize_overlay(Y_fh_val, Y_c_val, self.x_opt)
         r_val = Y_fh_val @ self.x_opt + Y_c_val @ psi_val
-        return float((self.gamma / 2) * np.var(r_val, ddof=1) - np.mean(r_val))
+        return float(np.var(r_val, ddof=1))
