@@ -134,6 +134,24 @@ endpoint corresponds to the unregularized problem and the upper endpoint is the 
 
 \subsection{Sparsity of the Regularized Expected Shortfall Optimizers} \label{app:sparsity-es}
 
+\begin{figure}[httb]
+    \centering
+    \includegraphics[width=1\textwidth]{../../results/figures/sparsity_analysis/es_assets.pdf}
+    \caption{Sparsity of the regularized Expected Shortfall currency overlay and joint optimizers.}
+    \label{fig:sparsity-es}
+\end{figure}
+
+Figure \ref{fig:sparsity-es} reports the share of the investable universe held at each rebalance date.
+
+Regularization stabilizes the weight vector conditional on the penalty coefficients, 
+but those coefficients are themselves re-selected at every rebalance date. 
+The number of active positions is sensitive to this recalibration, an L1-dominant selection
+ sets weights to zero and yields a concentrated portfolio, whereas an L2-dominant selection 
+ shrinks all weights toward the equally weighted portfolio. 
+ The oscillation therefore reflects the validation criterion alternating between these two regimes 
+ across quarters, not instability in the optimizer itself. The unregularized problem has no such 
+ degree of freedom. Its support is determined primarily by the leverage limit.
+
 \subsection{Sparsity of the Regularized Mean-Variance Optimizers} \label{app:sparsity-mv}
 
 \subsection{Sparsity of the Regularized Mean Absolute Deviation Optimizers} \label{app:sparsity-mad}
