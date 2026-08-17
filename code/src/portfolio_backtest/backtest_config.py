@@ -54,16 +54,19 @@ LAMBDA_L2_MV_CURR_GRID = [0.0, 5e-6, 1e-4, 2e-3]
 # Fixed
 LEVERAGE = [2.0]
 ALPHA = [0.80]
-GAMMA = [50.0]
-# GAMMA applies only to the joint MV programs below, which still carry a mean term.
-# The asset and overlay MV programs are mean-free, so a risk-aversion coefficient
-# there would be pure scaling on the penalties; it was dropped from both.
+
+# Every MV program is now mean-free, so no risk-aversion coefficient survives: with
+# the mean gone gamma is pure scaling on the risk term, exactly equivalent to dividing
+# both penalties by gamma / 2, and the penalty grids carry the tradeoff alone.
 #
-# The mean-bearing versions were kept just long enough to record why: at gamma = 3
-# the asset program collapses onto 19 of 101 names at the leverage bound
-# (results/runs/reg_mv_asset_zero/run_1) and the overlay reaches a gross psi of up
-# to 98x the portfolio notional (results/runs/reg_mv_curr_overlay/run_1). The grids
-# those two runs used are recorded in their own config.json.
+# The mean-bearing versions were kept just long enough to record why. At gamma = 3:
+#   * the asset program collapses onto 19 of 101 names at the leverage bound
+#     (results/runs/reg_mv_asset_zero/run_1)
+#   * the overlay reaches a gross psi of up to 98x the portfolio notional
+#     (results/runs/reg_mv_curr_overlay/run_1)
+#   * the joint program reaches up to 74x, with 6-131 active assets
+#     (results/runs/reg_mv_joint/run_1)
+# The grids those three runs used are recorded in their own config.json.
 
 
 ES_CONFIG = BacktestConfig(
@@ -186,21 +189,25 @@ MV_JOINT_CONFIG = BacktestConfig(
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":          GAMMA,
         "leverage_limit": LEVERAGE,
     },
 )
 
+# The joint program reuses the overlay's MV grids, as the ES configs do. Verified by
+# sweeping the joint program itself on windows at 2000/2007/2015: L1 on x drives gross
+# to the budget floor at 2.5e-5 (grid top 5e-5), L2 on x reaches equal weight by
+# 6.3e-3 - 1.6e-2 (grid top 1e-2), L1 on psi zeroes it by 1.6e-5 - 4e-5 (grid top 5e-5)
+# and L2 on psi reaches ~2% by 1.6e-3 (grid top 2e-3). All four bands sit inside the
+# existing bounds, so no joint-specific constants are needed.
 REG_MV_JOINT_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,
     rebalancing_frequency="quarterly",
     param_grid={
-        "gamma":            GAMMA,
-        "lambda_l1_asset":  LAMBDA_L1_ASSET_GRID,
-        "lambda_l2_asset":  LAMBDA_L2_ASSET_GRID,
-        "lambda_l1_curr":   LAMBDA_L1_CURR_GRID,
-        "lambda_l2_curr":   LAMBDA_L2_CURR_GRID,
+        "lambda_l1_asset":  LAMBDA_L1_MV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_MV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_MV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_MV_CURR_GRID,
         "leverage_limit":   LEVERAGE,
     },
 )
