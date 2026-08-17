@@ -3,7 +3,7 @@ strategy_name, top_10_run, top_50_run, top_100_run
 equal_weight_optimizer, 1, 2, 3
 
 reg_es_asset_full, 8, 9, 10      
-reg_es_asset_zero, 12, 10, 11    
+reg_es_asset_zero, 12, 14, 13    
 es_curr_overlay, 8, 9, 10   
 reg_es_curr_overlay, 9, 8, 7      
 es_joint, 7, 9, 8                
