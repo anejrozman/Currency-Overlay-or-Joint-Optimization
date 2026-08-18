@@ -55,4 +55,5 @@
 \contentsline {appendix}{\chapternumberline {D}Additional Results}{46}{appendix.D}%
 \contentsline {section}{\numberline {D.1}Hyperparameter Sensitivity Analysis}{46}{section.D.1}%
 \contentsline {section}{\numberline {D.2}Portfolio Sparsity Analysis}{50}{section.D.2}%
-\contentsline {chapter}{Bibliography}{52}{appendix*.11}%
+\contentsline {section}{\numberline {D.3}Risk Aversion Instability under Mean Variance Optimization}{51}{section.D.3}%
+\contentsline {chapter}{Bibliography}{53}{appendix*.11}%

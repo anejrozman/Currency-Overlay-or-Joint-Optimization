@@ -210,3 +210,39 @@ The number of active positions is sensitive to this recalibration, an L1-dominan
     \label{fig:sparsity-mv}
 \end{figure}
 \subsection*{Sparsity of the Regularized Mean Absolute Deviation Optimizers} \label{app:sparsity-mad}
+
+
+\section{Risk Aversion Instability under Mean Variance Optimization} \label{app:instability-mv}
+
+In \Cref{chap:empirical-analysis-and-baseline-results} we report backtest results for the mean-variance optimizers under infinite risk aversion, 
+which corresponds to the minimum variance problem. We do this because the mean-variance optimization problem is 
+is unstable under finite risk aversion \cite{DeMiguel et al. 2009}. We showcase this by runnign the 
+regularized overlay and joint optimizers under finite risk aversion on the top 10 universe and report the results in 
+\ref{tab:instability-mv}. 
+
+\begin{table}[ht]
+    \centering 
+    \scalebox{0.82}{%
+    \begin{tabular}{lcc}
+        \toprule
+        \multicolumn{3}{c}{\textbf{Mean-Variance Optimizers under Finite Risk Aversion}} \\
+        \midrule
+        \textbf{Metric} &       \textbf{Overlay} &      \textbf{Joint} \\
+        \midrule
+        ES (\%)                   & 2.07                  & 2.20    \\
+        Vol (\%)                  & 26.50                 & 28.54    \\
+        MD (\%)                   & 70.15                 & 69.31   \\
+        SR                        & 0.10                  & 0.11    \\
+        SOR                       & 0.07                  & 0.15    \\
+        ESR                       & 0.08                  & 0.09    \\   
+        $\text{Turnover}^a$       & 1.82                  & 1.84    \\
+        $\text{Turnover}^c$       & 19.04                 & 18.60    \\
+        \bottomrule
+    \end{tabular}
+    }
+    \caption{Performance metrics for the regularized mean-variance currency overlay and joint optimizers under finite risk aversion on the top 10 universe.}
+    \label{tab:instability-mv}
+\end{table}
+
+We can see from table \ref{tab:instability-mv} that the performance of the optimizers is highly unstable and results in poor out of sample performance of the portfolios.
+Two 
