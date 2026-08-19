@@ -13,6 +13,7 @@ on the first estimation window of the top-10 universe.
 Usage:
     python code/scripts/hyperparameter_boundary_analysis.py es
     python code/scripts/hyperparameter_boundary_analysis.py mv
+    python code/scripts/hyperparameter_boundary_analysis.py mad
 """
 
 from __future__ import annotations
@@ -47,7 +48,7 @@ DECADES_ABOVE = 2
 SEED = 0
 BASE_CURRENCY = "USD"
 
-MEASURES = ("es", "mv")
+MEASURES = ("es", "mv", "mad")
 ROLES = ("overlay", "joint")
 
 

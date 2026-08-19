@@ -9,6 +9,7 @@ to that bound, so the bound sits at 1.0 in every panel.
 Usage:
     python results/generate_boundary_plots.py es
     python results/generate_boundary_plots.py mv
+    python results/generate_boundary_plots.py mad
 
 Author: Anej Rozman
 """
@@ -56,8 +57,9 @@ BOUND_COLOR: str = "#8a8983"
 LEGEND_FACE_COLOR: str = "#ffffff"
 
 MEASURE_TITLES: dict[str, str] = {
-    "es": "Expected Shortfall",
-    "mv": "Mean-Variance",
+    "es":  "Expected Shortfall",
+    "mv":  "Mean-Variance",
+    "mad": "Mean Absolute Deviation",
 }
 
 # Panel order: asset block on the top row, currency block on the bottom row.
