@@ -316,6 +316,8 @@ class Backtester:
         * **ES_80** — Daily Expected Shortfall at 80 % confidence level
         * **ES_95** — Daily Expected Shortfall at 95 % confidence level
         * **VOL**   — Annualized volatility
+        * **MAD**   — Annualized mean absolute deviation, taken about the realized
+          out-of-sample mean of the full evaluation series
         * **MD**    — Maximum drawdown
         * **SR**    — Sharpe Ratio = annualized excess mean / annualized volatility
         * **SOR**   — Sortino Ratio = annualized excess mean / downside deviation
@@ -351,6 +353,15 @@ class Backtester:
         es_threshold_95 = r.quantile(0.05)
         daily_es_95 = -r[r <= es_threshold_95].mean()
 
+        # Mean Absolute Deviation about the realized out-of-sample mean of the full
+        # evaluation series. Annualized with sqrt(trading_days) rather than
+        # trading_days: MAD is a scale measure, so under iid returns it aggregates
+        # like a standard deviation, not like a mean. This matches ann_vol above and
+        # ann_es_80, and keeps the MAD/volatility ratio (0.7979 under normality)
+        # intact after annualisation.
+        daily_mad = float((r - r.mean()).abs().mean())
+        ann_mad = daily_mad * math.sqrt(trading_days)
+
         # Maximum Drawdown
         cum = (1.0 + r).cumprod()
         drawdown = (cum - cum.cummax()) / cum.cummax()
@@ -385,6 +396,7 @@ class Backtester:
             "ES_80 (daily, %)":              round(daily_es_80 * 100, 4),
             "ES_95 (daily, %)":              round(daily_es_95 * 100, 4),
             "Volatility (ann., %)":          round(ann_vol * 100, 4),
+            "MAD (ann., %)":                 round(ann_mad * 100, 4),
             "Max Drawdown (%)":              round(max_drawdown * 100, 4),
             "Sharpe Ratio":                  round(sr, 4),
             "Sortino Ratio":                 round(sor, 4),
