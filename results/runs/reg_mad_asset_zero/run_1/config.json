@@ -1,0 +1,32 @@
+{
+  "strategy": "reg_mad_asset_zero",
+  "label": "ASSETS-ZERO MAD (top-10)",
+  "run_date": "2026-08-18T22:45:36.724293",
+  "optimizer": "RegularizedMeanAbsoluteDeviationAssetZeroOptimizer",
+  "param_grid": {
+    "lambda_l1": [
+      0.0,
+      2.5e-05,
+      0.00025,
+      0.0025
+    ],
+    "lambda_l2": [
+      0.0,
+      0.01,
+      0.1,
+      1.0
+    ],
+    "leverage_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_u",
+  "training_return_key": "R_fh",
+  "universe_file": "currency_alocation_10_202603081747.csv",
+  "universe_size": 10,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
