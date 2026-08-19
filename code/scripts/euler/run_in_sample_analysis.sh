@@ -3,10 +3,10 @@
 #
 # Runs code/scripts/in_sample_analysis.py for one risk measure on one universe,
 # or on all three at once as three independent jobs. Each job solves the
-# unregularized joint and overlay programs at every quarterly rebalancing date
-# under both leverage caps (~91 dates x 2 strategies x 2 caps per universe) and
-# writes its own row-level CSV, so the jobs never touch each other's output and
-# can run concurrently.
+# unregularized joint and overlay programs plus the 1/N control at every
+# quarterly rebalancing date (~91 dates x 3 solves per universe) and writes its
+# own row-level CSV, so the jobs never touch each other's output and can run
+# concurrently.
 #
 # Unlike run_backtest.sh no BACKTEST_SCRATCH_DIR is needed: the diagnostic
 # recomputes the hedged and excess-currency returns in memory and writes nothing
