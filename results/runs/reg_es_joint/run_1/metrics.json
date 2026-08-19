@@ -2,6 +2,7 @@
   "ES_80 (daily, %)": 0.7751,
   "ES_95 (daily, %)": 1.4611,
   "Volatility (ann., %)": 9.4348,
+  "MAD (ann., %)": 6.2927,
   "Max Drawdown (%)": 42.9658,
   "Sharpe Ratio": 0.1652,
   "Sortino Ratio": 0.2209,
