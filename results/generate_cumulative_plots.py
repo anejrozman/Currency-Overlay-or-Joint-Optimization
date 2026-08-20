@@ -4,7 +4,8 @@ Cumulative out-of-sample wealth plots, one figure per universe size.
 Usage:
     python results/generate_cumulative_plots.py es
     python results/generate_cumulative_plots.py mv
-    TODO: implement mad, factor and general measures in the future.
+    python results/generate_cumulative_plots.py mad
+    TODO: implement factor and general measures in the future.
 
 Author: Anej Rozman
 """
@@ -42,8 +43,9 @@ GRID_COLOR: str = "#d9d8d4"
 LEGEND_FACE_COLOR: str = "#ffffff"
 
 MEASURE_TITLES: dict[str, str] = {
-    "es": "Expected Shortfall",
-    "mv": "Mean-Variance",
+    "es":  "Expected Shortfall",
+    "mv":  "Mean-Variance",
+    "mad": "Mean Absolute Deviation",
 }
 plt.rcParams["pdf.fonttype"] = 42
 
