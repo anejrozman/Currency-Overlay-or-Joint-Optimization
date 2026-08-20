@@ -244,4 +244,115 @@ List of results interpretations to write up
   \end{minipage}
 \end{figure}
 
+\section{Backtest Results of Mean Absolute Deviation Optimization Approaches}
+
+\begin{table}[htbp]
+  \centering
+  \scalebox{0.82}{%
+  \begin{tabular}{lcccccccc}
+    \toprule
+    \multicolumn{8}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%)                   & 1.15                  & 0.69                    & 0.96              & 0.65                 & 0.65             & 0.64              & 0.64                \\  
+    Vol (\%)                  & 13.96                 & 8.36                    & 11.70             & 7.86                 & 7.82             & 7.71              & 7.74               \\
+    MAD (\%)                  & 54.76                 & 5.67                    & 8.06              & 5.51                 & 5.47             & 5.38              & 5.35                \\
+    MD (\%)                   & 54.76                 & 28.59                   & 40.88             & 27.67                & 27.83            & 27.31             & 26.01                \\
+    SR                        & 0.12                  & 0.20                    & 0.27              & 0.16                 & 0.21             & 0.18              & 0.22               \\
+    SOR                       & 0.17                  & 0.27                    & 0.36              & 0.22                 & 0.27             & 0.25              & 0.29               \\
+    ESR                       & 0.09                  & 0.15                    & 0.21              & 0.12                 & 0.16             & 0.14              & 0.16               \\
+    $\text{Turnover}^a$       & 0.29                  & 1.08                    & 1.08              & 1.10                 & 1.04             & 1.06              & 1.06              \\
+    $\text{Turnover}^c$       & 0.92                  & 0.92                    & 0                 & 1.51                 & 1.36             & 1.84              & 1.44               \\
+    \midrule
+    \multicolumn{8}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%)                 & 1.04                        & 0.40                 & 0.79                & 0.41                & 0.40             & 0.41             & 0.40                \\
+    Vol (\%)                & 12.50                       & 6.19                 & 9.97                & 5.72                & 6.16             & 5.55             & 6.08               \\
+    MAD (\%)                & 55.74                       & 3.29                 & 6.56                & 3.47                & 3.26             & 3.44             & 3.24               \\
+    MD (\%)                 & 55.74                       & 35.90                & 43.81               & 35.93               & 35.92            & 36.94            & 35.51               \\
+    SR                      & 0.32                        & 0.48                 & 0.39                & 0.48                & 0.46             & 0.48             & 0.49               \\
+    SOR                     & 0.44                        & 0.77                 & 0.57                & 0.69                & 0.75             & 0.69             & 0.79               \\
+    ESR                     & 0.24                        & 0.46                 & 0.31                & 0.42                & 0.44             & 0.41             & 0.47               \\
+    $\text{Turnover}^a$     & 0.27                        & 1.30                 & 1.31                & 1.67                & 1.30             & 1.69             & 1.27               \\
+    $\text{Turnover}^c$     & 0.92                        & 0.96                 & 0                   & 1.98                & 1.09             & 1.25             & 1.05               \\
+    \midrule
+    \multicolumn{8}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \midrule
+    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    \midrule
+    ES (\%)                     & 0.97                      & 0.33                & 0.76                & 0.33              & 0.32              & 0.32             & \\
+    Vol (\%)                    & 11.67                     & 4.94                & 9.36                & 4.63              & 4.97              & 4.57             & \\
+    MAD (\%)                    & 56.26                     & 2.67                & 6.40                & 2.78              & 2.65              & 2.75            & \\
+    MD (\%)                     & 56.26                     & 31.28               & 36.99               & 31.25             & 31.28             & 31.41            & \\
+    SR                          & 0.37                      & 0.57                & 0.44                & 0.53              & 0.55              & 0.52             & \\
+    SOR                         & 0.49                      & 0.77                & 0.62                & 0.70              & 0.73              & 0.69             & \\
+    ESR                         & 0.28                      & 0.54                & 0.34                & 0.47              & 0.52              & 0.46             & \\
+    $\text{Turnover}^a$         & 0.27                      & 1.58                & 1.58                & 1.74              & 1.58              & 1.67             & \\
+    $\text{Turnover}^c$         & 0.91                      & 0.97                & 0                   & 0.97              & 1.01              & 1.16             & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics for mean absolute deviation optimization approaches on increasing universe sizes}
+  \label{tab:mad-universe-sizes}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:mad-universe-sizes} reports out-of-sample performance metrics for the international
+  portfolio optimization under mean absolute deviation, with portfolios rebalanced
+  quarterly. The realized out-of-sample statistics shown are Expected Shortfall (ES), volatility (Vol),
+  maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), the Expected Shortfall Ratio (ESR), 
+  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. 
+  Each panel corresponds to a different investment universe:
+  Panel A covers the small universe, made up of the 10 largest companies by market
+  capitalization in each economy; Panel B the medium universe, comprising the 50 largest
+  companies per economy; and Panel C the large universe, consisting of the 100 largest
+  companies per economy. The sample period runs from June 1990 to June 2023, and the
+  first out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and 
+    performance metrics are provided in section \ref{todo}.
+  \end{minipage}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/figures/cumulative_returns/mad_top10.pdf}
+  \caption{Cumulative returns of mean absolute deviation optimization approaches in the small investment universe.}
+  \label{fig:cumulative-returns-mad-top10}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:cumulative-returns-mad-top10} shows the cumulative returns of the mean absolute deviation optimization approaches in the small investment universe,
+  compared to the equal weight benchmark. The portfolios are reported net of transaction costs, and the sample period runs from June 1990 to June 2023, with the first out-of-sample portfolio formed in June 2000. Rebalancing is performed quarterly. 
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[htbp] 
+  \centering
+  \includegraphics[width=1\textwidth]{../results/figures/cumulative_returns/mad_top50.pdf}
+  \caption{Cumulative returns of mean absolute deviation optimization approaches in the medium investment universe.}
+  \label{fig:cumulative-returns-mad-top50}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:cumulative-returns-mad-top50} shows the cumulative returns of the mean absolute deviation optimization approaches in the medium investment universe,
+  compared to the equal weight benchmark. The portfolios are reported net of transaction costs, and the sample period runs from June 1990 to June 2023, with the first out-of-sample portfolio formed in June 2000. Rebalancing is performed quarterly. 
+  \end{minipage}
+\end{figure}
+ 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/figures/cumulative_returns/mad_top100.pdf}
+  \caption{Cumulative returns of mean absolute deviation optimization approaches in the large investment universe.}
+  \label{fig:cumulative-returns-mad-top100}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:cumulative-returns-mad-top100} shows the cumulative returns of the mean absolute deviation optimization approaches in the large investment universe,
+  compared to the equal weight benchmark. The portfolios are reported net of transaction costs, and the sample period runs from June 1990 to June 2023, with the first out-of-sample portfolio formed in June 2000. Rebalancing is performed quarterly. 
+  \end{minipage}
+\end{figure}
+
+
 \section{The Effects of Universe Size on Portfolio Performance}

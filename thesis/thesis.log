@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  19 AUG 2026 15:20
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  20 AUG 2026 16:29
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1383,12 +1383,12 @@ Package hyperref Info: Link coloring ON on input line 165.
 \@outlinefile=\write5
 \openout5 = `thesis.out'.
 
-<logos/UZHlogo.pdf, id=260, 154.5775pt x 49.18375pt>
+<logos/UZHlogo.pdf, id=264, 154.5775pt x 49.18375pt>
 File: logos/UZHlogo.pdf Graphic file (type pdf)
 <use logos/UZHlogo.pdf>
 Package pdftex.def Info: logos/UZHlogo.pdf  used on input line 174.
 (pdftex.def)             Requested size: 154.5771pt x 49.18361pt.
-<logos/ETHlogo.pdf, id=261, 179.67125pt x 45.16875pt>
+<logos/ETHlogo.pdf, id=265, 179.67125pt x 45.16875pt>
 File: logos/ETHlogo.pdf Graphic file (type pdf)
 <use logos/ETHlogo.pdf>
 Package pdftex.def Info: logos/ETHlogo.pdf  used on input line 174.
@@ -1532,17 +1532,17 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.4.1}) ha
                                                   \__shipout_drop_firstpage_...
 l.104 
       ]
-<logos/../../results/figures/asset_currency_corr_top10.pdf, id=447, 714.76294pt x 569.9326pt>
+<logos/../../results/figures/asset_currency_corr_top10.pdf, id=452, 714.76294pt x 569.9326pt>
 File: logos/../../results/figures/asset_currency_corr_top10.pdf Graphic file (type pdf)
 <use logos/../../results/figures/asset_currency_corr_top10.pdf>
 Package pdftex.def Info: logos/../../results/figures/asset_currency_corr_top10.pdf  used on input line 113.
 (pdftex.def)             Requested size: 354.40135pt x 282.59146pt.
-<logos/../../results/figures/asset_currency_corr_top50.pdf, id=448, 714.76294pt x 569.9326pt>
+<logos/../../results/figures/asset_currency_corr_top50.pdf, id=453, 714.76294pt x 569.9326pt>
 File: logos/../../results/figures/asset_currency_corr_top50.pdf Graphic file (type pdf)
 <use logos/../../results/figures/asset_currency_corr_top50.pdf>
 Package pdftex.def Info: logos/../../results/figures/asset_currency_corr_top50.pdf  used on input line 120.
 (pdftex.def)             Requested size: 354.40135pt x 282.59146pt.
-<logos/../../results/figures/asset_currency_corr_top100.pdf, id=449, 714.76294pt x 569.9326pt>
+<logos/../../results/figures/asset_currency_corr_top100.pdf, id=454, 714.76294pt x 569.9326pt>
 File: logos/../../results/figures/asset_currency_corr_top100.pdf Graphic file (type pdf)
 <use logos/../../results/figures/asset_currency_corr_top100.pdf>
 Package pdftex.def Info: logos/../../results/figures/asset_currency_corr_top100.pdf  used on input line 127.
@@ -1601,17 +1601,17 @@ LaTeX Warning: Reference `todo' on page 16 undefined on input line 3.
 
 LaTeX Warning: Reference `todo' on page 16 undefined on input line 70.
 
-<../results/figures/cumulative_returns/es_top10.pdf, id=731, 641.76096pt x 353.96616pt>
+<../results/figures/cumulative_returns/es_top10.pdf, id=736, 641.76096pt x 353.96616pt>
 File: ../results/figures/cumulative_returns/es_top10.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_returns/es_top10.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_returns/es_top10.pdf  used on input line 83.
 (pdftex.def)             Requested size: 443.0pt x 244.33952pt.
-<../results/figures/cumulative_returns/es_top50.pdf, id=733, 641.65208pt x 353.96616pt>
+<../results/figures/cumulative_returns/es_top50.pdf, id=738, 641.65208pt x 353.96616pt>
 File: ../results/figures/cumulative_returns/es_top50.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_returns/es_top50.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_returns/es_top50.pdf  used on input line 96.
 (pdftex.def)             Requested size: 443.0pt x 244.38814pt.
-<../results/figures/cumulative_returns/es_top100.pdf, id=735, 641.65208pt x 353.96616pt>
+<../results/figures/cumulative_returns/es_top100.pdf, id=740, 641.65208pt x 353.96616pt>
 File: ../results/figures/cumulative_returns/es_top100.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_returns/es_top100.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_returns/es_top100.pdf  used on input line 109.
@@ -1658,21 +1658,39 @@ Overfull \hbox (11.55086pt too wide) in paragraph at lines 140--140
 
 LaTeX Warning: Reference `todo' on page 20 undefined on input line 204.
 
-<../results/figures/cumulative_returns/mv_top10.pdf, id=784, 641.65208pt x 353.96616pt>
+<../results/figures/cumulative_returns/mv_top10.pdf, id=790, 641.65208pt x 353.96616pt>
 File: ../results/figures/cumulative_returns/mv_top10.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_returns/mv_top10.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_returns/mv_top10.pdf  used on input line 210.
 (pdftex.def)             Requested size: 443.0pt x 244.38814pt.
-<../results/figures/cumulative_returns/mv_top50.pdf, id=786, 641.65208pt x 353.96616pt>
+<../results/figures/cumulative_returns/mv_top50.pdf, id=792, 641.65208pt x 353.96616pt>
 File: ../results/figures/cumulative_returns/mv_top50.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_returns/mv_top50.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_returns/mv_top50.pdf  used on input line 223.
 (pdftex.def)             Requested size: 443.0pt x 244.38814pt.
-<../results/figures/cumulative_returns/mv_top100.pdf, id=788, 641.65208pt x 353.96616pt>
+<../results/figures/cumulative_returns/mv_top100.pdf, id=794, 641.65208pt x 353.96616pt>
 File: ../results/figures/cumulative_returns/mv_top100.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_returns/mv_top100.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_returns/mv_top100.pdf  used on input line 236.
 (pdftex.def)             Requested size: 443.0pt x 244.38814pt.
+
+LaTeX Warning: Reference `todo' on page 20 undefined on input line 314.
+
+<../results/figures/cumulative_returns/mad_top10.pdf, id=797, 641.64977pt x 353.96616pt>
+File: ../results/figures/cumulative_returns/mad_top10.pdf Graphic file (type pdf)
+<use ../results/figures/cumulative_returns/mad_top10.pdf>
+Package pdftex.def Info: ../results/figures/cumulative_returns/mad_top10.pdf  used on input line 320.
+(pdftex.def)             Requested size: 443.0pt x 244.38814pt.
+<../results/figures/cumulative_returns/mad_top50.pdf, id=799, 641.54095pt x 353.96616pt>
+File: ../results/figures/cumulative_returns/mad_top50.pdf Graphic file (type pdf)
+<use ../results/figures/cumulative_returns/mad_top50.pdf>
+Package pdftex.def Info: ../results/figures/cumulative_returns/mad_top50.pdf  used on input line 333.
+(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
+<../results/figures/cumulative_returns/mad_top100.pdf, id=801, 641.54095pt x 353.96616pt>
+File: ../results/figures/cumulative_returns/mad_top100.pdf Graphic file (type pdf)
+<use ../results/figures/cumulative_returns/mad_top100.pdf>
+Package pdftex.def Info: ../results/figures/cumulative_returns/mad_top100.pdf  used on input line 346.
+(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
 ) (./chapters/convex_risk_measures.tex
 
 [20
@@ -1699,31 +1717,55 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.6}) h
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.1 \chapter
-            {Convex Risk Measures}\label{chap:convex-risk-measures} <../results/figures/cumulative_returns/mv_top100.pdf>]) (./chapters/end_to_end_portfolio_optimization.tex
+            {Convex Risk Measures}\label{chap:convex-risk-measures}
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5.7}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1 \chapter
+            {Convex Risk Measures}\label{chap:convex-risk-measures} <../results/figures/cumulative_returns/mv_top100.pdf> <../results/figures/cumulative_returns/mad_top10.pdf>]
 
 [23
-
-]) (./chapters/results.tex) (./chapters/conclusion.tex
+pdfTeX warning (ext4): destination with the same identifier (name{table.5.3}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1 \chapter
+            {Convex Risk Measures}\label{chap:convex-risk-measures}]
 
 [24
-
-])
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5.8}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1 \chapter
+            {Convex Risk Measures}\label{chap:convex-risk-measures}
+pdfTeX warning (ext4): destination with the same identifier (name{figure.5.9}) has been already used, duplicate ignored
+<argument> ...shipout:D \box_use:N \l_shipout_box 
+                                                  \__shipout_drop_firstpage_...
+l.1 \chapter
+            {Convex Risk Measures}\label{chap:convex-risk-measures} <../results/figures/cumulative_returns/mad_top50.pdf> <../results/figures/cumulative_returns/mad_top100.pdf>]) (./chapters/end_to_end_portfolio_optimization.tex
 
 [25
 
-]
+]) (./chapters/results.tex) (./chapters/conclusion.tex
 
 [26
 
-] (./chapters/appendixA.tex
+])
 
 [27
 
 ]
 
-[28]
+[28
 
-[29]
+] (./chapters/appendixA.tex
+
+[29
+
+]
+
+[30]
+
+[31]
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <12> on input line 200.
 
@@ -1741,7 +1783,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 
-[30]
+[32]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 233.
@@ -1756,17 +1798,17 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 
-[31]
-
-[32]
-
-[33]) (./chapters/appendixB.tex
+[33]
 
 [34]
 
-[35]
+[35]) (./chapters/appendixB.tex
 
-[36
+[36]
+
+[37]
+
+[38
 
 ]
 
@@ -1795,26 +1837,26 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 
-[37]
-
-[38]
-
 [39]
 
 [40]
+
+[41]
+
+[42]
 Overfull \hbox (11.35751pt too wide) detected at line 423
 \OML/lmm/b/it/10.95 q[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 L \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;
  []
 
 
 
-[41]
-
-[42]) (./chapters/appendixC.tex
-
 [43]
 
-[44
+[44]) (./chapters/appendixC.tex
+
+[45]
+
+[46
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{equation.C.1}) has been already used, duplicate ignored
@@ -1823,35 +1865,35 @@ pdfTeX warning (ext4): destination with the same identifier (name{equation.C.1})
 l.26 \begin{align*}
                    ]) (./chapters/appendixD.tex
 
-[45]
+[47]
 
-Package natbib Warning: Citation `getsomething' on page 46 undefined on input line 41.
+Package natbib Warning: Citation `getsomething' on page 48 undefined on input line 41.
 
-<logos/../../results/figures/boundary_plots/es_top10_dinf.pdf, id=1107, 642.2504pt x 447.70543pt>
+<logos/../../results/figures/boundary_plots/es_top10_dinf.pdf, id=1156, 642.2504pt x 447.70543pt>
 File: logos/../../results/figures/boundary_plots/es_top10_dinf.pdf Graphic file (type pdf)
 <use logos/../../results/figures/boundary_plots/es_top10_dinf.pdf>
 Package pdftex.def Info: logos/../../results/figures/boundary_plots/es_top10_dinf.pdf  used on input line 53.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
 
 
-[46
+[48
 
 ]
-<logos/../../results/figures/boundary_plots/es_top10_gross.pdf, id=1114, 643.32655pt x 447.70543pt>
+<logos/../../results/figures/boundary_plots/es_top10_gross.pdf, id=1163, 643.32655pt x 447.70543pt>
 File: logos/../../results/figures/boundary_plots/es_top10_gross.pdf Graphic file (type pdf)
 <use logos/../../results/figures/boundary_plots/es_top10_gross.pdf>
 Package pdftex.def Info: logos/../../results/figures/boundary_plots/es_top10_gross.pdf  used on input line 65.
 (pdftex.def)             Requested size: 443.0pt x 308.29541pt.
 
 
-[47
+[49
 pdfTeX warning (ext4): destination with the same identifier (name{figure.D.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.119 \end{table}
                   <./logos/../../results/figures/boundary_plots/es_top10_dinf.pdf>]
 
-[48
+[50
 pdfTeX warning (ext4): destination with the same identifier (name{figure.D.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -1862,24 +1904,24 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.D.1}) ha
                                                   \__shipout_drop_firstpage_...
 l.121 \newpage
                <./logos/../../results/figures/boundary_plots/es_top10_gross.pdf>]
-<logos/../../results/figures/boundary_plots/mv_top10_dinf.pdf, id=1166, 642.23833pt x 447.70543pt>
+<logos/../../results/figures/boundary_plots/mv_top10_dinf.pdf, id=1215, 642.23833pt x 447.70543pt>
 File: logos/../../results/figures/boundary_plots/mv_top10_dinf.pdf Graphic file (type pdf)
 <use logos/../../results/figures/boundary_plots/mv_top10_dinf.pdf>
 Package pdftex.def Info: logos/../../results/figures/boundary_plots/mv_top10_dinf.pdf  used on input line 126.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
-<logos/../../results/figures/boundary_plots/mv_top10_gross.pdf, id=1169, 643.23625pt x 447.70543pt>
+<logos/../../results/figures/boundary_plots/mv_top10_gross.pdf, id=1218, 643.23625pt x 447.70543pt>
 File: logos/../../results/figures/boundary_plots/mv_top10_gross.pdf Graphic file (type pdf)
 <use logos/../../results/figures/boundary_plots/mv_top10_gross.pdf>
 Package pdftex.def Info: logos/../../results/figures/boundary_plots/mv_top10_gross.pdf  used on input line 138.
 (pdftex.def)             Requested size: 443.0pt x 308.34323pt.
-<logos/../../results/figures/sparsity_analysis/es_assets.pdf, id=1177, 773.3988pt x 286.99861pt>
+<logos/../../results/figures/sparsity_analysis/es_assets.pdf, id=1226, 773.3988pt x 286.99861pt>
 File: logos/../../results/figures/sparsity_analysis/es_assets.pdf Graphic file (type pdf)
 <use logos/../../results/figures/sparsity_analysis/es_assets.pdf>
 Package pdftex.def Info: logos/../../results/figures/sparsity_analysis/es_assets.pdf  used on input line 188.
 (pdftex.def)             Requested size: 443.0pt x 164.3923pt.
 
 
-[49
+[51
 pdfTeX warning (ext4): destination with the same identifier (name{figure.D.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -1891,7 +1933,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.D.2}) ha
 l.191 \end{figure}
                    <./logos/../../results/figures/boundary_plots/mv_top10_dinf.pdf>]
 
-[50
+[52
 pdfTeX warning (ext4): destination with the same identifier (name{figure.D.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -1902,41 +1944,41 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.D.5}) h
                                                   \__shipout_drop_firstpage_...
 l.195 R
        egularization stabilizes the weight vector conditional on the penalty... <./logos/../../results/figures/boundary_plots/mv_top10_gross.pdf> <./logos/../../results/figures/sparsity_analysis/es_assets.pdf>]
-<logos/../../results/figures/sparsity_analysis/mv_assets.pdf, id=1233, 773.3988pt x 286.99861pt>
+<logos/../../results/figures/sparsity_analysis/mv_assets.pdf, id=1282, 773.3988pt x 286.99861pt>
 File: logos/../../results/figures/sparsity_analysis/mv_assets.pdf Graphic file (type pdf)
 <use logos/../../results/figures/sparsity_analysis/mv_assets.pdf>
 Package pdftex.def Info: logos/../../results/figures/sparsity_analysis/mv_assets.pdf  used on input line 208.
 (pdftex.def)             Requested size: 443.0pt x 164.3923pt.
 
 
-Package natbib Warning: Citation `DeMiguel et al. 2009' on page 51 undefined on input line 219.
+Package natbib Warning: Citation `DeMiguel et al. 2009' on page 53 undefined on input line 219.
 
 )
 
-[51
+[53
 pdfTeX warning (ext4): destination with the same identifier (name{figure.D.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.210 \backmatter
                   <./logos/../../results/figures/sparsity_analysis/mv_assets.pdf>]
 
-[52
+[54
 pdfTeX warning (ext4): destination with the same identifier (name{table.D.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.210 \backmatter
                  ] (./thesis.bbl
 
-[53
+[55
 
 
 ])
-<declaration-originality.pdf, id=1262, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=1310, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 215.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=1264, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=1312, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 215.
@@ -1947,7 +1989,7 @@ Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 
 (pdftex.def)             Requested size: 597.57834pt x 845.1138pt.
 
 
-[54]
+[56]
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 215.
@@ -1962,7 +2004,7 @@ File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 215.
 (pdftex.def)             Requested size: 597.57834pt x 845.1138pt.
-[55
+[57
 
  <./declaration-originality.pdf>]
 \tf@thm=\write6
@@ -1985,21 +2027,21 @@ L3 programming layer <2020/03/25>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 8ABB55FF86CC21F433E6EA09AAC965B1;12449.
+(rerunfilecheck)             Checksum: 2158623B60EFB132D5CF3BECAA64E65E;12860.
  ) 
 Here is how much of TeX's memory you used:
- 40928 strings out of 473190
- 792219 string characters out of 5715800
- 1471936 words of memory out of 5000000
- 62692 multiletter control sequences out of 15000+600000
+ 40965 strings out of 473190
+ 793864 string characters out of 5715800
+ 1491609 words of memory out of 5000000
+ 62722 multiletter control sequences out of 15000+600000
  738152 words of font info for 370 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,19n,125p,1440b,2201s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (60 pages, 2179334 bytes).
+Output written on thesis.pdf (62 pages, 2585501 bytes).
 PDF statistics:
- 1516 PDF objects out of 1728 (max. 8388607)
- 1089 compressed objects within 11 object streams
- 220 named destinations out of 1000 (max. 500000)
- 101529 words of extra memory for PDF output out of 106986 (max. 10000000)
+ 1567 PDF objects out of 1728 (max. 8388607)
+ 1125 compressed objects within 12 object streams
+ 227 named destinations out of 1000 (max. 500000)
+ 101552 words of extra memory for PDF output out of 106986 (max. 10000000)
 
