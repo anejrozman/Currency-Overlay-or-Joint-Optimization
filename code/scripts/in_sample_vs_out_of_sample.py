@@ -36,6 +36,7 @@ import logging
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 import pandas as pd
 
@@ -68,6 +69,9 @@ MEASURE_LABELS = {
 # One marker per universe the currency-count arm runs on, so the two arms stay
 # distinguishable where they meet at the same currency share.
 CURRENCY_MARKERS = {50: "s", 10: "D"}
+CURRENCY_LABELS = {50: "Top-50 universe, reduced K", 10: "Top-10 universe, reduced K"}
+# Cells solved but left off the figure; (universe, K).
+PLOT_EXCLUDE = {(10, 3)}
 
 
 def _sorted(rows: list[dict], by: list[str]) -> pd.DataFrame:
@@ -329,11 +333,12 @@ def plot(summary: pd.DataFrame, stem: Path) -> None:
         part = summary[summary["measure"] == measure]
         line = part[part["arm"] == "grid"].sort_values("s")
         arm = part[part["arm"] == "currency"].sort_values("s")
+        arm = arm[
+            ~arm.apply(lambda c: (c["universe"], c["n_curr"]) in PLOT_EXCLUDE, axis=1)
+        ]
         for col, (color, label) in styles.items():
             if not line.empty:
-                ax.plot(
-                    line["s"], line[f"{col}_mean"], marker="o", color=color, label=label, zorder=3
-                )
+                ax.plot(line["s"], line[f"{col}_mean"], marker="o", color=color, zorder=3)
                 ax.fill_between(
                     line["s"], line[f"{col}_lo"], line[f"{col}_hi"], color=color, alpha=0.2, lw=0
                 )
@@ -363,7 +368,18 @@ def plot(summary: pd.DataFrame, stem: Path) -> None:
         ax.grid(True, alpha=0.3)
 
     axes[0].set_ylabel("Mean (joint - overlay) / overlay")
-    axes[0].legend(fontsize=8, loc="lower left")
+    handles = [
+        Line2D([], [], color=color, marker="o", label=label)
+        for color, label in styles.values()
+    ]
+    handles += [
+        Line2D([], [], color="dimgrey", marker="o", ls="none", label="Full currency block (K=14)")
+    ]
+    handles += [
+        Line2D([], [], color="dimgrey", marker=CURRENCY_MARKERS[u], ls="none", label=CURRENCY_LABELS[u])
+        for u in CURRENCY_MARKERS
+    ]
+    axes[0].legend(handles=handles, fontsize=7, loc="lower left", framealpha=0.9)
     fig.suptitle(
         "Joint vs overlay optimization across risk measures and "
         "increasing investable universe sizes",
