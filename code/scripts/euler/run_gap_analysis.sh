@@ -42,6 +42,8 @@
 #   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
 #   --mem-per-cpu SIZE   Memory per CPU (default: 4G for shuffle, 8G otherwise)
 #   --log-level LEVEL    DEBUG|INFO|WARNING (passthrough)
+#   --out-dir DIR        Output directory (passthrough).  Give concurrent jobs
+#                        distinct directories; the default is shared.
 
 set -euo pipefail
 
@@ -66,6 +68,7 @@ Usage:
   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
   --mem-per-cpu SIZE   Memory per CPU (default: 4G for shuffle, 8G otherwise)
   --log-level LEVEL    DEBUG|INFO|WARNING (passthrough)
+  --out-dir DIR        Output directory (passthrough); use distinct dirs to run jobs concurrently
 USAGE
     exit 1
 }
@@ -78,6 +81,7 @@ while [[ $# -gt 0 ]]; do
         --cpus)          CPUS="$2"; shift 2 ;;
         --mem-per-cpu)   MEM_PER_CPU="$2"; shift 2 ;;
         --log-level)     PASSTHROUGH+=("--log-level" "$2"); shift 2 ;;
+        --out-dir)       PASSTHROUGH+=("--out-dir" "$2"); shift 2 ;;
         -h|--help)       usage ;;
         *)               echo "Error: unknown argument '$1'"; usage ;;
     esac
