@@ -355,4 +355,47 @@ List of results interpretations to write up
 \end{figure}
 
 
+\newpage
 \section{The Effects of Universe Size on Portfolio Performance}
+
+Motivation and hypothesis: When analyzing the results of the backtests, we see that the performance of the joint optimization approaches deteriorates as the universe size increases. The hypothesis for this is that
+the joint approach must estimate the asset-currency dependance structure directly, while overlay avoids this with sequentially optimizing the weigths, which is a form of dimensionality reduction and 
+should improve the performance in a higher dimensional setting. So the joint optimization should have an edge in a smaller dimensional setting since it 
+can capture this dependence structure, but in a lerger dimensional setting, the estimation error would cause it to lose this edge. 
+
+
+Analysis structure and expectation: To test this hypothesis, we analyze the relationship between the share of currency exposure in the portfolio (same as dimensionality) and the gap in the target risk measure attained between the in-sample and out-of-sample optimization.  
+
+We calculate the mean of $$ g^{in sample, risk measure} = (f^{joint, in sample, risk measure} - f^{overlay, in sample, risk measure}) $$ and $$ g^{out of sample, risk measure} = (f^{joint, out of sample, risk measure} - f^{overlay, out of sample, risk measure}) $$ for each universe size and each optimization approach. 
+
+In the gap calculation, both $f^{in sample}$ and $f^{out of sample}$ are the same
+risk measure evaluated on the combined portfolio return. The
+weights are fit on the estimation window, scored on that window to give
+$f^{in sample}$, and scored on the following quarter to give $f^{out of sample}$. In total we have 91 rebalance dates in our backtest (Quarterly from 2000-06-30 to 2022-12-30). We report the mean and we we bootstrap the 95\% confidence interval for the mean of the gap. If $g$ is negative that means the joint optimization attains a lower risk measure score. The unregularized version of the optimizers is used since the relevant comparison is between the joint and overlay optimization (I could change this). 
+
+We define the currency share as $$ s = \frac{K}{K + 14N}$$ where K is the number of tradable currencies and N the number of assets in an economy. 
+
+The bootstrappind to get the confidence interval is done by taking the 91 dates and resampling the series $g_t$ with replacement 10000 times. Then the 2.5th and 97.5th percentiles are computed and visualized as the confidence interval. We resample blocks of time instead of individual dates (A block of 14 to 16 quarterly rebalances for the in-sample and 1 to 3 for the out of sample). This is done to account for the fact that the $g_t$ series is autocorrelated, and resampling individual dates would not give a good estimate of the confidence interval.
+
+We and additional analysis to check if the currency share $s$ could be attributed to the degradation in performance of the joint optimization. We 
+hold the top 50 asse universe and cut the number of currencies that are tradable to $K = 10$ and $K = 6$. We also hold the top 10 assset universe and cut the number of currencies that are tradable to $K = 10$ and $K = 6$ and $K=2$. This gives us an additional five points on the $g$ vs $s$ plot. 
+
+If the hypothesis is correct, we should see that the gap in sample should remain stable across universe sizes, indicating that the joint optimization is able to capture the dependence structure when there is no estimation error, and the out of sample gap should drift towards zero with increasing universe size, indicating that the joint optimization is losing its edge. 
+
+
+
+
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf}
+  \caption{The effect of currency share on the gap between in-sample and out-of-sample performance.}
+  \label{fig:gap-vs-currency-share}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:gap-vs-currency-share} shows the relationship between the share of currency exposure in the portfolio and the gap between in-sample and out-of-sample performance.
+  \end{minipage} 
+\end{figure}
+
+Interpreting results:

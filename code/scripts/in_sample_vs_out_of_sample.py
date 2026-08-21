@@ -11,23 +11,19 @@ resamples, block length by Politis-White), alongside the fraction of dates with 
 
 Pooled per measure, the relative gap is regressed on the currency share
 s = K / (K + 14 * top_N) with block-bootstrapped standard errors, turning the collapse
-into one slope.  Two mechanism arms move s without moving the asset count: a
-currency-count arm (top-50 universe intact, tradable overlay block cut to K = 10, 6 by
-economy size) and a shuffle arm (top-10, 20 draws permuting which currency each security
-is hedged with, bucket sizes preserved).  Under --shuffle-mode rehedge the security keeps
-its true local return and its true FX exposure but is hedged with the permuted currency,
-R = R_u + f_perm - e_perm, leaving residual exposure e_true - e_perm: the one-hedge-per-
-security sparsity and the 14-currency block survive, only their alignment with the true
-returns does not.  Under --shuffle-mode label the permutation instead selects which
-forward premium enters R_fh, which moves returns by well under a percent and is retained
-only as a null control.  A supporting table reports each program's realized risk over
-equal weight's, the absolute penalty both pay where their difference does not.
+into one slope.  A currency-count arm then moves s without moving the asset count: the
+asset universe is held intact and the tradable overlay block is cut to the K largest
+economies by constituent count, K = 10, 6 on top-50 and K = 10, 6, 3 on top-10.  Because
+s = K / (K + 14N), top-10 at K = 3 lands on s = 0.021 against the top-50 grid cell's
+0.020 with 140 securities rather than 700, which separates the currency share from the
+asset count.  A supporting table reports each program's realized risk over equal weight's,
+the absolute penalty both pay where their difference does not.
 
 The main 9 cells are read from results/in_sample_analysis/ rather than re-solved.
 
 Usage:
     python code/scripts/in_sample_vs_out_of_sample.py
-    python code/scripts/in_sample_vs_out_of_sample.py --arms grid currency shuffle
+    python code/scripts/in_sample_vs_out_of_sample.py --arms currency
     python code/scripts/in_sample_vs_out_of_sample.py --plot-only
 
 Author: Anej Rozman
@@ -51,7 +47,6 @@ from portfolio_backtest.utils.returns import (
     compute_daily_forward_premium,
     compute_excess_currency_returns,
     compute_fully_hedged_returns,
-    compute_unhedged_returns,
 )
 
 logger = logging.getLogger("in_sample_vs_out_of_sample")
@@ -59,16 +54,25 @@ logger = logging.getLogger("in_sample_vs_out_of_sample")
 MEASURES = ("mv", "es", "mad")
 UNIVERSES = (10, 50, 100)
 N_CURRENCIES = 14
-CURRENCY_COUNTS = (10, 6)
-CURRENCY_UNIVERSE = 50
-SHUFFLE_UNIVERSE = 10
-SHUFFLE_DRAWS = 20
+CURRENCY_ARM = {50: (10, 6), 10: (10, 6, 3)}
 N_BOOT = 10000
 SEED = 0
 
 SRC_DIR = config.RESULTS_DIR / "in_sample_analysis"
 OUT_DIR = config.RESULTS_DIR / "in_sample_vs_out_of_sample"
-MEASURE_LABELS = {"es": "ES(80%)", "mv": "Volatility", "mad": "MAD"}
+MEASURE_LABELS = {
+    "es": "Expected Shortfall",
+    "mv": "Volatility",
+    "mad": "Mean Absolute Deviation",
+}
+# One marker per universe the currency-count arm runs on, so the two arms stay
+# distinguishable where they meet at the same currency share.
+CURRENCY_MARKERS = {50: "s", 10: "D"}
+
+
+def _sorted(rows: list[dict], by: list[str]) -> pd.DataFrame:
+    frame = pd.DataFrame(rows)
+    return frame.sort_values(by).reset_index(drop=True) if not frame.empty else frame
 
 
 def currency_share(top_n: int, n_curr: int = N_CURRENCIES) -> float:
@@ -93,7 +97,7 @@ def _pair(rows: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
     return paired
 
 
-def _load(universe: int, rng: np.random.Generator | None = None, mode: str = "label"):
+def _load(universe: int):
     path = config.RAW_DIR / config.UNIVERSE_FILES[universe]
     R_local = load_csv(config.PROCESSED_DIR / config.LOCAL_RETURNS_FILE)
     R_local = R_local.where(R_local.abs() < config.RETURN_FILTER_BACKTEST)
@@ -102,24 +106,8 @@ def _load(universe: int, rng: np.random.Generator | None = None, mode: str = "la
         load_csv(config.PROCESSED_DIR / config.FWD_PREMIUMS_3M_FILE), config.TENOR_DAYS_3M
     )
     atc = build_asset_to_currency(path)
-    perm = atc
-    if rng is not None:
-        keys = list(atc)
-        values = [atc[k] for k in keys]
-        rng.shuffle(values)
-        perm = dict(zip(keys, values))
     R_c = compute_excess_currency_returns(e, f_daily)
-    if rng is not None and mode == "rehedge":
-        R_u = compute_unhedged_returns(R_local, e, f_daily, atc)
-        cols = [c for c in R_u.columns if c in perm]
-        idx = R_u.index.intersection(e.index).intersection(f_daily.index)
-        swap = pd.DataFrame(
-            {c: f_daily.loc[idx, perm[c]].to_numpy() - e.loc[idx, perm[c]].to_numpy() for c in cols},
-            index=idx,
-        )
-        R_fh = R_u.loc[idx, cols] + swap
-    else:
-        R_fh = compute_fully_hedged_returns(R_local, e, f_daily, perm)
+    R_fh = compute_fully_hedged_returns(R_local, e, f_daily, atc)
     R_fh = R_fh[[c for c in R_fh.columns if c in atc]]
     common = R_fh.index.intersection(R_c.index)
     return R_fh.loc[common], R_c.loc[common], isa._build_universe_mask(path, common), atc
@@ -185,44 +173,25 @@ def grid_arm() -> pd.DataFrame:
 
 
 def currency_arm(solver) -> pd.DataFrame:
-    R_fh, R_c, mask, atc = _load(CURRENCY_UNIVERSE)
-    windows = isa._rebalancing_windows(R_fh, mask, STRATEGY_REGISTRY["mv_joint"]["config"])
-    order = [c for c in pd.Series(list(atc.values())).value_counts().index if c in R_c.columns]
-
     frames = []
-    for n_curr in CURRENCY_COUNTS:
-        keep = order[:n_curr]
-        if "USD" not in keep:
-            keep = ["USD"] + order[: n_curr - 1]
-        logger.info("Currency arm K=%d: %s", n_curr, keep)
-        for measure in MEASURES:
-            rows = _sweep(measure, R_fh, R_c[keep], windows, solver)
-            paired = _pair(rows.dropna(subset=["in_sample_risk", "realized_risk"]), ["date"])
-            paired["measure"] = measure
-            paired["universe"] = CURRENCY_UNIVERSE
-            paired["n_curr"] = n_curr
-            paired["arm"] = "currency"
-            paired["draw"] = 0
-            frames.append(paired)
-    return pd.concat(frames, ignore_index=True)
-
-
-def shuffle_arm(solver, mode: str = "label") -> pd.DataFrame:
-    frames = []
-    for draw in range(SHUFFLE_DRAWS):
-        rng = np.random.default_rng(SEED + draw)
-        R_fh, R_c, mask, _ = _load(SHUFFLE_UNIVERSE, rng=rng, mode=mode)
+    for universe, counts in CURRENCY_ARM.items():
+        R_fh, R_c, mask, atc = _load(universe)
         windows = isa._rebalancing_windows(R_fh, mask, STRATEGY_REGISTRY["mv_joint"]["config"])
-        logger.info("Shuffle draw %d/%d", draw + 1, SHUFFLE_DRAWS)
-        for measure in MEASURES:
-            rows = _sweep(measure, R_fh, R_c, windows, solver)
-            paired = _pair(rows.dropna(subset=["in_sample_risk", "realized_risk"]), ["date"])
-            paired["measure"] = measure
-            paired["universe"] = SHUFFLE_UNIVERSE
-            paired["n_curr"] = N_CURRENCIES
-            paired["arm"] = f"shuffle_{mode}"
-            paired["draw"] = draw
-            frames.append(paired)
+        order = [c for c in pd.Series(list(atc.values())).value_counts().index if c in R_c.columns]
+        for n_curr in counts:
+            keep = order[:n_curr]
+            if "USD" not in keep:
+                keep = ["USD"] + order[: n_curr - 1]
+            logger.info("Currency arm top-%d K=%d: %s", universe, n_curr, keep)
+            for measure in MEASURES:
+                rows = _sweep(measure, R_fh, R_c[keep], windows, solver)
+                paired = _pair(rows.dropna(subset=["in_sample_risk", "realized_risk"]), ["date"])
+                paired["measure"] = measure
+                paired["universe"] = universe
+                paired["n_curr"] = n_curr
+                paired["arm"] = "currency"
+                paired["draw"] = 0
+                frames.append(paired)
     return pd.concat(frames, ignore_index=True)
 
 
@@ -300,7 +269,7 @@ def summarise(gaps: pd.DataFrame) -> pd.DataFrame:
                 row[f"{col}_block"] = block
             row[f"frac_neg_{side}"] = float((part[f"gap_{side}"] < 0).mean())
         rows.append(row)
-    return pd.DataFrame(rows).sort_values(["measure", "arm", "s", "draw"]).reset_index(drop=True)
+    return _sorted(rows, ["measure", "arm", "s", "draw"])
 
 
 def regressions(grid: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
@@ -349,10 +318,10 @@ def overfitting_table(grid: pd.DataFrame) -> pd.DataFrame:
             row[f"{tag}_overfit_lo"] = lo
             row[f"{tag}_overfit_hi"] = hi
         rows.append(row)
-    return pd.DataFrame(rows).sort_values(["measure", "universe"]).reset_index(drop=True)
+    return _sorted(rows, ["measure", "universe"])
 
 
-def plot(summary: pd.DataFrame, reg: pd.DataFrame, stem: Path) -> None:
+def plot(summary: pd.DataFrame, stem: Path) -> None:
     fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), sharex=True, sharey=True)
     styles = {"gap_in_rel": ("C0", "In-sample"), "gap_out_rel": ("C3", "Out-of-sample")}
 
@@ -360,7 +329,6 @@ def plot(summary: pd.DataFrame, reg: pd.DataFrame, stem: Path) -> None:
         part = summary[summary["measure"] == measure]
         line = part[part["arm"] == "grid"].sort_values("s")
         arm = part[part["arm"] == "currency"].sort_values("s")
-        shuffled = part[part["arm"].str.startswith("shuffle")]
         for col, (color, label) in styles.items():
             if not line.empty:
                 ax.plot(
@@ -369,15 +337,18 @@ def plot(summary: pd.DataFrame, reg: pd.DataFrame, stem: Path) -> None:
                 ax.fill_between(
                     line["s"], line[f"{col}_lo"], line[f"{col}_hi"], color=color, alpha=0.2, lw=0
                 )
-            if not arm.empty:
+            for universe, marker in CURRENCY_MARKERS.items():
+                cells = arm[arm["universe"] == universe]
+                if cells.empty:
+                    continue
                 ax.errorbar(
-                    arm["s"],
-                    arm[f"{col}_mean"],
+                    cells["s"],
+                    cells[f"{col}_mean"],
                     yerr=[
-                        arm[f"{col}_mean"] - arm[f"{col}_lo"],
-                        arm[f"{col}_hi"] - arm[f"{col}_mean"],
+                        cells[f"{col}_mean"] - cells[f"{col}_lo"],
+                        cells[f"{col}_hi"] - cells[f"{col}_mean"],
                     ],
-                    fmt="s",
+                    fmt=marker,
                     ms=6,
                     color=color,
                     ecolor=color,
@@ -385,32 +356,18 @@ def plot(summary: pd.DataFrame, reg: pd.DataFrame, stem: Path) -> None:
                     capsize=2.5,
                     zorder=4,
                 )
-            if not shuffled.empty:
-                ax.scatter(
-                    shuffled["s"],
-                    shuffled[f"{col}_mean"],
-                    marker="o",
-                    s=70,
-                    facecolors="none",
-                    edgecolors=color,
-                    linewidths=1.0,
-                    alpha=0.8,
-                    zorder=5,
-                )
-        slope = reg[(reg["measure"] == measure) & (reg["outcome"] == "gap_out_rel")]
-        subtitle = f"  (slope {slope['slope'].iloc[0]:.3f})" if not slope.empty else ""
         ax.axhline(0.0, color="grey", lw=1.0, zorder=0)
-        ax.set_title(f"{MEASURE_LABELS[measure]}{subtitle}", fontsize=11)
-        ax.set_xlabel("Currency share  s = K / (K + 14N)")
+        ax.set_title(MEASURE_LABELS[measure], fontsize=11)
+        ax.set_xlabel("Currency share")
         ax.set_xscale("log")
         ax.grid(True, alpha=0.3)
 
     axes[0].set_ylabel("Mean (joint - overlay) / overlay")
     axes[0].legend(fontsize=8, loc="lower left")
     fig.suptitle(
-        "The joint-over-overlay ceiling against the currency share of the decision vector\n"
-        "circles: top-10/50/100 grid   squares: currency-count arm   hollow: shuffled labels",
-        fontsize=11,
+        "Joint vs overlay optimization across risk measures and "
+        "increasing investable universe sizes",
+        fontsize=12,
     )
     fig.tight_layout()
     for ext in ("pdf", "png"):
@@ -424,9 +381,8 @@ def _parse_args() -> argparse.Namespace:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "--arms", nargs="+", default=["grid", "currency"], choices=["grid", "currency", "shuffle"]
+        "--arms", nargs="+", default=["grid", "currency"], choices=["grid", "currency"]
     )
-    parser.add_argument("--shuffle-mode", default="label", choices=["label", "rehedge"])
     parser.add_argument("--out-dir", type=Path, default=OUT_DIR)
     parser.add_argument("--plot-only", action="store_true")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING"])
@@ -447,22 +403,24 @@ def main() -> None:
         gaps = pd.read_csv(gaps_path, parse_dates=["date"])
     else:
         solver = isa._pick_solver()[0]
-        builders = {
-            "grid": grid_arm,
-            "currency": lambda: currency_arm(solver),
-            "shuffle": lambda: shuffle_arm(solver, args.shuffle_mode),
-        }
+        builders = {"grid": grid_arm, "currency": lambda: currency_arm(solver)}
         gaps = pd.concat([builders[arm]() for arm in args.arms], ignore_index=True)
         if gaps_path.exists():
-            replaced = {f"shuffle_{args.shuffle_mode}" if a == "shuffle" else a for a in args.arms}
             old = pd.read_csv(gaps_path, parse_dates=["date"])
-            gaps = pd.concat([old[~old["arm"].isin(replaced)], gaps], ignore_index=True)
+            gaps = pd.concat([old[~old["arm"].isin(args.arms)], gaps], ignore_index=True)
         gaps.to_csv(gaps_path, index=False)
         logger.info("Wrote %d rows to %s", len(gaps), gaps_path)
 
     gaps["s"] = [currency_share(u, k) for u, k in zip(gaps["universe"], gaps["n_curr"])]
     summary = summarise(gaps)
     grid = gaps[gaps["arm"] == "grid"]
+    if grid.empty:
+        logger.warning(
+            "No 'grid' rows in %s, so the regression and overfitting tables are empty. "
+            "They are built from the 9 main cells; merge this arm into the shared gaps.csv "
+            "and rerun with --plot-only to get them.",
+            gaps_path,
+        )
     reg = regressions(grid)
     overfit = overfitting_table(grid)
 
@@ -470,7 +428,7 @@ def main() -> None:
         table.to_csv(args.out_dir / f"{name}.csv", index=False)
         logger.info("Wrote %s", args.out_dir / f"{name}.csv")
 
-    plot(summary, reg, args.out_dir / "gap_vs_currency_share")
+    plot(summary, args.out_dir / "gap_vs_currency_share")
     print(summary.to_string(index=False))
     print()
     print(reg.to_string(index=False))
