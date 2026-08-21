@@ -9,15 +9,18 @@ risk, and once on the following quarter's holding window, giving the realized
 risk.  Two questions follow from those two numbers:
 
   * noise  — whether estimation error is large for each program on its own, and
-    whether it grows with the number of assets.  Top panel: the overfitting
-    ratio, that program's realized / in-sample risk divided by 1/N's realized /
-    in-sample risk on the same two windows, one line per program, reference at
+    whether it grows with the number of assets.  This is what the figure shows:
+    one panel per risk measure, each carrying the mean overfitting ratio of the
+    two programs, that program's realized / in-sample risk divided by 1/N's on
+    the same two windows, with circular block bootstrap bands and a reference at
     1.0.  The two lines are the same diagnostic run twice, not a comparison
     between the programs — each is read against 1.0 on its own.
   * ceiling — how much lower the joint program's risk is than the overlay's, and
-    whether its in-sample advantage survives out of sample.  Bottom panel: the
-    single comparison between them, median (overlay - joint) / overlay, drawn
-    once from in-sample risk and once from realized risk.
+    whether its in-sample advantage survives out of sample.  The per-measure
+    summary CSV still carries it as median (overlay - joint) / overlay on both
+    windows; the figure devoted to it now lives in in_sample_vs_out_of_sample.py,
+    which measures the same gap with intervals and a regression on the currency
+    share.
 
 Design choices, each of which the measurement depends on:
 
@@ -64,7 +67,10 @@ Design choices, each of which the measurement depends on:
 
 One row is written per date, strategy, universe and leverage cap; nothing is
 aggregated into the row-level CSV.  Aggregation happens only in the plotting
-step, which reads those CSVs back and also writes the medians behind the figure.
+step, which reads those CSVs back and writes both the per-measure medians and
+overfitting_means.csv, the means and intervals behind the figure.  The figure
+spans all three risk measures, so it is drawn from every CSV present in the
+output directory rather than from the measure this invocation swept.
 
 Usage:
     python code/scripts/in_sample_analysis.py es
@@ -88,6 +94,7 @@ import pandas as pd
 from portfolio_backtest import config
 from portfolio_backtest.backtest.backtester import Backtester
 from portfolio_backtest.strategy_registry import STRATEGY_REGISTRY
+from portfolio_backtest.utils.bootstrap import block_bootstrap_mean
 from portfolio_backtest.utils.io import build_asset_to_currency, load_csv
 from portfolio_backtest.utils.returns import (
     compute_daily_forward_premium,
@@ -97,7 +104,7 @@ from portfolio_backtest.utils.returns import (
 
 logger = logging.getLogger("in_sample_analysis")
 
-MEASURES = ("es", "mv", "mad")
+MEASURES = ("mv", "es", "mad")
 ROLES = ("joint", "overlay")
 UNIVERSE_SIZES = (10, 50, 100)
 
@@ -117,11 +124,13 @@ CONTROL_LEVERAGE_LABEL = "none"
 
 OUT_DIR = config.RESULTS_DIR / "in_sample_analysis"
 
-MEASURE_LABELS = {"es": "ES(80%)", "mv": "volatility", "mad": "MAD"}
+MEASURE_LABELS = {
+    "es": "Expected Shortfall",
+    "mv": "Volatility",
+    "mad": "Mean Absolute Deviation",
+}
 ROLE_LABELS = {"joint": "Joint", "overlay": "Overlay", CONTROL_STRATEGY: "1/N control"}
-ROLE_COLORS = {"joint": "C0", "overlay": "C1", CONTROL_STRATEGY: "dimgrey"}
-SIDE_LABELS = {"in_sample": "In-sample", "realized": "Realized"}
-SIDE_COLORS = {"in_sample": "C2", "realized": "C3"}
+ROLE_COLORS = {"joint": "C0", "overlay": "C3", CONTROL_STRATEGY: "dimgrey"}
 
 ROW_COLUMNS = [
     "measure",
@@ -516,6 +525,64 @@ def _load_rows(out_dir: Path, measure: str) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
+def _load_all_rows(out_dir: Path) -> pd.DataFrame:
+    """Row-level CSVs for every measure that has been swept so far."""
+    frames = []
+    for measure in MEASURES:
+        paths = sorted(out_dir.glob(f"in_sample_{measure}_top*.csv"))
+        frames += [pd.read_csv(path, parse_dates=["date"]) for path in paths]
+    if not frames:
+        raise FileNotFoundError(f"No row-level CSVs in {out_dir}. Run the sweep before plotting.")
+    return pd.concat(frames, ignore_index=True)
+
+
+def _overfit_stats(rows: pd.DataFrame) -> pd.DataFrame:
+    """
+    Mean overfitting ratio per measure, universe and program, with a circular
+    block bootstrap interval.
+
+    The ratio is formed date by date — the optimizer's realized / in-sample risk
+    divided by 1/N's on the same two windows — before any averaging, so the
+    window effect the control measures is removed per date rather than on
+    average.  The mean is right-skewed at the larger universes, where a few
+    quarters carry ratios above seven, which is what the interval exposes.
+    """
+    clean = rows.dropna(subset=["in_sample_risk", "realized_risk"])
+    clean = clean[clean["in_sample_risk"] > 0]
+    ratios = clean.assign(ratio=clean["realized_risk"] / clean["in_sample_risk"])
+
+    control = ratios[ratios["strategy"] == CONTROL_STRATEGY][
+        ["measure", "universe", "date", "ratio"]
+    ].rename(columns={"ratio": "control_ratio"})
+    optimized = ratios[ratios["strategy"] != CONTROL_STRATEGY].merge(
+        control, on=["measure", "universe", "date"], how="inner"
+    )
+    optimized = optimized[optimized["control_ratio"] > 0]
+    optimized["overfit"] = optimized["ratio"] / optimized["control_ratio"]
+
+    out = []
+    keys = ["measure", "universe", "leverage_label", "strategy"]
+    for (measure, universe, leverage_label, strategy), part in optimized.groupby(keys):
+        mean, lo, hi, se, block = block_bootstrap_mean(
+            part.sort_values("date")["overfit"].to_numpy()
+        )
+        out.append(
+            {
+                "measure": measure,
+                "universe": universe,
+                "leverage_label": leverage_label,
+                "strategy": strategy,
+                "mean": mean,
+                "ci_lo": lo,
+                "ci_hi": hi,
+                "se": se,
+                "block": block,
+                "n_dates": len(part),
+            }
+        )
+    return pd.DataFrame(out).sort_values(keys).reset_index(drop=True)
+
+
 def _aggregate(rows: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Three aggregates, all formed date by date before any median is taken.
@@ -629,23 +696,6 @@ def _summary_table(
     return wide[ordered].sort_values(["leverage_label", "universe"]).reset_index(drop=True)
 
 
-def _ratio_axis_limits(values: list[float], reference: float = 1.0) -> tuple[float, float]:
-    """
-    Limits for the ratio panel, whose axis starts at the reference line so that
-    the excess of realized over in-sample risk is read straight off the floor.
-
-    A median below the reference pushes the floor down to include it: MV at
-    top-10 sits at 0.93, and an axis anchored at 1.0 would drop that point off
-    the figure entirely rather than report it.
-    """
-    if not values:
-        return reference, reference + 0.1
-    lo, hi = min(values), max(values)
-    span = max(hi, reference) - min(lo, reference)
-    pad = 0.08 * span if span > 0 else 0.05 * max(abs(reference), 1.0)
-    return (reference if lo >= reference else lo - pad), max(hi, reference) + pad
-
-
 def _pad_to_reference(ax, reference: float) -> None:
     """
     Keep a reference line clearly inside the axes.
@@ -669,103 +719,61 @@ def _save(fig: plt.Figure, stem: Path) -> None:
     plt.close(fig)
 
 
-def plot_panels(
-    measure: str,
-    overfit_median: pd.DataFrame,
-    gap_median: pd.DataFrame,
+def plot_overfitting(
+    overfit_stats: pd.DataFrame,
     leverages: dict[str, float],
     stem: Path,
     leverage_label: str = "production",
 ) -> None:
     """
-    Two panels on a shared universe-size axis, two lines each.
+    One panel per risk measure, sharing a universe-size axis: the mean
+    overfitting ratio of each program, its realized / in-sample risk divided by
+    1/N's on the same two windows, with circular block bootstrap bands.
 
-    Top: each optimizer's overfitting ratio — its own realized / in-sample risk
-    divided by 1/N's on the same two windows.  The same diagnostic run once per
-    optimizer rather than a comparison between them, so the two lines are read
-    separately, each against 1.0.
-
-    Bottom: the one comparison between them, (overlay - joint) / overlay, drawn
-    from in-sample risk and from realized risk.
-
-    One leverage cap is drawn, the production one by default.  The second cap is
-    a control for the figure's own conclusion — the l1 cap is an implicit penalty
-    that tightens as the number of weights grows, so it could produce a
-    universe-size trend by itself — and that check belongs in the summary CSV,
-    which carries both caps, rather than as extra lines here.
+    The two lines are the same diagnostic run once per program rather than a
+    comparison between them; each is read against 1.0, where 1.0 means the
+    program's risk estimate degrades no worse than 1/N's does.
     """
-    overfit_median = overfit_median[overfit_median["leverage_label"] == leverage_label]
-    gap_median = gap_median[gap_median["leverage_label"] == leverage_label]
+    overfit_stats = overfit_stats[overfit_stats["leverage_label"] == leverage_label]
+    fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), sharex=True, sharey=True)
 
-    # The x-axis always carries all three universe sizes as discrete points, even
-    # before every sweep has landed, so a partial figure is read against the same
-    # frame as the finished one instead of silently rescaling.
-    universes = sorted(
-        set(UNIVERSE_SIZES) | set(overfit_median["universe"]) | set(gap_median["universe"])
-    )
+    universes = sorted(set(UNIVERSE_SIZES) | set(overfit_stats["universe"]))
     positions = {u: i for i, u in enumerate(universes)}
 
-    fig, (ax_top, ax_bottom) = plt.subplots(2, 1, figsize=(8, 8), sharex=True)
-    ratio_values: list[float] = []
+    for ax, measure in zip(axes, MEASURES):
+        part = overfit_stats[overfit_stats["measure"] == measure]
+        for role in ROLES:
+            cells = part[part["strategy"] == role].sort_values("universe")
+            if cells.empty:
+                continue
+            xs = [positions[u] for u in cells["universe"]]
+            ax.plot(
+                xs, cells["mean"], marker="o", color=ROLE_COLORS[role], label=ROLE_LABELS[role],
+                zorder=3,
+            )
+            ax.fill_between(
+                xs, cells["ci_lo"], cells["ci_hi"], color=ROLE_COLORS[role], alpha=0.2, lw=0
+            )
+        ax.axhline(1.0, color="grey", linewidth=1.0, zorder=0)
+        ax.set_title(MEASURE_LABELS[measure], fontsize=11)
+        ax.set_xlabel("Top-N stocks per economy")
+        ax.set_xticks(list(positions.values()))
+        ax.set_xticklabels([str(u) for u in universes])
+        ax.set_xlim(-0.35, len(universes) - 0.65)
+        ax.grid(True, alpha=0.3)
 
-    for role in ROLES:
-        part = overfit_median[overfit_median["strategy"] == role].sort_values("universe")
-        if part.empty:
-            continue
-        ratio_values.extend(part["median"].tolist())
-        ax_top.plot(
-            [positions[u] for u in part["universe"]],
-            part["median"],
-            marker="o",
-            color=ROLE_COLORS[role],
-            label=ROLE_LABELS[role],
-        )
-
-    gap_part = gap_median.sort_values("universe")
-    for side in ("in_sample", "realized"):
-        if gap_part.empty:
-            continue
-        ax_bottom.plot(
-            [positions[u] for u in gap_part["universe"]],
-            gap_part[f"gap_{side}"],
-            marker="o",
-            color=SIDE_COLORS[side],
-            label=SIDE_LABELS[side],
-        )
-
-    measure_label = MEASURE_LABELS[measure]
-    ax_top.axhline(1.0, color="grey", linewidth=1.0, zorder=0)
-    ax_top.set_ylim(*_ratio_axis_limits(ratio_values))
-    ax_top.set_ylabel(f"Median overfitting ratio, {measure_label} (strategy / 1/N)")
-    ax_top.set_title(
-        f"Estimation error: {measure_label} degradation relative to 1/N", fontsize=11
-    )
-    ax_top.grid(True, alpha=0.3)
-    ax_top.legend(fontsize=8, loc="best")
-
-    ax_bottom.axhline(0.0, color="grey", linewidth=1.0, zorder=0)
-    _pad_to_reference(ax_bottom, 0.0)
-    ax_bottom.set_ylabel("Median (overlay - joint) / overlay")
-    ax_bottom.set_xlabel("Top-N stocks per economy")
-    ax_bottom.set_title(f"Joint over overlay: relative {measure_label} gap", fontsize=11)
-    ax_bottom.set_xticks(list(positions.values()))
-    ax_bottom.set_xticklabels([str(u) for u in universes])
-    ax_bottom.set_xlim(-0.35, len(universes) - 0.65)
-    ax_bottom.grid(True, alpha=0.3)
-    ax_bottom.legend(fontsize=8, loc="best")
-
+    _pad_to_reference(axes[0], 1.0)
+    axes[0].set_ylabel("Mean overfitting ratio")
+    axes[0].legend(fontsize=8, loc="upper left")
     cap = leverages.get(leverage_label)
-    cap_note = f"leverage cap {cap:g}" if cap is not None else f"leverage {leverage_label}"
+    logger.info("Drawing overfitting panels at leverage cap %s", cap)
     fig.suptitle(
-        f"Unregularized {measure.upper()} joint and overlay: overfitting and the "
-        f"joint-over-overlay gap ({cap_note})",
+        "Out of sample degradation analysis of joint and overlay optimization "
+        "across risk measures and increasing universe sizes",
         fontsize=12,
     )
     fig.tight_layout()
     _save(fig, stem)
-
-
-# Entry point
 
 
 def _parse_args() -> argparse.Namespace:
@@ -858,7 +866,14 @@ def main() -> None:
     logger.info("Wrote plot medians to %s", summary_path)
     print(summary.to_string(index=False))
 
-    plot_panels(measure, overfit_median, gap_median, leverages, out_dir / f"in_sample_{measure}")
+    # The figure spans all three measures, so it is built from every CSV on disk
+    # rather than from this run's measure alone.
+    overfit_stats = _overfit_stats(_load_all_rows(out_dir))
+    stats_path = out_dir / "overfitting_means.csv"
+    overfit_stats.to_csv(stats_path, index=False)
+    logger.info("Wrote overfitting means to %s", stats_path)
+    print(overfit_stats.to_string(index=False))
+    plot_overfitting(overfit_stats, leverages, out_dir / "overfitting_by_measure")
 
 
 if __name__ == "__main__":
