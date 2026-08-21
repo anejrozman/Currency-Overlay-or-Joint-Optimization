@@ -53,6 +53,7 @@ from portfolio_backtest.utils.returns import (
 logger = logging.getLogger("in_sample_vs_out_of_sample")
 
 MEASURES = ("mv", "es", "mad")
+FAMILIES = ("unregularized", "regularized")
 UNIVERSES = (10, 50, 100)
 N_CURRENCIES = 14
 CURRENCY_ARM = {50: (10, 6), 10: (10, 6, 3)}
@@ -81,6 +82,53 @@ def _sorted(rows: list[dict], by: list[str]) -> pd.DataFrame:
 
 def currency_share(top_n: int, n_curr: int = N_CURRENCIES) -> float:
     return n_curr / (n_curr + N_CURRENCIES * top_n)
+
+
+def _resolve_strategies(measure: str, family: str) -> dict[str, str]:
+    want_reg = family == "regularized"
+    resolved = {}
+    for role in ("joint", "overlay"):
+        parts = {measure, role}
+        matches = [
+            name
+            for name in STRATEGY_REGISTRY
+            if ("reg" in name.split("_")) == want_reg and parts.issubset(set(name.split("_")))
+        ]
+        if len(matches) != 1:
+            raise ValueError(
+                f"Expected exactly one {family} {measure} {role} strategy, found {matches}."
+            )
+        resolved[role] = matches[0]
+    return resolved
+
+
+def _top_run(strategy: str, universe: int) -> int:
+    table = pd.read_csv(config.RUNS_DIR / "top_runs.csv")
+    table.columns = [c.strip() for c in table.columns]
+    table["strategy_name"] = table["strategy_name"].astype(str).str.strip()
+    row = table[table["strategy_name"] == strategy]
+    if row.empty:
+        raise ValueError(f"{strategy} has no entry in top_runs.csv.")
+    return int(row[f"top_{universe}_run"].iloc[0])
+
+
+def _hyperparams(strategy: str, universe: int, family: str) -> dict:
+    """
+    Per-date hyperparameters, keyed by rebalancing date.
+
+    The unregularized programs declare no penalties, so their production grid is a
+    singleton and one dict serves every date.  The regularized programs select
+    penalties by validation at each date over a 256-point grid, which is far too
+    large to re-search here; we reuse the selections the production backtest made
+    and recorded, so the diagnostic scores the weights production actually held.
+    """
+    if family == "unregularized":
+        return isa._fixed_hyperparams(strategy)
+    path = config.RUNS_DIR / strategy / f"run_{_top_run(strategy, universe)}" / "selected_params.csv"
+    chosen = pd.read_csv(path, parse_dates=["date"])
+    drop = {"date", "n_assets", "val_score"}
+    keys = [c for c in chosen.columns if c not in drop]
+    return {row["date"]: {k: row[k] for k in keys} for row in chosen.to_dict("records")}
 
 
 def _pair(rows: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
@@ -117,23 +165,35 @@ def _load(universe: int):
     return R_fh.loc[common], R_c.loc[common], isa._build_universe_mask(path, common), atc
 
 
-def _sweep(measure: str, R_fh, R_c, windows, solver) -> pd.DataFrame:
-    names = dict(isa._resolve_strategies(measure))
-    fixed = {role: isa._fixed_hyperparams(name) for role, name in names.items()}
+def _sweep(measure, R_fh, R_c, windows, solver, family, universe) -> pd.DataFrame:
+    names = _resolve_strategies(measure, family)
+    tables = {role: _hyperparams(name, universe, family) for role, name in names.items()}
     names["equal_weight"] = isa.CONTROL_STRATEGY_KEY
-    fixed["equal_weight"] = {k: v for k, v in fixed["joint"].items() if k == "alpha"}
 
     rows = []
     for i, window in enumerate(windows, start=1):
+        date = window["date"]
+        try:
+            chosen = {
+                role: (table if family == "unregularized" else table[date])
+                for role, table in tables.items()
+            }
+        except KeyError:
+            raise ValueError(
+                f"{family} {measure}: no production hyperparameters recorded for {date.date()}. "
+                f"The diagnostic and the production run must share rebalancing dates."
+            ) from None
+        chosen["equal_weight"] = {k: v for k, v in chosen["joint"].items() if k == "alpha"}
+
         assets = window["assets"]
         R_fh_est = R_fh.loc[window["estimation_start"] : window["estimation_end"], assets]
         R_c_est = R_c.loc[window["estimation_start"] : window["estimation_end"]]
         R_fh_hold = R_fh.loc[window["holding_start"] : window["holding_end"], assets].fillna(0.0)
         R_c_hold = R_c.loc[window["holding_start"] : window["holding_end"]].fillna(0.0)
-        logger.debug("[%d/%d] %s: %d assets", i, len(windows), window["date"].date(), len(assets))
+        logger.debug("[%d/%d] %s: %d assets", i, len(windows), date.date(), len(assets))
 
         for role, name in names.items():
-            params = {**fixed[role], "solver": solver}
+            params = {**chosen[role], "solver": solver}
             alpha = params.get("alpha")
             try:
                 x, psi = isa._solve_weights(
@@ -142,11 +202,11 @@ def _sweep(measure: str, R_fh, R_c, windows, solver) -> pd.DataFrame:
                 f_in = isa.evaluate_risk(measure, R_fh_est, R_c_est, x, psi, alpha)
                 f_out = isa.evaluate_risk(measure, R_fh_hold, R_c_hold, x, psi, alpha)
             except (RuntimeError, ValueError) as exc:
-                logger.warning("%s %s %s failed: %s", measure, window["date"].date(), role, exc)
+                logger.warning("%s %s %s failed: %s", measure, date.date(), role, exc)
                 f_in = f_out = float("nan")
             rows.append(
                 {
-                    "date": window["date"],
+                    "date": date,
                     "strategy": role,
                     "n_assets": len(assets),
                     "in_sample_risk": f_in,
@@ -156,17 +216,29 @@ def _sweep(measure: str, R_fh, R_c, windows, solver) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def grid_arm() -> pd.DataFrame:
+def grid_arm(solver, family: str) -> pd.DataFrame:
+    """
+    The 9 main cells.  The unregularized ones were already solved and scored by
+    in_sample_analysis.py, so they are read back rather than recomputed; the
+    regularized ones have no such cache and are solved here.
+    """
     frames = []
     for measure in MEASURES:
         for universe in UNIVERSES:
-            path = SRC_DIR / f"in_sample_{measure}_top{universe}.csv"
-            if not path.exists():
-                logger.warning("Missing %s; skipping.", path)
-                continue
-            rows = pd.read_csv(path, parse_dates=["date"])
-            rows = rows.dropna(subset=["in_sample_risk", "realized_risk"])
-            paired = _pair(rows, ["date"])
+            if family == "unregularized":
+                path = SRC_DIR / f"in_sample_{measure}_top{universe}.csv"
+                if not path.exists():
+                    logger.warning("Missing %s; skipping.", path)
+                    continue
+                rows = pd.read_csv(path, parse_dates=["date"])
+            else:
+                logger.info("Grid %s top-%d %s", family, universe, measure)
+                R_fh, R_c, mask, _ = _load(universe)
+                windows = isa._rebalancing_windows(
+                    R_fh, mask, STRATEGY_REGISTRY["mv_joint"]["config"]
+                )
+                rows = _sweep(measure, R_fh, R_c, windows, solver, family, universe)
+            paired = _pair(rows.dropna(subset=["in_sample_risk", "realized_risk"]), ["date"])
             paired["measure"] = measure
             paired["universe"] = universe
             paired["n_curr"] = N_CURRENCIES
@@ -176,7 +248,13 @@ def grid_arm() -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
-def currency_arm(solver) -> pd.DataFrame:
+def currency_arm(solver, family: str) -> pd.DataFrame:
+    """
+    Tradable overlay block cut to the K largest economies by constituent count,
+    with the asset universe left intact.  Regularized cells reuse the penalties
+    production selected on the full K = 14 problem, which is an approximation:
+    those penalties were not chosen for a reduced currency block.
+    """
     frames = []
     for universe, counts in CURRENCY_ARM.items():
         R_fh, R_c, mask, atc = _load(universe)
@@ -186,9 +264,9 @@ def currency_arm(solver) -> pd.DataFrame:
             keep = order[:n_curr]
             if "USD" not in keep:
                 keep = ["USD"] + order[: n_curr - 1]
-            logger.info("Currency arm top-%d K=%d: %s", universe, n_curr, keep)
+            logger.info("Currency arm %s top-%d K=%d: %s", family, universe, n_curr, keep)
             for measure in MEASURES:
-                rows = _sweep(measure, R_fh, R_c[keep], windows, solver)
+                rows = _sweep(measure, R_fh, R_c[keep], windows, solver, family, universe)
                 paired = _pair(rows.dropna(subset=["in_sample_risk", "realized_risk"]), ["date"])
                 paired["measure"] = measure
                 paired["universe"] = universe
@@ -249,10 +327,11 @@ def block_bootstrap_mean(x: np.ndarray, seed: int = SEED) -> tuple[float, float,
 
 def summarise(gaps: pd.DataFrame) -> pd.DataFrame:
     rows = []
-    for (measure, universe, n_curr, arm, draw), part in gaps.groupby(
-        ["measure", "universe", "n_curr", "arm", "draw"]
+    for (family, measure, universe, n_curr, arm, draw), part in gaps.groupby(
+        ["family", "measure", "universe", "n_curr", "arm", "draw"]
     ):
         row = {
+            "family": family,
             "measure": measure,
             "universe": universe,
             "n_curr": n_curr,
@@ -273,12 +352,12 @@ def summarise(gaps: pd.DataFrame) -> pd.DataFrame:
                 row[f"{col}_block"] = block
             row[f"frac_neg_{side}"] = float((part[f"gap_{side}"] < 0).mean())
         rows.append(row)
-    return _sorted(rows, ["measure", "arm", "s", "draw"])
+    return _sorted(rows, ["family", "measure", "arm", "s", "draw"])
 
 
 def regressions(grid: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
     rows = []
-    for measure, part in grid.groupby("measure"):
+    for (family, measure), part in grid.groupby(["family", "measure"]):
         cells = {u: cell.set_index("date") for u, cell in part.groupby("universe")}
         universes = sorted(cells)
         dates = sorted(set.intersection(*(set(cells[u].index) for u in universes)))
@@ -290,6 +369,7 @@ def regressions(grid: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
             slope, lo, hi, se, block = block_bootstrap_mean(Y @ contrast / denom, seed)
             rows.append(
                 {
+                    "family": family,
                     "measure": measure,
                     "outcome": col,
                     "slope": slope,
@@ -308,8 +388,8 @@ def regressions(grid: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
 def overfitting_table(grid: pd.DataFrame) -> pd.DataFrame:
     part = grid[(grid["out_ew"] > 0) & (grid["in_ew"] > 0)]
     rows = []
-    for (measure, universe), cell in part.groupby(["measure", "universe"]):
-        row = {"measure": measure, "universe": universe, "n_dates": len(cell)}
+    for (family, measure, universe), cell in part.groupby(["family", "measure", "universe"]):
+        row = {"family": family, "measure": measure, "universe": universe, "n_dates": len(cell)}
         ew_decay = (cell["out_ew"] / cell["in_ew"]).to_numpy()
         for tag in ("joint", "overlay"):
             mean, lo, hi, _, _ = block_bootstrap_mean((cell[f"out_{tag}"] / cell["out_ew"]).to_numpy())
@@ -322,10 +402,13 @@ def overfitting_table(grid: pd.DataFrame) -> pd.DataFrame:
             row[f"{tag}_overfit_lo"] = lo
             row[f"{tag}_overfit_hi"] = hi
         rows.append(row)
-    return _sorted(rows, ["measure", "universe"])
+    return _sorted(rows, ["family", "measure", "universe"])
 
 
-def plot(summary: pd.DataFrame, stem: Path) -> None:
+def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
+    summary = summary[summary["family"] == family]
+    if summary.empty:
+        return
     fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), sharex=True, sharey=True)
     styles = {"gap_in_rel": ("C0", "In-sample"), "gap_out_rel": ("C3", "Out-of-sample")}
 
@@ -380,9 +463,10 @@ def plot(summary: pd.DataFrame, stem: Path) -> None:
         for u in CURRENCY_MARKERS
     ]
     axes[0].legend(handles=handles, fontsize=7, loc="lower left", framealpha=0.9)
+    qualifier = "" if family == "unregularized" else f" ({family} programs)"
     fig.suptitle(
         "Joint vs overlay optimization across risk measures and "
-        "increasing investable universe sizes",
+        f"increasing investable universe sizes{qualifier}",
         fontsize=12,
     )
     fig.tight_layout()
@@ -399,6 +483,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--arms", nargs="+", default=["grid", "currency"], choices=["grid", "currency"]
     )
+    parser.add_argument("--family", default="unregularized", choices=list(FAMILIES))
     parser.add_argument("--out-dir", type=Path, default=OUT_DIR)
     parser.add_argument("--plot-only", action="store_true")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING"])
@@ -417,13 +502,22 @@ def main() -> None:
 
     if args.plot_only:
         gaps = pd.read_csv(gaps_path, parse_dates=["date"])
+        if "family" not in gaps.columns:
+            gaps["family"] = "unregularized"
     else:
         solver = isa._pick_solver()[0]
-        builders = {"grid": grid_arm, "currency": lambda: currency_arm(solver)}
+        builders = {
+            "grid": lambda: grid_arm(solver, args.family),
+            "currency": lambda: currency_arm(solver, args.family),
+        }
         gaps = pd.concat([builders[arm]() for arm in args.arms], ignore_index=True)
+        gaps["family"] = args.family
         if gaps_path.exists():
             old = pd.read_csv(gaps_path, parse_dates=["date"])
-            gaps = pd.concat([old[~old["arm"].isin(args.arms)], gaps], ignore_index=True)
+            if "family" not in old.columns:
+                old["family"] = "unregularized"
+            stale = (old["family"] == args.family) & old["arm"].isin(args.arms)
+            gaps = pd.concat([old[~stale], gaps], ignore_index=True)
         gaps.to_csv(gaps_path, index=False)
         logger.info("Wrote %d rows to %s", len(gaps), gaps_path)
 
@@ -444,7 +538,9 @@ def main() -> None:
         table.to_csv(args.out_dir / f"{name}.csv", index=False)
         logger.info("Wrote %s", args.out_dir / f"{name}.csv")
 
-    plot(summary, args.out_dir / "gap_vs_currency_share")
+    for family in sorted(gaps["family"].unique()):
+        suffix = "" if family == "unregularized" else f"_{family}"
+        plot(summary, args.out_dir / f"gap_vs_currency_share{suffix}", family)
     print(summary.to_string(index=False))
     print()
     print(reg.to_string(index=False))

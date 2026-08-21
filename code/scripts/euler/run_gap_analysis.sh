@@ -24,6 +24,7 @@
 #
 # Options:
 #   --arm NAME           Arm to run: currency or grid (default: currency)
+#   --family NAME        unregularized or regularized (default: unregularized)
 #   --time HH:MM:SS      SLURM time limit (default: 24:00:00, max 720:00:00)
 #   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
 #   --mem-per-cpu SIZE   Memory per CPU (default: 8G)
@@ -35,6 +36,7 @@
 set -euo pipefail
 
 ARM="currency"
+FAMILY="unregularized"
 TIME_LIMIT="24:00:00"
 CPUS=4
 MEM_PER_CPU=""
@@ -50,6 +52,7 @@ Usage:
   ./run_gap_analysis.sh [--arm <currency|grid>] [options]
 
   --arm NAME           Arm to run: currency or grid (default: currency)
+  --family NAME        unregularized or regularized (default: unregularized)
   --time HH:MM:SS      SLURM time limit (default: 24:00:00, max 720:00:00)
   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
   --mem-per-cpu SIZE   Memory per CPU (default: 8G)
@@ -62,6 +65,7 @@ USAGE
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --arm)           ARM="$2"; shift 2 ;;
+        --family)        FAMILY="$2"; shift 2 ;;
         --time)          TIME_LIMIT="$2"; shift 2 ;;
         --cpus)          CPUS="$2"; shift 2 ;;
         --mem-per-cpu)   MEM_PER_CPU="$2"; shift 2 ;;
@@ -75,6 +79,11 @@ done
 case "$ARM" in
     currency|grid) ;;
     *) echo "Error: --arm must be currency or grid."; exit 1 ;;
+esac
+
+case "$FAMILY" in
+    unregularized|regularized) ;;
+    *) echo "Error: --family must be unregularized or regularized."; exit 1 ;;
 esac
 
 if [[ ! "$TIME_LIMIT" =~ ^([0-9]+):([0-5][0-9]):([0-5][0-9])$ ]]; then
@@ -111,8 +120,8 @@ if [[ -n "$OUT_DIR" ]]; then
     PASSTHROUGH+=("--out-dir" "$OUT_DIR")
 fi
 
-JOB_NAME="gap_${ARM}"
-ARM_ARGS="--arms ${ARM}"
+JOB_NAME="gap_${ARM}_${FAMILY}"
+ARM_ARGS="--arms ${ARM} --family ${FAMILY}"
 
 echo "Submitting: ${JOB_NAME}  (time=${TIME_LIMIT}, cpus=${CPUS}, mem-per-cpu=${MEM_PER_CPU})"
 
