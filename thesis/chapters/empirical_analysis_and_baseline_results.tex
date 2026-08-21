@@ -409,7 +409,17 @@ THe out-of-sample results are the same for all three risk measures. The out-of-s
 
 The additional analysis with the reduced number of currencies is consistent with the main analysis. The out-of-sample gap drifts towards zero with increasing currency share, indicating that the joint optimization is losing its edge. This tells us that the benefits of joint optimization go away as the investment universe expands, and that the currency share (could) is an important factor. 
 
-TODO: Include the figure from the in sample analysis folder here
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_analysis/overfitting_by_measure.pdf}
+  \caption{The effect of universe size on the in-sample and out-of-sample performance gap for different risk measures.}
+  \label{fig:overfitting-by-measure}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    TODO
+  \end{minipage} 
+\end{figure}
 
 We can see in figure [TODO] that both optimization approaches degrade out of sample as the universe size increases, and by the same amount. Measured against the equally
 weighted portfolio over the same period, the ratio of realized risk to
