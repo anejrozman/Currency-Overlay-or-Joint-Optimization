@@ -36,6 +36,10 @@ from portfolio_backtest.backtest_config import (
     REG_OVERLAY_CONFIG,
     REG_SMV_ASSET_FULL_CONFIG,
     REG_SMV_ASSET_ZERO_CONFIG,
+    REG_SMV_JOINT_CONFIG,
+    REG_SMV_OVERLAY_CONFIG,
+    SMV_JOINT_CONFIG,
+    SMV_OVERLAY_CONFIG,
 )
 from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
@@ -59,6 +63,10 @@ from portfolio_backtest.optimizers import (
     RegularizedMeanVarianceJointOptimizer,
     RegularizedSemiVarianceAssetFullOptimizer,
     RegularizedSemiVarianceAssetZeroOptimizer,
+    RegularizedSemiVarianceCurrencyOverlayOptimizer,
+    SemiVarianceCurrencyOverlayOptimizer,
+    RegularizedSemiVarianceJointOptimizer,
+    SemiVarianceJointOptimizer,
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
@@ -224,5 +232,33 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "ASSETS-ZERO SMV",
         "use_hedging":      False,
         "config":           REG_SMV_ASSET_ZERO_CONFIG,
+    },
+    "smv_curr_overlay": {
+        "optimizer":        SemiVarianceCurrencyOverlayOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "SMV Currency Overlay",
+        "use_hedging":      True,
+        "config":           SMV_OVERLAY_CONFIG,
+    },
+    "reg_smv_curr_overlay": {
+        "optimizer":        RegularizedSemiVarianceCurrencyOverlayOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Regularized SMV Currency Overlay",
+        "use_hedging":      True,
+        "config":           REG_SMV_OVERLAY_CONFIG,
+    },
+    "smv_joint": {
+        "optimizer":        SemiVarianceJointOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "SMV Joint",
+        "use_hedging":      True,
+        "config":           SMV_JOINT_CONFIG,
+    },
+    "reg_smv_joint": {
+        "optimizer":        RegularizedSemiVarianceJointOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Regularized SMV Joint",
+        "use_hedging":      True,
+        "config":           REG_SMV_JOINT_CONFIG,
     },
 }

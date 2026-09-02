@@ -133,6 +133,30 @@ LAMBDA_L2_MAD_CURR_GRID = [0.0, 2.5e-3, 2.5e-2, 2.5e-1]
 LAMBDA_L1_SMV_ASSET_GRID = [0.0, 1e-6, 1e-5, 1e-4]
 LAMBDA_L2_SMV_ASSET_GRID = [0.0, 5e-5, 1.5e-3, 5e-2]
 
+# Currency-block SMV penalty grids, for the mean-free overlay. psi carries no budget
+# or leverage constraint, so L1 extinguishes it outright while L2 shrinks it smoothly
+# — the same asymmetry as the ES, MV and MAD currency grids, at SMV's own scale.
+# Calibrated by sweeping each penalty alone (asset penalties held at zero) on the same
+# five top-10 estimation windows as the asset grids, where unpenalized gross psi is
+# 1.09 - 1.87 across 13 non-base currencies.
+#
+# L1 halves the overlay by 3.2e-8 - 3.2e-7, leaves 2% of it by 3.2e-6 - 1.0e-5, and
+# zeroes it outright (gross psi = 0, no currency active) by 5.6e-6 - 1.8e-5; the bound
+# sits just past the latest of those. The onset is bracketed: at 1e-9 the overlay still
+# retains 97.6% - 99.2% of its unpenalized gross in every window.
+#
+# L2 never zeroes the overlay, so the bound is set where it is economically spent
+# rather than where it stops moving, the same criterion as LAMBDA_L2_MV_CURR_GRID and
+# LAMBDA_L2_MAD_CURR_GRID. It reaches 2% of unpenalized gross by 3.2e-4 - 1.0e-3 in
+# every window and 0.5% by 1.8e-3 - 5.6e-3. Unlike L1 its onset is NOT bracketed by
+# the sweep: at the smallest lambda swept, 1e-7, the overlay is already down to
+# 0.47 - 0.75 of unpenalized gross, so it halves at or below 1e-7 and the first grid
+# point is placed there rather than at a measured halving point. (Counts of "active"
+# currencies fall at large L2 only because individual weights drop below the 1e-6
+# tolerance once the whole overlay is spent; L2 produces no true sparsity.)
+LAMBDA_L1_SMV_CURR_GRID = [0.0, 2.5e-7, 2.5e-6, 2.5e-5]
+LAMBDA_L2_SMV_CURR_GRID = [0.0, 1e-7, 1e-5, 1e-3]
+
 
 # Fixed
 LEVERAGE = [2.0]
@@ -284,6 +308,76 @@ REG_SMV_ASSET_FULL_CONFIG = BacktestConfig(
 # asset_return_key split), so it reuses the same config object rather than a copy:
 # a single object cannot drift out of sync the way the two MV copies above could.
 REG_SMV_ASSET_ZERO_CONFIG = REG_SMV_ASSET_FULL_CONFIG
+
+# SMV overlay. The unregularized program has no penalties, so its grid is the
+# leverage cap alone, exactly as MV_OVERLAY_CONFIG and MAD_OVERLAY_CONFIG.
+SMV_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "leverage_limit": LEVERAGE,
+    },
+)
+
+# The regularized SMV joint program reuses the asset and currency SMV grids, as the ES,
+# MV and MAD joint configs reuse theirs. Both blocks were calibrated on the asset-level
+# and overlay programs, so the joint program was swept on its own to verify the bands
+# sit inside those bounds — the same check REG_MV_JOINT_CONFIG records, run here on the
+# five top-10 windows with each penalty swept alone and the other three at zero.
+# Unpenalized, the joint program has gross x of 1.72 - 2.00 (101-131 names active) and
+# gross psi of 1.42 - 2.10 across 13 non-base currencies.
+#
+#   L1 on x   pins the solution at the long-only budget corner by 1.0e-5 - 1.8e-5
+#             (bound 1e-4)
+#   L2 on x   reaches the equal-weight floor, within 1% of 1/N, by 1.0e-2 - 1.8e-2
+#             (bound 5e-2)
+#   L1 on psi zeroes the overlay outright by 5.6e-6 - 1.8e-5   (bound 2.5e-5)
+#   L2 on psi leaves 2% of unpenalized gross psi by 3.2e-4 - 1.0e-3  (bound 1e-3)
+#
+# The first three sit comfortably inside their bounds. L2 on psi does not: its band tops
+# out at 1.0e-3, exactly the grid bound, so the bound is sufficient rather than generous.
+# If the validation search selects that endpoint on a large share of rebalancing dates
+# the bound wants extending, as happened with LAMBDA_L2_CURR_GRID above.
+REG_SMV_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_SMV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SMV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SMV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SMV_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+    },
+)
+
+# The unregularized SMV joint program has no penalties, so its grid is the leverage
+# cap alone, exactly as MV_JOINT_CONFIG and MAD_JOINT_CONFIG.
+SMV_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "leverage_limit": LEVERAGE,
+    },
+)
+
+# The regularized overlay reuses the calibrated SMV asset grids for the asset block
+# and the SMV currency grids for the overlay block, as the ES, MV and MAD overlay
+# configs reuse theirs.
+REG_SMV_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_SMV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SMV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SMV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SMV_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+    },
+)
 
 MV_OVERLAY_CONFIG = BacktestConfig(
     window_years=10,
