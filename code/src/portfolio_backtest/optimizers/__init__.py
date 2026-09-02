@@ -21,6 +21,7 @@ from .mv_joint import MeanVarianceJointOptimizer
 from .reg_mv_curr_overlay import RegularizedMeanVarianceCurrencyOverlayOptimizer
 from .reg_mv_joint import RegularizedMeanVarianceJointOptimizer
 from .reg_smv_asset_full import RegularizedSemiVarianceAssetFullOptimizer
+from .reg_smv_asset_zero import RegularizedSemiVarianceAssetZeroOptimizer
 
 __all__ = [
     "BaseOptimizer",
@@ -44,4 +45,5 @@ __all__ = [
     "RegularizedMeanVarianceCurrencyOverlayOptimizer",
     "RegularizedMeanVarianceJointOptimizer",
     "RegularizedSemiVarianceAssetFullOptimizer",
+    "RegularizedSemiVarianceAssetZeroOptimizer",
 ]

@@ -279,6 +279,12 @@ REG_SMV_ASSET_FULL_CONFIG = BacktestConfig(
     },
 )
 
+# ASSETS-ZERO solves exactly the same asset problem as ASSETS-FULL on R_fh and
+# differs only at realization (unhedged, via the backtester's training_return_key /
+# asset_return_key split), so it reuses the same config object rather than a copy:
+# a single object cannot drift out of sync the way the two MV copies above could.
+REG_SMV_ASSET_ZERO_CONFIG = REG_SMV_ASSET_FULL_CONFIG
+
 MV_OVERLAY_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,
