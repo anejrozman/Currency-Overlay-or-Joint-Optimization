@@ -34,6 +34,7 @@ from portfolio_backtest.backtest_config import (
     REG_MV_JOINT_CONFIG,
     REG_MV_OVERLAY_CONFIG,
     REG_OVERLAY_CONFIG,
+    REG_SMV_ASSET_FULL_CONFIG,
 )
 from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
@@ -55,6 +56,7 @@ from portfolio_backtest.optimizers import (
     RegularizedMeanVarianceAssetZeroOptimizer,
     RegularizedMeanVarianceCurrencyOverlayOptimizer,
     RegularizedMeanVarianceJointOptimizer,
+    RegularizedSemiVarianceAssetFullOptimizer,
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
@@ -202,5 +204,12 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "Regularized MV Joint",
         "use_hedging":      True,
         "config":           REG_MV_JOINT_CONFIG,
+    },
+    "reg_smv_asset_full": {
+        "optimizer":        RegularizedSemiVarianceAssetFullOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "ASSETS-FULL SMV",
+        "use_hedging":      True,
+        "config":           REG_SMV_ASSET_FULL_CONFIG,
     },
 }
