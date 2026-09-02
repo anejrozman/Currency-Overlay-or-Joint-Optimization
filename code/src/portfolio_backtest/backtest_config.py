@@ -98,6 +98,42 @@ LAMBDA_L1_MAD_CURR_GRID = [0.0, 1.5e-5, 1.5e-4, 1.5e-3]
 LAMBDA_L2_MAD_CURR_GRID = [0.0, 2.5e-3, 2.5e-2, 2.5e-1]
 
 
+# Asset-level semi-variance penalty grids, for the mean-free (minimum-semi-variance)
+# asset problem. The SMV risk term is the smallest of the four measures: 9.3e-6 - 1.1e-5
+# at the unpenalized optimum, against MV variance ~2.0e-5, MAD ~3.1e-3 and ES_80 ~5.7e-3
+# on the same windows. It runs at almost exactly half the MV term, as it must for a
+# near-symmetric sample, so the MV grids are within a factor of two of biting correctly
+# but are not reused: the term is estimated at its own scale and calibrated here. It is
+# stable across regimes (9.34e-6 to 1.11e-5, an 18% spread), so one grid serves the whole
+# sample. Bounds were calibrated by sweeping each penalty alone over nine decades (L1,
+# 1e-9 to 1e-1) and eight decades (L2, 1e-7 to 1e1) at four points per decade, on five
+# real estimation windows of the top-10 universe (1990-2000 through 2012-2021,
+# T = 2609-2610, N = 101-131).
+#
+# Note that gross exposure is confined to [1, 2] here: the budget constraint sum(x) = 1
+# floors it and the leverage cap tops it. Neither penalty can drive it to zero the way
+# the unconstrained overlay grids can, so the progress measure below is the share of the
+# excess gross above 1 that the penalty spends, not gross itself.
+#
+# L1 saturates at a corner. It spends 10% of the excess gross by 3.2e-7 - 1.8e-6, half by
+# 1.8e-6 - 3.2e-6 and 98% by 1.0e-5 - 3.2e-5; from 3.2e-5 - 1.0e-4 on the solution is
+# pinned at the long-only budget corner, gross = 1.00000000 exactly in every window, with
+# the active count down from 101-127 names to 29-49. Past the 1e-4 bound d_inf never
+# exceeds 8.1e-5. As with MAD, d_inf alone does not locate the lower end: the unpenalized
+# optimum has ties the penalty breaks at lambdas far below where gross moves, so gross and
+# the active count identify the onset and d_inf only confirms the upper bound.
+#
+# L2 decays smoothly and never corners. It kills no names at any lambda — the active count
+# never falls below its unpenalized value in any window — and instead pulls the weights
+# toward equal weight. Gross reaches the budget floor by 1.8e-3 - 5.6e-3, and ||x||^2 comes
+# within 1% of the equal-weight floor 1/N by 1.0e-2 - 3.2e-2 (within 0.1% by 3.2e-2 - 1.0e-1).
+# Unlike LAMBDA_L2_MAD_ASSET_GRID, where the floor is only approached, it is attained here
+# to five decimals, so the bound is set just past the latest window's 1% crossing. The
+# interior point is the log-centre of the two ends.
+LAMBDA_L1_SMV_ASSET_GRID = [0.0, 1e-6, 1e-5, 1e-4]
+LAMBDA_L2_SMV_ASSET_GRID = [0.0, 5e-5, 1.5e-3, 5e-2]
+
+
 # Fixed
 LEVERAGE = [2.0]
 ALPHA = [0.80]
@@ -228,6 +264,26 @@ REG_MAD_ASSET_FULL_CONFIG = BacktestConfig(
 # asset_return_key split), so it reuses the same config object rather than a copy:
 # a single object cannot drift out of sync the way the two MV copies above could.
 REG_MAD_ASSET_ZERO_CONFIG = REG_MAD_ASSET_FULL_CONFIG
+
+# SMV asset-full. Same mean-free structure, window and rebalancing frequency as the ES, MV
+# and MAD asset problems so the four risk measures stay directly comparable; only the
+# penalty grids differ, since the SMV risk term is on its own scale.
+REG_SMV_ASSET_FULL_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1":      LAMBDA_L1_SMV_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_SMV_ASSET_GRID,
+        "leverage_limit": LEVERAGE,
+    },
+)
+
+# ASSETS-ZERO solves exactly the same asset problem as ASSETS-FULL on R_fh and
+# differs only at realization (unhedged, via the backtester's training_return_key /
+# asset_return_key split), so it reuses the same config object rather than a copy:
+# a single object cannot drift out of sync the way the two MV copies above could.
+REG_SMV_ASSET_ZERO_CONFIG = REG_SMV_ASSET_FULL_CONFIG
 
 MV_OVERLAY_CONFIG = BacktestConfig(
     window_years=10,
