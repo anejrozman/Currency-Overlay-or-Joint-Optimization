@@ -16,6 +16,7 @@ skipped.
 Usage:
     python results/sparsity_analysis.py es
     python results/sparsity_analysis.py mv
+    python results/sparsity_analysis.py mad
 
 Author: Anej Rozman
 """
@@ -63,8 +64,9 @@ GRID_COLOR: str = "#d9d8d4"
 LEGEND_FACE_COLOR: str = "#ffffff"
 
 MEASURE_TITLES: dict[str, str] = {
-    "es": "Expected Shortfall",
-    "mv": "Mean-Variance",
+    "es":  "Expected Shortfall",
+    "mv":  "Mean-Variance",
+    "mad": "Mean Absolute Deviation",
 }
 
 # Keyed by universe size rather than panel position, so a universe added later
