@@ -10,6 +10,7 @@ Usage:
     python results/generate_boundary_plots.py es
     python results/generate_boundary_plots.py mv
     python results/generate_boundary_plots.py mad
+    python results/generate_boundary_plots.py smv
 
 Author: Anej Rozman
 """
@@ -60,6 +61,7 @@ MEASURE_TITLES: dict[str, str] = {
     "es":  "Expected Shortfall",
     "mv":  "Mean-Variance",
     "mad": "Mean Absolute Deviation",
+    "smv": "Semi-Variance",
 }
 
 # Panel order: asset block on the top row, currency block on the bottom row.

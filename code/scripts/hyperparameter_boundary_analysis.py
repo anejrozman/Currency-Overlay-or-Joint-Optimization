@@ -14,6 +14,7 @@ Usage:
     python code/scripts/hyperparameter_boundary_analysis.py es
     python code/scripts/hyperparameter_boundary_analysis.py mv
     python code/scripts/hyperparameter_boundary_analysis.py mad
+    python code/scripts/hyperparameter_boundary_analysis.py smv
 """
 
 from __future__ import annotations
@@ -48,7 +49,7 @@ DECADES_ABOVE = 2
 SEED = 0
 BASE_CURRENCY = "USD"
 
-MEASURES = ("es", "mv", "mad")
+MEASURES = ("es", "mv", "mad", "smv")
 ROLES = ("overlay", "joint")
 
 
