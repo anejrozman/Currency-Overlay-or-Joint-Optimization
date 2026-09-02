@@ -19,7 +19,16 @@ s = K / (K + 14N), top-10 at K = 3 lands on s = 0.021 against the top-50 grid ce
 asset count.  A supporting table reports each program's realized risk over equal weight's,
 the absolute penalty both pay where their difference does not.
 
-The main 9 cells are read from results/in_sample_analysis/ rather than re-solved.
+The main cells (one per measure x universe) are read from results/in_sample_analysis/
+rather than re-solved; a measure with no cached in_sample_<measure>_top<N>.csv is
+warned about and skipped.
+
+--family regularized additionally needs, for each measure, a production run of both
+its joint and its overlay strategy plus a row in results/runs/top_runs.csv, because
+the per-date penalties are reused from what production selected rather than
+re-searched over the 256-point grid.  reg_smv_joint and reg_smv_curr_overlay have
+neither yet, so the regularized arm is available for smv only once those cluster
+runs land and their top_runs.csv rows are added.
 
 Usage:
     python code/scripts/in_sample_vs_out_of_sample.py
@@ -53,7 +62,7 @@ from portfolio_backtest.utils.returns import (
 
 logger = logging.getLogger("in_sample_vs_out_of_sample")
 
-MEASURES = ("mv", "es", "mad")
+MEASURES = ("mv", "es", "mad", "smv")
 FAMILIES = ("unregularized", "regularized")
 UNIVERSES = (10, 50, 100)
 N_CURRENCIES = 14
@@ -66,6 +75,7 @@ MEASURE_LABELS = {
     "es": "Expected Shortfall",
     "mv": "Volatility",
     "mad": "Mean Absolute Deviation",
+    "smv": "Semi-Deviation",
 }
 # One marker per universe the currency-count arm runs on, so the two arms stay
 # distinguishable where they meet at the same currency share.
@@ -361,16 +371,23 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
     summary = summary[summary["family"] == family]
     if summary.empty:
         return
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(
+        1, len(MEASURES), figsize=(4.33 * len(MEASURES), 4.4), sharex=True, sharey=True
+    )
     styles = {"gap_in_rel": ("C0", "In-sample"), "gap_out_rel": ("C3", "Out-of-sample")}
 
     for ax, measure in zip(axes, MEASURES):
         part = summary[summary["measure"] == measure]
         line = part[part["arm"] == "grid"].sort_values("s")
         arm = part[part["arm"] == "currency"].sort_values("s")
-        arm = arm[
-            ~arm.apply(lambda c: (c["universe"], c["n_curr"]) in PLOT_EXCLUDE, axis=1)
-        ]
+        # DataFrame.apply(axis=1) on an empty frame returns a DataFrame, not a
+        # boolean Series, and masking with it drops every column -- so a measure
+        # with no currency-arm rows yet (smv, until that arm is run) would fail
+        # on the "universe" lookup below rather than draw an empty panel.
+        if not arm.empty:
+            arm = arm[
+                ~arm.apply(lambda c: (c["universe"], c["n_curr"]) in PLOT_EXCLUDE, axis=1)
+            ]
         for col, (color, label) in styles.items():
             if not line.empty:
                 ax.plot(line["s"], line[f"{col}_mean"], marker="o", color=color, zorder=3)

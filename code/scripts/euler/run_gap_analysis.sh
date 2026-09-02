@@ -5,11 +5,18 @@
 # the cluster is the currency-count arm, which re-solves the joint and overlay
 # programs at every rebalancing date for each tradable-currency count:
 #
-#   currency  top-50 at K = 10, 6 and top-10 at K = 10, 6, 2 (five cells x 3
+#   currency  top-50 at K = 10, 6 and top-10 at K = 10, 6, 2 (five cells x 4
 #             measures x ~91 dates x 2 programs).  The top-50 half dominates the
-#             cost; it took ~13h on a laptop under Clarabel.
-#   grid      the 9 main cells; reads results/in_sample_analysis/ and re-solves
-#             nothing, so it takes seconds and does not need a job at all
+#             cost; it took ~13h on a laptop under Clarabel for the three original
+#             measures.  Adding semi-variance raises the per-date solve cost ~37%
+#             (measured: the mv/es/mad joint+overlay pair costs 5.33s per date at
+#             N=101, smv adds 1.95s), so budget ~18h under Clarabel, less under
+#             Gurobi.  The 24h default still covers it, but not by much.
+#   grid      the main cells, one per measure x universe; reads
+#             results/in_sample_analysis/ and re-solves nothing, so it takes
+#             seconds and does not need a job at all.  A measure with no cached
+#             in_sample_<measure>_top<N>.csv is warned about and skipped, so smv
+#             stays absent until in_sample_analysis.py is run for it.
 #
 # Arms share results/in_sample_vs_out_of_sample/gaps.csv, and each run rewrites
 # that file with its own arm's rows replaced.  Do not run two arms concurrently
@@ -18,6 +25,11 @@
 #
 # The tables and figure are built separately, once the arms have landed:
 #   python code/scripts/in_sample_vs_out_of_sample.py --plot-only
+#
+# --family regularized reuses the penalties each production run selected, read via
+# results/runs/top_runs.csv.  reg_smv_joint and reg_smv_curr_overlay have no
+# production run and no top_runs.csv row yet, so the regularized arm covers smv
+# only once those land.
 #
 # Usage:
 #   ./run_gap_analysis.sh [--arm <currency|grid>] [options]

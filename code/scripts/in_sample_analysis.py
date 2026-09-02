@@ -104,7 +104,7 @@ from portfolio_backtest.utils.returns import (
 
 logger = logging.getLogger("in_sample_analysis")
 
-MEASURES = ("mv", "es", "mad")
+MEASURES = ("mv", "es", "mad", "smv")
 ROLES = ("joint", "overlay")
 UNIVERSE_SIZES = (10, 50, 100)
 
@@ -128,6 +128,7 @@ MEASURE_LABELS = {
     "es": "Expected Shortfall",
     "mv": "Volatility",
     "mad": "Mean Absolute Deviation",
+    "smv": "Semi-Deviation",
 }
 ROLE_LABELS = {"joint": "Joint", "overlay": "Overlay", CONTROL_STRATEGY: "1/N control"}
 ROLE_COLORS = {"joint": "C0", "overlay": "C3", CONTROL_STRATEGY: "dimgrey"}
@@ -340,7 +341,7 @@ def evaluate_risk(
     weights come in fixed.
 
     Args:
-        measure: ``"es"``, ``"mv"`` or ``"mad"``.
+        measure: ``"es"``, ``"mv"``, ``"mad"`` or ``"smv"``.
         R_fh_window: Fully hedged asset returns over the window, columns aligned to *x*.
         R_c_window: Excess currency returns over the window, columns aligned to *psi*.
         x: Asset weights.
@@ -349,8 +350,8 @@ def evaluate_risk(
 
     Returns:
         ES at *alpha* (mean loss over the worst ``1-alpha`` tail), the standard
-        deviation, or the mean absolute deviation about the window's own mean.
-        Lower is better in every case.  NaN on an empty window.
+        deviation, the mean absolute deviation, or the semi-deviation about the
+        window's own mean.  Lower is better in every case.  NaN on an empty window.
     """
     if R_fh_window.empty or R_c_window.empty:
         return float("nan")
@@ -376,6 +377,12 @@ def evaluate_risk(
         return float(np.std(r, ddof=1)) if r.size > 1 else float("nan")
     if measure == "mad":
         return float(np.mean(np.abs(r - r.mean())))
+    if measure == "smv":
+        # Semi-deviation, not semi-variance: same minimizer, but linear in scale
+        # so the ratios stay comparable with the ES, MV and MAD ones, exactly as
+        # the mv branch above returns the standard deviation rather than the variance.
+        downside = np.minimum(r - r.mean(), 0.0)
+        return float(np.sqrt(np.mean(downside ** 2))) if r.size > 1 else float("nan")
     raise ValueError(f"Unknown measure '{measure}'.")
 
 
@@ -735,7 +742,7 @@ def plot_overfitting(
     program's risk estimate degrades no worse than 1/N's does.
     """
     overfit_stats = overfit_stats[overfit_stats["leverage_label"] == leverage_label]
-    fig, axes = plt.subplots(1, 3, figsize=(13, 4.4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(1, len(MEASURES), figsize=(17, 4.4), sharex=True, sharey=True)
 
     universes = sorted(set(UNIVERSE_SIZES) | set(overfit_stats["universe"]))
     positions = {u: i for i, u in enumerate(universes)}
