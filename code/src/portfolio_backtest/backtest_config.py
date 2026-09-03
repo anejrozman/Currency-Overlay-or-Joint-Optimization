@@ -554,3 +554,16 @@ REG_SOES_ASSET_FULL_CONFIG = BacktestConfig(
 # asset_return_key split), so it reuses the same config object rather than a copy,
 # as REG_SMV_ASSET_ZERO_CONFIG does above.
 REG_SOES_ASSET_ZERO_CONFIG = REG_SOES_ASSET_FULL_CONFIG
+
+# Unregularized SOES overlay. Keeps alpha (unlike the mean-free MV/MAD/SMV
+# overlays), exactly as OVERLAY_CONFIG does for ES; the unregularized program has
+# no penalties, so its grid is alpha and the leverage cap alone.
+SOES_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "leverage_limit": LEVERAGE,
+    },
+)
