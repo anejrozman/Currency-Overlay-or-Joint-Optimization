@@ -40,6 +40,7 @@ from portfolio_backtest.backtest_config import (
     REG_SMV_OVERLAY_CONFIG,
     REG_SOES_ASSET_FULL_CONFIG,
     REG_SOES_ASSET_ZERO_CONFIG,
+    REG_SOES_JOINT_CONFIG,
     REG_SOES_OVERLAY_CONFIG,
     SOES_JOINT_CONFIG,
     SOES_OVERLAY_CONFIG,
@@ -69,6 +70,7 @@ from portfolio_backtest.optimizers import (
     RegularizedSecondOrderExpectedShortfallAssetFullOptimizer,
     RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer,
     RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer,
+    RegularizedSecondOrderExpectedShortfallJointOptimizer,
     SecondOrderExpectedShortfallCurrencyOverlayOptimizer,
     SecondOrderExpectedShortfallJointOptimizer,
     RegularizedSemiVarianceAssetFullOptimizer,
@@ -309,5 +311,12 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "SOES Joint",
         "use_hedging":      True,
         "config":           SOES_JOINT_CONFIG,
+    },
+    "reg_soes_joint": {
+        "optimizer":        RegularizedSecondOrderExpectedShortfallJointOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Regularized SOES Joint",
+        "use_hedging":      True,
+        "config":           REG_SOES_JOINT_CONFIG,
     },
 }

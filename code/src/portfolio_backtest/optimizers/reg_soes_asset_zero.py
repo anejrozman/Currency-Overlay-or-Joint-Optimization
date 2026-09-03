@@ -61,8 +61,8 @@ class RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
             hyperparams: Optional dict with keys:
 
                 * ``alpha``          (float) — confidence level, default 0.80
-                * ``lambda_l1``      (float) — L1 penalty weight, default 5e-5
-                * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
+                * ``lambda_l1``      (float) — L1 penalty weight, default 1e-2
+                * ``lambda_l2``      (float) — L2 penalty weight, default 1.0
                 * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
                 * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI``
                                                (``cp.CLARABEL`` when gurobipy is unavailable)
@@ -71,8 +71,8 @@ class RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
         # Defaults are the interior points of the calibrated grids, so a --no-grid
         # run lands in the regularized regime rather than at an untested extreme.
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
-        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 5e-5)
-        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 0.3)
+        self.lambda_l1: float = self.hyperparams.get("lambda_l1", 1e-2)
+        self.lambda_l2: float = self.hyperparams.get("lambda_l2", 1.0)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
 

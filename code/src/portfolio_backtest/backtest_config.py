@@ -621,3 +621,42 @@ SOES_JOINT_CONFIG = BacktestConfig(
         "leverage_limit": LEVERAGE,
     },
 )
+
+# The regularized SOES joint program reuses the asset and currency SOES grids, as the
+# ES, MV, MAD and SMV joint configs reuse theirs. Both blocks were calibrated on the
+# asset-level and overlay programs, so the joint program was swept on its own to
+# verify the bands sit inside those bounds — the same check REG_SMV_JOINT_CONFIG
+# records, run here on the five top-10 windows with each penalty swept alone and the
+# other three at zero. Unpenalized, the joint program has gross x of 2.00 exactly
+# (85-100 of 101-129 names active, pinned at the leverage cap just as the unpenalized
+# asset-only program is) and gross psi of 1.52-4.37 across 13 non-base currencies —
+# notably larger than the standalone overlay's unpenalized 1.31-2.56, since x and psi
+# are chosen together here and psi leans harder on currency risk reduction than a psi
+# fit against an already-fixed x.
+#
+#   L1 on x   pins the solution at the long-only budget corner by 1.0e-2 in every
+#             window (bound 1e-1)
+#   L2 on x   reaches the budget floor (gross x = 1.00000000 exactly) by 1.0 - 3.2
+#             (bound 15.0)
+#   L1 on psi zeroes the overlay outright by 3.2e-3 - 1.0e-2   (bound 1e-2)
+#   L2 on psi leaves 2% of unpenalized gross psi by 1.0e-1 - 1.0   (bound 1.0)
+#
+# The first three sit comfortably inside their bounds. L2 on psi does not: its band
+# tops out at 1.0, exactly the grid bound, so the bound is sufficient rather than
+# generous — the same situation REG_SMV_JOINT_CONFIG flags for its own L2-on-psi
+# check. If the validation search selects that endpoint on a large share of
+# rebalancing dates, the bound wants extending, as happened with LAMBDA_L2_CURR_GRID
+# above.
+REG_SOES_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":            ALPHA,
+        "lambda_l1_asset":  LAMBDA_L1_SOES_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SOES_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SOES_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SOES_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+    },
+)
