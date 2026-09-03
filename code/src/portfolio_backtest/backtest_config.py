@@ -206,6 +206,30 @@ LAMBDA_L2_SMV_CURR_GRID = [0.0, 1e-7, 1e-5, 1e-3]
 LAMBDA_L1_SOES_ASSET_GRID = [0.0, 1e-3, 1e-2, 1e-1]
 LAMBDA_L2_SOES_ASSET_GRID = [0.0, 5e-2, 1.0, 15.0]
 
+# Currency-block HMCR_2 penalty grids, for the regularized SOES overlay. psi carries
+# no budget or leverage constraint, so L1 extinguishes it outright while L2 shrinks it
+# smoothly — the same asymmetry as the ES, MV, MAD and SMV currency grids, at HMCR_2's
+# own scale. Calibrated by sweeping each penalty alone (asset penalties held at zero,
+# alpha = 0.80, leverage_limit = 2.0) at three points per decade on the same five
+# top-10 estimation windows as the SOES asset grids above, where unpenalized gross psi
+# is 1.31 - 2.56 across 13 non-base currencies. Exploits the overlay optimizer's own
+# step-1 caching (see reg_soes_curr_overlay.py): with the asset penalties fixed at
+# zero for the whole sweep, step 1 solves once per window and every swept point reuses
+# it, so the full two-grid, five-window sweep completed in 45 seconds on Clarabel.
+#
+# L1 halves the overlay by 2.2e-5 - 1.0e-4, and zeroes it outright (gross psi = 0, no
+# currency active) by 2.2e-3 - 1.0e-2; the bound is set at that upper zeroing point,
+# the same criterion as LAMBDA_L1_SMV_CURR_GRID.
+#
+# L2 never zeroes the overlay — only individual currency weights fall below the 1e-6
+# active tolerance at very large lambda, exactly the LAMBDA_L2_SMV_CURR_GRID pattern
+# and not true sparsity — so the bound is set where it is economically spent rather
+# than where it stops moving. It halves the overlay by 4.6e-5 - 4.6e-4 and reaches 2%
+# of unpenalized gross by 2.2e-1 - 1.0 in every window; the bound is set at that upper
+# 2%-crossing point.
+LAMBDA_L1_SOES_CURR_GRID = [0.0, 1e-4, 1e-3, 1e-2]
+LAMBDA_L2_SOES_CURR_GRID = [0.0, 1e-4, 1e-2, 1.0]
+
 
 # Fixed
 LEVERAGE = [2.0]
@@ -565,5 +589,22 @@ SOES_OVERLAY_CONFIG = BacktestConfig(
     param_grid={
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
+    },
+)
+
+# The regularized overlay reuses the calibrated SOES asset grids for the asset block
+# and the SOES currency grids for the overlay block, as the ES, MV, MAD and SMV
+# overlay configs reuse theirs.
+REG_SOES_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":            ALPHA,
+        "lambda_l1_asset":  LAMBDA_L1_SOES_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SOES_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SOES_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SOES_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
     },
 )

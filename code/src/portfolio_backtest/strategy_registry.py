@@ -40,6 +40,7 @@ from portfolio_backtest.backtest_config import (
     REG_SMV_OVERLAY_CONFIG,
     REG_SOES_ASSET_FULL_CONFIG,
     REG_SOES_ASSET_ZERO_CONFIG,
+    REG_SOES_OVERLAY_CONFIG,
     SOES_OVERLAY_CONFIG,
     SMV_JOINT_CONFIG,
     SMV_OVERLAY_CONFIG,
@@ -66,6 +67,7 @@ from portfolio_backtest.optimizers import (
     RegularizedMeanVarianceJointOptimizer,
     RegularizedSecondOrderExpectedShortfallAssetFullOptimizer,
     RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer,
+    RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer,
     SecondOrderExpectedShortfallCurrencyOverlayOptimizer,
     RegularizedSemiVarianceAssetFullOptimizer,
     RegularizedSemiVarianceAssetZeroOptimizer,
@@ -291,5 +293,12 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "SOES Currency Overlay",
         "use_hedging":      True,
         "config":           SOES_OVERLAY_CONFIG,
+    },
+    "reg_soes_curr_overlay": {
+        "optimizer":        RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Regularized SOES Currency Overlay",
+        "use_hedging":      True,
+        "config":           REG_SOES_OVERLAY_CONFIG,
     },
 }
