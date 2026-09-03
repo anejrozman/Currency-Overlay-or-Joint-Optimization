@@ -5,7 +5,7 @@ and does it collapse as the currency share of the decision vector falls?
 At every quarterly rebalancing date the unregularized joint and overlay programs of one
 risk measure are fit on the ten-year estimation window and scored twice by one shared
 empirical scorer: on that window (f_in, the ceiling) and on the following quarter
-(f_out).  The signed gap g = f_joint - f_overlay is negative when joint is better.  Per
+(f_out).  The signed gap g = f_overlay - f_joint is positive when joint is better.  Per
 (measure, universe) cell the mean of each gap gets a circular block bootstrap CI (10000
 resamples, block length by Politis-White), alongside the fraction of dates with g < 0.
 
@@ -77,6 +77,9 @@ MEASURE_LABELS = {
     "mad": "Mean Absolute Deviation",
     "smv": "Semi-Deviation",
 }
+# The figure draws the grid arm alone, so these three are no longer read by
+# plot().  They are kept because the currency arm is still solved and written to
+# gaps.csv / gap_summary.csv, and a future figure of that arm would want them.
 # One marker per universe the currency-count arm runs on, so the two arms stay
 # distinguishable where they meet at the same currency share.
 CURRENCY_MARKERS = {50: "s", 10: "D"}
@@ -152,8 +155,11 @@ def _pair(rows: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
         )
     paired = parts[0].join(parts[1], how="inner").join(parts[2], how="left").reset_index()
     paired = paired[(paired["in_overlay"] > 0) & (paired["out_overlay"] > 0)]
-    paired["gap_in"] = paired["in_joint"] - paired["in_overlay"]
-    paired["gap_out"] = paired["out_joint"] - paired["out_overlay"]
+    # Signed so that POSITIVE means the joint program is better. These are risk
+    # measures, where lower is better, so the joint's advantage is the overlay's
+    # risk minus the joint's -- not the other way round.
+    paired["gap_in"] = paired["in_overlay"] - paired["in_joint"]
+    paired["gap_out"] = paired["out_overlay"] - paired["out_joint"]
     paired["gap_in_rel"] = paired["gap_in"] / paired["in_overlay"]
     paired["gap_out_rel"] = paired["gap_out"] / paired["out_overlay"]
     return paired
@@ -312,7 +318,7 @@ def summarise(gaps: pd.DataFrame) -> pd.DataFrame:
                 row[f"{col}_hi"] = hi
                 row[f"{col}_se"] = se
                 row[f"{col}_block"] = block
-            row[f"frac_neg_{side}"] = float((part[f"gap_{side}"] < 0).mean())
+            row[f"frac_joint_better_{side}"] = float((part[f"gap_{side}"] > 0).mean())
         rows.append(row)
     return _sorted(rows, ["family", "measure", "arm", "s", "draw"])
 
@@ -378,58 +384,38 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
 
     for ax, measure in zip(axes, MEASURES):
         part = summary[summary["measure"] == measure]
-        line = part[part["arm"] == "grid"].sort_values("s")
-        arm = part[part["arm"] == "currency"].sort_values("s")
-        # DataFrame.apply(axis=1) on an empty frame returns a DataFrame, not a
-        # boolean Series, and masking with it drops every column -- so a measure
-        # with no currency-arm rows yet (smv, until that arm is run) would fail
-        # on the "universe" lookup below rather than draw an empty panel.
-        if not arm.empty:
-            arm = arm[
-                ~arm.apply(lambda c: (c["universe"], c["n_curr"]) in PLOT_EXCLUDE, axis=1)
-            ]
+        # Grid arm only: one point per universe size, plotted against the asset
+        # universe rather than the currency share.  The currency arm is still
+        # solved and summarised into gap_summary.csv, it is simply not drawn.
+        line = part[part["arm"] == "grid"].sort_values("universe")
         for col, (color, label) in styles.items():
-            if not line.empty:
-                ax.plot(line["s"], line[f"{col}_mean"], marker="o", color=color, zorder=3)
-                ax.fill_between(
-                    line["s"], line[f"{col}_lo"], line[f"{col}_hi"], color=color, alpha=0.2, lw=0
-                )
-            for universe, marker in CURRENCY_MARKERS.items():
-                cells = arm[arm["universe"] == universe]
-                if cells.empty:
-                    continue
-                ax.errorbar(
-                    cells["s"],
-                    cells[f"{col}_mean"],
-                    yerr=[
-                        cells[f"{col}_mean"] - cells[f"{col}_lo"],
-                        cells[f"{col}_hi"] - cells[f"{col}_mean"],
-                    ],
-                    fmt=marker,
-                    ms=6,
-                    color=color,
-                    ecolor=color,
-                    elinewidth=1.0,
-                    capsize=2.5,
-                    zorder=4,
-                )
+            if line.empty:
+                continue
+            ax.plot(
+                line["universe"], line[f"{col}_mean"],
+                marker="s", ms=5, color=color, zorder=3,
+            )
+            ax.fill_between(
+                line["universe"], line[f"{col}_lo"], line[f"{col}_hi"],
+                color=color, alpha=0.2, lw=0,
+            )
         ax.axhline(0.0, color="grey", lw=1.0, zorder=0)
         ax.set_title(MEASURE_LABELS[measure], fontsize=11)
-        ax.set_xlabel("Currency share")
+        ax.set_xlabel("Universe size")
+        # Log spacing keeps 10/50/100 legible, but the decade ticks a log axis
+        # picks by default (10, 100) would drop the 50, so label the three
+        # universes explicitly and drop the minor ticks between them.
         ax.set_xscale("log")
+        ax.set_xticks(list(UNIVERSES))
+        ax.set_xticklabels([str(u) for u in UNIVERSES])
+        ax.set_xticks([], minor=True)
+        ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
         ax.grid(True, alpha=0.3)
 
-    axes[0].set_ylabel("Mean (joint - overlay) / overlay")
+    axes[0].set_ylabel("Mean (overlay - joint) / overlay")
     handles = [
-        Line2D([], [], color=color, marker="o", label=label)
+        Line2D([], [], color=color, marker="s", label=label)
         for color, label in styles.values()
-    ]
-    handles += [
-        Line2D([], [], color="dimgrey", marker="o", ls="none", label="Full currency block (K=14)")
-    ]
-    handles += [
-        Line2D([], [], color="dimgrey", marker=CURRENCY_MARKERS[u], ls="none", label=CURRENCY_LABELS[u])
-        for u in CURRENCY_MARKERS
     ]
     axes[0].legend(handles=handles, fontsize=7, loc="lower left", framealpha=0.9)
     qualifier = "" if family == "unregularized" else f" ({family} programs)"
