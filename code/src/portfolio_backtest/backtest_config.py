@@ -158,6 +158,55 @@ LAMBDA_L1_SMV_CURR_GRID = [0.0, 2.5e-7, 2.5e-6, 2.5e-5]
 LAMBDA_L2_SMV_CURR_GRID = [0.0, 1e-7, 1e-5, 1e-3]
 
 
+# Asset-level second-order ES (HMCR_2) penalty grids, for the regularized ASSETS-FULL
+# HMCR_2 asset problem (Krokhmal 2007; see reg_soes_asset_full.py). HMCR_2 sits on the
+# same daily-return scale as ES_80 but runs materially larger, since the tail is
+# penalized by its L2 norm rather than its mean and the L2 norm of a set of positive
+# numbers dominates their mean by construction — so the ES asset grids above are close
+# in shape but not in magnitude, and this measure is calibrated at its own scale rather
+# than reusing them. There is no overlay or joint variant of this measure yet, so unlike
+# ES/MV/MAD/SMV above there is no companion currency-block grid here.
+#
+# Bounds were calibrated by sweeping each penalty alone (the other held at zero,
+# alpha = 0.80, leverage_limit = 2.0) at three points per decade on the same five real
+# estimation windows of the top-10 universe used for the SMV grids above
+# (1990-2000 through 2012-2022, T = 2610, N = 101-129), solved with Clarabel (no local
+# Gurobi; see the solver fallback in reg_soes_asset_full.py).
+#
+# Gross exposure is confined to [1, 2] exactly as for MV/MAD/SMV: the budget constraint
+# sum(x) = 1 floors it and the leverage cap ||x||_1 <= 2 tops it. Unlike those three
+# measures, the unpenalized optimum sits exactly at the leverage cap (gross =
+# 2.00000000 in every window) rather than somewhere inside [1, 2] — the unregularized
+# HMCR_2 program always wants to lever into short positions to shrink the tail norm
+# further. The progress measure below is, as for the other asset grids, the share of
+# the excess gross above 1 that the penalty spends.
+#
+# L1 saturates at a corner. It spends 10% of the excess gross by 1.0e-3 - 2.2e-3, half
+# by 2.2e-3 - 4.6e-3 and 98% by 1.0e-2 - 2.2e-2; from 2.2e-2 - 4.6e-2 on the solution is
+# pinned at the long-only budget corner, gross = 1.00000000 exactly in every window,
+# with the active count down from 74-84 names to 23-30. Past the 4.6e-2 bound d_inf
+# never exceeds 1.9e-6. The grid's low end is set at the onset (1e-3) and its high end
+# at the point every window is already pinned (1e-1, one full decade past the 4.6e-2
+# stabilization point, for margin); the interior point 1e-2 is the exact log-centre of
+# the two and itself sits right at the 98%-spent mark.
+#
+# L2 decays smoothly and never corners: the active count only grows, from 74-84
+# unpenalized toward the full universe (101-129, i.e. every name active) as the
+# quadratic penalty spreads exposure across all of them, exactly the MV/MAD/SMV
+# pattern of pulling weights toward equal weight rather than pruning them. Gross
+# starts moving at 4.6e-2 - 1.0e-1, reaches the budget floor (gross = 1.00000000
+# exactly) by 1.0 - 2.2, and ||x||^2 comes within 1% of the equal-weight floor 1/N by
+# 4.6 - 10.0 (within 0.1% by 21.5 - 46.4). As with SMV, and unlike MAD, the floor is
+# attained here to five decimals (from lambda ~ 460 on, in every window) rather than
+# only approached, so the bound is set just past the latest window's 1% crossing
+# (10.0) rather than pushed out toward full attainment: 15.0. The interior point is
+# set at 1.0 — close to, but not exactly, the log-centre of the two ends (0.87) —
+# because 1.0 is also where the budget floor is first reached exactly, in the fastest
+# window.
+LAMBDA_L1_SOES_ASSET_GRID = [0.0, 1e-3, 1e-2, 1e-1]
+LAMBDA_L2_SOES_ASSET_GRID = [0.0, 5e-2, 1.0, 15.0]
+
+
 # Fixed
 LEVERAGE = [2.0]
 ALPHA = [0.80]
@@ -482,5 +531,20 @@ REG_MV_JOINT_CONFIG = BacktestConfig(
         "lambda_l1_curr":   LAMBDA_L1_MV_CURR_GRID,
         "lambda_l2_curr":   LAMBDA_L2_MV_CURR_GRID,
         "leverage_limit":   LEVERAGE,
+    },
+)
+
+# Asset-only regularized second-order ES (HMCR_2), ASSETS-FULL strategy. Structured
+# like ES_CONFIG (alpha plus the two penalties): unlike MV/MAD/SMV, HMCR_2 keeps a
+# confidence level. There is no overlay or joint variant of this measure yet.
+REG_SOES_ASSET_FULL_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "lambda_l1":      LAMBDA_L1_SOES_ASSET_GRID,
+        "lambda_l2":      LAMBDA_L2_SOES_ASSET_GRID,
+        "leverage_limit": LEVERAGE,
     },
 )

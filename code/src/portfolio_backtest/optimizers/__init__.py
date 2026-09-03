@@ -26,6 +26,7 @@ from .smv_curr_overlay import SemiVarianceCurrencyOverlayOptimizer
 from .reg_smv_curr_overlay import RegularizedSemiVarianceCurrencyOverlayOptimizer
 from .smv_joint import SemiVarianceJointOptimizer
 from .reg_smv_joint import RegularizedSemiVarianceJointOptimizer
+from .reg_soes_asset_full import RegularizedSecondOrderExpectedShortfallAssetFullOptimizer
 
 __all__ = [
     "BaseOptimizer",
@@ -48,6 +49,7 @@ __all__ = [
     "RegularizedMeanVarianceAssetZeroOptimizer",
     "RegularizedMeanVarianceCurrencyOverlayOptimizer",
     "RegularizedMeanVarianceJointOptimizer",
+    "RegularizedSecondOrderExpectedShortfallAssetFullOptimizer",
     "RegularizedSemiVarianceAssetFullOptimizer",
     "RegularizedSemiVarianceAssetZeroOptimizer",
     "RegularizedSemiVarianceCurrencyOverlayOptimizer",

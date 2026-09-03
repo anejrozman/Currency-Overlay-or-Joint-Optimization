@@ -38,6 +38,7 @@ from portfolio_backtest.backtest_config import (
     REG_SMV_ASSET_ZERO_CONFIG,
     REG_SMV_JOINT_CONFIG,
     REG_SMV_OVERLAY_CONFIG,
+    REG_SOES_ASSET_FULL_CONFIG,
     SMV_JOINT_CONFIG,
     SMV_OVERLAY_CONFIG,
 )
@@ -61,6 +62,7 @@ from portfolio_backtest.optimizers import (
     RegularizedMeanVarianceAssetZeroOptimizer,
     RegularizedMeanVarianceCurrencyOverlayOptimizer,
     RegularizedMeanVarianceJointOptimizer,
+    RegularizedSecondOrderExpectedShortfallAssetFullOptimizer,
     RegularizedSemiVarianceAssetFullOptimizer,
     RegularizedSemiVarianceAssetZeroOptimizer,
     RegularizedSemiVarianceCurrencyOverlayOptimizer,
@@ -260,5 +262,12 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "Regularized SMV Joint",
         "use_hedging":      True,
         "config":           REG_SMV_JOINT_CONFIG,
+    },
+    "reg_soes_asset_full": {
+        "optimizer":        RegularizedSecondOrderExpectedShortfallAssetFullOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "ASSETS-FULL SOES",
+        "use_hedging":      True,
+        "config":           REG_SOES_ASSET_FULL_CONFIG,
     },
 }
