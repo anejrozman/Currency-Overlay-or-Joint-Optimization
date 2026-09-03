@@ -30,6 +30,7 @@ from .reg_soes_asset_full import RegularizedSecondOrderExpectedShortfallAssetFul
 from .reg_soes_asset_zero import RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer
 from .reg_soes_curr_overlay import RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer
 from .soes_curr_overlay import SecondOrderExpectedShortfallCurrencyOverlayOptimizer
+from .soes_joint import SecondOrderExpectedShortfallJointOptimizer
 
 __all__ = [
     "BaseOptimizer",
@@ -60,6 +61,7 @@ __all__ = [
     "RegularizedSemiVarianceCurrencyOverlayOptimizer",
     "RegularizedSemiVarianceJointOptimizer",
     "SecondOrderExpectedShortfallCurrencyOverlayOptimizer",
+    "SecondOrderExpectedShortfallJointOptimizer",
     "SemiVarianceCurrencyOverlayOptimizer",
     "SemiVarianceJointOptimizer",
 ]

@@ -608,3 +608,16 @@ REG_SOES_OVERLAY_CONFIG = BacktestConfig(
         "leverage_limit":   LEVERAGE,
     },
 )
+
+# Unregularized SOES joint program. Keeps alpha, exactly as JOINT_CONFIG does for
+# es_joint; the unregularized program has no penalties, so its grid is alpha and
+# the leverage cap alone.
+SOES_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "leverage_limit": LEVERAGE,
+    },
+)
