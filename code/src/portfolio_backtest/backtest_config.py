@@ -548,3 +548,9 @@ REG_SOES_ASSET_FULL_CONFIG = BacktestConfig(
         "leverage_limit": LEVERAGE,
     },
 )
+
+# ASSETS-ZERO solves exactly the same asset problem as ASSETS-FULL on R_fh and
+# differs only at realization (unhedged, via the backtester's training_return_key /
+# asset_return_key split), so it reuses the same config object rather than a copy,
+# as REG_SMV_ASSET_ZERO_CONFIG does above.
+REG_SOES_ASSET_ZERO_CONFIG = REG_SOES_ASSET_FULL_CONFIG

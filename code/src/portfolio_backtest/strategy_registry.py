@@ -39,6 +39,7 @@ from portfolio_backtest.backtest_config import (
     REG_SMV_JOINT_CONFIG,
     REG_SMV_OVERLAY_CONFIG,
     REG_SOES_ASSET_FULL_CONFIG,
+    REG_SOES_ASSET_ZERO_CONFIG,
     SMV_JOINT_CONFIG,
     SMV_OVERLAY_CONFIG,
 )
@@ -63,6 +64,7 @@ from portfolio_backtest.optimizers import (
     RegularizedMeanVarianceCurrencyOverlayOptimizer,
     RegularizedMeanVarianceJointOptimizer,
     RegularizedSecondOrderExpectedShortfallAssetFullOptimizer,
+    RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer,
     RegularizedSemiVarianceAssetFullOptimizer,
     RegularizedSemiVarianceAssetZeroOptimizer,
     RegularizedSemiVarianceCurrencyOverlayOptimizer,
@@ -269,5 +271,16 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label":            "ASSETS-FULL SOES",
         "use_hedging":      True,
         "config":           REG_SOES_ASSET_FULL_CONFIG,
+    },
+    "reg_soes_asset_zero": {
+        "optimizer":        RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer,
+        "asset_return_key": "R_u",
+        # Paper definition (Lucescu & Ulrych 2026, Sec. 4.2): weights are
+        # optimized on fully hedged returns (same asset problem as
+        # ASSETS-FULL) and realized unhedged.
+        "training_return_key": "R_fh",
+        "label":            "ASSETS-ZERO SOES",
+        "use_hedging":      False,
+        "config":           REG_SOES_ASSET_ZERO_CONFIG,
     },
 }
