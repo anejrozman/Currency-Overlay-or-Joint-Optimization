@@ -11,6 +11,16 @@ tuned independently.
 Convention: gamma = infinity, so the mean term drops and the ES coefficient is
 normalized to one. The Table 3 penalty bounds are read as already normalized.
 
+With ``demean`` set, both return matrices are centered columnwise before the
+program is solved, so ES is measured on deviations from the sample mean rather
+than on raw returns and is comparable to the deviation measures (mean-variance,
+MAD, semi-variance), all of which demean by construction. :meth:`score` holds the
+trained weights fixed and re-centers only the validation portfolio return, by its
+own mean. The flag enters the problem cache key because it is baked into the
+compiled program through Y_fh and Y_c, exactly like alpha and the leverage limit.
+Off by default; the switch is ``DEMEAN`` in backtest_config.py, mirrored into the
+parameter grid there as ``DEMEAN_GRID``.
+
 Author: Anej Rozman
 """
 
@@ -22,6 +32,8 @@ from collections import OrderedDict
 
 import cvxpy as cp
 import numpy as np
+
+from portfolio_backtest.backtest_config import DEMEAN
 
 from .base_optimizer import BaseOptimizer
 
@@ -70,6 +82,9 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
                 * ``lambda_l1_curr``   (float) — L1 penalty on psi, default 0.0
                 * ``lambda_l2_curr``   (float) — L2 penalty on psi, default 0.0
                 * ``leverage_limit``   (float) — ||x||_1 cap, default 2.0
+                * ``demean``           (bool)  — center R_fh and R_c columnwise
+                                                 before solving, default
+                                                 ``backtest_config.DEMEAN``
                 * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
         """
         super().__init__(hyperparams)
@@ -89,6 +104,7 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         self.lambda_l1_curr: float = self.hyperparams.get("lambda_l1_curr", 0.0)
         self.lambda_l2_curr: float = self.hyperparams.get("lambda_l2_curr", 0.0)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.demean: bool = bool(self.hyperparams.get("demean", DEMEAN))
         self.solver = self.hyperparams.get("solver", cp.GUROBI)
 
         for name in (
@@ -154,14 +170,22 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
 
         self.Y_fh = np.ascontiguousarray(R_fh.values, dtype=float)
         self.Y_c = np.ascontiguousarray(R_c.values, dtype=float)
+        if self.demean:
+            self.Y_fh = self.Y_fh - self.Y_fh.mean(axis=0)
+            self.Y_c = self.Y_c - self.Y_c.mean(axis=0)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
+        # demean belongs in the key for the same reason alpha and the leverage limit
+        # do: it is baked into the compiled program as a constant, here through the
+        # centered Y_fh and Y_c. Without it a demeaned and a raw run in the same
+        # process would silently share a compiled problem.
         self._cache_key = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
             float(self.alpha),
             float(self.leverage_limit),
+            bool(self.demean),
         )
 
     # Problem construction
@@ -339,6 +363,10 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         The ES estimator matches the backtester's compute_performance_metrics:
         the mean of returns at or below the (1-alpha) quantile.
 
+        Under ``demean`` the validation portfolio return is centered by its own
+        mean, not the training one: the score has to be the deviation ES of this
+        window, so the location it deviates from is this window's mean.
+
         Args:
             weights: The dict returned by :meth:`optimize`.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
@@ -369,6 +397,8 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
             )
 
         port_rets = Y_fh_val @ x + Y_c_val @ psi
+        if self.demean:
+            port_rets = port_rets - port_rets.mean()
 
         threshold = np.quantile(port_rets, 1.0 - self.alpha)
         tail = port_rets[port_rets <= threshold]

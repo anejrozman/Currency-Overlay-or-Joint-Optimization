@@ -35,6 +35,17 @@ joint program (not the smaller step-2-only overlay problem) makes Gurobi hit
 its barrier iteration limit and return status=user_limit when psi_base is
 unidentified. The same precaution is taken here for the same reason.
 
+With ``demean`` set, both return matrices are centered columnwise before the
+program is solved, so HMCR_2 is measured on deviations from the sample mean
+rather than on raw returns and is comparable to the deviation measures
+(mean-variance, MAD, semi-variance), all of which demean by construction.
+:meth:`score` holds the trained weights fixed and re-centers only the validation
+portfolio return, by its own mean. The flag enters the problem cache key because
+it is baked into the compiled program through Y_fh and Y_c, exactly like alpha
+and the leverage limit. All of this is identical to reg_es_joint.py; the switch
+is ``DEMEAN`` in backtest_config.py, off by default, mirrored into the parameter
+grid there as ``DEMEAN_GRID`` and shared with the ES optimizers.
+
 Performance notes (identical rationale to reg_es_joint.py / reg_smv_joint.py):
 
 * The compiled problem is cached at class level, keyed on the estimation
@@ -62,6 +73,8 @@ from collections import OrderedDict
 import cvxpy as cp
 import numpy as np
 from scipy.optimize import minimize_scalar
+
+from portfolio_backtest.backtest_config import DEMEAN
 
 from .base_optimizer import BaseOptimizer
 
@@ -114,6 +127,9 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
                 * ``lambda_l1_curr``   (float) — L1 penalty on psi, default 0.0
                 * ``lambda_l2_curr``   (float) — L2 penalty on psi, default 0.0
                 * ``leverage_limit``   (float) — ||x||_1 cap, default 2.0
+                * ``demean``           (bool)  — center R_fh and R_c columnwise
+                                                 before solving, default
+                                                 ``backtest_config.DEMEAN``
                 * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
                                                  (``cp.CLARABEL`` when gurobipy is unavailable)
         """
@@ -134,6 +150,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         self.lambda_l1_curr: float = self.hyperparams.get("lambda_l1_curr", 0.0)
         self.lambda_l2_curr: float = self.hyperparams.get("lambda_l2_curr", 0.0)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.demean: bool = bool(self.hyperparams.get("demean", DEMEAN))
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
 
         for name in (
@@ -204,14 +221,22 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
 
         self.Y_fh = np.ascontiguousarray(R_fh.values, dtype=float)
         self.Y_c = np.ascontiguousarray(R_c.values, dtype=float)
+        if self.demean:
+            self.Y_fh = self.Y_fh - self.Y_fh.mean(axis=0)
+            self.Y_c = self.Y_c - self.Y_c.mean(axis=0)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
+        # demean belongs in the key for the same reason alpha and the leverage limit
+        # do: it is baked into the compiled program as a constant, here through the
+        # centered Y_fh and Y_c. Without it a demeaned and a raw run in the same
+        # process would silently share a compiled problem.
         self._cache_key = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
             float(self.alpha),
             float(self.leverage_limit),
+            bool(self.demean),
         )
 
     # Problem construction
@@ -398,6 +423,14 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         numerically with the same bounded 1-D search used throughout the SOES
         family.
 
+        Under ``demean`` the validation portfolio return is centered by its own
+        mean, not the training one: the score has to be the deviation HMCR_2 of
+        this window, so the location it deviates from is this window's mean. The
+        zeta search then runs on the centered losses, and its bracket
+        (losses.min(), losses.max()) still contains the minimizer — HMCR_2 is
+        translation-equivariant, so centering shifts both zeta and the score by
+        the same constant.
+
         Args:
             weights: The dict returned by :meth:`optimize`.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
@@ -429,6 +462,8 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
             )
 
         port_rets = Y_fh_val @ x + Y_c_val @ psi
+        if self.demean:
+            port_rets = port_rets - port_rets.mean()
 
         tail_prob = 1.0 - self.alpha
         losses = -port_rets

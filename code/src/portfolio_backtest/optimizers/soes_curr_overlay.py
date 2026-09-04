@@ -33,6 +33,15 @@ nonsingular in that direction. Step 2 here has no quadratic term in psi at all,
 so the same non-issue applies as for ES: psi_base is left free rather than
 pinned to zero.
 
+With ``demean`` set, both return matrices are centered columnwise before either
+step is solved, and the validation window is centered by its own column means
+before step 2 is re-solved there. HMCR_2 is then measured on deviations from the
+sample mean rather than on raw returns, which puts it on the same footing as the
+deviation measures (mean-variance, MAD, semi-variance), all of which demean by
+construction. The flag and its treatment are identical to es_curr_overlay.py's;
+the switch is ``DEMEAN`` in backtest_config.py, off by default, mirrored into the
+parameter grid there as ``DEMEAN_GRID`` and shared with the ES optimizers.
+
 Author: Anej Rozman
 """
 
@@ -42,6 +51,9 @@ import logging
 import cvxpy as cp
 import numpy as np
 from scipy.optimize import minimize_scalar
+
+from portfolio_backtest.backtest_config import DEMEAN
+
 from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
@@ -74,12 +86,16 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
 
                 * ``alpha``          (float) — confidence level, default 0.80
                 * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
+                * ``demean``         (bool)  — center R_fh and R_c columnwise before
+                                               solving, default
+                                               ``backtest_config.DEMEAN``
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
                                                (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.demean: bool = bool(self.hyperparams.get("demean", DEMEAN))
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
 
         global _warned_fallback
@@ -109,6 +125,9 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         R_c = train_bundle["R_c"]
         self.Y_fh = np.asarray(R_fh.values, dtype=float)
         self.Y_c = np.asarray(R_c.values, dtype=float)
+        if self.demean:
+            self.Y_fh = self.Y_fh - self.Y_fh.mean(axis=0)
+            self.Y_c = self.Y_c - self.Y_c.mean(axis=0)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
@@ -255,6 +274,14 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         score against the realized data directly rather than trusting the
         solver's eta.value under a status that may be inexact.
 
+        Under ``demean`` the validation matrices are centered by their own column
+        means, not the training ones: the score has to be the deviation HMCR_2 of
+        this window, so the location it deviates from is this window's mean. The
+        zeta search then runs on the centered losses, and its bracket
+        (losses.min(), losses.max()) still contains the minimizer — HMCR_2 is
+        translation-equivariant, so centering shifts both zeta and the score by
+        the same constant.
+
         Args:
             weights: Not used; asset weights are taken from ``self.x_opt``.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
@@ -274,6 +301,9 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
 
         Y_fh_val = np.asarray(R_fh_val.values, dtype=float)
         Y_c_val = np.asarray(R_c_val.values, dtype=float)
+        if self.demean:
+            Y_fh_val = Y_fh_val - Y_fh_val.mean(axis=0)
+            Y_c_val = Y_c_val - Y_c_val.mean(axis=0)
 
         psi_val = self._optimize_overlay(Y_fh_val, Y_c_val, self.x_opt)
         port_rets = Y_fh_val @ self.x_opt + Y_c_val @ psi_val

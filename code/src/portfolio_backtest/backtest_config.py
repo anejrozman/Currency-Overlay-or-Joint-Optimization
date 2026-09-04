@@ -235,6 +235,24 @@ LAMBDA_L2_SOES_CURR_GRID = [0.0, 1e-4, 1e-2, 1.0]
 LEVERAGE = [2.0]
 ALPHA = [0.80]
 
+# Column-demeaning switch for the eight ES and SOES overlay/joint programs,
+# flipped manually. ES and its second-order variant (HMCR_2) are the two risk
+# measures here that are not deviation measures: MV, MAD and semi-variance all
+# subtract the sample mean before measuring risk, so their objectives are
+# location-free, while raw ES and SOES also reward a high mean. Set this to True
+# to center the return matrices columnwise before those programs are solved,
+# which turns their objectives into pure deviation measures and makes them
+# comparable to the other three.
+#
+# The scalar is what the eight optimizers import as their own default, and
+# DEMEAN_GRID puts the same value in their grids, so a grid run and a --no-grid
+# run (which falls back to those defaults) demean identically. Kept a one-element
+# list rather than a two-point grid: demeaned and raw ES are different risk
+# measures, not competing hyperparameters, so the validation search must not
+# choose between them.
+DEMEAN: bool = True
+DEMEAN_GRID = [DEMEAN]
+
 # Every MV program is now mean-free, so no risk-aversion coefficient survives: with
 # the mean gone gamma is pure scaling on the risk term, exactly equivalent to dividing
 # both penalties by gamma / 2, and the penalty grids carry the tradeoff alone.
@@ -275,6 +293,7 @@ OVERLAY_CONFIG = BacktestConfig(
     param_grid={
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
+        "demean":         DEMEAN_GRID,
     },
 )
 
@@ -289,6 +308,7 @@ REG_OVERLAY_CONFIG = BacktestConfig(
         "lambda_l1_curr":  LAMBDA_L1_CURR_GRID,
         "lambda_l2_curr":  LAMBDA_L2_CURR_GRID,
         "leverage_limit":  LEVERAGE,
+        "demean":          DEMEAN_GRID,
     },
 )
 
@@ -299,6 +319,7 @@ JOINT_CONFIG = BacktestConfig(
     param_grid={
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
+        "demean":         DEMEAN_GRID,
     },
 )
 
@@ -313,6 +334,7 @@ REG_JOINT_CONFIG = BacktestConfig(
         "lambda_l1_curr":  LAMBDA_L1_CURR_GRID,
         "lambda_l2_curr":  LAMBDA_L2_CURR_GRID,
         "leverage_limit":  LEVERAGE,
+        "demean":          DEMEAN_GRID,
     },
 )
 
@@ -589,6 +611,7 @@ SOES_OVERLAY_CONFIG = BacktestConfig(
     param_grid={
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
+        "demean":         DEMEAN_GRID,
     },
 )
 
@@ -606,6 +629,7 @@ REG_SOES_OVERLAY_CONFIG = BacktestConfig(
         "lambda_l1_curr":   LAMBDA_L1_SOES_CURR_GRID,
         "lambda_l2_curr":   LAMBDA_L2_SOES_CURR_GRID,
         "leverage_limit":   LEVERAGE,
+        "demean":           DEMEAN_GRID,
     },
 )
 
@@ -619,6 +643,7 @@ SOES_JOINT_CONFIG = BacktestConfig(
     param_grid={
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
+        "demean":         DEMEAN_GRID,
     },
 )
 
@@ -658,5 +683,6 @@ REG_SOES_JOINT_CONFIG = BacktestConfig(
         "lambda_l1_curr":   LAMBDA_L1_SOES_CURR_GRID,
         "lambda_l2_curr":   LAMBDA_L2_SOES_CURR_GRID,
         "leverage_limit":   LEVERAGE,
+        "demean":           DEMEAN_GRID,
     },
 )

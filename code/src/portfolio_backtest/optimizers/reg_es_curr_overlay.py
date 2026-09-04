@@ -15,6 +15,16 @@ paper's objective after dividing through by gamma / 2. The mean term vanishes an
 penalties are read as the already-normalized quantities 2 * lambda / gamma, so the
 Table 3 bounds apply directly to lambda_*_asset and lambda_*_curr as used here.
 
+With ``demean`` set, both return matrices are centered columnwise before either
+step is solved, so ES is measured on deviations from the sample mean rather than
+on raw returns and is comparable to the deviation measures (mean-variance, MAD,
+semi-variance), all of which demean by construction. :meth:`score` holds the
+trained weights fixed and re-centers only the validation portfolio return, by its
+own mean. The flag enters the cache key because it is baked into the compiled
+problems through Y_fh and Y_c, exactly like alpha and the leverage limit. Off by
+default; the switch is ``DEMEAN`` in backtest_config.py, mirrored into the
+parameter grid there as ``DEMEAN_GRID``.
+
 Performance notes:
 
 * The Backtester constructs a fresh optimizer instance for every hyperparameter
@@ -36,6 +46,8 @@ import os
 
 import cvxpy as cp
 import numpy as np
+
+from portfolio_backtest.backtest_config import DEMEAN
 
 from .base_optimizer import BaseOptimizer
 
@@ -69,6 +81,9 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
                 * ``lambda_l1_curr``   (float) — L1 penalty on the overlay, default 0.0
                 * ``lambda_l2_curr``   (float) — L2 penalty on the overlay, default 0.0
                 * ``leverage_limit``   (float) — ||x||_1 cap for step 1, default 2.0
+                * ``demean``           (bool)  — center R_fh and R_c columnwise
+                                                 before solving, default
+                                                 ``backtest_config.DEMEAN``
                 * ``crossover``        (bool)  — run Gurobi crossover after the barrier
                                                  solve, default ``False``. Off is faster;
                                                  on returns vertex solutions with exact
@@ -84,6 +99,7 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         self.lambda_l1_curr: float = self.hyperparams.get("lambda_l1_curr", 0.0)
         self.lambda_l2_curr: float = self.hyperparams.get("lambda_l2_curr", 0.0)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.demean: bool = bool(self.hyperparams.get("demean", DEMEAN))
         self.crossover: bool = bool(self.hyperparams.get("crossover", False))
         self.threads: int = int(
             self.hyperparams.get("threads", os.environ.get("SLURM_CPUS_PER_TASK", 4))
@@ -114,16 +130,19 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         Drop the compiled problems and cached step-1 solutions if the estimation
         window has changed.
 
-        ``alpha`` and ``leverage_limit`` enter the key because they are baked into the
-        compiled problems as constants rather than as parameters. If either is ever
-        added to the grid, the cache invalidates instead of silently reusing the wrong
-        problem.
+        ``alpha``, ``leverage_limit`` and ``demean`` enter the key because they are
+        baked into the compiled problems as constants rather than as parameters
+        (``demean`` through the centered Y_fh and Y_c). If any of them is ever added
+        to the grid, the cache invalidates instead of silently reusing the wrong
+        problem — or, for ``demean``, letting a demeaned and a raw run in the same
+        process share problems and cached step-1 solutions.
         """
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
             float(self.alpha),
             float(self.leverage_limit),
+            bool(self.demean),
         )
         key = hashlib.blake2b(repr(parts).encode(), digest_size=16).hexdigest()
 
@@ -153,6 +172,9 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
 
         self.Y_fh = R_fh.values
         self.Y_c = R_c.values
+        if self.demean:
+            self.Y_fh = self.Y_fh - self.Y_fh.mean(axis=0)
+            self.Y_c = self.Y_c - self.Y_c.mean(axis=0)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
@@ -318,6 +340,10 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         :meth:`optimize` on the training window and held fixed. Nothing is re-solved on
         the validation sample.
 
+        Under ``demean`` the validation portfolio return is centered by its own mean,
+        not the training one: the score has to be the deviation ES of this window, so
+        the location it deviates from is this window's mean.
+
         Args:
             weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
@@ -339,6 +365,8 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         x = np.asarray(weights["x"], dtype=float)
         psi = np.asarray(weights["psi"], dtype=float)
         port_rets = R_fh_val.values @ x + R_c_val.values @ psi
+        if self.demean:
+            port_rets = port_rets - port_rets.mean()
         threshold = np.quantile(port_rets, 1.0 - self.alpha)
         tail = port_rets[port_rets <= threshold]
         return float(-np.mean(tail)) if len(tail) > 0 else float(-np.mean(port_rets))

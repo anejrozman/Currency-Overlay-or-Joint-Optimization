@@ -5,6 +5,14 @@ Minimizes ES of the combined portfolio return (R_fh @ x + R_c @ psi) jointly ove
 both asset weights x and currency overlay weights psi in a single optimization scheme.
 No regularization. Leverage cap on asset weights only, psi is unconstrained.
 
+With ``demean`` set, both return matrices are centered columnwise before the
+program is solved, and the validation window is centered by its own column means
+before the joint problem is re-solved there. ES is then measured on deviations
+from the sample mean rather than on raw returns, which puts it on the same
+footing as the deviation measures (mean-variance, MAD, semi-variance), all of
+which demean by construction. Off by default; the switch is ``DEMEAN`` in
+backtest_config.py, mirrored into the parameter grid there as ``DEMEAN_GRID``.
+
 Author: Anej Rozman
 """
 
@@ -13,6 +21,9 @@ from __future__ import annotations
 import logging
 import cvxpy as cp
 import numpy as np
+
+from portfolio_backtest.backtest_config import DEMEAN
+
 from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
@@ -33,11 +44,15 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
 
                 * ``alpha``          (float) — ES confidence level, default 0.80
                 * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
+                * ``demean``         (bool)  — center R_fh and R_c columnwise before
+                                               solving, default
+                                               ``backtest_config.DEMEAN``
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.demean: bool = bool(self.hyperparams.get("demean", DEMEAN))
         self.solver = self.hyperparams.get("solver", cp.GUROBI)
 
         self.Y_fh: np.ndarray | None = None
@@ -61,6 +76,9 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
         R_c = train_bundle["R_c"]
         self.Y_fh = R_fh.values
         self.Y_c = R_c.values
+        if self.demean:
+            self.Y_fh = self.Y_fh - self.Y_fh.mean(axis=0)
+            self.Y_c = self.Y_c - self.Y_c.mean(axis=0)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
@@ -159,6 +177,10 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
         """
         Evaluate validation Expected Shortfall by rerunning the joint optimization on val data.
 
+        Under ``demean`` the validation matrices are centered by their own column
+        means, not the training ones: the score has to be the deviation ES of this
+        window, so the location it deviates from is this window's mean.
+
         Args:
             weights: Not used, joint optimization is rerun on val data.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
@@ -175,6 +197,9 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
 
         Y_fh_val = R_fh_val.values
         Y_c_val = R_c_val.values
+        if self.demean:
+            Y_fh_val = Y_fh_val - Y_fh_val.mean(axis=0)
+            Y_c_val = Y_c_val - Y_c_val.mean(axis=0)
 
         result = self._optimize_joint(Y_fh_val, Y_c_val)
         port_rets = Y_fh_val @ result["x"] + Y_c_val @ result["psi"]

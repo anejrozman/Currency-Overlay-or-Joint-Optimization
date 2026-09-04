@@ -31,6 +31,16 @@ already used by the other four SOES optimizers built alongside it
 reg_soes_curr_overlay.py): fall back to Clarabel when gurobipy is unavailable,
 so this class is usable locally without always overriding ``solver`` by hand.
 
+With ``demean`` set, both return matrices are centered columnwise before the
+program is solved, and the validation window is centered by its own column means
+before the joint problem is re-solved there. HMCR_2 is then measured on
+deviations from the sample mean rather than on raw returns, which puts it on the
+same footing as the deviation measures (mean-variance, MAD, semi-variance), all
+of which demean by construction. The flag and its treatment are identical to
+es_joint.py's; the switch is ``DEMEAN`` in backtest_config.py, off by default,
+mirrored into the parameter grid there as ``DEMEAN_GRID`` and shared with the ES
+optimizers.
+
 Author: Anej Rozman
 """
 
@@ -40,6 +50,9 @@ import logging
 import cvxpy as cp
 import numpy as np
 from scipy.optimize import minimize_scalar
+
+from portfolio_backtest.backtest_config import DEMEAN
+
 from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
@@ -72,12 +85,16 @@ class SecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
 
                 * ``alpha``          (float) — confidence level, default 0.80
                 * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
+                * ``demean``         (bool)  — center R_fh and R_c columnwise before
+                                               solving, default
+                                               ``backtest_config.DEMEAN``
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
                                                (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
+        self.demean: bool = bool(self.hyperparams.get("demean", DEMEAN))
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
 
         global _warned_fallback
@@ -106,6 +123,9 @@ class SecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         R_c = train_bundle["R_c"]
         self.Y_fh = np.asarray(R_fh.values, dtype=float)
         self.Y_c = np.asarray(R_c.values, dtype=float)
+        if self.demean:
+            self.Y_fh = self.Y_fh - self.Y_fh.mean(axis=0)
+            self.Y_c = self.Y_c - self.Y_c.mean(axis=0)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
@@ -220,6 +240,14 @@ class SecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         numerically with the same bounded 1-D search used throughout the SOES
         family.
 
+        Under ``demean`` the validation matrices are centered by their own column
+        means, not the training ones: the score has to be the deviation HMCR_2 of
+        this window, so the location it deviates from is this window's mean. The
+        zeta search then runs on the centered losses, and its bracket
+        (losses.min(), losses.max()) still contains the minimizer — HMCR_2 is
+        translation-equivariant, so centering shifts both zeta and the score by
+        the same constant.
+
         Args:
             weights: Not used, joint optimization is rerun on val data.
             val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
@@ -237,6 +265,9 @@ class SecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
 
         Y_fh_val = np.asarray(R_fh_val.values, dtype=float)
         Y_c_val = np.asarray(R_c_val.values, dtype=float)
+        if self.demean:
+            Y_fh_val = Y_fh_val - Y_fh_val.mean(axis=0)
+            Y_c_val = Y_c_val - Y_c_val.mean(axis=0)
 
         result = self._optimize_joint(Y_fh_val, Y_c_val)
         port_rets = Y_fh_val @ result["x"] + Y_c_val @ result["psi"]
