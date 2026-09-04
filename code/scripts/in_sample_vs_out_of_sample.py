@@ -155,6 +155,46 @@ def _hyperparams(strategy: str, universe: int, family: str) -> dict:
     return {row["date"]: {k: row[k] for k in keys} for row in chosen.to_dict("records")}
 
 
+def _available(measures, universes, family: str) -> list[str]:
+    """
+    Measures this family can actually be solved for.
+
+    The regularized arm reuses the penalties production selected per date, so a
+    measure whose backtest has not landed cannot be solved at all -- top_runs.csv
+    records that as a blank cell.  The whole measure is dropped rather than the
+    missing cell, because regressions() contrasts a measure's universes against
+    each other and a single-universe cell would leave it with no contrast to
+    regress on.  Mirrors how the unregularized branch of grid_arm warns and
+    skips a measure with no cached in_sample_<measure>_top<N>.csv.
+    """
+    if family == "unregularized":
+        return list(measures)
+    keep = []
+    for measure in measures:
+        missing = [
+            f"{name} top-{universe}"
+            for universe in universes
+            for name in _resolve_strategies(measure, family).values()
+            if not _has_run(name, universe)
+        ]
+        if missing:
+            logger.warning(
+                "Skipping %s %s: no production run recorded for %s.",
+                family, measure, ", ".join(missing),
+            )
+        else:
+            keep.append(measure)
+    return keep
+
+
+def _has_run(strategy: str, universe: int) -> bool:
+    try:
+        _top_run(strategy, universe)
+    except ValueError:
+        return False
+    return True
+
+
 def _pair(rows: pd.DataFrame, keys: list[str]) -> pd.DataFrame:
     parts = []
     for strategy, tag in (("joint", "joint"), ("overlay", "overlay"), ("equal_weight", "ew")):
@@ -243,15 +283,15 @@ def _sweep(measure, R_fh, R_c, windows, solver, family, universe) -> pd.DataFram
     return pd.DataFrame(rows)
 
 
-def grid_arm(solver, family: str) -> pd.DataFrame:
+def grid_arm(solver, family: str, measures, universes) -> pd.DataFrame:
     """
     The 9 main cells.  The unregularized ones were already solved and scored by
     in_sample_analysis.py, so they are read back rather than recomputed; the
     regularized ones have no such cache and are solved here.
     """
     frames = []
-    for measure in MEASURES:
-        for universe in UNIVERSES:
+    for measure in _available(measures, universes, family):
+        for universe in universes:
             if family == "unregularized":
                 path = SRC_DIR / f"in_sample_{measure}_top{universe}.csv"
                 if not path.exists():
@@ -275,7 +315,7 @@ def grid_arm(solver, family: str) -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
-def currency_arm(solver, family: str) -> pd.DataFrame:
+def currency_arm(solver, family: str, measures, universes) -> pd.DataFrame:
     """
     Tradable overlay block cut to the K largest economies by constituent count,
     with the asset universe left intact.  Regularized cells reuse the penalties
@@ -283,7 +323,10 @@ def currency_arm(solver, family: str) -> pd.DataFrame:
     those penalties were not chosen for a reduced currency block.
     """
     frames = []
+    measures = _available(measures, universes, family)
     for universe, counts in CURRENCY_ARM.items():
+        if universe not in universes:
+            continue
         R_fh, R_c, mask, atc = _load(universe)
         windows = isa._rebalancing_windows(R_fh, mask, STRATEGY_REGISTRY["mv_joint"]["config"])
         order = [c for c in pd.Series(list(atc.values())).value_counts().index if c in R_c.columns]
@@ -292,7 +335,7 @@ def currency_arm(solver, family: str) -> pd.DataFrame:
             if "USD" not in keep:
                 keep = ["USD"] + order[: n_curr - 1]
             logger.info("Currency arm %s top-%d K=%d: %s", family, universe, n_curr, keep)
-            for measure in MEASURES:
+            for measure in measures:
                 rows = _sweep(measure, R_fh, R_c[keep], windows, solver, family, universe)
                 paired = _pair(rows.dropna(subset=["in_sample_risk", "realized_risk"]), ["date"])
                 paired["measure"] = measure
@@ -450,6 +493,21 @@ def _parse_args() -> argparse.Namespace:
         "--arms", nargs="+", default=["grid", "currency"], choices=["grid", "currency"]
     )
     parser.add_argument("--family", default="unregularized", choices=list(FAMILIES))
+    parser.add_argument(
+        "--measures", nargs="+", default=list(MEASURES), choices=list(MEASURES),
+        help="Measures to solve (default: all). The regularized arm re-solves rather "
+             "than reading a cache, so scope it to what actually needs rebuilding.",
+    )
+    parser.add_argument(
+        "--universes", nargs="+", type=int, default=list(UNIVERSES), choices=list(UNIVERSES),
+        help="Universe sizes to solve (default: all three). Split across concurrent "
+             "jobs with distinct --out-dir, then merge their gaps.csv.",
+    )
+    parser.add_argument(
+        "--sweep-only", action="store_true",
+        help="Write gaps.csv and stop, skipping the tables and figures. Use for a job "
+             "covering one slice, whose regression would have no universe contrast.",
+    )
     parser.add_argument("--out-dir", type=Path, default=OUT_DIR)
     parser.add_argument("--plot-only", action="store_true")
     parser.add_argument("--log-level", default="INFO", choices=["DEBUG", "INFO", "WARNING"])
@@ -473,8 +531,8 @@ def main() -> None:
     else:
         solver = isa._pick_solver()[0]
         builders = {
-            "grid": lambda: grid_arm(solver, args.family),
-            "currency": lambda: currency_arm(solver, args.family),
+            "grid": lambda: grid_arm(solver, args.family, args.measures, args.universes),
+            "currency": lambda: currency_arm(solver, args.family, args.measures, args.universes),
         }
         gaps = pd.concat([builders[arm]() for arm in args.arms], ignore_index=True)
         gaps["family"] = args.family
@@ -482,10 +540,17 @@ def main() -> None:
             old = pd.read_csv(gaps_path, parse_dates=["date"])
             if "family" not in old.columns:
                 old["family"] = "unregularized"
-            stale = (old["family"] == args.family) & old["arm"].isin(args.arms)
+            stale = (
+                (old["family"] == args.family)
+                & old["arm"].isin(args.arms)
+                & old["measure"].isin(args.measures)
+                & old["universe"].isin(args.universes)
+            )
             gaps = pd.concat([old[~stale], gaps], ignore_index=True)
         gaps.to_csv(gaps_path, index=False)
         logger.info("Wrote %d rows to %s", len(gaps), gaps_path)
+        if args.sweep_only:
+            return
 
     gaps["s"] = [currency_share(u, k) for u, k in zip(gaps["universe"], gaps["n_curr"])]
     summary = summarise(gaps)
