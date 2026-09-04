@@ -15,8 +15,9 @@
 #   grid      the main cells, one per measure x universe; reads
 #             results/in_sample_analysis/ and re-solves nothing, so it takes
 #             seconds and does not need a job at all.  A measure with no cached
-#             in_sample_<measure>_top<N>.csv is warned about and skipped, so smv
-#             stays absent until in_sample_analysis.py is run for it.
+#             in_sample_<measure>_top<N>.csv is warned about and skipped, so a
+#             newly added measure stays absent until in_sample_analysis.py is
+#             run for it.
 #
 # Arms share results/in_sample_vs_out_of_sample/gaps.csv, and each run rewrites
 # that file with its own arm's rows replaced.  Do not run two arms concurrently
@@ -27,9 +28,9 @@
 #   python code/scripts/in_sample_vs_out_of_sample.py --plot-only
 #
 # --family regularized reuses the penalties each production run selected, read via
-# results/runs/top_runs.csv.  reg_smv_joint and reg_smv_curr_overlay have no
-# production run and no top_runs.csv row yet, so the regularized arm covers smv
-# only once those land.
+# results/runs/top_runs.csv.  reg_soes_joint and reg_soes_curr_overlay have finished
+# on top-10 alone, so their top-50 and top-100 cells there are blank and the
+# regularized arm covers soes only once those land.
 #
 # Usage:
 #   ./run_gap_analysis.sh [--arm <currency|grid>] [options]

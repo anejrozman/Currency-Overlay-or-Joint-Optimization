@@ -16,11 +16,11 @@
 #   python code/scripts/in_sample_analysis.py <measure> --plot-only
 #
 # Usage:
-#   ./run_in_sample_analysis.sh --measure <es|mv|mad> --universe <10|50|100> [options]
-#   ./run_in_sample_analysis.sh --measure <es|mv|mad> --all-universes [options]
+#   ./run_in_sample_analysis.sh --measure <es|mv|mad|smv|soes> --universe <10|50|100> [options]
+#   ./run_in_sample_analysis.sh --measure <es|mv|mad|smv|soes> --all-universes [options]
 #
 # Options:
-#   --measure NAME      Risk measure: es, mv or mad (required)
+#   --measure NAME      Risk measure: es, mv, mad, smv or soes (required)
 #   --universe N        Top-N universe: 10, 50, or 100 (default: 10)
 #   --all-universes     Submit one job per universe instead of a single one
 #   --time HH:MM:SS     SLURM time limit (default: 24:00:00, max 720:00:00)
@@ -44,10 +44,10 @@ usage() {
 Submit the in-sample vs realized risk diagnostic to the Euler cluster.
 
 Usage:
-  ./run_in_sample_analysis.sh --measure <es|mv|mad> --universe <10|50|100> [options]
-  ./run_in_sample_analysis.sh --measure <es|mv|mad> --all-universes [options]
+  ./run_in_sample_analysis.sh --measure <es|mv|mad|smv|soes> --universe <10|50|100> [options]
+  ./run_in_sample_analysis.sh --measure <es|mv|mad|smv|soes> --all-universes [options]
 
-  --measure NAME      Risk measure: es, mv or mad (required)
+  --measure NAME      Risk measure: es, mv, mad, smv or soes (required)
   --universe N        Top-N universe: 10, 50, or 100 (default: 10)
   --all-universes     Submit one job per universe instead of a single one
   --time HH:MM:SS     SLURM time limit (default: 24:00:00, max 720:00:00)
@@ -75,8 +75,8 @@ done
 [[ -z "$MEASURE" ]] && { echo "Error: --measure is required."; usage; }
 
 case "$MEASURE" in
-    es|mv|mad) ;;
-    *) echo "Error: --measure must be es, mv or mad."; exit 1 ;;
+    es|mv|mad|smv|soes) ;;
+    *) echo "Error: --measure must be es, mv, mad, smv or soes."; exit 1 ;;
 esac
 
 case "$UNIVERSE" in

@@ -24,14 +24,15 @@ rather than re-solved; a measure with no cached in_sample_<measure>_top<N>.csv i
 warned about and skipped.
 
 --family regularized additionally needs, for each measure, a production run of both
-its joint and its overlay strategy plus a row in results/runs/top_runs.csv, because
-the per-date penalties are reused from what production selected rather than
-re-searched over the 256-point grid.  reg_smv_joint and reg_smv_curr_overlay have
-neither yet, so the regularized arm is available for smv only once those cluster
-runs land and their top_runs.csv rows are added.
+its joint and its overlay strategy plus a filled cell in results/runs/top_runs.csv,
+because the per-date penalties are reused from what production selected rather than
+re-searched over the 256-point grid.  reg_soes_joint and reg_soes_curr_overlay have
+finished on top-10 alone, so their top-50 and top-100 cells are blank and the
+regularized arm covers soes only once those cluster runs land.
 
 Usage:
     python code/scripts/in_sample_vs_out_of_sample.py
+    python code/scripts/in_sample_vs_out_of_sample.py --arms grid
     python code/scripts/in_sample_vs_out_of_sample.py --arms currency
     python code/scripts/in_sample_vs_out_of_sample.py --plot-only
 
@@ -62,7 +63,7 @@ from portfolio_backtest.utils.returns import (
 
 logger = logging.getLogger("in_sample_vs_out_of_sample")
 
-MEASURES = ("mv", "es", "mad", "smv")
+MEASURES = ("mv", "es", "mad", "smv", "soes")
 FAMILIES = ("unregularized", "regularized")
 UNIVERSES = (10, 50, 100)
 N_CURRENCIES = 14
@@ -76,6 +77,7 @@ MEASURE_LABELS = {
     "mv": "Volatility",
     "mad": "Mean Absolute Deviation",
     "smv": "Semi-Deviation",
+    "soes": "Second-Order Expected Shortfall",
 }
 # The figure draws the grid arm alone, so these three are no longer read by
 # plot().  They are kept because the currency arm is still solved and written to
@@ -122,7 +124,16 @@ def _top_run(strategy: str, universe: int) -> int:
     row = table[table["strategy_name"] == strategy]
     if row.empty:
         raise ValueError(f"{strategy} has no entry in top_runs.csv.")
-    return int(row[f"top_{universe}_run"].iloc[0])
+    # A blank cell is how top_runs.csv records a production run that has not
+    # landed; without this it would surface as int(nan) far from the cause.
+    run = row[f"top_{universe}_run"].iloc[0]
+    if pd.isna(run):
+        raise ValueError(
+            f"{strategy} has no top-{universe} run recorded in top_runs.csv. The "
+            f"regularized arm reuses the penalties that production selected, so it "
+            f"cannot run on this cell until that backtest lands."
+        )
+    return int(run)
 
 
 def _hyperparams(strategy: str, universe: int, family: str) -> dict:

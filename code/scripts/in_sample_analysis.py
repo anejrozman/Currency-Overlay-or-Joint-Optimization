@@ -69,12 +69,13 @@ One row is written per date, strategy, universe and leverage cap; nothing is
 aggregated into the row-level CSV.  Aggregation happens only in the plotting
 step, which reads those CSVs back and writes both the per-measure medians and
 overfitting_means.csv, the means and intervals behind the figure.  The figure
-spans all three risk measures, so it is drawn from every CSV present in the
-output directory rather than from the measure this invocation swept.
+spans every risk measure, so it is drawn from every CSV present in the output
+directory rather than from the measure this invocation swept.
 
 Usage:
     python code/scripts/in_sample_analysis.py es
     python code/scripts/in_sample_analysis.py mv --universes 10 50
+    python code/scripts/in_sample_analysis.py soes --universes 10 50 100
     python code/scripts/in_sample_analysis.py mad --plot-only
 
 Author: Anej Rozman
@@ -90,6 +91,7 @@ import cvxpy as cp
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from scipy.optimize import minimize_scalar
 
 from portfolio_backtest import config
 from portfolio_backtest.backtest.backtester import Backtester
@@ -104,7 +106,7 @@ from portfolio_backtest.utils.returns import (
 
 logger = logging.getLogger("in_sample_analysis")
 
-MEASURES = ("mv", "es", "mad", "smv")
+MEASURES = ("mv", "es", "mad", "smv", "soes")
 ROLES = ("joint", "overlay")
 UNIVERSE_SIZES = (10, 50, 100)
 
@@ -129,6 +131,7 @@ MEASURE_LABELS = {
     "mv": "Volatility",
     "mad": "Mean Absolute Deviation",
     "smv": "Semi-Deviation",
+    "soes": "Second-Order Expected Shortfall",
 }
 ROLE_LABELS = {"joint": "Joint", "overlay": "Overlay", CONTROL_STRATEGY: "1/N control"}
 ROLE_COLORS = {"joint": "C0", "overlay": "C3", CONTROL_STRATEGY: "dimgrey"}
@@ -341,7 +344,7 @@ def evaluate_risk(
     weights come in fixed.
 
     Args:
-        measure: ``"es"``, ``"mv"``, ``"mad"`` or ``"smv"``.
+        measure: ``"es"``, ``"mv"``, ``"mad"``, ``"smv"`` or ``"soes"``.
         R_fh_window: Fully hedged asset returns over the window, columns aligned to *x*.
         R_c_window: Excess currency returns over the window, columns aligned to *psi*.
         x: Asset weights.
@@ -350,8 +353,9 @@ def evaluate_risk(
 
     Returns:
         ES at *alpha* (mean loss over the worst ``1-alpha`` tail), the standard
-        deviation, the mean absolute deviation, or the semi-deviation about the
-        window's own mean.  Lower is better in every case.  NaN on an empty window.
+        deviation, the mean absolute deviation, the semi-deviation about the
+        window's own mean, or HMCR_2 at *alpha*.  Lower is better in every case.
+        NaN on an empty window.
     """
     if R_fh_window.empty or R_c_window.empty:
         return float("nan")
@@ -383,6 +387,27 @@ def evaluate_risk(
         # the mv branch above returns the standard deviation rather than the variance.
         downside = np.minimum(r - r.mean(), 0.0)
         return float(np.sqrt(np.mean(downside ** 2))) if r.size > 1 else float("nan")
+    if measure == "soes":
+        # HMCR_2 (Krokhmal 2007), the objective the SOES programs minimize:
+        # min over zeta of zeta + ||max(loss - zeta, 0)||_2 / ((1-alpha) sqrt(T)).
+        # Unlike ES, whose minimizer is the empirical VaR and can be read off a
+        # quantile, p = 2 has no such shortcut, so zeta is solved for with the
+        # same bounded 1-D search the SOES optimizers' own score() methods use.
+        # Positively homogeneous of degree 1, so it is already on the linear
+        # scale the mv and smv branches convert to above.
+        if alpha is None:
+            raise ValueError("alpha is required to evaluate SOES.")
+        tail_prob = 1.0 - alpha
+        losses = -r
+        best = minimize_scalar(
+            lambda zeta: zeta
+            + np.linalg.norm(np.maximum(losses - zeta, 0.0))
+            / (tail_prob * np.sqrt(losses.size)),
+            bounds=(float(losses.min()), float(losses.max())),
+            method="bounded",
+            options={"xatol": 1e-10},
+        )
+        return float(best.fun)
     raise ValueError(f"Unknown measure '{measure}'.")
 
 
@@ -742,7 +767,9 @@ def plot_overfitting(
     program's risk estimate degrades no worse than 1/N's does.
     """
     overfit_stats = overfit_stats[overfit_stats["leverage_label"] == leverage_label]
-    fig, axes = plt.subplots(1, len(MEASURES), figsize=(17, 4.4), sharex=True, sharey=True)
+    fig, axes = plt.subplots(
+        1, len(MEASURES), figsize=(4.25 * len(MEASURES), 4.4), sharex=True, sharey=True
+    )
 
     universes = sorted(set(UNIVERSE_SIZES) | set(overfit_stats["universe"]))
     positions = {u: i for i, u in enumerate(universes)}
@@ -873,7 +900,7 @@ def main() -> None:
     logger.info("Wrote plot medians to %s", summary_path)
     print(summary.to_string(index=False))
 
-    # The figure spans all three measures, so it is built from every CSV on disk
+    # The figure spans every measure, so it is built from every CSV on disk
     # rather than from this run's measure alone.
     overfit_stats = _overfit_stats(_load_all_rows(out_dir))
     stats_path = out_dir / "overfitting_means.csv"
