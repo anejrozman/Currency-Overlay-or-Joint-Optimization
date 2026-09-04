@@ -1,0 +1,12 @@
+{
+  "ES_80 (daily, %)": 0.3508,
+  "ES_95 (daily, %)": 0.662,
+  "Volatility (ann., %)": 4.5666,
+  "MAD (ann., %)": 3.097,
+  "Max Drawdown (%)": 30.4132,
+  "Sharpe Ratio": 0.8213,
+  "Sortino Ratio": 1.0865,
+  "ESR": 0.6735,
+  "Avg Asset Turnover (per rebal.)": 0.9197,
+  "Avg Currency Turnover (per rebal.)": 0.9723
+}

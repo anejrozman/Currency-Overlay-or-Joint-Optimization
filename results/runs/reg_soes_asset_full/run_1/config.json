@@ -1,0 +1,35 @@
+{
+  "strategy": "reg_soes_asset_full",
+  "label": "ASSETS-FULL SOES (top-100)",
+  "run_date": "2026-09-03T20:54:14.313229",
+  "optimizer": "RegularizedSecondOrderExpectedShortfallAssetFullOptimizer",
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "lambda_l1": [
+      0.0,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "lambda_l2": [
+      0.0,
+      0.05,
+      1.0,
+      15.0
+    ],
+    "leverage_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_100_202603081747.csv",
+  "universe_size": 100,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
