@@ -1,0 +1,13 @@
+strategy_name, top_10_run, top_50_run, top_100_run
+
+equal_weight_optimizer,         1, 2, 3
+
+es_curr_overlay,                15, 13, 14
+reg_es_curr_overlay,            12, 10, 11
+es_joint,                       13, 14, 12
+reg_es_joint,                   11, 10, 12
+
+soes_curr_overlay,              5, 6, 7
+reg_soes_curr_overlay,          6, 4, 5
+soes_joint,                     8, 7, 6
+reg_soes_joint,                 6, 8, 7
