@@ -79,6 +79,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+import os
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -297,21 +298,47 @@ def _shard_path(out_dir: Path, family: str, measure: str, universe: int) -> Path
 
 def _read_shards(out_dir: Path) -> pd.DataFrame:
     """
-    Every cell that has landed in *out_dir*, concatenated.
+    Every cell that has landed in *out_dir*, concatenated and de-duplicated.
 
     Reads back from disk rather than reusing what this process just solved, so a
     job that swept one cell still builds its tables against the cells its
     siblings finished, and --plot-only needs no sweep at all.
+
+    Re-solving a cell overwrites its own shard, so the ordinary case of running
+    the same family twice needs no handling here.  What does need handling is a
+    cell reaching the directory under a second filename -- a hand-made backup, a
+    rename, a copy from another out-dir.  The glob would then count it twice:
+    the means survive, but every bootstrap interval tightens as though the cell
+    carried twice the evidence, and nothing in the output says so.  Shards are
+    read newest-first-wins and de-duplicated on the cell key, with a warning
+    naming the files, since silently halving the width of a published CI is the
+    worse failure.
     """
-    paths = sorted(out_dir.glob("gaps_*.csv"))
+    paths = sorted(out_dir.glob("gaps_*.csv"), key=lambda p: p.stat().st_mtime)
     if not paths:
         raise FileNotFoundError(
             f"No gaps_*.csv shards in {out_dir}. Solve at least one cell before "
             f"building the tables and figure."
         )
-    return pd.concat(
-        [pd.read_csv(path, parse_dates=["date"]) for path in paths], ignore_index=True
-    )
+    frames = []
+    for path in paths:
+        frame = pd.read_csv(path, parse_dates=["date"])
+        frame["shard"] = path.name
+        frames.append(frame)
+    gaps = pd.concat(frames, ignore_index=True)
+
+    keys = ["family", "measure", "universe", "date"]
+    clashing = gaps.duplicated(keys, keep=False)
+    if clashing.any():
+        logger.warning(
+            "Duplicate cells across shards: %s. One cell is present under more than "
+            "one filename, which would double its weight in every bootstrap interval. "
+            "Keeping whichever shard was written most recently; delete the stale one.",
+            ", ".join(sorted(gaps.loc[clashing, "shard"].unique())),
+        )
+        # Paths were read oldest-first, so the newest solve is the last occurrence.
+        gaps = gaps.drop_duplicates(keys, keep="last")
+    return gaps.drop(columns="shard").sort_values(keys).reset_index(drop=True)
 
 
 def grid_arm(solver, family: str, measures, universes, out_dir: Path) -> int:
@@ -344,7 +371,13 @@ def grid_arm(solver, family: str, measures, universes, out_dir: Path) -> int:
             paired["draw"] = 0
             paired["family"] = family
             path = _shard_path(out_dir, family, measure, universe)
-            paired.to_csv(path, index=False)
+            # Written through a per-process temp file and renamed into place, so a
+            # shard is never observed half-written. Two jobs solving the same cell
+            # at once -- the same family submitted twice before the first finished
+            # -- then resolve to one whole file rather than an interleaved one.
+            tmp = path.with_name(f"{path.name}.{os.getpid()}.tmp")
+            paired.to_csv(tmp, index=False)
+            tmp.replace(path)
             logger.info("Wrote %d rows to %s", len(paired), path)
             written += 1
     return written
