@@ -1,0 +1,50 @@
+{
+  "strategy": "reg_soes_curr_overlay",
+  "label": "Regularized SOES Currency Overlay (top-100)",
+  "run_date": "2026-09-05T08:19:50.879076",
+  "optimizer": "RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer",
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "lambda_l1_asset": [
+      0.0,
+      0.001,
+      0.01,
+      0.1
+    ],
+    "lambda_l2_asset": [
+      0.0,
+      0.05,
+      1.0,
+      15.0
+    ],
+    "lambda_l1_curr": [
+      0.0,
+      0.0001,
+      0.001,
+      0.01
+    ],
+    "lambda_l2_curr": [
+      0.0,
+      0.0001,
+      0.01,
+      1.0
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "demean": [
+      true
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_100_202603081747.csv",
+  "universe_size": 100,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
