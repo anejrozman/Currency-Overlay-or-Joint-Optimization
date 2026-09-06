@@ -400,6 +400,50 @@ JOINT_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing regularized ES overlay and joint programs. Both reuse the ES penalty
+# grids calibrated on their mean-free counterparts, as REG_OVERLAY_CONFIG and
+# REG_JOINT_CONFIG do; the risk term is the same measure at the same scale, so the
+# bounds transfer. Note the calibration was done without a mean term competing for
+# the objective, so the penalty that is optimal here may sit lower than it does
+# there -- worth re-reading the selected-lambda series once these have run.
+#
+# gamma is deliberately NOT in either grid. Both configs already have
+# 4 x 4 x 4 x 4 = 256 combinations per rebalancing date, and crossing that with
+# ES_GAMMA_GRID's seven points is not affordable at these universe sizes. The
+# optimizers default gamma to 2 and still read it from hyperparams, so it can be
+# swept deliberately later without touching their code. 2 is a conservative choice
+# rather than a calibrated one: the unregularized sweeps favoured 0.2 (overlay) and
+# 1.0 (joint), but with no penalties competing against the mean term.
+REG_ES_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":           ALPHA,
+        "lambda_l1_asset": LAMBDA_L1_ASSET_GRID,
+        "lambda_l2_asset": LAMBDA_L2_ASSET_GRID,
+        "lambda_l1_curr":  LAMBDA_L1_CURR_GRID,
+        "lambda_l2_curr":  LAMBDA_L2_CURR_GRID,
+        "leverage_limit":  LEVERAGE,
+        "overlay_limit":   OVERLAY_LIMIT,
+    },
+)
+
+REG_ES_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":           ALPHA,
+        "lambda_l1_asset": LAMBDA_L1_ASSET_GRID,
+        "lambda_l2_asset": LAMBDA_L2_ASSET_GRID,
+        "lambda_l1_curr":  LAMBDA_L1_CURR_GRID,
+        "lambda_l2_curr":  LAMBDA_L2_CURR_GRID,
+        "leverage_limit":  LEVERAGE,
+        "overlay_limit":   OVERLAY_LIMIT,
+    },
+)
+
 REG_JOINT_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,

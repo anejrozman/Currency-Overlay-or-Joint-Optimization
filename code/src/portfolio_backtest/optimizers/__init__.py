@@ -9,7 +9,9 @@ from .es_joint_w_mean import ExpectedShortfallJointWithMeanOptimizer
 from .reg_es_asset_full import RegularizedExpectedShortfallAssetFullOptimizer
 from .reg_es_asset_zero import RegularizedExpectedShortfallAssetZeroOptimizer
 from .reg_es_curr_overlay import RegularizedExpectedShortfallCurrencyOverlayOptimizer
+from .reg_es_curr_overlay_w_mean import RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer
 from .reg_es_joint import RegularizedExpectedShortfallJointOptimizer
+from .reg_es_joint_w_mean import RegularizedExpectedShortfallJointWithMeanOptimizer
 from .reg_mad_asset_full import RegularizedMeanAbsoluteDeviationAssetFullOptimizer
 from .reg_mad_asset_zero import RegularizedMeanAbsoluteDeviationAssetZeroOptimizer
 from .mad_curr_overlay import MeanAbsoluteDeviationCurrencyOverlayOptimizer
@@ -49,7 +51,9 @@ __all__ = [
     "RegularizedExpectedShortfallAssetFullOptimizer",
     "RegularizedExpectedShortfallAssetZeroOptimizer",
     "RegularizedExpectedShortfallCurrencyOverlayOptimizer",
+    "RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer",
     "RegularizedExpectedShortfallJointOptimizer",
+    "RegularizedExpectedShortfallJointWithMeanOptimizer",
     "RegularizedMeanAbsoluteDeviationAssetFullOptimizer",
     "RegularizedMeanAbsoluteDeviationAssetZeroOptimizer",
     "RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer",
