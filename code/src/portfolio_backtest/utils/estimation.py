@@ -239,3 +239,91 @@ def pooled_asset_mean(
 
     # Expand back to asset level: position of each asset's economy in `present`.
     return mu_economy[np.searchsorted(present, economy_ids)], w
+
+def economy_ids_from_indicator(C: object, n_assets: int) -> np.ndarray:
+    """
+    Map each asset to its economy from an asset-to-currency indicator matrix.
+
+    The Backtester assembles this matrix (bundle key ``"C"``) and restricts it to
+    the window's valid assets; its columns are R_c's columns in order, so economy
+    k and currency k are the same object and no separate mapping is needed.
+
+    Args:
+        C: (N, K) asset-to-currency indicator matrix from the data bundle.
+        n_assets: Expected number of assets, for validation.
+
+    Returns:
+        Length-N integer array of economy indices, in R_c's column order.
+
+    Raises:
+        ValueError: If ``C`` is missing, mis-shaped, or has a row that is not a
+                    single indicator -- an asset with no economy, or more than
+                    one, would otherwise be silently misattributed.
+    """
+    if C is None:
+        raise ValueError("bundle must contain 'C' (asset-to-currency matrix).")
+    C_arr = np.asarray(C, dtype=float)
+    if C_arr.ndim != 2 or C_arr.shape[0] != n_assets:
+        raise ValueError(f"'C' has shape {C_arr.shape}, expected ({n_assets}, K).")
+    if not np.allclose(C_arr.sum(axis=1), 1.0):
+        bad = int((~np.isclose(C_arr.sum(axis=1), 1.0)).sum())
+        raise ValueError(
+            f"Every row of 'C' must assign exactly one economy; {bad} row(s) do not."
+        )
+    return C_arr.argmax(axis=1)
+
+
+def conditional_currency_mean(F: object, Y_c: np.ndarray) -> np.ndarray:
+    """
+    Conditional currency mean from the forward premium: mu_c = -f_t.
+
+    Under the random-walk hypothesis for spot (E_t[e_{t+1}] = 0), the definition
+    R_c = e_{t+1} - f_t gives E_t[R_c] = -f_t directly, so the expected excess
+    currency return is the negative forward premium -- the carry.  Nothing is
+    estimated: f_t is observed at the end of the window, which is why this
+    replaces the James-Stein shrunk sample mean the module used previously.  That
+    sample mean was shrunk to exactly zero in most windows, since 13 currency
+    means over a 2500-day window carry almost no signal, leaving step 2 with no
+    mean term at all.
+
+    The pooled OLS of R_c on f over the full sample gives a slope of -0.83,
+    against -1 under random-walk spot and 0 under uncovered interest parity, so
+    the -1 loading used here is close to what the data supports and far from the
+    UIP null.  The remaining discrepancy does not matter: a constant rescaling of
+    mu_c is absorbed exactly by gamma, since the objective is
+    Risk - mu' w / gamma.  Only a time-varying or per-currency loading would add
+    content beyond this, at the cost of parameters estimated from one window.
+
+    The forward premium frame is already shifted by one day when it is built
+    (:func:`~portfolio_backtest.utils.returns.compute_daily_forward_premium`), so
+    the last row of the window is the premium known one day before the window
+    ends.  That is stale by a day rather than forward-looking, which is the safe
+    direction.
+
+    The base currency is held at zero: its R_c column is identically zero by
+    construction and its forward premium is likewise zero, so it carries no carry.
+
+    Args:
+        F: (q, K) frame of daily forward premiums for the window, aligned to R_c.
+        Y_c: (q, K) array of excess currency returns, used only to locate the
+             base-currency column.
+
+    Returns:
+        Length-K conditional mean vector.
+
+    Raises:
+        ValueError: If ``F`` is missing or empty -- this optimizer conditions on
+                    it and must not silently fall back to a zero mean.
+    """
+    if F is None or getattr(F, "empty", False):
+        raise ValueError(
+            "bundle must contain a non-empty 'F' (daily forward premiums) for the "
+            "conditional currency mean; check that the runner passes it."
+        )
+    f_last = np.asarray(getattr(F, "values", F), dtype=float)[-1]
+    mu = -np.nan_to_num(f_last, nan=0.0)
+
+    base = np.where(Y_c.var(axis=0) <= 0.0)[0]
+    if base.size:
+        mu[base] = 0.0
+    return mu

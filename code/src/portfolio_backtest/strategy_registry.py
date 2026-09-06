@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from portfolio_backtest.backtest_config import (
     ES_CONFIG,
+    ES_MEAN_JOINT_CONFIG,
     ES_MEAN_OVERLAY_CONFIG,
     EW_CONFIG,
     JOINT_CONFIG,
@@ -53,6 +54,7 @@ from portfolio_backtest.optimizers import (
     ExpectedShortfallCurrencyOverlayOptimizer,
     ExpectedShortfallCurrencyOverlayWithMeanOptimizer,
     ExpectedShortfallJointOptimizer,
+    ExpectedShortfallJointWithMeanOptimizer,
     MeanAbsoluteDeviationCurrencyOverlayOptimizer,
     MeanAbsoluteDeviationJointOptimizer,
     MeanVarianceCurrencyOverlayOptimizer,
@@ -129,6 +131,13 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label": "ES Joint",
         "use_hedging": True,
         "config": JOINT_CONFIG,
+    },
+    "es_joint_w_mean": {
+        "optimizer": ExpectedShortfallJointWithMeanOptimizer,
+        "asset_return_key": "R_fh",
+        "label": "Mean-ES Joint",
+        "use_hedging": True,
+        "config": ES_MEAN_JOINT_CONFIG,
     },
     "reg_es_joint": {
         "optimizer": RegularizedExpectedShortfallJointOptimizer,

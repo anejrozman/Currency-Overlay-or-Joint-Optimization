@@ -79,7 +79,11 @@ import logging
 import cvxpy as cp
 import numpy as np
 
-from ..utils.estimation import pooled_asset_mean
+from ..utils.estimation import (
+    conditional_currency_mean,
+    economy_ids_from_indicator,
+    pooled_asset_mean,
+)
 
 from .base_optimizer import BaseOptimizer
 
@@ -94,62 +98,6 @@ except ImportError:
     _DEFAULT_SOLVER = cp.CLARABEL
 
 _warned_fallback = False
-
-
-def _conditional_currency_mean(F: object, Y_c: np.ndarray) -> np.ndarray:
-    """
-    Conditional currency mean from the forward premium: mu_c = -f_t.
-
-    Under the random-walk hypothesis for spot (E_t[e_{t+1}] = 0), the definition
-    R_c = e_{t+1} - f_t gives E_t[R_c] = -f_t directly, so the expected excess
-    currency return is the negative forward premium -- the carry.  Nothing is
-    estimated: f_t is observed at the end of the window, which is why this
-    replaces the James-Stein shrunk sample mean the module used previously.  That
-    sample mean was shrunk to exactly zero in most windows, since 13 currency
-    means over a 2500-day window carry almost no signal, leaving step 2 with no
-    mean term at all.
-
-    The pooled OLS of R_c on f over the full sample gives a slope of -0.83,
-    against -1 under random-walk spot and 0 under uncovered interest parity, so
-    the -1 loading used here is close to what the data supports and far from the
-    UIP null.  The remaining discrepancy does not matter: a constant rescaling of
-    mu_c is absorbed exactly by gamma, since the objective is
-    Risk - mu' w / gamma.  Only a time-varying or per-currency loading would add
-    content beyond this, at the cost of parameters estimated from one window.
-
-    The forward premium frame is already shifted by one day when it is built
-    (:func:`~portfolio_backtest.utils.returns.compute_daily_forward_premium`), so
-    the last row of the window is the premium known one day before the window
-    ends.  That is stale by a day rather than forward-looking, which is the safe
-    direction.
-
-    The base currency is held at zero: its R_c column is identically zero by
-    construction and its forward premium is likewise zero, so it carries no carry.
-
-    Args:
-        F: (q, K) frame of daily forward premiums for the window, aligned to R_c.
-        Y_c: (q, K) array of excess currency returns, used only to locate the
-             base-currency column.
-
-    Returns:
-        Length-K conditional mean vector.
-
-    Raises:
-        ValueError: If ``F`` is missing or empty -- this optimizer conditions on
-                    it and must not silently fall back to a zero mean.
-    """
-    if F is None or getattr(F, "empty", False):
-        raise ValueError(
-            "bundle must contain a non-empty 'F' (daily forward premiums) for the "
-            "conditional currency mean; check that the runner passes it."
-        )
-    f_last = np.asarray(getattr(F, "values", F), dtype=float)[-1]
-    mu = -np.nan_to_num(f_last, nan=0.0)
-
-    base = np.where(Y_c.var(axis=0) <= 0.0)[0]
-    if base.size:
-        mu[base] = 0.0
-    return mu
 
 
 class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
@@ -197,37 +145,6 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         self.q: int = 0
         self.x_opt: np.ndarray | None = None
 
-    @staticmethod
-    def _economy_ids(C: object, n_assets: int) -> np.ndarray:
-        """
-        Map each asset to its economy from the bundle's indicator matrix.
-
-        Args:
-            C: (N, K) asset-to-currency indicator matrix from the data bundle.
-            n_assets: Expected number of assets, for validation.
-
-        Returns:
-            Length-N integer array of economy indices, in R_c's column order.
-
-        Raises:
-            ValueError: If ``C`` is missing, mis-shaped, or has a row that is not
-                        a single indicator — an asset with no economy, or more
-                        than one, would otherwise be silently misattributed.
-        """
-        if C is None:
-            raise ValueError("train_bundle must contain 'C' (asset-to-currency matrix).")
-        C_arr = np.asarray(C, dtype=float)
-        if C_arr.ndim != 2 or C_arr.shape[0] != n_assets:
-            raise ValueError(
-                f"'C' has shape {C_arr.shape}, expected ({n_assets}, K)."
-            )
-        if not np.allclose(C_arr.sum(axis=1), 1.0):
-            raise ValueError(
-                "Every row of 'C' must assign exactly one economy; "
-                f"{int((~np.isclose(C_arr.sum(axis=1), 1.0)).sum())} row(s) do not."
-            )
-        return C_arr.argmax(axis=1)
-
     def fit(self, train_bundle: dict[str, object]) -> None:
         """
         Extract the return matrices and estimate both mean vectors.
@@ -246,9 +163,9 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
-        self.economy_ids = self._economy_ids(train_bundle.get("C"), self.N)
+        self.economy_ids = economy_ids_from_indicator(train_bundle.get("C"), self.N)
         self.mu_a, w_a = pooled_asset_mean(self.Y_fh, self.economy_ids)
-        self.mu_c = _conditional_currency_mean(train_bundle.get("F"), self.Y_c)
+        self.mu_c = conditional_currency_mean(train_bundle.get("F"), self.Y_c)
         logger.debug(
             "Asset mean shrinkage w=%.4f (%d economies); carry mu_c gross=%.2e.",
             w_a, len(np.unique(self.economy_ids)), np.abs(self.mu_c).sum(),
@@ -440,9 +357,9 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         # Step 2 is re-solved here, so it still needs this window's own mean
         # vectors -- the objective it minimizes is the gamma-scaled one.  Only the
         # score returned below is gamma-free.
-        economy_ids = self._economy_ids(val_bundle.get("C"), Y_fh_val.shape[1])
+        economy_ids = economy_ids_from_indicator(val_bundle.get("C"), Y_fh_val.shape[1])
         mu_a_val, _ = pooled_asset_mean(Y_fh_val, economy_ids)
-        mu_c_val = _conditional_currency_mean(val_bundle.get("F"), Y_c_val)
+        mu_c_val = conditional_currency_mean(val_bundle.get("F"), Y_c_val)
 
         psi_val = self._optimize_overlay(
             Y_fh_val, Y_c_val, self.x_opt, mu_a_val, mu_c_val

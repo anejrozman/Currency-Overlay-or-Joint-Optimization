@@ -370,6 +370,25 @@ REG_OVERLAY_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing ES joint program. Same grid as ES_MEAN_OVERLAY_CONFIG, and reusing
+# ES_GAMMA_GRID: it is the same risk measure at the same scale, so the calibrated
+# range transfers, exactly as the other joint configs reuse the asset and currency
+# grids calibrated on their standalone programs. The joint program chooses x and psi
+# against a single tail rather than in sequence, so the mean pulls somewhat harder at
+# any given gamma; if the selected-gamma series clusters at either endpoint, this
+# range wants recalibrating on the joint program itself.
+ES_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "gamma":          ES_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
+    },
+)
+
 JOINT_CONFIG = BacktestConfig(
     window_years=10,
     val_years=1,
