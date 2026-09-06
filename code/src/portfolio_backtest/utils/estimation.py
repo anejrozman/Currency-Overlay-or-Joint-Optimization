@@ -146,3 +146,96 @@ def sample_cross_cov(Y1: np.ndarray, Y2: np.ndarray) -> np.ndarray:
     x1 = Y1 - Y1.mean(axis=0)
     x2 = Y2 - Y2.mean(axis=0)
     return (x1.T @ x2) / (t - 1)
+
+
+def james_stein_mean(Y: np.ndarray) -> tuple[np.ndarray, float]:
+    """
+    James-Stein shrinkage estimator for the mean, shrinking toward zero.
+
+    Unlike :func:`bayes_stein`, which shrinks toward the minimum-variance
+    portfolio mean, the target here is the origin: the estimate is
+    ``(1 - w) * mu_hat`` with
+
+        w = min(1, (d - 2) * sigma_bar_sq / (q * ||mu_hat||^2)),
+
+    where ``sigma_bar_sq`` is the average per-column sample variance. The
+    intensity is data-driven and grows with the noise level (large average
+    variance, short window) and with the dimension, and shrinks as the sample
+    mean vector moves away from zero. At ``w = 1`` the estimate is the zero
+    vector, i.e. no return prediction at all.
+
+    Shrinking toward zero rather than a grand mean is deliberate: a grand mean
+    is itself an estimated quantity that inherits the noise the shrinkage is
+    meant to suppress, whereas zero is the null hypothesis that the assets carry
+    no predictable drift over the window. The estimator degenerates when the
+    classical dominance condition cannot hold (``d <= 2``) or when the shrinkage
+    factor is undefined (``||mu_hat|| = 0``); both return ``w = 1``, i.e. the
+    zero vector.
+
+    Args:
+        Y: (q, d) array of returns.
+
+    Returns:
+        Two-tuple of the shrunk mean vector, shape *(d,)*, and the shrinkage
+        weight ``w`` in *[0, 1]*.
+    """
+    mu_hat = Y.mean(axis=0)
+    q, d = Y.shape
+
+    # James-Stein dominates the sample mean only from d = 3 on, and the factor
+    # below is undefined at mu_hat = 0. Both cases collapse to the target.
+    ss = float(mu_hat @ mu_hat)
+    if d <= 2 or ss == 0.0:
+        return np.zeros_like(mu_hat), 1.0
+
+    sigma_bar_sq = float(Y.var(axis=0, ddof=1).mean())
+    w = min(1.0, (d - 2) * sigma_bar_sq / (q * ss))
+    return (1.0 - w) * mu_hat, w
+
+
+def pooled_asset_mean(
+    Y_fh: np.ndarray, economy_ids: np.ndarray
+) -> tuple[np.ndarray, float]:
+    """
+    Economy-pooled, James-Stein shrunk asset means.
+
+    Estimating N individual asset means from a single window is hopeless at the
+    sample sizes here (N ~ 100-130 against q ~ 2500 daily observations, with a
+    signal-to-noise ratio per asset far below one). Pooling collapses the
+    estimation problem onto the 14 economies: each economy's return series is
+    the equal-weighted average of its constituents, that q x d panel is passed
+    through :func:`james_stein_mean`, and every asset inherits its own economy's
+    shrunk mean. The dimensionality of the mean estimate drops from N to at most
+    14 while the number of observations is unchanged, and the cross-sectional
+    spread of expected returns is restricted to the between-economy dimension.
+
+    Economies with no asset in the current estimation window are dropped rather
+    than carried as empty columns, so ``d`` is the number of economies actually
+    represented, which is at most 14 and can be smaller for a window whose
+    point-in-time universe does not span every economy.
+
+    Args:
+        Y_fh: (q, N) array of asset returns.
+        economy_ids: Length-N integer array mapping each asset to its economy.
+
+    Returns:
+        Two-tuple of the per-asset mean vector, shape *(N,)*, in which all
+        assets of one economy share a value, and the shrinkage weight ``w``
+        applied at the economy level.
+    """
+    economy_ids = np.asarray(economy_ids, dtype=int)
+    if economy_ids.shape[0] != Y_fh.shape[1]:
+        raise ValueError(
+            f"economy_ids has length {economy_ids.shape[0]}, "
+            f"expected {Y_fh.shape[1]} (one per asset)."
+        )
+
+    present = np.unique(economy_ids)
+    panel = np.column_stack(
+        [Y_fh[:, economy_ids == e].mean(axis=1) for e in present]
+    )
+
+    mu_economy, w = james_stein_mean(panel)
+
+    # Expand back to asset level: position of each asset's economy in `present`.
+    return mu_economy[np.searchsorted(present, economy_ids)], w

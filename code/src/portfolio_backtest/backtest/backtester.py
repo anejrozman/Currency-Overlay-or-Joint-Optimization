@@ -449,6 +449,8 @@ class Backtester:
                 * ``asset_return_key`` (pd.DataFrame) daily asset returns
                   (``R_fh`` or ``R_u`` depending on ``self.asset_return_key``).
                 * ``"R_c"`` (pd.DataFrame, optional) excess currency returns.
+                * ``"F"`` (pd.DataFrame, optional) daily forward premiums aligned
+                  to ``R_c``; consumed only by mean-bearing optimizers.
                 * ``"asset_to_currency"`` (dict) RIC to currency mapping.
                 * ``"universe_mask"`` (pd.DataFrame, optional) universe mask.
 
@@ -463,6 +465,9 @@ class Backtester:
             else R_fh
         )
         R_c: Optional[pd.DataFrame] = data_bundle.get("R_c")
+        # Daily forward premiums, aligned to R_c. Optional: only the mean-bearing
+        # optimizers condition on it, every other optimizer ignores the key.
+        F: Optional[pd.DataFrame] = data_bundle.get("F")
         asset_to_currency: dict = data_bundle["asset_to_currency"]
         universe_mask: Optional[pd.DataFrame] = data_bundle.get("universe_mask", None)
 
@@ -556,6 +561,9 @@ class Backtester:
             R_c_train = R_c.loc[train_start:train_end] if R_c is not None else pd.DataFrame()
             R_c_val = R_c.loc[validation_start:validation_end] if R_c is not None else pd.DataFrame()
             R_c_full = R_c.loc[full_est_start:full_est_end] if R_c is not None else pd.DataFrame()
+            F_train = F.loc[train_start:train_end] if F is not None else pd.DataFrame()
+            F_val = F.loc[validation_start:validation_end] if F is not None else pd.DataFrame()
+            F_full = F.loc[full_est_start:full_est_end] if F is not None else pd.DataFrame()
             C_sub = C.loc[valid_assets].values 
 
             # Hyperparameter grid search 
@@ -569,6 +577,7 @@ class Backtester:
                     train_bundle_inner = {
                         self.training_return_key: R_train_frame.loc[train_start:train_end, valid_assets],
                         "R_c": R_c_train,
+                        "F": F_train,
                         "C": C_sub,
                     }
                     opt.fit(train_bundle_inner)
@@ -577,6 +586,7 @@ class Backtester:
                     val_bundle_inner = {
                         self.training_return_key: R_train_frame.loc[validation_start:validation_end, valid_assets],
                         "R_c": R_c_val,
+                        "F": F_val,
                         "C": C_sub,
                     }
                     s = opt.score(candidate_weights, val_bundle_inner)
@@ -596,6 +606,7 @@ class Backtester:
             full_train_bundle = {
                 self.training_return_key: R_train_frame.loc[full_est_start:full_est_end, valid_assets],
                 "R_c": R_c_full,
+                "F": F_full,
                 "C": C_sub,
             }
             opt_final.fit(full_train_bundle)

@@ -17,6 +17,7 @@ from __future__ import annotations
 
 from portfolio_backtest.backtest_config import (
     ES_CONFIG,
+    ES_MEAN_OVERLAY_CONFIG,
     EW_CONFIG,
     JOINT_CONFIG,
     MAD_JOINT_CONFIG,
@@ -50,6 +51,7 @@ from portfolio_backtest.backtest_config import (
 from portfolio_backtest.optimizers import (
     EqualWeightOptimizer,
     ExpectedShortfallCurrencyOverlayOptimizer,
+    ExpectedShortfallCurrencyOverlayWithMeanOptimizer,
     ExpectedShortfallJointOptimizer,
     MeanAbsoluteDeviationCurrencyOverlayOptimizer,
     MeanAbsoluteDeviationJointOptimizer,
@@ -106,6 +108,13 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "label": "ES Currency Overlay",
         "use_hedging": True,
         "config": OVERLAY_CONFIG,
+    },
+    "es_curr_overlay_w_mean": {
+        "optimizer": ExpectedShortfallCurrencyOverlayWithMeanOptimizer,
+        "asset_return_key": "R_fh",
+        "label": "Mean-ES Currency Overlay",
+        "use_hedging": True,
+        "config": ES_MEAN_OVERLAY_CONFIG,
     },
     "reg_es_curr_overlay": {
         "optimizer": RegularizedExpectedShortfallCurrencyOverlayOptimizer,

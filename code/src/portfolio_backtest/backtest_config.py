@@ -234,6 +234,48 @@ LAMBDA_L2_SOES_CURR_GRID = [0.0, 1e-4, 1e-2, 1.0]
 # Fixed
 LEVERAGE = [2.0]
 ALPHA = [0.80]
+OVERLAY_LIMIT = [2.0]
+
+# Risk-aversion grid for the mean-bearing ES overlay. Named per risk measure:
+# the objective is Risk - mu'w / gamma, so the balancing gamma scales with the
+# magnitude of the risk term, and those differ by three orders of magnitude across
+# the measures here (variance ~2e-5, SMV ~1e-5, MAD ~3.1e-3, ES_80 ~1.2e-2, HMCR_2
+# larger still). An MV or MAD mean-bearing program needs its own grid calibrated at
+# its own scale; this one is ES-specific and must not be reused.
+# Risk-aversion grid for the mean-bearing ES overlay (es_curr_overlay_w_mean.py),
+# the one program here that keeps a mean term. The mean enters its objective with
+# coefficient 1 / gamma, so small gamma means an aggressive mean tilt and large
+# gamma a nearly mean-free program.
+#
+# Calibrated by running the backtester at fixed gamma (no selection, so the OOS
+# result is attributable to gamma alone) on the top-10 universe, quarterly, 10y
+# window, leverage 2.0, overlay cap 2.0, over 2000-07 to 2023-04:
+#
+#   gamma    ES_80    Vol     MDD      SR       ESR    annRet
+#     100   0.6892   8.16   29.29   0.0772   0.0576    2.07%   <- mean term inert
+#      10   0.6903   8.17   29.29   0.0829   0.0618    2.11%
+#       1   0.6948   8.23   29.61   0.0963   0.0718    2.23%
+#     0.5   0.7032   8.31   29.45   0.1041   0.0775    2.30%
+#     0.2   0.7395   8.74   29.27   0.1536   0.1144    2.78%   <- optimum
+#    0.05   1.1406  13.76   44.94   0.1309   0.0995    3.24%   <- risk running away
+#    0.01   2.3278  29.06   76.68  -0.0869  -0.0683   -1.09%   <- blow-up
+#
+# The optimum is interior at ~0.2 and the curve is single-peaked, so the grid is
+# recentered on it rather than left on the original [100 ... 1] range, where every
+# point sat in the inert region and the search could only ever run to the bottom
+# endpoint. From gamma = 10 up the mean term changes nothing (ES_80 and MDD flat to
+# three decimals against the mean-free program), so sweeping 100/50/20 wasted three
+# of seven grid points; 10 is retained as the near-mean-free anchor.
+#
+# The lower bound is set at 0.1: one point past the peak, enough to bracket an
+# interior optimum, and a full decade above the 0.01 blow-up. That blow-up is the
+# same pathology recorded for the old mean-bearing MV programs above — as gamma
+# falls the objective tends to pure mean maximization over sum(x) = 1, ||x||_1 <= 2,
+# a linear program whose solution is a levered corner bet on the highest trailing-mean
+# economies — but note it takes a gamma two decades below the useful range to
+# trigger here, where the raw-mean MV programs blew up at gamma = 3. The economy
+# pooling and the James-Stein shrinkage are what buy that margin.
+ES_GAMMA_GRID = [10, 5, 2, 1, 0.5, 0.2, 0.1]
 
 # Column-demeaning switch for the eight ES and SOES overlay/joint programs,
 # flipped manually. ES and its second-order variant (HMCR_2) are the two risk
@@ -294,6 +336,22 @@ OVERLAY_CONFIG = BacktestConfig(
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
         "demean":         DEMEAN_GRID,
+    },
+)
+
+# Mean-bearing ES overlay. No `demean` entry, deliberately: centering the return
+# matrices would zero the sample means this program is built around, so the switch is
+# not just unused here but contradictory. Carries the overlay L1 cap and the risk
+# aversion grid on top of OVERLAY_CONFIG's alpha and leverage cap.
+ES_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "gamma":          ES_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
     },
 )
 
