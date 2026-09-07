@@ -1,0 +1,9 @@
+strategy_name, top_10_run, top_50_run, top_100_run
+
+equal_weight_optimizer, 1, 2, 3
+
+es_curr_overlay_w_mean, 5, 4, 6
+reg_es_curr_overlay_w_mean, 4, 3, 2 
+es_joint_w_mean,           2, 4, 3 
+reg_es_joint_w_mean,        2
+
