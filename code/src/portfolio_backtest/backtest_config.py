@@ -277,6 +277,86 @@ OVERLAY_LIMIT = [2.0]
 # pooling and the James-Stein shrinkage are what buy that margin.
 ES_GAMMA_GRID = [10, 5, 2, 1, 0.5, 0.2, 0.1]
 
+# Risk-aversion grid for the mean-bearing MV overlay (mv_curr_overlay_w_mean.py).
+# Calibrated on its own program and its own scale; ES_GAMMA_GRID must not be reused
+# here, for two independent reasons. The scale differs: the objective is
+# Risk - mu'w / gamma, and a daily variance (~2.6e-5) is three orders of magnitude
+# below an ES_80 (~1.2e-2), so the balancing gamma is that much larger. And the two
+# gammas do different work: variance is a deviation measure, so the mean reaches
+# this objective only through the explicit pooled and shrunk mu terms, whereas raw
+# undemeaned ES is not a deviation measure -- ES(-r) = ES_deviation(-r) - E[r] --
+# so es_curr_overlay_w_mean.py carries a second implicit mean channel at fixed
+# weight one, estimated by the raw portfolio sample mean.
+#
+# Calibrated the same way ES_GAMMA_GRID was: the backtester at fixed gamma (a
+# one-point grid, so no selection and the OOS result is attributable to gamma
+# alone) on the top-10 universe, quarterly, 10y window, leverage 2.0, overlay cap
+# 2.0, over 2000-07 to 2023-04. Solved with Clarabel rather than Gurobi, a ~1e-6
+# weight difference.
+#
+#   gamma   ES_80    Vol     MDD      SR       ESR    annRet   nAct   grossPsi
+#     ---  0.6658   7.97   28.23   0.1404   0.1059    2.55%   119.4     1.095   <- mv_curr_overlay
+#    3000  0.6658   7.97   28.20   0.1452   0.1096    2.59%   115.8     1.087
+#    1000  0.6658   7.98   28.07   0.1552   0.1172    2.67%   115.9     1.072
+#     500  0.6660   7.98   27.86   0.1702   0.1285    2.79%   115.9     1.061
+#     300  0.6663   7.99   27.58   0.1894   0.1430    2.95%   115.9     1.091
+#     200  0.6671   8.00   27.26   0.2109   0.1593    3.12%   115.8     1.160
+#     100  0.6712   8.06   26.36   0.2576   0.1948    3.51%   115.7     1.344
+#      50  0.6847   8.23   25.45   0.3172   0.2401    4.05%   115.0     1.577   <- MDD minimum
+#      30  0.7115   8.57   26.56   0.3718   0.2821    4.62%   113.9     1.771
+#      20  0.7568   9.13   28.38   0.4133   0.3140    5.21%   110.5     1.900
+#      15  0.8052   9.76   30.53   0.4503   0.3438    5.83%   106.8     1.959
+#      10  0.9113  11.15   33.37   0.4808   0.3706    6.80%    98.8     1.991   <- SR optimum
+#       7  1.0439  12.91   36.72   0.4708   0.3667    7.51%    88.7     2.000
+#       5  1.2021  14.97   41.08   0.4398   0.3450    8.02%    75.7     2.000
+#       3  1.5100  19.06   47.70   0.4522   0.3596   10.05%    59.5     2.000
+#       2  1.8148  23.64   57.63   0.4364   0.3582   11.75%    50.2     2.000
+#       1  2.4961  36.38   77.35   0.2783   0.2554   11.56%    34.5     2.000   <- risk running away
+#     0.5  3.1919  51.86   88.97   0.1937   0.1983   11.48%    25.1     2.000   <- blow-up
+#
+# The Sharpe curve is single-peaked with an interior optimum at gamma = 10, and the
+# blow-up is a full decade below that. The grid deliberately does not span the whole
+# swept range: it is the [10, 100] band, which is where the mean term earns its
+# keep without the program turning into a levered corner bet. Above 100 the mean is
+# nearly inert (gamma = 1000 moves the Sharpe by 0.015 over mv_curr_overlay and the
+# drawdown by 0.16pp), and below 10 the risk runs away faster than the return: from
+# 10 to 5 the Sharpe already falls while volatility rises by half.
+#
+# Note that gamma = 10 is both the measured Sharpe optimum and the grid's lower
+# endpoint, so the selection cannot bracket the optimum from below. In practice it
+# does not try to: the gamma-free score leans conservative on this program and picks
+# gamma = 100 on 87% of the 91 quarterly dates, never once reaching the lower
+# endpoint (SR 0.2702, MDD 26.4%, against 0.2576 / 26.4% at a fixed gamma = 100).
+# The binding endpoint is therefore the upper one. Scoring variants were measured
+# and move which endpoint is preferred rather than making the search discriminate;
+# mv_curr_overlay_w_mean.score records the comparison. Read the selected-gamma
+# series accordingly -- as a statement about where the band is cut off, not as a
+# fitted interior optimum.
+#
+# Three caveats worth carrying into the write-up. First, the Sharpe optimum and the
+# drawdown optimum disagree: gamma = 50 cuts MDD to 25.4%, below the mean-free
+# program's 28.2%, while gamma = 10 more than triples the Sharpe but takes MDD up to
+# 33.4%. Selection is on the gamma-free score, not on either directly. Second, at
+# the bottom of the band both caps bind (at gamma = 10, gross x 1.99 of 2.0 and gross
+# psi 1.99 of 2.0), so the overlay there is a corner of the L1 ball -- its direction
+# set by the carry ranking and its size by the cap rather than by the variance
+# tradeoff. Over most of the band it is not: gross psi is 1.34 at gamma = 100.
+# Third, and for the same reason, the peak is a joint property of gamma and the two
+# caps rather than of gamma alone; re-swept caps would move it.
+#
+# The blow-up is also far milder here than for the raw-mean MV programs recorded
+# below, which collapsed onto 19 of 101 names at gamma = 3 in the
+# (gamma / 2) * Var - mu'w convention, i.e. gamma = 1.5 in this one. At gamma = 1.5
+# here the program still holds ~40 names and a positive Sharpe. The pooling is what
+# buys that margin -- and it is the pooling, not the shrinkage on top of it. Measured
+# over the 127 estimation windows, the James-Stein weight on the economy panel has a
+# median of 0.19 and only reaches 1.0 (mean killed outright) on 1.6% of them, so
+# roughly four fifths of the raw economy mean survives into mu_a. Collapsing N ~ 116
+# asset means onto at most 14 economy means is the step that does the work.
+#
+# Ordered descending to match ES_GAMMA_GRID.
+MV_GAMMA_GRID = [100, 50, 30, 20, 10]
+
 # Column-demeaning switch for the eight ES and SOES overlay/joint programs,
 # flipped manually. ES and its second-order variant (HMCR_2) are the two risk
 # measures here that are not deviation measures: MV, MAD and semi-variance all
@@ -601,6 +681,20 @@ MV_OVERLAY_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "leverage_limit": LEVERAGE,
+    },
+)
+
+# Mean-bearing MV overlay. Carries the overlay L1 cap and the MV risk-aversion grid
+# on top of MV_OVERLAY_CONFIG's leverage cap. No `demean` entry: variance is already
+# location-free, so the switch the ES overlays carry has no analogue here.
+MV_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          MV_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
     },
 )
 

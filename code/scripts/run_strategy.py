@@ -219,7 +219,7 @@ def main() -> None:
         data_bundle["R_c"] = R_c_filtered
         # Daily forward premiums, aligned to R_c's calendar and column order, for
         # optimizers that condition their currency mean on the carry signal
-        # (es_curr_overlay_w_mean).  Ignored by every other optimizer.
+        # (the *_w_mean family).  Ignored by every other optimizer.
         data_bundle["F"] = f_daily_shifted.reindex(
             index=R_c_filtered.index, columns=R_c_filtered.columns
         )

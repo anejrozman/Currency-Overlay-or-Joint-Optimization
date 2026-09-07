@@ -21,6 +21,7 @@ from .reg_mad_curr_overlay import RegularizedMeanAbsoluteDeviationCurrencyOverla
 from .reg_mv_asset_full import RegularizedMeanVarianceAssetFullOptimizer
 from .reg_mv_asset_zero import RegularizedMeanVarianceAssetZeroOptimizer
 from .mv_curr_overlay import MeanVarianceCurrencyOverlayOptimizer
+from .mv_curr_overlay_w_mean import MeanVarianceCurrencyOverlayWithMeanOptimizer
 from .mv_joint import MeanVarianceJointOptimizer
 from .reg_mv_curr_overlay import RegularizedMeanVarianceCurrencyOverlayOptimizer
 from .reg_mv_joint import RegularizedMeanVarianceJointOptimizer
@@ -47,6 +48,7 @@ __all__ = [
     "MeanAbsoluteDeviationCurrencyOverlayOptimizer",
     "MeanAbsoluteDeviationJointOptimizer",
     "MeanVarianceCurrencyOverlayOptimizer",
+    "MeanVarianceCurrencyOverlayWithMeanOptimizer",
     "MeanVarianceJointOptimizer",
     "RegularizedExpectedShortfallAssetFullOptimizer",
     "RegularizedExpectedShortfallAssetZeroOptimizer",
