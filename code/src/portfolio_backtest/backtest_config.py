@@ -711,6 +711,63 @@ REG_MV_OVERLAY_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing regularized MV overlay and joint programs. Both reuse the MV penalty
+# grids calibrated on their mean-free counterparts, as REG_MV_OVERLAY_CONFIG and
+# REG_MV_JOINT_CONFIG do; the risk term is the same measure at the same scale, so the
+# bounds transfer. Note the calibration was done without a mean term competing for the
+# objective, so the penalty that is optimal here may sit lower than it does there --
+# worth re-reading the selected-lambda series once these have run.
+#
+# gamma is deliberately NOT in either grid, exactly as in REG_ES_MEAN_OVERLAY_CONFIG.
+# Both configs already have 4 x 4 x 4 x 4 = 256 combinations per rebalancing date, and
+# crossing that with MV_GAMMA_GRID's five points is not affordable at these universe
+# sizes. The optimizers default gamma to 30 and still read it from hyperparams, so it
+# can be swept deliberately later without touching their code. Unlike the ES pair's
+# conservative choice of 2, 30 is calibrated: it is the centre point of MV_GAMMA_GRID,
+# and on the fixed-gamma sweeps of both unregularized MV programs it improves on the
+# mean-free program along both axes at once -- Sharpe 0.372 against 0.140 (overlay) and
+# 0.373 against 0.162 (joint), at drawdowns of 26.6% and 25.9% against 28.2% and 27.9%.
+# It sits one step more aggressive than the drawdown minimum at gamma = 50 and one step
+# short of gamma = 20, where both caps saturate. Those sweeps had no penalties competing
+# against the mean term, so it is a starting point rather than a jointly optimal one.
+#
+# Both also carry OVERLAY_LIMIT, which their mean-free counterparts do not. At gamma =
+# 30 it binds rarely: over the full 256-point grid on three test windows the overlay
+# never reaches it outright (widest solution 1.9999) and the joint sits on it at 3.3% of
+# points, all in the lightly-penalized corner where nothing else restrains psi. By
+# gamma = 10 it is the only thing between psi and the double-digit gross notional
+# recorded above for the discarded mean-bearing MV programs (74x - 98x). Where it binds,
+# psi sits on a corner of the L1 ball with its direction set by the carry ranking rather
+# than by the variance-mean tradeoff; the per-window table is in
+# reg_mv_curr_overlay_w_mean.py.
+REG_MV_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_MV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_MV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_MV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_MV_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
+    },
+)
+
+REG_MV_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_MV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_MV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_MV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_MV_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
+    },
+)
+
 # The regularized MAD joint program reuses the asset and currency MAD grids, as the ES
 # and MV joint configs reuse theirs. Both blocks were calibrated on the asset-level and
 # overlay programs rather than on the joint one; reg_mv_joint records a joint-specific
@@ -773,6 +830,53 @@ MV_JOINT_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "leverage_limit": LEVERAGE,
+    },
+)
+
+# Mean-bearing MV joint program. Reuses MV_GAMMA_GRID, and unlike ES_MEAN_JOINT_CONFIG
+# -- which reuses ES_GAMMA_GRID on the argument that the band should be the right order
+# of magnitude and flags it for recalibration -- that reuse is measured here rather
+# than assumed. The ES pair gave reason to doubt it would transfer: its unregularized
+# sweeps favoured gamma = 0.2 for the overlay and 1.0 for the joint, a factor of five
+# in one risk measure, on the argument that choosing x and psi against a single risk
+# term rather than in sequence makes the mean pull harder at a given gamma.
+#
+# It transfers here. Same fixed-gamma protocol as MV_GAMMA_GRID (one-point grid, top-10,
+# quarterly, 10y window, leverage 2.0, overlay cap 2.0, 2000-07 to 2023-04, Clarabel):
+#
+#   gamma   ES_80    Vol     MDD      SR       ESR    annRet   nAct   grossPsi
+#     ---  0.6439   7.73   27.92   0.1621   0.1226    2.69%   119.7     1.273   <- mv_joint
+#    1000  0.6441   7.73   27.78   0.1758   0.1329    2.79%   119.7     1.221
+#     200  0.6462   7.76   27.22   0.2264   0.1713    3.19%   119.7     1.380
+#     100  0.6516   7.82   26.56   0.2658   0.2010    3.51%   119.6     1.535
+#      50  0.6671   8.02   25.32   0.3189   0.2414    3.99%   119.1     1.715   <- MDD minimum
+#      30  0.6970   8.40   25.92   0.3732   0.2833    4.57%   117.9     1.835
+#      20  0.7438   9.00   27.95   0.4206   0.3206    5.22%   115.0     1.909
+#      10  0.9060  11.14   33.21   0.4732   0.3666    6.71%   101.6     1.994   <- SR optimum
+#       5  1.2001  15.01   41.61   0.4378   0.3449    8.01%    74.3     2.000
+#       2  1.8197  23.93   60.16   0.4064   0.3366   11.16%    45.3     2.000
+#
+# The curve is the overlay's to within noise at every point -- Sharpe 0.473 against
+# 0.481 at the optimum, 0.319 against 0.317 at gamma = 50 -- with the same interior
+# peak at 10, the same drawdown minimum at 50, and the same saturation of both caps
+# below 20. So the [10, 100] band needs no adjustment, and the ES pair's five-fold
+# shift does not repeat in this measure.
+#
+# That similarity is itself a result rather than a formality: on the top-10 universe
+# the joint program buys almost nothing over the sequential overlay once a mean term
+# is present, which is the comparison in_sample_vs_out_of_sample_w_mean.py exists to
+# quantify across universe sizes. Note it is not a pure sequencing contrast -- the two
+# also differ in how the asset-currency cross-covariance is estimated (raw sample in
+# the overlay, shrunk within the stacked Ledoit-Wolf here), inherited from the mean-free
+# pair and documented in mv_joint_w_mean.py.
+MV_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          MV_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
     },
 )
 

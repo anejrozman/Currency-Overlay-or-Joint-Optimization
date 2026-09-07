@@ -23,8 +23,11 @@ from .reg_mv_asset_zero import RegularizedMeanVarianceAssetZeroOptimizer
 from .mv_curr_overlay import MeanVarianceCurrencyOverlayOptimizer
 from .mv_curr_overlay_w_mean import MeanVarianceCurrencyOverlayWithMeanOptimizer
 from .mv_joint import MeanVarianceJointOptimizer
+from .mv_joint_w_mean import MeanVarianceJointWithMeanOptimizer
 from .reg_mv_curr_overlay import RegularizedMeanVarianceCurrencyOverlayOptimizer
+from .reg_mv_curr_overlay_w_mean import RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer
 from .reg_mv_joint import RegularizedMeanVarianceJointOptimizer
+from .reg_mv_joint_w_mean import RegularizedMeanVarianceJointWithMeanOptimizer
 from .reg_smv_asset_full import RegularizedSemiVarianceAssetFullOptimizer
 from .reg_smv_asset_zero import RegularizedSemiVarianceAssetZeroOptimizer
 from .smv_curr_overlay import SemiVarianceCurrencyOverlayOptimizer
@@ -50,6 +53,7 @@ __all__ = [
     "MeanVarianceCurrencyOverlayOptimizer",
     "MeanVarianceCurrencyOverlayWithMeanOptimizer",
     "MeanVarianceJointOptimizer",
+    "MeanVarianceJointWithMeanOptimizer",
     "RegularizedExpectedShortfallAssetFullOptimizer",
     "RegularizedExpectedShortfallAssetZeroOptimizer",
     "RegularizedExpectedShortfallCurrencyOverlayOptimizer",
@@ -63,7 +67,9 @@ __all__ = [
     "RegularizedMeanVarianceAssetFullOptimizer",
     "RegularizedMeanVarianceAssetZeroOptimizer",
     "RegularizedMeanVarianceCurrencyOverlayOptimizer",
+    "RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer",
     "RegularizedMeanVarianceJointOptimizer",
+    "RegularizedMeanVarianceJointWithMeanOptimizer",
     "RegularizedSecondOrderExpectedShortfallAssetFullOptimizer",
     "RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer",
     "RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer",
