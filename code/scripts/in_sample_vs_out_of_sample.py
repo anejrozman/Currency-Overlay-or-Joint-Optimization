@@ -107,7 +107,12 @@ def _resolve_strategies(measure: str, family: str) -> dict[str, str]:
         matches = [
             name
             for name in STRATEGY_REGISTRY
-            if ("reg" in name.split("_")) == want_reg and parts.issubset(set(name.split("_")))
+            if ("reg" in name.split("_")) == want_reg
+            # The mean-bearing programs (*_w_mean) are a separate family with their
+            # own script; without this they match here too and every measure raises
+            # on two candidates. Restores the behaviour this had before they existed.
+            and "mean" not in name.split("_")
+            and parts.issubset(set(name.split("_")))
         ]
         if len(matches) != 1:
             raise ValueError(
