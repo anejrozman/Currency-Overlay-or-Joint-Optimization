@@ -45,6 +45,8 @@ from portfolio_backtest.backtest_config import (
     REG_SMV_ASSET_FULL_CONFIG,
     REG_SMV_ASSET_ZERO_CONFIG,
     REG_SMV_JOINT_CONFIG,
+    REG_SMV_MEAN_JOINT_CONFIG,
+    REG_SMV_MEAN_OVERLAY_CONFIG,
     REG_SMV_OVERLAY_CONFIG,
     REG_SOES_ASSET_FULL_CONFIG,
     REG_SOES_ASSET_ZERO_CONFIG,
@@ -53,6 +55,8 @@ from portfolio_backtest.backtest_config import (
     SOES_JOINT_CONFIG,
     SOES_OVERLAY_CONFIG,
     SMV_JOINT_CONFIG,
+    SMV_MEAN_JOINT_CONFIG,
+    SMV_MEAN_OVERLAY_CONFIG,
     SMV_OVERLAY_CONFIG,
 )
 from portfolio_backtest.optimizers import (
@@ -92,9 +96,13 @@ from portfolio_backtest.optimizers import (
     RegularizedSemiVarianceAssetFullOptimizer,
     RegularizedSemiVarianceAssetZeroOptimizer,
     RegularizedSemiVarianceCurrencyOverlayOptimizer,
+    RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer,
     SemiVarianceCurrencyOverlayOptimizer,
+    SemiVarianceCurrencyOverlayWithMeanOptimizer,
     RegularizedSemiVarianceJointOptimizer,
+    RegularizedSemiVarianceJointWithMeanOptimizer,
     SemiVarianceJointOptimizer,
+    SemiVarianceJointWithMeanOptimizer,
 )
 
 STRATEGY_REGISTRY: dict[str, dict] = {
@@ -324,12 +332,26 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "use_hedging":      True,
         "config":           SMV_OVERLAY_CONFIG,
     },
+    "smv_curr_overlay_w_mean": {
+        "optimizer":        SemiVarianceCurrencyOverlayWithMeanOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Mean-SMV Currency Overlay",
+        "use_hedging":      True,
+        "config":           SMV_MEAN_OVERLAY_CONFIG,
+    },
     "reg_smv_curr_overlay": {
         "optimizer":        RegularizedSemiVarianceCurrencyOverlayOptimizer,
         "asset_return_key": "R_fh",
         "label":            "Regularized SMV Currency Overlay",
         "use_hedging":      True,
         "config":           REG_SMV_OVERLAY_CONFIG,
+    },
+    "reg_smv_curr_overlay_w_mean": {
+        "optimizer":        RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Regularized Mean-SMV Currency Overlay",
+        "use_hedging":      True,
+        "config":           REG_SMV_MEAN_OVERLAY_CONFIG,
     },
     "smv_joint": {
         "optimizer":        SemiVarianceJointOptimizer,
@@ -338,12 +360,26 @@ STRATEGY_REGISTRY: dict[str, dict] = {
         "use_hedging":      True,
         "config":           SMV_JOINT_CONFIG,
     },
+    "smv_joint_w_mean": {
+        "optimizer":        SemiVarianceJointWithMeanOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Mean-SMV Joint",
+        "use_hedging":      True,
+        "config":           SMV_MEAN_JOINT_CONFIG,
+    },
     "reg_smv_joint": {
         "optimizer":        RegularizedSemiVarianceJointOptimizer,
         "asset_return_key": "R_fh",
         "label":            "Regularized SMV Joint",
         "use_hedging":      True,
         "config":           REG_SMV_JOINT_CONFIG,
+    },
+    "reg_smv_joint_w_mean": {
+        "optimizer":        RegularizedSemiVarianceJointWithMeanOptimizer,
+        "asset_return_key": "R_fh",
+        "label":            "Regularized Mean-SMV Joint",
+        "use_hedging":      True,
+        "config":           REG_SMV_MEAN_JOINT_CONFIG,
     },
     "reg_soes_asset_full": {
         "optimizer":        RegularizedSecondOrderExpectedShortfallAssetFullOptimizer,

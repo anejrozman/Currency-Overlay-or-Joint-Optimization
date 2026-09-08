@@ -357,6 +357,56 @@ ES_GAMMA_GRID = [10, 5, 2, 1, 0.5, 0.2, 0.1]
 # Ordered descending to match ES_GAMMA_GRID.
 MV_GAMMA_GRID = [100, 50, 30, 20, 10]
 
+# Risk-aversion grid for the mean-bearing SMV overlay and joint programs
+# (smv_curr_overlay_w_mean.py, smv_joint_w_mean.py). Calibrated on its own programs
+# and its own scale; MV_GAMMA_GRID must not be reused. The objective is
+# Risk - mu'w / gamma, and a daily semi-variance (~9e-6) sits below a daily variance
+# (~2.6e-5), but the balancing gamma does not follow the level ratio -- it follows the
+# gradient, and empirically SMV at gamma = 50 produces about the tilt MV shows at
+# gamma = 100, so the useful band sits roughly a factor of two below MV's.
+#
+# Calibrated the same way MV_GAMMA_GRID was: the backtester at fixed gamma (a one-point
+# grid, so no selection and the OOS result is attributable to gamma alone) on the top-10
+# universe, quarterly, 10y window, leverage 2.0, overlay cap 2.0, over 2000-07 to
+# 2023-04, Clarabel rather than Gurobi (~1e-6 weight difference).
+#
+#   OVERLAY                                                 JOINT
+#   gamma   ES_80    Vol     MDD      SR     annRet  nAct  |  ES_80    Vol     MDD      SR     annRet  nAct
+#     ---  0.6834   8.15   32.17   0.0827   2.11%  115.7  | 0.6571   7.84   32.63   0.0782   2.05%  119.3  <- mean-free, NO cap
+#     1e7  0.6829   8.14   32.16   0.0877   2.15%  113.5  | 0.6562   7.84   32.61   0.0855   2.11%  118.9  <- mean off, cap ON
+#     500  0.6836   8.16   31.76   0.1409   2.58%  113.9  | 0.6570   7.85   31.80   0.1441   2.57%  119.0
+#     100  0.7012   8.39   29.25   0.2727   3.72%  113.3  | 0.6795   8.13   29.39   0.2822   3.73%  118.6
+#      50  0.7447   8.93   28.17   0.3316   4.40%  110.7  | 0.7299   8.77   27.84   0.3387   4.40%  115.5  <- MDD min
+#      30  0.8171   9.85   30.52   0.3810   5.19%  104.9  | 0.8108   9.81   30.17   0.3819   5.18%  109.1
+#      20  0.9181  11.15   33.35   0.4092   6.00%   96.3  | 0.9189  11.22   32.76   0.3972   5.89%   98.9  <- joint SR peak
+#      15  1.0171  12.44   34.89   0.4197   6.66%   87.3  | 1.0227  12.56   34.45   0.3967   6.42%   87.9  <- overlay SR peak
+#      10  1.1992  14.81   39.52   0.3977   7.32%   72.5  | 1.2069  14.95   40.39   0.3752   7.04%   69.8
+#       5  1.6172  20.45   48.92   0.4152   9.93%   49.8  | 1.6262  20.74   51.33   0.3867   9.46%   46.5
+#       2  2.4569  35.99   76.92   0.2479  10.36%   30.6  | 2.4690  36.32   79.82   0.2045   8.86%   28.1  <- blow-up
+#
+# The Sharpe peaks at 15 (overlay, 0.4197) and 20 (joint, 0.3972), and both curves are
+# flat across 15-20, so the grid brackets that plateau with 20 and 15 inside it, 30 and
+# 50 above, 100 as the conservative anchor, and 10 one step below. The lower bound of 10
+# is five times the gamma = 2 blow-up, where the Sharpe halves and drawdown reaches
+# 77-80%. Between 15 and 5 the Sharpe is not monotone (overlay 0.420, 0.398, 0.415);
+# that dip and recovery is inside the noise this backtest resolves -- three
+# implementation variants of the MV score moved its Sharpe by +/-0.04 -- so it is read
+# as a plateau, not as a second optimum, and 5 is excluded because its drawdown (49-51%)
+# is not usable regardless.
+#
+# Two caveats, the first shared with MV_GAMMA_GRID and the second specific to SMV.
+# The Sharpe optimum and the drawdown optimum disagree: gamma = 50 cuts MDD to 27.8-28.2%
+# against 32.2-32.6% mean-free, while the Sharpe peak at 15-20 takes MDD back up to
+# 33-35%. Second, the "---" row is the UNCAPPED mean-free program while every gamma row
+# carries the 2.0 overlay cap, which binds on ~20% of windows even with the mean term
+# off (see smv_curr_overlay_w_mean.py) -- so the two rows differ by the cap as well as
+# by the mean. The 1e7 row isolates that: turning the cap on with the mean term off is
+# worth +0.005 Sharpe (overlay) and +0.007 (joint), against +0.053 and +0.059 for the
+# mean term alone at gamma = 500. The cap is therefore a negligible part of the effect
+# despite binding on a fifth of windows, and the "---" row is a usable baseline after
+# all; use the 1e7 row when the decomposition has to be exact.
+SMV_GAMMA_GRID = [100, 50, 30, 20, 15, 10]
+
 # Column-demeaning switch for the eight ES and SOES overlay/joint programs,
 # flipped manually. ES and its second-order variant (HMCR_2) are the two risk
 # measures here that are not deviation measures: MV, MAD and semi-variance all
@@ -659,6 +709,32 @@ SMV_JOINT_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing SMV overlay and joint programs. Carry the overlay L1 cap and the SMV
+# risk-aversion grid on top of the leverage cap. No `demean` entry: the semi-variance
+# is already a deviation measure here, since the return matrices are demeaned before
+# the program is formed, so the switch the ES overlays carry has no analogue.
+SMV_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          SMV_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
+    },
+)
+
+SMV_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          SMV_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
+    },
+)
+
 # The regularized overlay reuses the calibrated SMV asset grids for the asset block
 # and the SMV currency grids for the overlay block, as the ES, MV and MAD overlay
 # configs reuse theirs.
@@ -672,6 +748,62 @@ REG_SMV_OVERLAY_CONFIG = BacktestConfig(
         "lambda_l1_curr":   LAMBDA_L1_SMV_CURR_GRID,
         "lambda_l2_curr":   LAMBDA_L2_SMV_CURR_GRID,
         "leverage_limit":   LEVERAGE,
+    },
+)
+
+# Mean-bearing regularized SMV overlay and joint programs. Both reuse the SMV penalty
+# grids calibrated on their mean-free counterparts, as REG_SMV_OVERLAY_CONFIG and
+# REG_SMV_JOINT_CONFIG do; the risk term is the same measure at the same scale, so the
+# bounds transfer. As with the MV pair, the calibration was done without a mean term
+# competing for the objective, and the MV production runs showed the mean-bearing
+# programs then select STRONGER penalties, increasingly so with universe size -- watch
+# the selected-lambda series here for the same, and for endpoint clustering.
+#
+# gamma is deliberately NOT in either grid, exactly as in REG_MV_MEAN_OVERLAY_CONFIG.
+# Both configs already have 4 x 4 x 4 x 4 = 256 combinations per rebalancing date, and
+# crossing that with SMV_GAMMA_GRID's six points is not affordable -- still less at SMV's
+# solve cost, which is ~50x a mean-variance one. The optimizers default gamma to 30 and
+# still read it from hyperparams, so it can be swept deliberately later. 30 is
+# calibrated: on the fixed-gamma sweeps of both unregularized SMV programs it is the
+# most aggressive grid point that still improves drawdown over the mean-free program
+# (MDD 30.5% overlay and 30.2% joint, against 32.2% and 32.6%), while raising the Sharpe
+# from 0.083 to 0.381 and from 0.078 to 0.382. Note that 30 sits closer to the SMV
+# Sharpe peak (15-20) than the same number does on the MV curve (peak 10), so this pair
+# runs a relatively more aggressive tilt than the MV pair at the same nominal gamma.
+# gamma is not comparable across risk measures.
+#
+# Both also carry OVERLAY_LIMIT, which their mean-free counterparts do not. Unlike the
+# MV pair this is not free: the mean-free SMV programs already reach gross psi of 2.5-2.9
+# on some windows, so the cap binds on ~20% of them even with the mean term off, and
+# these are not strict supersets of their mean-free counterparts. Measured on the
+# unregularized pair the effect is small -- turning the cap on with the mean term off is
+# worth +0.005 (overlay) and +0.007 (joint) Sharpe, against +0.053 and +0.059 for the
+# mean term alone.
+REG_SMV_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_SMV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SMV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SMV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SMV_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
+    },
+)
+
+REG_SMV_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_SMV_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SMV_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SMV_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SMV_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
     },
 )
 
@@ -714,9 +846,23 @@ REG_MV_OVERLAY_CONFIG = BacktestConfig(
 # Mean-bearing regularized MV overlay and joint programs. Both reuse the MV penalty
 # grids calibrated on their mean-free counterparts, as REG_MV_OVERLAY_CONFIG and
 # REG_MV_JOINT_CONFIG do; the risk term is the same measure at the same scale, so the
-# bounds transfer. Note the calibration was done without a mean term competing for the
-# objective, so the penalty that is optimal here may sit lower than it does there --
-# worth re-reading the selected-lambda series once these have run.
+# bounds transfer. The calibration was done without a mean term competing for the
+# objective, and the selected-lambda series from the first production runs settles which
+# way that cuts: the mean-bearing programs select STRONGER penalties, not weaker, and
+# increasingly so with universe size. The mean term pushes the weights out and the
+# penalties are what pull them back, so there is more for them to restrain. Median
+# selected lambda_l1_asset goes 1e-6 -> 5e-6 at top-50 and top-100; median
+# lambda_l1_curr goes 0 -> 5e-7 at both; median lambda_l2_curr goes 0 -> 5e-6 at top-100.
+#
+# One consequence needs acting on before these grids are reused. At top-100 the
+# mean-bearing overlay selects the TOP of LAMBDA_L1_MV_ASSET_GRID (5e-5) on 43 of 91
+# rebalancing dates (47%), against 10 of 91 for its mean-free counterpart. That is
+# endpoint clustering: the calibrated upper bound was set for a program with no mean
+# term to restrain, and the mean-bearing one wants to go past it. LAMBDA_L1_MV_ASSET_GRID
+# should be extended upward before the top-100 mean-bearing results are read as a
+# selected optimum rather than a truncated one. lambda_l1_curr also reaches its top on
+# 18 of 91 dates at top-50 and top-100 (20%), which is worth watching but not yet
+# clustering; the two L2 grids are comfortably interior everywhere.
 #
 # gamma is deliberately NOT in either grid, exactly as in REG_ES_MEAN_OVERLAY_CONFIG.
 # Both configs already have 4 x 4 x 4 x 4 = 256 combinations per rebalancing date, and

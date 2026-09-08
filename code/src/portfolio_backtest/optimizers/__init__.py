@@ -31,9 +31,13 @@ from .reg_mv_joint_w_mean import RegularizedMeanVarianceJointWithMeanOptimizer
 from .reg_smv_asset_full import RegularizedSemiVarianceAssetFullOptimizer
 from .reg_smv_asset_zero import RegularizedSemiVarianceAssetZeroOptimizer
 from .smv_curr_overlay import SemiVarianceCurrencyOverlayOptimizer
+from .smv_curr_overlay_w_mean import SemiVarianceCurrencyOverlayWithMeanOptimizer
 from .reg_smv_curr_overlay import RegularizedSemiVarianceCurrencyOverlayOptimizer
+from .reg_smv_curr_overlay_w_mean import RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer
 from .smv_joint import SemiVarianceJointOptimizer
+from .smv_joint_w_mean import SemiVarianceJointWithMeanOptimizer
 from .reg_smv_joint import RegularizedSemiVarianceJointOptimizer
+from .reg_smv_joint_w_mean import RegularizedSemiVarianceJointWithMeanOptimizer
 from .reg_soes_asset_full import RegularizedSecondOrderExpectedShortfallAssetFullOptimizer
 from .reg_soes_asset_zero import RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer
 from .reg_soes_curr_overlay import RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer
@@ -77,9 +81,13 @@ __all__ = [
     "RegularizedSemiVarianceAssetFullOptimizer",
     "RegularizedSemiVarianceAssetZeroOptimizer",
     "RegularizedSemiVarianceCurrencyOverlayOptimizer",
+    "RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer",
     "RegularizedSemiVarianceJointOptimizer",
+    "RegularizedSemiVarianceJointWithMeanOptimizer",
     "SecondOrderExpectedShortfallCurrencyOverlayOptimizer",
     "SecondOrderExpectedShortfallJointOptimizer",
     "SemiVarianceCurrencyOverlayOptimizer",
+    "SemiVarianceCurrencyOverlayWithMeanOptimizer",
     "SemiVarianceJointOptimizer",
+    "SemiVarianceJointWithMeanOptimizer",
 ]
