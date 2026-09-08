@@ -45,9 +45,13 @@ from .reg_smv_joint_w_mean import RegularizedSemiVarianceJointWithMeanOptimizer
 from .reg_soes_asset_full import RegularizedSecondOrderExpectedShortfallAssetFullOptimizer
 from .reg_soes_asset_zero import RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer
 from .reg_soes_curr_overlay import RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer
+from .reg_soes_curr_overlay_w_mean import RegularizedSecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer
 from .reg_soes_joint import RegularizedSecondOrderExpectedShortfallJointOptimizer
+from .reg_soes_joint_w_mean import RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer
 from .soes_curr_overlay import SecondOrderExpectedShortfallCurrencyOverlayOptimizer
+from .soes_curr_overlay_w_mean import SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer
 from .soes_joint import SecondOrderExpectedShortfallJointOptimizer
+from .soes_joint_w_mean import SecondOrderExpectedShortfallJointWithMeanOptimizer
 
 __all__ = [
     "BaseOptimizer",
@@ -85,7 +89,9 @@ __all__ = [
     "RegularizedSecondOrderExpectedShortfallAssetFullOptimizer",
     "RegularizedSecondOrderExpectedShortfallAssetZeroOptimizer",
     "RegularizedSecondOrderExpectedShortfallCurrencyOverlayOptimizer",
+    "RegularizedSecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer",
     "RegularizedSecondOrderExpectedShortfallJointOptimizer",
+    "RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer",
     "RegularizedSemiVarianceAssetFullOptimizer",
     "RegularizedSemiVarianceAssetZeroOptimizer",
     "RegularizedSemiVarianceCurrencyOverlayOptimizer",
@@ -93,7 +99,9 @@ __all__ = [
     "RegularizedSemiVarianceJointOptimizer",
     "RegularizedSemiVarianceJointWithMeanOptimizer",
     "SecondOrderExpectedShortfallCurrencyOverlayOptimizer",
+    "SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer",
     "SecondOrderExpectedShortfallJointOptimizer",
+    "SecondOrderExpectedShortfallJointWithMeanOptimizer",
     "SemiVarianceCurrencyOverlayOptimizer",
     "SemiVarianceCurrencyOverlayWithMeanOptimizer",
     "SemiVarianceJointOptimizer",

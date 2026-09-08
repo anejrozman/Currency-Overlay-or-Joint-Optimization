@@ -461,6 +461,53 @@ SMV_GAMMA_GRID = [100, 50, 30, 20, 15, 10]
 # outlier, which is consistent with its objective double-counting the mean.
 MAD_GAMMA_GRID = [3, 1, 0.5, 0.3, 0.2, 0.15]
 
+# Risk-aversion grid for the mean-bearing SOES overlay (soes_curr_overlay_w_mean.py).
+# Calibrated on its own program. HMCR_2 is DEGREE-ONE, like ES and MAD and unlike MV
+# and SMV, so gamma is a pure information ratio and the band sits two to three decades
+# below MV_GAMMA_GRID and SMV_GAMMA_GRID -- close to ES_GAMMA_GRID and MAD_GAMMA_GRID.
+#
+# Calibrated the same way the others were: the backtester at fixed gamma (a one-point
+# grid, so no selection and the OOS result is attributable to gamma alone) on the top-10
+# universe, quarterly, 10y window, leverage 2.0, overlay cap 2.0, over 2000-07 to
+# 2023-04, Clarabel rather than Gurobi. The "---" baseline is soes_curr_overlay with
+# demean=False, which is the program this one collapses to as gamma -> infinity; note
+# that is NOT soes_curr_overlay's own default, since the mean-bearing version does not
+# demean (see soes_curr_overlay_w_mean.py).
+#
+#   gamma   ES_80    Vol     MDD      SR       ESR    annRet   nAct   grossPsi
+#     ---  0.7668   9.17   34.43   0.0748   0.0563    2.12%    83.3     2.043   <- mean-free
+#       3  0.7650   9.15   34.50   0.0949   0.0715    2.30%    83.4     1.708
+#       1  0.7653   9.16   34.18   0.1239   0.0935    2.57%    83.5     1.638
+#     0.5  0.7666   9.19   33.77   0.1648   0.1244    2.95%    83.5     1.604
+#     0.3  0.7699   9.24   33.41   0.2036   0.1540    3.32%    83.1     1.654
+#     0.2  0.7768   9.33   32.92   0.2375   0.1797    3.65%    82.5     1.740
+#     0.1  0.8103   9.73   30.73   0.2909   0.2201    4.27%    80.6     1.909   <- SR and MDD optimum
+#    0.05  0.9491  11.49   32.73   0.2797   0.2134    4.65%    72.0     1.999
+#    0.04  1.0522  12.90   36.49   0.2632   0.2032    4.83%    66.1     2.000
+#    0.03  1.2252  15.09   40.76   0.2701   0.2095    5.51%    57.4     2.000
+#
+# The Sharpe peaks at gamma = 0.1 and the grid brackets it: 0.2 above, 0.05 below, with
+# 3 down to 0.3 as the conservative end. Unusually for this family the Sharpe optimum
+# and the drawdown optimum COINCIDE at 0.1 -- MDD falls monotonically from 34.4% to
+# 30.7% and only deteriorates below the peak. Every other measure has them disagree,
+# with the drawdown minimum sitting one to three grid points more conservative than the
+# Sharpe peak.
+#
+# The lower bound of 0.05 is set by the divergence threshold, not by taste. HMCR_2's
+# degree-one homogeneity makes step 2 unbounded below for
+# gamma < gamma_crit = max_d [mu_c'd / HMCR_2(-(R_c d))], measured at 0.0155, 0.0224 and
+# 0.0264 on the raw return matrices this program uses. 0.05 keeps a 1.9x margin over the
+# worst of those; 0.04 and 0.03 cut it to 1.5x and 1.14x and are past the peak anyway,
+# with drawdowns of 36.5% and 40.8%.
+#
+# For reference across measures, the peak Sharpe each mean-bearing overlay reaches on
+# this universe: MV 0.481 (gamma 10), MAD 0.469 (0.2), SMV 0.420 (15), SOES 0.291 (0.1),
+# ES 0.154 (0.2). The three deviation measures cluster at the top; the two undemeaned
+# ones -- ES and SOES -- sit well below, which is consistent with their objectives
+# double-counting the mean (see soes_curr_overlay_w_mean.py).
+SOES_GAMMA_GRID = [3, 1, 0.5, 0.3, 0.2, 0.1, 0.05]
+
+
 
 # Column-demeaning switch for the eight ES and SOES overlay/joint programs,
 # flipped manually. ES and its second-order variant (HMCR_2) are the two risk
@@ -1248,6 +1295,23 @@ SOES_OVERLAY_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing SOES overlay. Carries the overlay L1 cap and the SOES risk-aversion
+# grid on top of SOES_OVERLAY_CONFIG's alpha and leverage cap. No `demean` entry,
+# deliberately: centering would zero the sample means this program is built around,
+# exactly as in ES_MEAN_OVERLAY_CONFIG. The cap is not optional - HMCR_2 is degree-one,
+# so step 2 is unbounded below without it for gamma under ~0.026.
+SOES_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "gamma":          SOES_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
+    },
+)
+
 # The regularized overlay reuses the calibrated SOES asset grids for the asset block
 # and the SOES currency grids for the overlay block, as the ES, MV, MAD and SMV
 # overlay configs reuse theirs.
@@ -1266,6 +1330,71 @@ REG_SOES_OVERLAY_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing regularized SOES overlay and joint programs. Both reuse the SOES penalty
+# grids calibrated on their mean-free counterparts; the risk term is the same measure at
+# the same scale, so the bounds transfer. As with the MV pair, the calibration was done
+# without a mean term competing for the objective, and the MV production runs showed the
+# mean-bearing programs then select STRONGER penalties, increasingly so with universe
+# size -- watch the selected-lambda series here for the same, and for endpoint clustering.
+#
+# No `demean` entry in either grid, deliberately: centering would zero the sample means
+# these programs are built around, exactly as in the ES mean-bearing configs.
+#
+# gamma is NOT in either grid. Both already carry 4 x 4 x 4 x 4 = 256 combinations per
+# rebalancing date, and crossing that with SOES_GAMMA_GRID's seven points is not
+# affordable at SOES's SOCP cost. The optimizers default gamma to 0.5 and still read it
+# from hyperparams. 0.5 is a CONSERVATIVE choice rather than the swept optimum, and more
+# conservative in relative terms than the values fixed for the other measures: on the
+# unregularized sweeps it gives Sharpe 0.165 (overlay) and 0.118 (joint) against peaks of
+# 0.291 at gamma = 0.1 and 0.234 at gamma = 0.05. For the overlay the Sharpe peak and the
+# drawdown minimum coincide at 0.1, so the criterion that picked 30 for MV/SMV and 0.5
+# for MAD -- the most aggressive point still improving drawdown -- would point at 0.1
+# here. For the joint no gamma improves drawdown at all, so that criterion does not apply.
+#
+# Both carry OVERLAY_LIMIT, and it is not the safeguard it is for the MV and SMV pairs.
+# HMCR_2 is degree-one, so the overlay block is unbounded below for gamma under
+# gamma_crit = max_d [mu_c'd / HMCR_2(-(R_c d))] = 0.0155 - 0.0264. The shipped 0.5
+# clears that by ~19x for the overlay. The JOINT is a different matter: uncapped, the
+# unregularized version is reported unbounded by the solver at every gamma down from 1,
+# including 0.5 itself, because the asset block partially offsets the carry direction at
+# finite scale. For reg_soes_joint_w_mean the cap is what makes the shipped configuration
+# solvable at all. The penalties do not substitute: the zero-zero currency corner is in
+# the grid.
+#
+# Neither is a strict superset of its mean-free counterpart. Mean-free undemeaned SOES
+# runs a gross psi of 0.62 - 2.99 (overlay) and 1.61 - 3.90 (joint) across three windows,
+# so the 2.0 cap binds on two of three even with the mean term off -- the largest
+# overshoot in the suite.
+REG_SOES_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":            ALPHA,
+        "lambda_l1_asset":  LAMBDA_L1_SOES_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SOES_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SOES_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SOES_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
+    },
+)
+
+REG_SOES_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":            ALPHA,
+        "lambda_l1_asset":  LAMBDA_L1_SOES_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_SOES_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_SOES_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_SOES_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
+    },
+)
+
 # Unregularized SOES joint program. Keeps alpha, exactly as JOINT_CONFIG does for
 # es_joint; the unregularized program has no penalties, so its grid is alpha and
 # the leverage cap alone.
@@ -1277,6 +1406,63 @@ SOES_JOINT_CONFIG = BacktestConfig(
         "alpha":          ALPHA,
         "leverage_limit": LEVERAGE,
         "demean":         DEMEAN_GRID,
+    },
+)
+
+# Mean-bearing SOES joint program. Reuses SOES_GAMMA_GRID, and as with the MAD pair
+# that reuse is measured rather than assumed -- the joint was swept on its own, with
+# soes_joint(demean=False) as the baseline it collapses to:
+#
+#   gamma   ES_80    Vol     MDD      SR       ESR    annRet   nAct   grossPsi
+#     ---  0.7346   8.72   35.38   0.0216   0.0161    1.62%    92.9     2.986   <- mean-free, UNCAPPED
+#     1e9  0.7293   8.66   36.31   0.0556   0.0418    1.92%    93.1     1.868   <- mean OFF, cap ON
+#       3  0.7302   8.67   36.31   0.0679   0.0508    2.02%    93.0     1.884
+#       1  0.7330   8.70   36.56   0.0882   0.0660    2.20%    92.6     1.893
+#     0.5  0.7370   8.75   37.06   0.1181   0.0883    2.47%    92.4     1.889
+#     0.3  0.7453   8.83   37.73   0.1495   0.1116    2.76%    91.8     1.947
+#     0.2  0.7584   8.98   38.90   0.1716   0.1279    2.98%    90.9     1.964
+#     0.1  0.8140   9.69   39.32   0.2290   0.1716    3.65%    87.0     1.995
+#    0.05  0.9889  11.94   35.71   0.2335   0.1776    4.22%    74.0     2.000   <- SR optimum
+#    0.04  1.1142  13.63   39.70   0.1925   0.1484    4.06%    66.3     2.000
+#
+# The Sharpe peaks at gamma = 0.05, but 0.1 (0.2290) is within noise of it -- the gap of
+# 0.0045 is an order of magnitude below the +/-0.04 sensitivity to implementation
+# choices measured on the MV pair -- so the top of this curve is a 0.1-0.05 plateau
+# rather than a point. SOES_GAMMA_GRID's [3 ... 0.05] covers it unchanged, and its floor
+# of 0.05 keeps the same 1.89x margin over the worst measured gamma_crit (0.0264).
+# gamma = 0.04 is excluded on both counts: its Sharpe (0.1925) is clearly off the
+# plateau and its margin falls to 1.5x.
+#
+# Two things distinguish this program from every other joint in the suite, and both
+# belong in the write-up. Drawdown gets monotonically WORSE across most of the band
+# (35.4% at the mean-free end to 39.3% at gamma = 0.1) rather than improving first --
+# so unlike the MV, SMV and MAD joints there is no region that beats the mean-free
+# program on both axes. And the "---" row is not a clean baseline: it is the UNCAPPED
+# mean-free joint, whose gross psi of 2.986 exceeds the 2.0 cap every mean-bearing row
+# carries. The 1e9 row isolates that, and here -- unlike the SMV pair, where the cap was
+# worth +0.005 Sharpe -- the cap is most of the story at the conservative end. Imposing
+# it with the mean term off is worth +0.034 Sharpe (0.0216 -> 0.0556) and cuts gross psi
+# from 2.99 to 1.87. So of the +0.046 jump from "---" to gamma = 3, roughly three
+# quarters is the cap and one quarter the mean term. That reverses at the optimum: at
+# gamma = 0.05 the mean term is worth +0.178 against the cap's +0.034. USE THE 1e9 ROW,
+# not the "---" row, as the baseline for what the mean term buys.
+#
+# The cap is not optional here. HMCR_2 is degree-one and x is confined to a compact set,
+# so psi is the only runaway direction and the asymptotic threshold is
+# gamma_crit = max_d [mu_c'd / HMCR_2(-(R_c d))] = 0.0155 - 0.0264, identical to the
+# overlay's. But the asymptote badly understates the case: uncapped, this program is
+# reported unbounded by the solver at EVERY gamma tested down from 1 -- 38x above
+# gamma_crit -- where the uncapped overlay stayed bounded to 0.02. The cap is what makes
+# the whole band solvable, not a safeguard near the threshold.
+SOES_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "alpha":          ALPHA,
+        "gamma":          SOES_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
     },
 )
 
