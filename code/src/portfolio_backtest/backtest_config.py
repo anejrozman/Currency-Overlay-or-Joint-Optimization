@@ -407,6 +407,61 @@ MV_GAMMA_GRID = [100, 50, 30, 20, 10]
 # all; use the 1e7 row when the decomposition has to be exact.
 SMV_GAMMA_GRID = [100, 50, 30, 20, 15, 10]
 
+# Risk-aversion grid for the mean-bearing MAD overlay (mad_curr_overlay_w_mean.py).
+# Calibrated on its own program; none of the other grids transfer, and the reason is
+# structural rather than incidental. MAD is a DEGREE-ONE risk measure, like ES and
+# unlike MV and SMV: the objective is Risk - mu'w / gamma with both terms homogeneous
+# of degree one in w, so gamma is a pure information ratio. A daily MAD is ~3.1e-3
+# against a daily variance of ~2.6e-5 and semi-variance of ~9e-6, which puts this band
+# two to three decades below MV_GAMMA_GRID and SMV_GAMMA_GRID and close to
+# ES_GAMMA_GRID's [10 ... 0.1]. The four grids look wildly different because two
+# measures are degree one and two are degree two, not because any of them is
+# miscalibrated.
+#
+# Calibrated the same way the others were: the backtester at fixed gamma (a one-point
+# grid, so no selection and the OOS result is attributable to gamma alone) on the top-10
+# universe, quarterly, 10y window, leverage 2.0, overlay cap 2.0, over 2000-07 to
+# 2023-04, Clarabel rather than Gurobi (~1e-6 weight difference).
+#
+#   gamma   ES_80    Vol     MDD      SR       ESR    annRet   nAct   grossPsi
+#     ---  0.6535   7.87   27.67   0.1601   0.1214    2.70%   118.7     0.945   <- mad_curr_overlay
+#     100  0.6537   7.87   27.58   0.1619   0.1228    2.71%   118.7     0.947   <- mean term inert
+#      10  0.6548   7.89   27.35   0.1712   0.1299    2.79%   118.6     0.924
+#       3  0.6571   7.92   27.19   0.2015   0.1531    3.03%   118.7     0.996
+#       1  0.6685   8.08   25.84   0.2817   0.2144    3.71%   118.4     1.270   <- MDD minimum
+#     0.5  0.6898   8.31   26.52   0.3379   0.2565    4.24%   117.8     1.541
+#     0.3  0.7348   8.86   28.82   0.3821   0.2901    4.82%   114.7     1.811
+#     0.2  0.8262  10.10   33.22   0.4694   0.3613    6.17%   108.2     1.967   <- SR optimum
+#    0.15  0.9629  11.96   38.58   0.4434   0.3469    6.74%    99.3     2.000
+#     0.1  1.3066  16.99   48.74   0.4363   0.3574    8.85%    79.3     2.000   <- past gamma_crit
+#
+# The Sharpe curve is single-peaked at gamma = 0.2 and the grid brackets it: 0.3 above,
+# 0.15 below, with 1 and 3 as the conservative end. 10 and 100 are dropped as inert --
+# gamma = 100 moves the Sharpe by 0.002 over the mean-free program and the drawdown by
+# 0.09pp.
+#
+# The lower bound of 0.15 is not a judgement call. MAD's degree-one homogeneity makes
+# step 2 unbounded below for gamma < gamma_crit = max_d [mu_c'd / MAD(A_c d)], measured
+# at 0.062, 0.078 and 0.110 on three windows. 0.15 is the last grid point above every
+# measured gamma_crit, so the whole grid stays well posed on its own terms and the 2.0
+# overlay cap is a safeguard rather than the only thing holding the program together.
+# gamma = 0.1 sits below the largest gamma_crit and is excluded for that reason as well
+# as on drawdown (48.7%).
+#
+# Two caveats, both shared with the MV and SMV grids. The Sharpe optimum and the
+# drawdown optimum disagree: gamma = 1 cuts MDD to 25.8% against 27.7% mean-free while
+# nearly doubling the Sharpe, whereas the peak at 0.2 takes MDD up to 33.2%. And the cap
+# saturates at the aggressive end (gross psi 1.97 at gamma = 0.2, 2.00 at 0.15), so
+# there psi is a corner of the L1 ball with its direction set by the carry ranking
+# rather than by the risk-return tradeoff.
+#
+# For reference across measures, the peak Sharpe each mean-bearing overlay reaches on
+# this universe: MV 0.481 (gamma 10), MAD 0.469 (gamma 0.2), SMV 0.420 (gamma 15),
+# ES 0.154 (gamma 0.2). The three deviation measures land close together; raw ES is the
+# outlier, which is consistent with its objective double-counting the mean.
+MAD_GAMMA_GRID = [3, 1, 0.5, 0.3, 0.2, 0.15]
+
+
 # Column-demeaning switch for the eight ES and SOES overlay/joint programs,
 # flipped manually. ES and its second-order variant (HMCR_2) are the two risk
 # measures here that are not deviation measures: MV, MAD and semi-variance all
@@ -943,6 +998,44 @@ MAD_JOINT_CONFIG = BacktestConfig(
     },
 )
 
+# Mean-bearing MAD joint program. Reuses MAD_GAMMA_GRID, and as with the MV pair that
+# reuse is measured rather than assumed -- the joint program was swept on its own:
+#
+#   gamma   ES_80    Vol     MDD      SR       ESR    annRet   nAct   grossPsi
+#     ---  0.6384   7.71   27.31   0.1804   0.1372    2.83%   119.7     1.356   <- mad_joint
+#      10  0.6386   7.72   27.57   0.1941   0.1477    2.93%   119.7     1.306   <- nearly inert
+#       3  0.6401   7.75   26.71   0.2435   0.1856    3.32%   119.7     1.342
+#       1  0.6492   7.88   25.43   0.3225   0.2466    3.98%   119.7     1.506   <- MDD minimum
+#     0.5  0.6712   8.13   25.58   0.3749   0.2861    4.48%   119.4     1.713
+#     0.3  0.7291   8.84   28.09   0.3876   0.2959    4.86%   117.0     1.894
+#     0.2  0.8389  10.33   33.73   0.4327   0.3357    5.91%   110.4     1.990   <- SR optimum
+#    0.15  1.0033  12.66   40.37   0.3885   0.3089    6.35%    98.8     2.000
+#
+# The curve lands on the overlay's: same single peak at gamma = 0.2, same drawdown
+# minimum at gamma = 1, same near-inert conservative end at 10. So MAD_GAMMA_GRID
+# transfers unchanged, and its lower bound of 0.15 -- the last point above every
+# measured gamma_crit (0.062, 0.078, 0.110, identical for the joint) -- applies here
+# for the same reason.
+#
+# The cap is not optional: MAD is degree-one and x is confined to a compact set, so psi
+# is the only runaway direction and the program is unbounded below without it for gamma
+# under ~0.1. It does more work here than in the overlay -- uncapped, the joint reaches
+# gross psi of 4.7 at gamma = 1 and 22.7 at 0.12, well above gamma_crit, where the
+# overlay is still below 0.5; mad_joint_w_mean.py records the measurements.
+#
+# Note the joint does not beat the overlay at either program's optimum (0.433 against
+# 0.469 at gamma = 0.2), the same ordering the MV and SMV pairs show.
+MAD_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          MAD_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
+    },
+)
+
 # MAD overlays. The unregularized program has no penalties, so its grid is the
 # leverage cap alone, exactly as MV_OVERLAY_CONFIG.
 MAD_OVERLAY_CONFIG = BacktestConfig(
@@ -951,6 +1044,22 @@ MAD_OVERLAY_CONFIG = BacktestConfig(
     rebalancing_frequency="quarterly",
     param_grid={
         "leverage_limit": LEVERAGE,
+    },
+)
+
+# Mean-bearing MAD overlay. Carries the overlay L1 cap and the MAD risk-aversion grid
+# on top of MAD_OVERLAY_CONFIG's leverage cap. The cap is not optional here: MAD is
+# degree-one, so step 2 is unbounded below without it for gamma under ~0.1. No
+# `demean` entry: the MAD is already a deviation measure, formed on demeaned return
+# matrices, so the switch the ES overlays carry has no analogue.
+MAD_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "gamma":          MAD_GAMMA_GRID,
+        "leverage_limit": LEVERAGE,
+        "overlay_limit":  OVERLAY_LIMIT,
     },
 )
 
@@ -967,6 +1076,65 @@ REG_MAD_OVERLAY_CONFIG = BacktestConfig(
         "lambda_l1_curr":   LAMBDA_L1_MAD_CURR_GRID,
         "lambda_l2_curr":   LAMBDA_L2_MAD_CURR_GRID,
         "leverage_limit":   LEVERAGE,
+    },
+)
+
+# Mean-bearing regularized MAD overlay and joint programs. Both reuse the MAD penalty
+# grids calibrated on their mean-free counterparts, as REG_MAD_OVERLAY_CONFIG and
+# REG_MAD_JOINT_CONFIG do; the risk term is the same measure at the same scale, so the
+# bounds transfer. As with the MV pair, the calibration was done without a mean term
+# competing for the objective, and the MV production runs showed the mean-bearing
+# programs then select STRONGER penalties, increasingly so with universe size -- watch
+# the selected-lambda series here for the same, and for endpoint clustering.
+#
+# gamma is deliberately NOT in either grid, exactly as in REG_MV_MEAN_OVERLAY_CONFIG and
+# REG_SMV_MEAN_OVERLAY_CONFIG. Both configs already have 4 x 4 x 4 x 4 = 256
+# combinations per rebalancing date, and crossing that with MAD_GAMMA_GRID's six points
+# is not affordable. The optimizers default gamma to 0.5 and still read it from
+# hyperparams. 0.5 is calibrated by the same criterion that picked 30 for the MV and
+# SMV pairs: on the fixed-gamma sweeps of both unregularized MAD programs it is the most
+# aggressive grid point that still improves drawdown over the mean-free program (MDD
+# 26.5% overlay and 25.6% joint, against 27.7% and 27.3%), while more than doubling the
+# Sharpe -- 0.160 to 0.338 and 0.180 to 0.375.
+#
+# gamma is not comparable across risk measures. MAD is degree one, like ES and unlike MV
+# and SMV, so its band sits two to three decades below theirs; 0.5 here and 30 there are
+# comparable positions on their own curves, not comparable numbers.
+#
+# Both also carry OVERLAY_LIMIT, and here it is not the safeguard it is for the MV and
+# SMV pairs. MAD is degree-one, so the overlay block is unbounded below for gamma under
+# gamma_crit = max_d [mu_c'd / MAD(A_c d)], measured at 0.062 - 0.110. The shipped 0.5
+# clears that by ~4.5x for the overlay, but the JOINT program is far more fragile: at
+# finite scale its asset block partially offsets the carry direction, and uncapped it
+# reaches gross psi of 4.7 at gamma = 1 while the solver reports it unbounded at gamma =
+# 0.5, the shipped value. For reg_mad_joint_w_mean the cap is what makes the shipped
+# configuration solvable at all. The penalties do not substitute for it: the
+# lambda_l1_curr = lambda_l2_curr = 0 corner is in the grid.
+REG_MAD_MEAN_OVERLAY_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_MAD_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_MAD_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_MAD_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_MAD_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
+    },
+)
+
+REG_MAD_MEAN_JOINT_CONFIG = BacktestConfig(
+    window_years=10,
+    val_years=1,
+    rebalancing_frequency="quarterly",
+    param_grid={
+        "lambda_l1_asset":  LAMBDA_L1_MAD_ASSET_GRID,
+        "lambda_l2_asset":  LAMBDA_L2_MAD_ASSET_GRID,
+        "lambda_l1_curr":   LAMBDA_L1_MAD_CURR_GRID,
+        "lambda_l2_curr":   LAMBDA_L2_MAD_CURR_GRID,
+        "leverage_limit":   LEVERAGE,
+        "overlay_limit":    OVERLAY_LIMIT,
     },
 )
 

@@ -15,9 +15,13 @@ from .reg_es_joint_w_mean import RegularizedExpectedShortfallJointWithMeanOptimi
 from .reg_mad_asset_full import RegularizedMeanAbsoluteDeviationAssetFullOptimizer
 from .reg_mad_asset_zero import RegularizedMeanAbsoluteDeviationAssetZeroOptimizer
 from .mad_curr_overlay import MeanAbsoluteDeviationCurrencyOverlayOptimizer
+from .mad_curr_overlay_w_mean import MeanAbsoluteDeviationCurrencyOverlayWithMeanOptimizer
 from .mad_joint import MeanAbsoluteDeviationJointOptimizer
+from .mad_joint_w_mean import MeanAbsoluteDeviationJointWithMeanOptimizer
 from .reg_mad_joint import RegularizedMeanAbsoluteDeviationJointOptimizer
+from .reg_mad_joint_w_mean import RegularizedMeanAbsoluteDeviationJointWithMeanOptimizer
 from .reg_mad_curr_overlay import RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer
+from .reg_mad_curr_overlay_w_mean import RegularizedMeanAbsoluteDeviationCurrencyOverlayWithMeanOptimizer
 from .reg_mv_asset_full import RegularizedMeanVarianceAssetFullOptimizer
 from .reg_mv_asset_zero import RegularizedMeanVarianceAssetZeroOptimizer
 from .mv_curr_overlay import MeanVarianceCurrencyOverlayOptimizer
@@ -53,7 +57,9 @@ __all__ = [
     "ExpectedShortfallJointOptimizer",
     "ExpectedShortfallJointWithMeanOptimizer",
     "MeanAbsoluteDeviationCurrencyOverlayOptimizer",
+    "MeanAbsoluteDeviationCurrencyOverlayWithMeanOptimizer",
     "MeanAbsoluteDeviationJointOptimizer",
+    "MeanAbsoluteDeviationJointWithMeanOptimizer",
     "MeanVarianceCurrencyOverlayOptimizer",
     "MeanVarianceCurrencyOverlayWithMeanOptimizer",
     "MeanVarianceJointOptimizer",
@@ -67,7 +73,9 @@ __all__ = [
     "RegularizedMeanAbsoluteDeviationAssetFullOptimizer",
     "RegularizedMeanAbsoluteDeviationAssetZeroOptimizer",
     "RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer",
+    "RegularizedMeanAbsoluteDeviationCurrencyOverlayWithMeanOptimizer",
     "RegularizedMeanAbsoluteDeviationJointOptimizer",
+    "RegularizedMeanAbsoluteDeviationJointWithMeanOptimizer",
     "RegularizedMeanVarianceAssetFullOptimizer",
     "RegularizedMeanVarianceAssetZeroOptimizer",
     "RegularizedMeanVarianceCurrencyOverlayOptimizer",
