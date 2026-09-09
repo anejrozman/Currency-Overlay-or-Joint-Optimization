@@ -3,9 +3,20 @@ Cumulative out-of-sample wealth plots, one figure per universe size.
 
 Usage:
     python results/generate_cumulative_plots.py es
-    python results/generate_cumulative_plots.py mv
-    python results/generate_cumulative_plots.py mad
-    TODO: implement factor and general measures in the future.
+    python results/generate_cumulative_plots.py soes --variant w_mean
+    python results/generate_cumulative_plots.py smv --variant demeaned
+
+The --variant flag selects which top-runs table to read and where the
+figures are written:
+
+    base      runs/top_runs.csv          -> figures/cumulative_returns/
+    w_mean    runs/top_runs_w_mean.csv   -> figures/cumulative_returns/w_mean/
+    demeaned  runs/top_demeaned_runs.csv -> figures/cumulative_returns/demeaned/
+
+Not every measure exists in every variant; combinations without runs are
+skipped silently.
+
+TODO: implement factor and general measures in the future.
 
 Author: Anej Rozman
 """
@@ -23,8 +34,13 @@ import pandas as pd
 
 RESULTS_DIR: Path = Path(__file__).resolve().parent
 RUNS_DIR: Path = RESULTS_DIR / "runs"
-TOP_RUNS_FILE: Path = RUNS_DIR / "top_runs.csv"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "cumulative_returns"
+
+VARIANTS: dict[str, dict[str, str]] = {
+    "base":     {"file": "top_runs.csv",          "subdir": "",         "suffix": ""},
+    "w_mean":   {"file": "top_runs_w_mean.csv",   "subdir": "w_mean",   "suffix": " with mean term"},
+    "demeaned": {"file": "top_demeaned_runs.csv", "subdir": "demeaned", "suffix": " (demeaned)"},
+}
 
 BENCHMARK_STRATEGY: str = "equal_weight_optimizer"
 
@@ -43,15 +59,19 @@ GRID_COLOR: str = "#d9d8d4"
 LEGEND_FACE_COLOR: str = "#ffffff"
 
 MEASURE_TITLES: dict[str, str] = {
-    "es":  "Expected Shortfall",
-    "mv":  "Mean-Variance",
-    "mad": "Mean Absolute Deviation",
+    "es":   "Expected Shortfall",
+    "soes": "Second-Order Expected Shortfall",
+    "mv":   "Mean-Variance",
+    "smv":  "Semi-Variance",
+    "mad":  "Mean Absolute Deviation",
 }
 plt.rcParams["pdf.fonttype"] = 42
 
 
-def _read_top_runs() -> tuple[list[int], list[tuple[str, dict[int, int | None]]]]:
-    with open(TOP_RUNS_FILE, newline="") as fh:
+def _read_top_runs(
+    path: Path,
+) -> tuple[list[int], list[tuple[str, dict[int, int | None]]]]:
+    with open(path, newline="") as fh:
         rows = [[cell.strip() for cell in row] for row in csv.reader(fh)]
 
     header = next(row for row in rows if row and row[0])
@@ -146,6 +166,8 @@ def _collect_series(
         else:
             series.append(spec)
 
+    if not series:
+        return []
     if benchmark is not None:
         series.append(benchmark)
     return series
@@ -160,7 +182,9 @@ def _align_series(series: list[dict]) -> None:
         spec["wealth"] = aligned / aligned.iloc[0]
 
 
-def _plot(series: list[dict], measure: str, universe: int) -> None:
+def _plot(
+    series: list[dict], measure: str, universe: int, variant: dict[str, str]
+) -> None:
     fig, ax = plt.subplots(figsize=(9, 5))
 
     for spec in series:
@@ -177,8 +201,8 @@ def _plot(series: list[dict], measure: str, universe: int) -> None:
         )
 
     ax.set_title(
-        f"Cumulative performance, regularized {MEASURE_TITLES[measure]} strategies, "
-        f"top-{universe}",
+        f"Cumulative performance, regularized {MEASURE_TITLES[measure]} "
+        f"strategies{variant['suffix']}, top-{universe}",
         color=TEXT_PRIMARY, fontsize=12, loc="center", pad=12,
     )
     ax.set_xlabel("")
@@ -203,9 +227,10 @@ def _plot(series: list[dict], measure: str, universe: int) -> None:
 
     fig.tight_layout()
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    out_dir = OUT_DIR / variant["subdir"]
+    out_dir.mkdir(parents=True, exist_ok=True)
     fig.savefig(
-        OUT_DIR / f"{measure}_top{universe}.pdf",
+        out_dir / f"{measure}_top{universe}.pdf",
         format="pdf", dpi=600, bbox_inches="tight",
     )
     plt.close(fig)
@@ -218,15 +243,22 @@ def main() -> None:
         choices=sorted(MEASURE_TITLES),
         help="Optimizer family to plot.",
     )
-    measure = parser.parse_args().measure
+    parser.add_argument(
+        "--variant",
+        choices=sorted(VARIANTS),
+        default="base",
+        help="Top-runs table to read (default: base).",
+    )
+    args = parser.parse_args()
+    measure, variant = args.measure, VARIANTS[args.variant]
 
-    universes, entries = _read_top_runs()
+    universes, entries = _read_top_runs(RUNS_DIR / variant["file"])
     for universe in universes:
         series = _collect_series(entries, universe, measure)
         if not series:
             continue
         _align_series(series)
-        _plot(series, measure, universe)
+        _plot(series, measure, universe, variant)
 
 
 if __name__ == "__main__":
