@@ -174,14 +174,14 @@ class MeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
             hyperparams: Optional dict with keys:
 
                 * ``gamma``          (float) — risk aversion; the mean term enters
-                                               with coefficient 1 / gamma, default 100
+                                               with coefficient 1 / gamma, default 30
                 * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
                 * ``overlay_limit``  (float) — ||psi||_1 cap for step 2, default 2.0
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
                                                (``cp.CLARABEL`` when gurobipy is unavailable)
         """
         super().__init__(hyperparams)
-        self.gamma: float = self.hyperparams.get("gamma", 100)
+        self.gamma: float = self.hyperparams.get("gamma", 30)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.overlay_limit: float = self.hyperparams.get("overlay_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)

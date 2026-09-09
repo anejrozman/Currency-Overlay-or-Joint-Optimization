@@ -88,7 +88,7 @@ class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
 
                 * ``alpha``          (float) — ES confidence level, default 0.80
                 * ``gamma``          (float) — risk aversion; the mean term enters
-                                               with coefficient 1 / gamma, default 100
+                                               with coefficient 1 / gamma, default 2
                 * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
                 * ``overlay_limit``  (float) — ||psi||_1 cap, default 2.0
                 * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
@@ -96,7 +96,7 @@ class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
-        self.gamma: float = self.hyperparams.get("gamma", 100)
+        self.gamma: float = self.hyperparams.get("gamma", 2)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.overlay_limit: float = self.hyperparams.get("overlay_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)

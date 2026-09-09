@@ -161,7 +161,7 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
-        self.gamma: float = self.hyperparams.get("gamma", 0.1)
+        self.gamma: float = self.hyperparams.get("gamma", 0.5)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.overlay_limit: float = self.hyperparams.get("overlay_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)

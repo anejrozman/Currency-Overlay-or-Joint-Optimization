@@ -275,7 +275,30 @@ OVERLAY_LIMIT = [2.0]
 # economies — but note it takes a gamma two decades below the useful range to
 # trigger here, where the raw-mean MV programs blew up at gamma = 3. The economy
 # pooling and the James-Stein shrinkage are what buy that margin.
-ES_GAMMA_GRID = [10, 5, 2, 1, 0.5, 0.2, 0.1]
+#
+# PINNED to a single point.  Gamma was a searched hyperparameter, and the joint and
+# overlay programs of a measure routinely selected different values -- at top-100
+# they agreed on 14% of dates for ES and 20% for MAD -- so the two programs were
+# minimizing different objectives.  That makes the joint-vs-overlay gap in
+# in_sample_vs_out_of_sample_w_mean.py unidentified: it conflates the optimization
+# structure it means to measure with the difference in selected risk appetite.  MV
+# and SMV, where selection agreed on 97-99% of dates, were unaffected; ES and MAD,
+# where it did not, produced in-sample gaps that went negative -- the joint program
+# scoring worse than the overlay on a functional it never minimized.
+#
+# Each grid is now the one point the regularized program of the same measure
+# already runs at, so both families sit at one gamma per measure and are directly
+# comparable for the first time.  The calibrated ranges are kept in the comments
+# above and below: they are the evidence for where each pinned value sits, and
+# restoring a search is a matter of pasting the range back.  One-element lists
+# rather than deleted keys, so gamma still reaches config.json and
+# selected_params.csv and a grid run and a --no-grid run solve identically -- the
+# same reasoning as DEMEAN / DEMEAN_GRID below.
+#
+# Each value must equal the `gamma` default of the four optimizers of its measure
+# (the two *_w_mean programs and their two reg_* counterparts); they are matched as
+# of this commit.
+ES_GAMMA_GRID = [2]  # was [10, 5, 2, 1, 0.5, 0.2, 0.1]
 
 # Risk-aversion grid for the mean-bearing MV overlay (mv_curr_overlay_w_mean.py).
 # Calibrated on its own program and its own scale; ES_GAMMA_GRID must not be reused
@@ -355,7 +378,10 @@ ES_GAMMA_GRID = [10, 5, 2, 1, 0.5, 0.2, 0.1]
 # asset means onto at most 14 economy means is the step that does the work.
 #
 # Ordered descending to match ES_GAMMA_GRID.
-MV_GAMMA_GRID = [100, 50, 30, 20, 10]
+#
+# PINNED to 30, the value the reg_* programs of this measure run at; see
+# ES_GAMMA_GRID for why the grids were collapsed to points.
+MV_GAMMA_GRID = [30]  # was [100, 50, 30, 20, 10]
 
 # Risk-aversion grid for the mean-bearing SMV overlay and joint programs
 # (smv_curr_overlay_w_mean.py, smv_joint_w_mean.py). Calibrated on its own programs
@@ -405,7 +431,10 @@ MV_GAMMA_GRID = [100, 50, 30, 20, 10]
 # mean term alone at gamma = 500. The cap is therefore a negligible part of the effect
 # despite binding on a fifth of windows, and the "---" row is a usable baseline after
 # all; use the 1e7 row when the decomposition has to be exact.
-SMV_GAMMA_GRID = [100, 50, 30, 20, 15, 10]
+#
+# PINNED to 30, the value the reg_* programs of this measure run at; see
+# ES_GAMMA_GRID for why the grids were collapsed to points.
+SMV_GAMMA_GRID = [30]  # was [100, 50, 30, 20, 15, 10]
 
 # Risk-aversion grid for the mean-bearing MAD overlay (mad_curr_overlay_w_mean.py).
 # Calibrated on its own program; none of the other grids transfer, and the reason is
@@ -459,7 +488,10 @@ SMV_GAMMA_GRID = [100, 50, 30, 20, 15, 10]
 # this universe: MV 0.481 (gamma 10), MAD 0.469 (gamma 0.2), SMV 0.420 (gamma 15),
 # ES 0.154 (gamma 0.2). The three deviation measures land close together; raw ES is the
 # outlier, which is consistent with its objective double-counting the mean.
-MAD_GAMMA_GRID = [3, 1, 0.5, 0.3, 0.2, 0.15]
+#
+# PINNED to 0.5, the value the reg_* programs of this measure run at; see
+# ES_GAMMA_GRID for why the grids were collapsed to points.
+MAD_GAMMA_GRID = [0.5]  # was [3, 1, 0.5, 0.3, 0.2, 0.15]
 
 # Risk-aversion grid for the mean-bearing SOES overlay (soes_curr_overlay_w_mean.py).
 # Calibrated on its own program. HMCR_2 is DEGREE-ONE, like ES and MAD and unlike MV
@@ -505,7 +537,10 @@ MAD_GAMMA_GRID = [3, 1, 0.5, 0.3, 0.2, 0.15]
 # ES 0.154 (0.2). The three deviation measures cluster at the top; the two undemeaned
 # ones -- ES and SOES -- sit well below, which is consistent with their objectives
 # double-counting the mean (see soes_curr_overlay_w_mean.py).
-SOES_GAMMA_GRID = [3, 1, 0.5, 0.3, 0.2, 0.1, 0.05]
+#
+# PINNED to 0.5, the value the reg_* programs of this measure run at; see
+# ES_GAMMA_GRID for why the grids were collapsed to points.
+SOES_GAMMA_GRID = [0.5]  # was [3, 1, 0.5, 0.3, 0.2, 0.1, 0.05]
 
 
 
