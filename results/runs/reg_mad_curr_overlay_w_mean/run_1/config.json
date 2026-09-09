@@ -1,0 +1,47 @@
+{
+  "strategy": "reg_mad_curr_overlay_w_mean",
+  "label": "Regularized Mean-MAD Currency Overlay (top-10)",
+  "run_date": "2026-09-08T14:31:19.101884",
+  "optimizer": "RegularizedMeanAbsoluteDeviationCurrencyOverlayWithMeanOptimizer",
+  "param_grid": {
+    "lambda_l1_asset": [
+      0.0,
+      2.5e-05,
+      0.00025,
+      0.0025
+    ],
+    "lambda_l2_asset": [
+      0.0,
+      0.01,
+      0.1,
+      1.0
+    ],
+    "lambda_l1_curr": [
+      0.0,
+      1.5e-05,
+      0.00015,
+      0.0015
+    ],
+    "lambda_l2_curr": [
+      0.0,
+      0.0025,
+      0.025,
+      0.25
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "overlay_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_10_202603081747.csv",
+  "universe_size": 10,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}

@@ -1,0 +1,31 @@
+{
+  "strategy": "smv_curr_overlay_w_mean",
+  "label": "Mean-SMV Currency Overlay (top-100)",
+  "run_date": "2026-09-08T11:14:56.418763",
+  "optimizer": "SemiVarianceCurrencyOverlayWithMeanOptimizer",
+  "param_grid": {
+    "gamma": [
+      100,
+      50,
+      30,
+      20,
+      15,
+      10
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "overlay_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_100_202603081747.csv",
+  "universe_size": 100,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}

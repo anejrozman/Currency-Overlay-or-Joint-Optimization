@@ -1,0 +1,47 @@
+{
+  "strategy": "reg_smv_joint_w_mean",
+  "label": "Regularized Mean-SMV Joint (top-50)",
+  "run_date": "2026-09-08T11:15:53.987694",
+  "optimizer": "RegularizedSemiVarianceJointWithMeanOptimizer",
+  "param_grid": {
+    "lambda_l1_asset": [
+      0.0,
+      1e-06,
+      1e-05,
+      0.0001
+    ],
+    "lambda_l2_asset": [
+      0.0,
+      5e-05,
+      0.0015,
+      0.05
+    ],
+    "lambda_l1_curr": [
+      0.0,
+      2.5e-07,
+      2.5e-06,
+      2.5e-05
+    ],
+    "lambda_l2_curr": [
+      0.0,
+      1e-07,
+      1e-05,
+      0.001
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "overlay_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_50_202603081747.csv",
+  "universe_size": 50,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
