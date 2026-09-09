@@ -1,28 +1,28 @@
 strategy_name, top_10_run, top_50_run, top_100_run
 
-equal_weight_optimizer, 1, 2, 3
+equal_weight_optimizer,         1,   2,   3
 
-es_curr_overlay_w_mean,      5, 4, 6
-reg_es_curr_overlay_w_mean,  4, 3, 2
-es_joint_w_mean,             2, 4, 3
-reg_es_joint_w_mean,         2, 3, 4
+es_curr_overlay_w_mean,         9,   8,   7
+reg_es_curr_overlay_w_mean,     4,   3,   2
+es_joint_w_mean,                6,   5,   7
+reg_es_joint_w_mean,            2,   3,   4
 
-mv_curr_overlay_w_mean,      1, 2, 3
-reg_mv_curr_overlay_w_mean,  1, 3, 2
-mv_joint_w_mean,             1, 2, 3
-reg_mv_joint_w_mean,         1, 3, 2
+mv_curr_overlay_w_mean,         4,   6,   5
+reg_mv_curr_overlay_w_mean,     1,   3,   2
+mv_joint_w_mean,                5,   6,   4
+reg_mv_joint_w_mean,            1,   3,   2
 
-soes_curr_overlay_w_mean,     3, 2, 1
-reg_soes_curr_overlay_w_mean, 3, 2, 1
-soes_joint_w_mean,            1, 3, 2
-reg_soes_joint_w_mean,        3, 1, 2
+soes_curr_overlay_w_mean,       5,   6,   4
+reg_soes_curr_overlay_w_mean,   3,   2,   1
+soes_joint_w_mean,              5,   6,   4
+reg_soes_joint_w_mean,          3,   1,   2
 
-mad_curr_overlay_w_mean,     3, 2, 1
-reg_mad_curr_overlay_w_mean, 1, 3, 2
-mad_joint_w_mean,            3, 2, 1
-reg_mad_joint_w_mean,        1, 2, 3
+mad_curr_overlay_w_mean,        6,   5,   4
+reg_mad_curr_overlay_w_mean,    1,   3,   2
+mad_joint_w_mean,               5,   6,   4
+reg_mad_joint_w_mean,           1,   2,   3
 
-smv_curr_overlay_w_mean,     1, 2, 3
-reg_smv_curr_overlay_w_mean, 4, 3, 1
-smv_joint_w_mean,            3, 2, 1
-reg_smv_joint_w_mean,        2, 1, 3
+smv_curr_overlay_w_mean,        6,   5,   4
+reg_smv_curr_overlay_w_mean,    4,   3,   1
+smv_joint_w_mean,               5,   4,   6
+reg_smv_joint_w_mean,           2,   1,   3
