@@ -44,7 +44,9 @@ term:
     too, which is new: gamma is a searched hyperparameter for them, so
     isa._fixed_hyperparams would reject their grid outright, and fixing gamma at
     one value for the diagnostic would score weights no backtest ever held.  Both
-    families therefore need a filled cell in results/runs/top_runs_w_mean.csv.
+    families therefore need, for every cell, a run recorded in
+    results/runs/top_runs_w_mean.csv whose directory carries selected_params.csv
+    -- a cell filled in when the backtest was submitted is not yet enough.
   * The currency-count arm is dropped, as in the de-meaned script.  Every cell
     carries the full K = 14 overlay block.
 
@@ -63,10 +65,13 @@ touches -- there is no shared file to race on and no merge step.  Re-solving a
 cell overwrites its own shard and nothing else.
 
 A measure whose ``*_w_mean`` optimizers are not registered yet is warned about
-and skipped, so this runs today against the ES pair alone and picks up the other
-four as they land.  A measure missing any of its cells in top_runs_w_mean.csv is
-likewise skipped whole, since regressions() contrasts a measure's universes
-against each other and a single-universe cell has nothing to regress on.
+and skipped; all five pairs are registered as of 2026-09-09, so what gates a
+measure now is whether its production runs have landed.  A measure missing any
+of its requested cells is skipped whole, since regressions() contrasts a
+measure's universes against each other and a single-universe cell has nothing to
+regress on.  That drop is scoped to what one invocation asks for, which is why
+the cluster submission runs one cell per job: --measures smv --universes 10
+solves that cell even while smv's top-100 backtest is still in flight.
 
 Usage:
     python code/scripts/in_sample_vs_out_of_sample_w_mean.py
@@ -75,7 +80,7 @@ Usage:
     python code/scripts/in_sample_vs_out_of_sample_w_mean.py --plot-only
 
 One cell per job on the cluster, then the tables and figures once they land:
-    ... --family unregularized --measures es --universes 50 --sweep-only
+    code/scripts/euler/run_gap_analysis_w_mean.sh --family unregularized
     python code/scripts/in_sample_vs_out_of_sample_w_mean.py --plot-only
 
 Author: Anej Rozman
@@ -185,11 +190,23 @@ def _top_run(strategy: str, universe: int) -> int:
 
 
 def _has_run(strategy: str, universe: int) -> bool:
+    """
+    Whether *strategy*'s top-*universe* hyperparameters can actually be read.
+
+    A filled cell is not sufficient.  top_runs_w_mean.csv records the run each
+    universe was launched under, so a cell points at a run directory from the
+    moment the job is submitted -- before the backtest has written the
+    selected_params.csv this script reuses.  Checking the cell alone would let
+    _available() clear a measure whose runs have not landed, and the sweep would
+    then die on a bare FileNotFoundError partway through grid_arm, after the
+    cells before it had already been solved.  The file on disk is the real
+    precondition, so that is what is tested.
+    """
     try:
-        _top_run(strategy, universe)
+        run = _top_run(strategy, universe)
     except ValueError:
         return False
-    return True
+    return (config.RUNS_DIR / strategy / f"run_{run}" / "selected_params.csv").exists()
 
 
 def _require_mean_run(strategy: str, run_dir: Path) -> None:
@@ -245,11 +262,12 @@ def _available(measures, universes, family: str) -> list[str]:
 
     Two ways a measure drops out.  Its ``*_w_mean`` optimizers may not be written
     yet, which is the ordinary case while the rollout is in progress.  Or its
-    production runs may not have landed on every requested universe, which
-    top_runs_w_mean.csv records as a blank cell.  Either way the whole measure is
-    dropped rather than the missing cell, because regressions() contrasts a
-    measure's universes against each other and a single-universe cell would leave
-    it with no contrast to regress on.
+    production runs may not have landed on every requested universe -- either a
+    blank cell in top_runs_w_mean.csv, or a filled cell naming a run whose
+    backtest is still in flight and has written no selected_params.csv.  Either
+    way the whole measure is dropped rather than the missing cell, because
+    regressions() contrasts a measure's universes against each other and a
+    single-universe cell would leave it with no contrast to regress on.
     """
     keep = []
     for measure in measures:
@@ -269,8 +287,10 @@ def _available(measures, universes, family: str) -> list[str]:
         ]
         if missing:
             logger.warning(
-                "Skipping %s %s: no mean-bearing production run recorded for %s.",
-                family, measure, ", ".join(missing),
+                "Skipping %s %s: no usable mean-bearing production run for %s "
+                "(no entry in %s, or the backtest has not written "
+                "selected_params.csv yet).",
+                family, measure, ", ".join(missing), RUNS_FILE.name,
             )
         else:
             keep.append(measure)

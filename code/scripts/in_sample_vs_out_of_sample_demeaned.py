@@ -134,11 +134,21 @@ def _top_run(strategy: str, universe: int) -> int:
 
 
 def _has_run(strategy: str, universe: int) -> bool:
+    """
+    Whether *strategy*'s top-*universe* penalties can actually be read.
+
+    A filled cell is not sufficient.  top_demeaned_runs.csv points at a run
+    directory from the moment the backtest is submitted, before it has written
+    the selected_params.csv the regularized arm reuses, so checking the cell
+    alone would let _available() clear a measure whose runs have not landed and
+    leave the sweep to die on a bare FileNotFoundError partway through grid_arm.
+    The file on disk is the real precondition, so that is what is tested.
+    """
     try:
-        _top_run(strategy, universe)
+        run = _top_run(strategy, universe)
     except ValueError:
         return False
-    return True
+    return (config.RUNS_DIR / strategy / f"run_{run}" / "selected_params.csv").exists()
 
 
 def _require_demeaned(strategy: str, params: dict) -> None:
@@ -195,9 +205,10 @@ def _available(measures, universes, family: str) -> list[str]:
     Measures this family can actually be solved for.
 
     The regularized arm reuses the penalties production selected per date, so a
-    measure whose backtest has not landed cannot be solved at all -- the runs
-    table records that as a blank cell.  The whole measure is dropped rather than
-    the missing cell, because regressions() contrasts a measure's universes
+    measure whose backtest has not landed cannot be solved at all -- either a
+    blank cell in the runs table, or a filled cell naming a run still in flight
+    that has written no selected_params.csv.  The whole measure is dropped rather
+    than the missing cell, because regressions() contrasts a measure's universes
     against each other and a single-universe cell would leave it with no contrast
     to regress on.
     """
@@ -213,8 +224,10 @@ def _available(measures, universes, family: str) -> list[str]:
         ]
         if missing:
             logger.warning(
-                "Skipping %s %s: no de-meaned production run recorded for %s.",
-                family, measure, ", ".join(missing),
+                "Skipping %s %s: no usable de-meaned production run for %s "
+                "(no entry in %s, or the backtest has not written "
+                "selected_params.csv yet).",
+                family, measure, ", ".join(missing), RUNS_FILE.name,
             )
         else:
             keep.append(measure)
