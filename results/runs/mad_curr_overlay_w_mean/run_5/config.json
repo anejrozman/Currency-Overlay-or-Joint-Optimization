@@ -1,0 +1,26 @@
+{
+  "strategy": "mad_curr_overlay_w_mean",
+  "label": "Mean-MAD Currency Overlay (top-50)",
+  "run_date": "2026-09-09T14:59:30.439451",
+  "optimizer": "MeanAbsoluteDeviationCurrencyOverlayWithMeanOptimizer",
+  "param_grid": {
+    "gamma": [
+      0.5
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "overlay_limit": [
+      2.0
+    ]
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_50_202603081747.csv",
+  "universe_size": 50,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
