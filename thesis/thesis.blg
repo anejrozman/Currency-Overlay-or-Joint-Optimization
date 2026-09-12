@@ -1,0 +1,54 @@
+This is BibTeX, Version 0.99d (TeX Live 2025)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: thesis.aux
+White space in argument---line 361 of file thesis.aux
+ : \citation{DeMiguel
+ :                    et al. 2009}
+I'm skipping whatever remains of this command
+The style file: plain.bst
+Database file #1: refs.bib
+Warning--I didn't find a database entry for "getsomething"
+Warning--empty journal in FrazziniIsraelMoskowitz2018
+Warning--empty journal in Jones2002
+You've used 25 entries,
+            2118 wiz_defined-function locations,
+            673 strings with 8376 characters,
+and the built_in function-call counts, 7609 in all, are:
+= -- 746
+> -- 336
+< -- 1
++ -- 137
+- -- 108
+* -- 559
+:= -- 1304
+add.period$ -- 76
+call.type$ -- 25
+change.case$ -- 127
+chr.to.int$ -- 0
+cite$ -- 27
+duplicate$ -- 261
+empty$ -- 613
+format.name$ -- 108
+if$ -- 1556
+int.to.chr$ -- 0
+int.to.str$ -- 25
+missing$ -- 23
+newline$ -- 128
+num.names$ -- 50
+pop$ -- 114
+preamble$ -- 1
+purify$ -- 104
+quote$ -- 0
+skip$ -- 179
+stack$ -- 0
+substring$ -- 506
+swap$ -- 23
+text.length$ -- 1
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 96
+warning$ -- 2
+while$ -- 75
+width$ -- 27
+write$ -- 271
+(There was 1 error message)
