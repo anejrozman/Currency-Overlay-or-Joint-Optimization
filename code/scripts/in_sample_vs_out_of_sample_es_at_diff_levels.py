@@ -123,6 +123,16 @@ FAMILY = "unregularized"
 LEVELS = (50, 60, 70, 80, 90, 95)
 UNIVERSES = (10, 50, 100)
 
+# Levels solved and tabulated but left off the figures, mirroring PLOT_EXCLUDE in
+# in_sample_vs_out_of_sample.py. ES at 50% averages the whole lower half rather
+# than a tail, which puts it at the edge of what the measure is for; it is also
+# the level where the realized gap behaves least like the rest of the sweep
+# (top-100: in-sample +5.7%, realized -3.7%, the widest interval in the study and
+# the one date lost to the relative gap's denominator). It stays in gaps_*.csv,
+# gap_summary.csv and both regressions -- only the figures drop it.
+PLOT_EXCLUDE_LEVELS: tuple[int, ...] = (50,)
+PLOT_LEVELS = tuple(lvl for lvl in LEVELS if lvl not in PLOT_EXCLUDE_LEVELS)
+
 # The two strategies swept across levels, by the role they play in the gap.
 STRATEGIES = {"joint": "es_joint", "overlay": "es_curr_overlay"}
 
@@ -639,9 +649,10 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
         logger.warning("No cells to plot.")
         return
     fig, axes = plt.subplots(
-        1, len(LEVELS), figsize=(4.33 * len(LEVELS), 4.4), sharex=True, sharey=True
+        1, len(PLOT_LEVELS), figsize=(4.33 * len(PLOT_LEVELS), 4.4),
+        sharex=True, sharey=True,
     )
-    for ax, level in zip(axes, LEVELS):
+    for ax, level in zip(axes, PLOT_LEVELS):
         line = summary[summary["level"] == level].sort_values("universe")
         _draw(ax, line, "universe", STYLES)
         if line.empty:
@@ -683,7 +694,9 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
         1, len(UNIVERSES), figsize=(4.7 * len(UNIVERSES), 4.4), sharex=True, sharey=True
     )
     for ax, universe in zip(axes, UNIVERSES):
-        line = summary[summary["universe"] == universe].sort_values("level")
+        line = summary[
+            (summary["universe"] == universe) & summary["level"].isin(PLOT_LEVELS)
+        ].sort_values("level")
         _draw(ax, line, "level", STYLES)
         if line.empty:
             ax.text(
@@ -693,9 +706,9 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
         _style_gap_axis(ax)
         ax.set_title(f"Top-{universe} universe", fontsize=11)
         ax.set_xlabel("ES confidence level (%)")
-        ax.set_xticks(list(LEVELS))
-        ax.set_xticklabels([str(lvl) for lvl in LEVELS])
-        ax.set_xlim(min(LEVELS) - 3, max(LEVELS) + 3)
+        ax.set_xticks(list(PLOT_LEVELS))
+        ax.set_xticklabels([str(lvl) for lvl in PLOT_LEVELS])
+        ax.set_xlim(min(PLOT_LEVELS) - 3, max(PLOT_LEVELS) + 3)
 
     axes[0].set_ylabel("Mean (overlay - joint) / overlay")
     _legend(axes[0], STYLES)
