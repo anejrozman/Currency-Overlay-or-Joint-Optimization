@@ -48,16 +48,21 @@ Four things differ from in_sample_vs_out_of_sample.py, each forced by the sweep:
     scripts.  Every cell carries the full K = 14 overlay block.
 
 A caveat the figure cannot show, so the tables carry it.  f_out is scored on the
-one quarter actually held, ~63 trading days, which is what makes it comparable
-with the three sibling analyses.  The tail it averages therefore thins as the
-level rises: ~31 observations at level 50, ~12 at level 80, ~3 at level 95.  At
-the top of the sweep f_out is an extreme order statistic rather than an
+one quarter actually held, which is what makes it comparable with the three
+sibling analyses.  Measured on the top-10 cells, the windows are 2610 trading days
+in sample and 65 out, so the tail each side averages over is:
+
+    level    50    60    70    80    90    95
+    in     1305  1044   783   522   261   131
+    out      32    26    20    13     6     3
+
+At the top of the sweep f_out is an extreme order statistic rather than an
 expectation, the per-date gap turns heavy-tailed, and the out-of-sample intervals
 widen for reasons that have nothing to do with either program.  The in-sample side
-is unaffected (~2500-day window, 125 tail observations at level 95).  Every
-summary row reports the median realized tail count so this is visible next to the
-number it explains, and any date whose f_out could not be relativized is counted
-and logged rather than silently dropped.
+stays well populated throughout.  Every summary row reports the median realized
+tail count so this is visible next to the number it explains, and any date whose
+f_out could not be relativized is counted and logged rather than silently
+dropped.
 
 Only the unregularized programs were swept across levels, so there is no --family
 flag: results/runs/top_runs.csv records the regularized ES runs at alpha = 0.80

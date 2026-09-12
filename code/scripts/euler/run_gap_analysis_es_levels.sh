@@ -37,12 +37,12 @@
 #
 # A note on what the top-level cells mean
 # ---------------------------------------
-# f_out is scored on the one quarter actually held (~63 trading days), so the tail
-# it averages thins as the level rises: ~31 observations at level 50, ~12 at level
-# 80, ~3 at level 95. The level-90 and level-95 out-of-sample intervals will be
-# wide for that reason alone. This is a property of the measurement, not of the
-# jobs; gap_summary.csv reports the median realized tail count per cell so the
-# effect is visible next to the numbers it explains.
+# f_out is scored on the one quarter actually held (65 trading days, measured), so
+# the tail it averages thins as the level rises: 32 observations at level 50, 13 at
+# level 80, 6 at level 90, 3 at level 95. The level-90 and level-95 out-of-sample
+# intervals will be wide for that reason alone. This is a property of the
+# measurement, not of the jobs; gap_summary.csv reports the median realized tail
+# count per cell so the effect is visible next to the numbers it explains.
 #
 # The tables and figures are built separately, once the cells have landed:
 #   python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only
