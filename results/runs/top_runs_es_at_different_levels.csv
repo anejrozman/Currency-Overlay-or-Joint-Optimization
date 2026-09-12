@@ -1,0 +1,17 @@
+strategy_name, top_10_run, top_50_run, top_100_run
+
+equal_weight_optimizer,         1,   2,   3
+
+es_curr_overlay_level_50, 
+es_curr_overlay_level_60,
+es_curr_overlay_level_70,
+es_curr_overlay_level_80,
+es_curr_overlay_level_90,
+es_curr_overlay_level_95,
+
+es_joint_level_50,
+es_joint_level_60,
+es_joint_level_70,
+es_joint_level_80,  
+es_joint_level_90,
+es_joint_level_95,

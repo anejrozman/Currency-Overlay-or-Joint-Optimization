@@ -13,6 +13,10 @@ Arguments:
 
     --no-grid: Disable hyperparameter grid search (optional, default: strategy config)
 
+    --alpha: Pin the ES confidence level in the strategy's grid (optional, default: strategy config)
+
+    --no-demean: Pin demean to False in the strategy's grid (optional, default: backtest_config.DEMEAN)
+
     --log-level: Logging verbosity (optional, default: INFO)
 
 Author: Anej Rozman
@@ -82,6 +86,24 @@ def _parse_args() -> argparse.Namespace:
         help="Disable hyperparameter grid search (use optimizer defaults).",
     )
     parser.add_argument(
+        "--alpha",
+        type=float,
+        default=None,
+        help=(
+            "Pin the ES confidence level in the strategy's parameter grid to this "
+            "single value (e.g. 0.95), overriding backtest_config.ALPHA. "
+            "Incompatible with --no-grid."
+        ),
+    )
+    parser.add_argument(
+        "--no-demean",
+        action="store_true",
+        help=(
+            "Pin 'demean' to False in the strategy's parameter grid, overriding "
+            "backtest_config.DEMEAN. Incompatible with --no-grid."
+        ),
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING"],
@@ -119,6 +141,42 @@ def main() -> None:
     rebalancing_frequency: str = base_cfg.rebalancing_frequency
     param_grid: dict | None = None if args.no_grid else (base_cfg.param_grid or None)
 
+    # Grid overrides. Each pins one axis of the strategy's grid to a single value,
+    # collapsing the validation search along that axis by design: this is how the
+    # ES-level sweep (code/scripts/euler/run_es_levels.sh) runs one optimizer at
+    # 0.50 ... 0.95 rather than at the single ALPHA in backtest_config.py.
+    #
+    # An override naming a key the strategy's grid does not have is an error, not a
+    # silent no-op. The optimizers read every hyperparameter with a .get() default,
+    # so a misplaced --alpha would otherwise run happily at the built-in 0.80 and
+    # the mistake would only surface as a duplicate row in the results table.
+    overrides: dict[str, object] = {}
+    if args.alpha is not None:
+        if not 0.0 < args.alpha < 1.0:
+            raise SystemExit(f"--alpha must be strictly in (0, 1), got {args.alpha}.")
+        overrides["alpha"] = args.alpha
+    if args.no_demean:
+        overrides["demean"] = False
+    override_flags = {"alpha": "--alpha", "demean": "--no-demean"}
+
+    if overrides:
+        if param_grid is None:
+            flags = ", ".join(override_flags[k] for k in overrides)
+            raise SystemExit(
+                f"Cannot apply {flags}: strategy '{args.strategy}' has no parameter "
+                f"grid to override -- either its grid is empty (equally_weighted) or "
+                f"--no-grid was passed."
+            )
+        param_grid = dict(param_grid)
+        for key, value in overrides.items():
+            if key not in param_grid:
+                raise SystemExit(
+                    f"Strategy '{args.strategy}' has no '{key}' in its parameter grid, "
+                    f"so {override_flags[key]} would have no effect. Its grid keys are: "
+                    f"{sorted(param_grid)}."
+                )
+            param_grid[key] = [value]
+
     # File paths
     universe_path = config.RAW_DIR / config.UNIVERSE_FILES[args.universe]
     local_returns_path = config.PROCESSED_DIR / config.LOCAL_RETURNS_FILE
@@ -143,6 +201,8 @@ def main() -> None:
     run_dir = next_run_dir(optimizer_cls)
     log.info("Strategy: %s", args.strategy)
     log.info("Universe: top-%d per economy", args.universe)
+    for key, value in overrides.items():
+        log.info("Grid override: %s = [%r]", key, value)
     log.info("Run directory: %s", run_dir)
 
     #Load processed data 
@@ -237,6 +297,10 @@ def main() -> None:
         "run_date": datetime.now().isoformat(),
         "optimizer": optimizer_cls.__name__,
         "param_grid": param_grid,
+        # Marks a run as part of a sweep and says which axis was pinned. The pinned
+        # value is already inside param_grid above; this key is what distinguishes a
+        # deliberately pinned run from a default one that happens to share the value.
+        "grid_overrides": overrides or None,
         "window_years": window_years,
         "val_years": val_years,
         "rebalancing_frequency": rebalancing_frequency,

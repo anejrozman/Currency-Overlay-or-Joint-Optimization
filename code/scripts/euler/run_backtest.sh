@@ -15,6 +15,9 @@
 #   --cpus N            CPUs per task (default: 4 -> Gurobi runs 3 threads)
 #   --mem-per-cpu SIZE  Memory per CPU, e.g. 4G (default: 4G)
 #   --no-grid           Skip grid search (passthrough to run_strategy.py)
+#   --alpha A           Pin the ES level in the strategy's grid, e.g. 0.95 (passthrough).
+#                       Also tags the job name and log files with the level.
+#   --no-demean         Pin demean=False in the strategy's grid (passthrough)
 #   --window-years N    Override estimation window (passthrough)
 #   --val-years N       Override validation window (passthrough)
 #   --log-level LEVEL   DEBUG|INFO|WARNING (passthrough)
@@ -26,6 +29,7 @@ UNIVERSE=10
 TIME_LIMIT="24:00:00"
 CPUS=4
 MEM_PER_CPU="4G"
+ALPHA=""
 PASSTHROUGH=()
 MAX_HOURS=720
 
@@ -42,6 +46,8 @@ Usage:
   --cpus N            CPUs per task (default: 4 -> Gurobi runs 3 threads)
   --mem-per-cpu SIZE  Memory per CPU, e.g. 4G (default: 4G)
   --no-grid           Skip grid search (passthrough to run_strategy.py)
+  --alpha A           Pin the ES level in the strategy's grid, e.g. 0.95 (passthrough)
+  --no-demean         Pin demean=False in the strategy's grid (passthrough)
   --window-years N    Override estimation window (passthrough)
   --val-years N       Override validation window (passthrough)
   --log-level LEVEL   DEBUG|INFO|WARNING (passthrough)
@@ -57,6 +63,8 @@ while [[ $# -gt 0 ]]; do
         --cpus)         CPUS="$2"; shift 2 ;;
         --mem-per-cpu)  MEM_PER_CPU="$2"; shift 2 ;;
         --no-grid)      PASSTHROUGH+=("--no-grid"); shift ;;
+        --alpha)        ALPHA="$2"; PASSTHROUGH+=("--alpha" "$2"); shift 2 ;;
+        --no-demean)    PASSTHROUGH+=("--no-demean"); shift ;;
         --window-years) PASSTHROUGH+=("--window-years" "$2"); shift 2 ;;
         --val-years)    PASSTHROUGH+=("--val-years" "$2"); shift 2 ;;
         --log-level)    PASSTHROUGH+=("--log-level" "$2"); shift 2 ;;
@@ -88,7 +96,18 @@ LOGS_DIR="$ROOT_DIR/logs"
 VENV="$ROOT_DIR/code/.venv/bin/activate" 
 mkdir -p "$LOGS_DIR"
 
-JOB_NAME="${STRATEGY}_u${UNIVERSE}"
+# Tag the job with the ES level when one is pinned (0.95 -> a95), so squeue and the
+# log filenames stay distinguishable while several levels of one strategy are queued.
+if [[ -n "$ALPHA" ]]; then
+    if [[ ! "$ALPHA" =~ ^0?\.[0-9]+$ ]]; then
+        echo "Error: --alpha must be a decimal strictly between 0 and 1 (e.g. 0.95)."
+        exit 1
+    fi
+    LEVEL="$(awk -v a="$ALPHA" 'BEGIN { printf "%d", a * 100 + 0.5 }')"
+    JOB_NAME="${STRATEGY}_a${LEVEL}_u${UNIVERSE}"
+else
+    JOB_NAME="${STRATEGY}_u${UNIVERSE}"
+fi
 echo "Submitting: ${JOB_NAME}  (time=${TIME_LIMIT}, cpus=${CPUS}, mem-per-cpu=${MEM_PER_CPU})"
 
 sbatch <<EOF
