@@ -5,29 +5,29 @@ equal_weight_optimizer,       1,   2,   3
 es_curr_overlay_level_50,    19,  18,  30
 es_curr_overlay_level_60,    20,  17,  16
 es_curr_overlay_level_70,    27,  29,  21
-es_curr_overlay_level_72.5,    ,    ,
-es_curr_overlay_level_75,      ,    ,
-es_curr_overlay_level_77.5,    ,    ,
+es_curr_overlay_level_72.5,  37,  48,  53
+es_curr_overlay_level_75,    34,  42,  57
+es_curr_overlay_level_77.5,  36,  46,  50
 es_curr_overlay_level_80,    25,  23,  31
-es_curr_overlay_level_82.5,    ,    ,
-es_curr_overlay_level_85,      ,    ,
-es_curr_overlay_level_87.5,    ,    ,
+es_curr_overlay_level_82.5,  47,  44,  51
+es_curr_overlay_level_85,    49,  39,  56
+es_curr_overlay_level_87.5,  45,  40,  52
 es_curr_overlay_level_90,    26,  22,  32
-es_curr_overlay_level_92.5,    ,    ,
+es_curr_overlay_level_92.5,  43,  41,  55
 es_curr_overlay_level_95,    24,  28,  33
-es_curr_overlay_level_97.5,    ,    ,
+es_curr_overlay_level_97.5,  38,  35,  54
 
 es_joint_level_50,           18,  15,  28
 es_joint_level_60,           20,  16,  27
 es_joint_level_70,           19,  23,  29
-es_joint_level_72.5,           ,    ,
-es_joint_level_75,             ,    ,
-es_joint_level_77.5,           ,    ,
+es_joint_level_72.5,         36,  34,  51
+es_joint_level_75,           40,  38,  48
+es_joint_level_77.5,         43,  35,  50
 es_joint_level_80,           17,  25,  30
-es_joint_level_82.5,           ,    ,
-es_joint_level_85,             ,    ,
-es_joint_level_87.5,           ,    ,
+es_joint_level_82.5,         41,  37,  49
+es_joint_level_85,           42,  39,  53
+es_joint_level_87.5,         46,  33,  54
 es_joint_level_90,           21,  24,  31
-es_joint_level_92.5,           ,    ,
+es_joint_level_92.5,         44,  52,  55
 es_joint_level_95,           22,  26,  32
-es_joint_level_97.5,           ,    ,
+es_joint_level_97.5,         47,  45,  56
