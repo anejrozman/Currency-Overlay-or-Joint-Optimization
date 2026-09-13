@@ -1,13 +1,13 @@
 """
 Fill in results/runs/top_runs_es_at_different_levels.csv from the runs on disk.
 
-The ES-level sweep (code/scripts/euler/run_es_levels.sh) submits 36 concurrent
-jobs, and next_run_dir() claims a run number with an atomic mkdir when each job
-starts. Which number ends up holding which level is therefore decided by the
-scheduler, and all 18 overlay runs share results/runs/es_curr_overlay/ with the
-runs that were already there (the joint runs likewise share es_joint/). This
-script reads it back off disk instead of asking anyone to open 36 config.json
-files by hand.
+The ES-level sweep (code/scripts/euler/run_es_levels.sh) submits one concurrent
+job per cell -- 14 levels x 2 strategies x 3 universes = 84 -- and next_run_dir()
+claims a run number with an atomic mkdir when each job starts. Which number ends
+up holding which level is therefore decided by the scheduler, and every overlay
+run shares results/runs/es_curr_overlay/ with the runs that were already there
+(the joint runs likewise share es_joint/). This script reads the mapping back off
+disk instead of asking anyone to open 84 config.json files by hand.
 
 A run belongs to the sweep when its config.json carries "grid_overrides" with an
 "alpha" key. That marker, not the alpha value itself, is what separates a swept
@@ -17,11 +17,15 @@ run in the directory, so matching on the value alone would collide with them.
 Reading the table it writes
 ---------------------------
 The row name carries the strategy AND the level, but the run directory is named
-after the optimizer file only. To find a run, strip the "_level_NN" suffix from
+after the optimizer file only. To find a run, strip the "_level_<L>" suffix from
 the row name and use that as the directory:
 
-    row es_joint_level_95, cell top_100_run = 21
-        -> results/runs/es_joint/run_21
+    row es_joint_level_95,   cell top_100_run = 21 -> results/runs/es_joint/run_21
+    row es_joint_level_72.5, cell top_10_run  = 40 -> results/runs/es_joint/run_40
+
+Whole levels are spelled without a decimal point and half levels with one, which
+is what portfolio_backtest.utils.levels.format_level guarantees; the six levels
+run first therefore keep the row names they were written under.
 
 Usage:
     python code/scripts/collect_es_level_runs.py            # print, change nothing
@@ -39,9 +43,10 @@ import json
 from pathlib import Path
 
 from portfolio_backtest import config
+from portfolio_backtest.utils.levels import ES_LEVELS, format_level, level_of_alpha
 
 STRATEGIES: tuple[str, ...] = ("es_curr_overlay", "es_joint")
-LEVELS: tuple[int, ...] = (50, 60, 70, 80, 90, 95)
+LEVELS: tuple[float, ...] = ES_LEVELS
 UNIVERSES: tuple[int, ...] = (10, 50, 100)
 TABLE_FILE: str = "top_runs_es_at_different_levels.csv"
 
@@ -51,10 +56,9 @@ TABLE_FILE: str = "top_runs_es_at_different_levels.csv"
 REQUIRED_ARTIFACTS: tuple[str, ...] = ("oos_returns.csv", "metrics.json")
 
 
-def _level_of(alpha: float) -> int | None:
-    """Map a pinned alpha onto one of the sweep's integer levels, or None."""
-    level = round(alpha * 100)
-    return level if level in LEVELS and abs(alpha * 100 - level) < 1e-9 else None
+def _level_of(alpha: float) -> float | None:
+    """Map a pinned alpha onto one of the sweep's levels, or None."""
+    return level_of_alpha(alpha, LEVELS)
 
 
 def _collect(demean: bool) -> tuple[dict[tuple[str, int, int], int], list[str]]:
@@ -89,7 +93,7 @@ def _collect(demean: bool) -> tuple[dict[tuple[str, int, int], int], list[str]]:
             if level is None:
                 notes.append(
                     f"{run_dir.name}: alpha={overrides['alpha']} is not one of the "
-                    f"sweep levels {LEVELS}, skipped"
+                    f"sweep levels, skipped"
                 )
                 continue
 
@@ -97,7 +101,7 @@ def _collect(demean: bool) -> tuple[dict[tuple[str, int, int], int], list[str]]:
             missing = [f for f in REQUIRED_ARTIFACTS if not (run_dir / f).is_file()]
             if missing:
                 notes.append(
-                    f"{strategy}/{run_dir.name} (level {level}, top-{universe}): "
+                    f"{strategy}/{run_dir.name} (level {format_level(level)}, top-{universe}): "
                     f"incomplete, missing {', '.join(missing)} -- left blank"
                 )
                 continue
@@ -117,7 +121,7 @@ def _collect(demean: bool) -> tuple[dict[tuple[str, int, int], int], list[str]]:
         if len(candidates) > 1:
             dropped = ", ".join(f"run_{n}" for _, n in candidates[:-1])
             notes.append(
-                f"{strategy} level {level} top-{universe}: {len(candidates)} runs "
+                f"{strategy} level {format_level(level)} top-{universe}: {len(candidates)} runs "
                 f"match, kept the newest (run_{resolved[key]}), ignored {dropped}"
             )
 
@@ -134,7 +138,7 @@ def _preserved_rows(path: Path) -> list[list[str]]:
     if not path.is_file():
         return [["equal_weight_optimizer", "1", "2", "3"]]
 
-    generated = {f"{s}_level_{l}" for s in STRATEGIES for l in LEVELS}
+    generated = {f"{s}_level_{format_level(l)}" for s in STRATEGIES for l in LEVELS}
     preserved: list[list[str]] = []
     with open(path, newline="") as fh:
         for row in csv.reader(fh):
@@ -151,13 +155,18 @@ def _render(resolved: dict[tuple[str, int, int], int], path: Path) -> str:
     """Render the table, matching the layout of the other top-runs files."""
     header = ["strategy_name"] + [f"top_{u}_run" for u in UNIVERSES]
     name_width = max(
-        len(f"{s}_level_{l}") for s in STRATEGIES for l in LEVELS
+        len(f"{s}_level_{format_level(l)}") for s in STRATEGIES for l in LEVELS
     )
     name_width = max(name_width, len(header[0]), *(len(r[0]) for r in _preserved_rows(path) or [[""]]))
 
     def line(name: str, cells: list[str]) -> str:
         padded = f"{name + ',':<{name_width + 1}}"
-        return padded + " " + ", ".join(f"{c:>3}" for c in cells)
+        # Trailing blanks are trimmed, but an unfilled cell in the middle of a row
+        # still reads back as spaces rather than NaN, because the column alignment
+        # puts the name's padding inside the next field. Consumers of this table
+        # treat a whitespace-only cell as blank; see _top_run in
+        # in_sample_vs_out_of_sample_es_at_diff_levels.py.
+        return (padded + " " + ", ".join(f"{c:>3}" for c in cells)).rstrip()
 
     blocks: list[list[str]] = [[line(header[0], header[1:])]]
 
@@ -171,7 +180,7 @@ def _render(resolved: dict[tuple[str, int, int], int], path: Path) -> str:
             cells = [
                 str(resolved.get((strategy, level, u), "")) for u in UNIVERSES
             ]
-            block.append(line(f"{strategy}_level_{level}", cells))
+            block.append(line(f"{strategy}_level_{format_level(level)}", cells))
         blocks.append(block)
 
     return "\n\n".join("\n".join(block) for block in blocks) + "\n"

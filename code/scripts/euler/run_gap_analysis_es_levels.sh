@@ -2,9 +2,16 @@
 # Submit the ES-level joint-vs-overlay gap experiment to the Euler cluster.
 #
 # Runs code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py as one job per
-# cell: six confidence levels (50/60/70/80/90/95) x three universes (10, 50, 100)
-# = 18 independent jobs, each solving the unregularized ES joint and overlay
-# programs plus the 1/N control at ~91 quarterly rebalancing dates.
+# cell: 14 confidence levels (50/60/70, then 2.5-point steps from 72.5 to 97.5)
+# x three universes (10, 50, 100) = 42 independent jobs, each solving the
+# unregularized ES joint and overlay programs plus the 1/N control at ~91 quarterly
+# rebalancing dates.
+#
+#   ./run_gap_analysis_es_levels.sh --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
+#
+# is the submission that adds the dense grid to an existing coarse sweep: 24 jobs.
+# Cells whose shard already exists in the output directory are skipped unless
+# --force, so re-running after a partial sweep submits only what is missing.
 #
 # The cells are independent, so the jobs run concurrently and share one output
 # directory. Each writes gaps_unregularized_level<L>_top<N>.csv and touches no
@@ -39,10 +46,12 @@
 # ---------------------------------------
 # f_out is scored on the one quarter actually held (65 trading days, measured), so
 # the tail it averages thins as the level rises: 32 observations at level 50, 13 at
-# level 80, 6 at level 90, 3 at level 95. The level-90 and level-95 out-of-sample
-# intervals will be wide for that reason alone. This is a property of the
-# measurement, not of the jobs; gap_summary.csv reports the median realized tail
-# count per cell so the effect is visible next to the numbers it explains.
+# level 80, 6 at level 90, 3 at level 95 and ~2 at level 97.5. Those intervals will
+# be wide for that reason alone. Each cell therefore also scores a second horizon,
+# the following year (~252 days), reported as gap_out_1y alongside gap_out; it
+# lifts the level-97.5 tail from ~2 observations to ~6 and is the arm to read when
+# the quarterly figure disagrees with the production backtests at the top end. Both
+# are in gap_summary.csv, with the median realized tail count of each.
 #
 # The tables and figures are built separately, once the cells have landed:
 #   python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only
@@ -51,8 +60,9 @@
 #   ./run_gap_analysis_es_levels.sh [options]
 #
 # Options:
-#   --level N            Submit one level alone: 50, 60, 70, 80, 90 or 95
-#                        (default: all six)
+#   --level N            Submit one level alone, e.g. 72.5 (default: all 14)
+#   --levels "A B C"     Submit this set of levels
+#   --force              Submit cells whose shard already exists
 #   --universe N         Submit top-10, 50 or 100 alone (default: all three)
 #   --time HH:MM:SS      Override the per-universe time limit (max 720:00:00)
 #   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
@@ -73,10 +83,11 @@ CPUS=4
 MEM_PER_CPU=""
 OUT_DIR=""
 DRY_RUN=0
+FORCE=0
 PASSTHROUGH=()
 MAX_HOURS=720
 
-LEVELS_ALL=(50 60 70 80 90 95)
+LEVELS_ALL=(50 60 70 72.5 75 77.5 80 82.5 85 87.5 90 92.5 95 97.5)
 UNIVERSES_ALL=(10 50 100)
 
 usage() {
@@ -86,7 +97,9 @@ Submit the ES-level joint-vs-overlay gap experiment to the Euler cluster.
 Usage:
   ./run_gap_analysis_es_levels.sh [options]
 
-  --level N            Submit one level alone: 50, 60, 70, 80, 90 or 95 (default: all)
+  --level N            Submit one level alone, e.g. 72.5 (default: all 14)
+  --levels "A B C"     Submit this set of levels
+  --force              Submit cells whose shard already exists
   --universe N         Submit top-10, 50 or 100 alone (default: all three)
   --time HH:MM:SS      Override the per-universe time limit (max 720:00:00)
   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
@@ -101,6 +114,8 @@ USAGE
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --level)         LEVEL="$2"; shift 2 ;;
+        --levels)        read -r -a LEVELS_SET <<< "$2"; shift 2 ;;
+        --force)         FORCE=1; shift ;;
         --universe)      UNIVERSE="$2"; shift 2 ;;
         --time)          TIME_LIMIT="$2"; shift 2 ;;
         --cpus)          CPUS="$2"; shift 2 ;;
@@ -113,14 +128,25 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+is_sweep_level() {
+    local candidate="$1" known
+    for known in "${LEVELS_ALL[@]}"; do [[ "$known" == "$candidate" ]] && return 0; done
+    return 1
+}
+
 if [[ -n "$LEVEL" ]]; then
-    case "$LEVEL" in
-        50|60|70|80|90|95) LEVELS=("$LEVEL") ;;
-        *) echo "Error: --level must be 50, 60, 70, 80, 90 or 95."; exit 1 ;;
-    esac
+    LEVELS=("$LEVEL")
+elif [[ -n "${LEVELS_SET+x}" ]]; then
+    LEVELS=("${LEVELS_SET[@]}")
 else
     LEVELS=("${LEVELS_ALL[@]}")
 fi
+for level in "${LEVELS[@]}"; do
+    if ! is_sweep_level "$level"; then
+        echo "Error: '$level' is not a sweep level (${LEVELS_ALL[*]})."
+        exit 1
+    fi
+done
 
 if [[ -n "$UNIVERSE" ]]; then
     case "$UNIVERSE" in
@@ -183,9 +209,18 @@ tier_mem() {
 # Heaviest universe first, so the long poles start before the short jobs.
 IFS=$'\n' read -r -d '' -a UNIVERSES < <(printf '%s\n' "${UNIVERSES[@]}" | sort -rn && printf '\0')
 
+SHARD_DIR="${OUT_DIR:-$ROOT_DIR/results/in_sample_vs_out_of_sample_es_at_diff_levels}"
+
 count=0
+skipped=0
 for universe in "${UNIVERSES[@]}"; do
     for level in "${LEVELS[@]}"; do
+        shard="$SHARD_DIR/gaps_unregularized_level${level}_top${universe}.csv"
+        if (( ! FORCE )) && [[ -f "$shard" ]]; then
+            printf '  level=%-5s top-%-4s already solved, skipping\n' "$level" "$universe"
+            skipped=$((skipped + 1))
+            continue
+        fi
         job_time="${TIME_LIMIT:-$(tier_time "$universe")}"
         job_mem="${MEM_PER_CPU:-$(tier_mem "$universe")}"
         JOB_NAME="gap_es_l${level}_top${universe}"
@@ -227,6 +262,7 @@ EOF
 done
 
 echo
+(( skipped )) && echo "${skipped} cells skipped (shard already present; --force to resolve)."
 if (( DRY_RUN )); then
     echo "${count} jobs planned (dry run, nothing submitted)."
 else

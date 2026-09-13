@@ -96,14 +96,16 @@ LOGS_DIR="$ROOT_DIR/logs"
 VENV="$ROOT_DIR/code/.venv/bin/activate" 
 mkdir -p "$LOGS_DIR"
 
-# Tag the job with the ES level when one is pinned (0.95 -> a95), so squeue and the
-# log filenames stay distinguishable while several levels of one strategy are queued.
+# Tag the job with the ES level when one is pinned (0.95 -> a95, 0.725 -> a72.5), so
+# squeue and the log filenames stay distinguishable while several levels of one
+# strategy are queued. %g rather than %d: truncating would collapse 0.725 and 0.72
+# onto the same tag, and both are levels this sweep can be asked to run.
 if [[ -n "$ALPHA" ]]; then
     if [[ ! "$ALPHA" =~ ^0?\.[0-9]+$ ]]; then
         echo "Error: --alpha must be a decimal strictly between 0 and 1 (e.g. 0.95)."
         exit 1
     fi
-    LEVEL="$(awk -v a="$ALPHA" 'BEGIN { printf "%d", a * 100 + 0.5 }')"
+    LEVEL="$(awk -v a="$ALPHA" 'BEGIN { printf "%g", a * 100 }')"
     JOB_NAME="${STRATEGY}_a${LEVEL}_u${UNIVERSE}"
 else
     JOB_NAME="${STRATEGY}_u${UNIVERSE}"

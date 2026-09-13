@@ -3,8 +3,9 @@ Does the joint program's in-sample edge over the currency overlay depend on wher
 in the loss distribution the risk measure looks?
 
 The same measurement in_sample_vs_out_of_sample.py makes, with the risk measure
-held fixed at Expected Shortfall and its confidence level swept instead:
-alpha = 0.50, 0.60, 0.70, 0.80, 0.90, 0.95.  The sibling scripts vary the measure
+held fixed at Expected Shortfall and its confidence level swept instead: 50, 60
+and 70 percent, then a 2.5-point grid from 72.5 to 97.5 (the sweep is
+portfolio_backtest.utils.levels.ES_LEVELS).  The sibling scripts vary the measure
 across panels; this one varies the level, so where they ask whether the joint
 program's advantage is a property of the functional, this one asks whether it is a
 property of the tail depth -- ES at 0.50 is a whole-lower-half average, ES at 0.95
@@ -47,22 +48,34 @@ Four things differ from in_sample_vs_out_of_sample.py, each forced by the sweep:
   * The currency-count arm is dropped, as in the de-meaned and mean-bearing
     scripts.  Every cell carries the full K = 14 overlay block.
 
-A caveat the figure cannot show, so the tables carry it.  f_out is scored on the
-one quarter actually held, which is what makes it comparable with the three
-sibling analyses.  Measured on the top-10 cells, the windows are 2610 trading days
-in sample and 65 out, so the tail each side averages over is:
+Two out-of-sample horizons, because one is not enough at the top of the sweep.
+f_out is scored on the one quarter actually held, which is what makes it
+comparable with the three sibling analyses.  Measured on the top-10 cells the
+windows are 2610 trading days in sample and 65 out, so the tail each side averages
+over thins sharply with the level:
 
-    level    50    60    70    80    90    95
-    in     1305  1044   783   522   261   131
-    out      32    26    20    13     6     3
+    level    50    60    70    80    90    95  97.5
+    in     1305  1044   783   522   261   131    65
+    out      32    26    20    13     6     3     2
 
-At the top of the sweep f_out is an extreme order statistic rather than an
-expectation, the per-date gap turns heavy-tailed, and the out-of-sample intervals
-widen for reasons that have nothing to do with either program.  The in-sample side
-stays well populated throughout.  Every summary row reports the median realized
-tail count so this is visible next to the number it explains, and any date whose
-f_out could not be relativized is counted and logged rather than silently
-dropped.
+At the top of the sweep that quarterly f_out is an extreme order statistic rather
+than an expectation: the per-date gap turns heavy-tailed and the intervals widen
+for reasons that have nothing to do with either program.  So each cell also scores
+the following year (~252 trading days) as ``gap_out_1y``, which lifts the level
+97.5 tail from about two observations to six.  The quarterly horizon stays primary
+and is what the figures draw; the annual one is the arm to read when the quarterly
+figure disagrees with the production backtests at the top end, as it does at 90
+and 95.  Its windows overlap by three quarters between consecutive rebalancing
+dates, so Politis-White selects a longer block and its intervals are wider than
+the date count alone suggests.
+
+Both horizons start at the same rebalance, so the annual window contains the
+quarterly one rather than following it; the annual arm is the same decision judged
+over a longer horizon, not a later decision.  A date whose annual window is
+truncated by the end of the data is left unscored on that arm rather than scored
+on a stub.  Every summary row reports the median realized tail count of each
+horizon, and any date whose f_out could not be relativized is counted and logged
+rather than silently dropped.
 
 Only the unregularized programs were swept across levels, so there is no --family
 flag: results/runs/top_runs.csv records the regularized ES runs at alpha = 0.80
@@ -71,10 +84,16 @@ ivo.summarise, ivo.regressions and ivo.overfitting_table apply unchanged.
 
 Each cell writes its own shard, gaps_unregularized_level<L>_top<N>.csv, the moment
 it finishes, and the tables and figures are built by globbing every shard in the
-output directory.  Two things follow, both of which the cluster submission in
+output directory.  Whole levels are spelled without a decimal point and half levels
+with one (format_level), so cells solved before the dense grid existed keep their
+filenames.  A shard written before the annual horizon was added carries none of its
+columns; _read_shards fills them with NaN and says which cells are affected, so a
+directory holding both generations still tabulates as one frame.
+
+Two things follow from the sharding, both of which the cluster submission in
 euler/run_gap_analysis_es_levels.sh depends on.  A cell that has landed is
 durable: a job killed by its wall-clock limit keeps what it already solved.  And
-the 18 cells can be solved by 18 concurrent jobs sharing one output directory,
+the 42 cells can be solved by 42 concurrent jobs sharing one output directory,
 because each writes a filename no other job touches -- there is no shared file to
 race on and no merge step.  Re-solving a cell overwrites its own shard.
 
@@ -86,9 +105,16 @@ universes against each other.  That drop is scoped to what one invocation asks
 for, which is why the cluster submission runs one cell per job: --levels 95
 --universes 10 solves that cell regardless of what else has landed.
 
+The figures split the two sweeps.  gap_vs_level draws every level of the sweep
+against the level axis, one panel per universe.  gap_vs_universe draws one panel
+per level against the universe axis and is restricted to the round levels
+(ROUND_LEVELS), because fourteen panels do not fit on a page; every level is still
+tabulated in both.  Level 50 is excluded from both figures and kept in the tables
+(PLOT_EXCLUDE_LEVELS).
+
 Usage:
     python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py
-    python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --levels 95 --universes 10
+    python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --levels 72.5 --universes 10
     python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only
 
 One cell per job on the cluster, then the tables and figures once they land:
@@ -115,13 +141,33 @@ import in_sample_vs_out_of_sample as ivo
 from portfolio_backtest import config
 from portfolio_backtest.strategy_registry import STRATEGY_REGISTRY
 from portfolio_backtest.utils.bootstrap import block_bootstrap_mean
+from portfolio_backtest.utils.levels import (
+    ES_LEVELS,
+    ROUND_LEVELS,
+    alpha_of,
+    format_level,
+    parse_level,
+)
 
 logger = logging.getLogger("in_sample_vs_out_of_sample_es_at_diff_levels")
 
 MEASURE = "es"
 FAMILY = "unregularized"
-LEVELS = (50, 60, 70, 80, 90, 95)
+LEVELS = ES_LEVELS
 UNIVERSES = (10, 50, 100)
+
+# Trading days in the secondary out-of-sample window. f_out is scored on the one
+# quarter actually held, which is what makes it comparable with the three sibling
+# analyses; f_out_1y repeats the measurement on the following year so the top of
+# the level sweep has a populated tail to be judged on. At level 97.5 the quarterly
+# tail is ~2 observations and the annual one ~6. The annual windows of consecutive
+# rebalancing dates overlap by three quarters, which inflates the serial dependence
+# the block bootstrap has to absorb; Politis-White picks a longer block in response,
+# so the intervals stay honest but are wider than the date count alone suggests.
+WINDOW_1Y_DAYS = config.TRADING_DAYS
+# Below this many trading days the annual window is too truncated to score, which
+# happens only for the last rebalancing dates where the data runs out.
+WINDOW_1Y_MIN_DAYS = config.TRADING_DAYS // 2
 
 # Levels solved and tabulated but left off the figures, mirroring PLOT_EXCLUDE in
 # in_sample_vs_out_of_sample.py. ES at 50% averages the whole lower half rather
@@ -130,8 +176,13 @@ UNIVERSES = (10, 50, 100)
 # (top-100: in-sample +5.7%, realized -3.7%, the widest interval in the study and
 # the one date lost to the relative gap's denominator). It stays in gaps_*.csv,
 # gap_summary.csv and both regressions -- only the figures drop it.
-PLOT_EXCLUDE_LEVELS: tuple[int, ...] = (50,)
+PLOT_EXCLUDE_LEVELS: tuple[float, ...] = (50.0,)
 PLOT_LEVELS = tuple(lvl for lvl in LEVELS if lvl not in PLOT_EXCLUDE_LEVELS)
+
+# The by-universe figure draws one panel per level, which the full 14-level sweep
+# cannot fit on a page; the round levels carry its shape and the dense grid is what
+# the by-level figure exists to show. Every level is still tabulated in both.
+UNIVERSE_PANEL_LEVELS = tuple(lvl for lvl in ROUND_LEVELS if lvl in LEVELS)
 
 # The two strategies swept across levels, by the role they play in the gap.
 STRATEGIES = {"joint": "es_joint", "overlay": "es_curr_overlay"}
@@ -157,7 +208,7 @@ def _row_name(role: str, level: int) -> str:
     directories rather than making one per level.  _run_dir is the other half of
     this mapping and the two must stay in step.
     """
-    return f"{STRATEGIES[role]}_level_{level}"
+    return f"{STRATEGIES[role]}_level_{format_level(level)}"
 
 
 def _run_dir(role: str, run: int) -> Path:
@@ -173,9 +224,14 @@ def _top_run(role: str, level: int, universe: int) -> int:
     if row.empty:
         raise ValueError(f"{row_name} has no entry in {RUNS_FILE.name}.")
     # A blank cell is how the table records a production run that has not landed;
-    # without this it would surface as int(nan) far from the cause.
+    # without this it would surface as int(nan) far from the cause. The table is
+    # column-aligned, so an unfilled cell reads back as a run of spaces rather than
+    # as NaN -- pandas only calls a field missing when it is genuinely empty, and
+    # the name padding before it is part of the field.
     run = row[f"top_{universe}_run"].iloc[0]
-    if pd.isna(run):
+    if isinstance(run, str) and not run.strip():
+        run = None
+    if run is None or pd.isna(run):
         raise ValueError(
             f"{row_name} has no top-{universe} run recorded in {RUNS_FILE.name}. "
             f"Every cell reuses the settings production ran with, so this cell "
@@ -223,11 +279,12 @@ def _require_level(label: str, level: int, params: dict) -> None:
     scoring.
     """
     if "alpha" not in params:
-        raise ValueError(f"{label} records no 'alpha'; cannot verify it is level {level}.")
+        raise ValueError(f"{label} records no 'alpha'; cannot verify it is level {format_level(level)}.")
     alpha = float(params["alpha"])
-    if abs(alpha - level / 100.0) > 1e-9:
+    if abs(alpha - alpha_of(level)) > 1e-9:
         raise ValueError(
-            f"{label} was run at alpha={alpha}, not {level / 100.0} as the level-{level} "
+            f"{label} was run at alpha={alpha}, not {alpha_of(level)} as the "
+            f"level-{format_level(level)} "
             f"cell requires. Check {RUNS_FILE.name}: its rows are named "
             f"<strategy>_level_<L> but point at run directories that are siblings, so a "
             f"transposed run number is not otherwise detectable."
@@ -264,8 +321,10 @@ def _hyperparams(role: str, level: int, universe: int) -> dict:
     keys = [c for c in chosen.columns if c not in drop]
     table = {row["date"]: {k: row[k] for k in keys} for row in chosen.to_dict("records")}
     for params in table.values():
-        _require_level(f"{STRATEGIES[role]} {run_dir.name} (level {level}, top-{universe})",
-                       level, params)
+        _require_level(
+            f"{STRATEGIES[role]} {run_dir.name} (level {format_level(level)}, top-{universe})",
+            level, params,
+        )
     return table
 
 
@@ -288,9 +347,9 @@ def _available(levels, universes) -> list[int]:
         ]
         if missing:
             logger.warning(
-                "Skipping level %d: no usable production run for %s (no entry in %s, "
+                "Skipping level %s: no usable production run for %s (no entry in %s, "
                 "or the backtest has not written selected_params.csv yet).",
-                level, ", ".join(missing), RUNS_FILE.name,
+                format_level(level), ", ".join(missing), RUNS_FILE.name,
             )
         else:
             keep.append(level)
@@ -308,9 +367,10 @@ def _sweep(level, R_fh, R_c, windows, solver, universe) -> tuple[pd.DataFrame, p
     the second of which carries the realized tail counts that make the level's
     out-of-sample noise legible.
     """
-    alpha = level / 100.0
+    alpha = alpha_of(level)
     tables = {role: _hyperparams(role, level, universe) for role in STRATEGIES}
     names = {**STRATEGIES, "equal_weight": isa.CONTROL_STRATEGY_KEY}
+    calendar = R_fh.index
 
     rows, sizes = [], []
     for i, window in enumerate(windows, start=1):
@@ -331,6 +391,17 @@ def _sweep(level, R_fh, R_c, windows, solver, universe) -> tuple[pd.DataFrame, p
         R_c_est = R_c.loc[window["estimation_start"] : window["estimation_end"]]
         R_fh_hold = R_fh.loc[window["holding_start"] : window["holding_end"], assets].fillna(0.0)
         R_c_hold = R_c.loc[window["holding_start"] : window["holding_end"]].fillna(0.0)
+
+        # The annual window starts where the quarterly one does and runs a year,
+        # so the two share their opening quarter rather than being disjoint: this
+        # is the same holding period judged over a longer horizon, not a different
+        # one. Truncated at the end of the data, where fewer than half a year
+        # remains it is not scored at all.
+        start_pos = calendar.searchsorted(window["holding_start"])
+        span = calendar[start_pos : start_pos + WINDOW_1Y_DAYS]
+        long_enough = len(span) >= WINDOW_1Y_MIN_DAYS
+        R_fh_1y = R_fh.loc[span, assets].fillna(0.0)
+        R_c_1y = R_c.loc[span].fillna(0.0)
         logger.debug("[%d/%d] %s: %d assets", i, len(windows), date.date(), len(assets))
 
         # Tail counts implied by this window and this level. np.quantile takes the
@@ -344,6 +415,8 @@ def _sweep(level, R_fh, R_c, windows, solver, universe) -> tuple[pd.DataFrame, p
                 "n_days_out": len(R_fh_hold),
                 "n_tail_in": max(1, round(len(R_fh_est) * (1.0 - alpha))),
                 "n_tail_out": max(1, round(len(R_fh_hold) * (1.0 - alpha))),
+                "n_days_out_1y": len(span) if long_enough else 0,
+                "n_tail_out_1y": max(1, round(len(span) * (1.0 - alpha))) if long_enough else 0,
             }
         )
 
@@ -355,9 +428,16 @@ def _sweep(level, R_fh, R_c, windows, solver, universe) -> tuple[pd.DataFrame, p
                 )
                 f_in = isa.evaluate_risk(MEASURE, R_fh_est, R_c_est, x, psi, alpha)
                 f_out = isa.evaluate_risk(MEASURE, R_fh_hold, R_c_hold, x, psi, alpha)
+                f_out_1y = (
+                    isa.evaluate_risk(MEASURE, R_fh_1y, R_c_1y, x, psi, alpha)
+                    if long_enough
+                    else float("nan")
+                )
             except (RuntimeError, ValueError) as exc:
-                logger.warning("level %d %s %s failed: %s", level, date.date(), role, exc)
-                f_in = f_out = float("nan")
+                logger.warning(
+                    "level %s %s %s failed: %s", format_level(level), date.date(), role, exc
+                )
+                f_in = f_out = f_out_1y = float("nan")
             rows.append(
                 {
                     "date": date,
@@ -365,14 +445,46 @@ def _sweep(level, R_fh, R_c, windows, solver, universe) -> tuple[pd.DataFrame, p
                     "n_assets": len(assets),
                     "in_sample_risk": f_in,
                     "realized_risk": f_out,
+                    "realized_risk_1y": f_out_1y,
                 }
             )
     return pd.DataFrame(rows), pd.DataFrame(sizes)
 
 
-def _shard_path(out_dir: Path, level: int, universe: int) -> Path:
+def _pair_annual(rows: pd.DataFrame, paired: pd.DataFrame) -> pd.DataFrame:
+    """
+    Attach the annual-horizon gap to the quarterly *paired* frame.
+
+    ivo._pair pivots one realized column, so the second horizon is paired by
+    handing it the same frame with realized_risk_1y in that slot and renaming what
+    comes back. Joined left onto the quarterly frame: the quarter is the primary
+    measurement and decides which dates the cell has, while a date whose annual
+    window was truncated at the end of the data, or whose annual overlay risk was
+    not strictly positive, simply carries NaN in the annual columns rather than
+    dropping out of the cell.
+    """
+    annual = rows.dropna(subset=["in_sample_risk", "realized_risk_1y"]).copy()
+    if annual.empty:
+        for col in ("gap_out_1y", "gap_out_1y_rel", "out_joint_1y", "out_overlay_1y", "out_ew_1y"):
+            paired[col] = float("nan")
+        return paired
+    annual["realized_risk"] = annual["realized_risk_1y"]
+    annual_paired = ivo._pair(annual, ["date"])
+    keep = annual_paired[
+        ["date", "gap_out", "gap_out_rel", "out_joint", "out_overlay", "out_ew"]
+    ].rename(columns={
+        "gap_out": "gap_out_1y",
+        "gap_out_rel": "gap_out_1y_rel",
+        "out_joint": "out_joint_1y",
+        "out_overlay": "out_overlay_1y",
+        "out_ew": "out_ew_1y",
+    })
+    return paired.merge(keep, on="date", how="left")
+
+
+def _shard_path(out_dir: Path, level: float, universe: int) -> Path:
     """One cell's rows.  Unique per cell, so concurrent jobs never share a file."""
-    return out_dir / f"gaps_{FAMILY}_level{level}_top{universe}.csv"
+    return out_dir / f"gaps_{FAMILY}_level{format_level(level)}_top{universe}.csv"
 
 
 def _read_shards(out_dir: Path) -> pd.DataFrame:
@@ -404,6 +516,32 @@ def _read_shards(out_dir: Path) -> pd.DataFrame:
         frames.append(frame)
     gaps = pd.concat(frames, ignore_index=True)
 
+    # Shards written before the annual horizon existed carry none of its columns.
+    # They are filled with NaN here rather than guarded at each use site, so a
+    # directory holding both generations tabulates as one frame in which those
+    # cells simply have no annual measurement. Re-solving a cell adds it.
+    annual_columns = (
+        "gap_out_1y", "gap_out_1y_rel",
+        "out_joint_1y", "out_overlay_1y", "out_ew_1y",
+        "n_days_out_1y", "n_tail_out_1y",
+    )
+    missing = [c for c in annual_columns if c not in gaps.columns]
+    for column in missing:
+        gaps[column] = float("nan")
+    if missing:
+        stale = sorted(
+            f"level {format_level(lvl)} top-{int(uni)}"
+            for lvl, uni in gaps.loc[
+                gaps[annual_columns[0]].isna(), ["level", "universe"]
+            ].drop_duplicates().itertuples(index=False)
+        )
+        logger.warning(
+            "%d cell(s) predate the annual out-of-sample horizon and carry no "
+            "gap_out_1y: %s. Re-solve them (run_gap_analysis_es_levels.sh --force) "
+            "to fill that arm.",
+            len(stale), ", ".join(stale),
+        )
+
     keys = ["family", "measure", "level", "universe", "date"]
     clashing = gaps.duplicated(keys, keep=False)
     if clashing.any():
@@ -434,7 +572,7 @@ def grid_arm(solver, levels, universes, out_dir: Path) -> int:
     written = 0
     for level in _available(levels, universes):
         for universe in universes:
-            logger.info("Grid level %d top-%d", level, universe)
+            logger.info("Grid level %s top-%d", format_level(level), universe)
             R_fh, R_c, mask, _ = ivo._load(universe)
             windows = isa._rebalancing_windows(
                 R_fh, mask, STRATEGY_REGISTRY["mv_joint"]["config"]
@@ -442,6 +580,7 @@ def grid_arm(solver, levels, universes, out_dir: Path) -> int:
             rows, sizes = _sweep(level, R_fh, R_c, windows, solver, universe)
             scored = rows.dropna(subset=["in_sample_risk", "realized_risk"])
             paired = ivo._pair(scored, ["date"])
+            paired = _pair_annual(rows, paired)
 
             # _pair drops any date whose overlay risk is not strictly positive,
             # because it is the denominator of the relative gap. Raw ES can be
@@ -451,13 +590,16 @@ def grid_arm(solver, levels, universes, out_dir: Path) -> int:
             dropped = scored["date"].nunique() - paired["date"].nunique()
             if dropped:
                 logger.warning(
-                    "level %d top-%d: %d of %d dates dropped, overlay risk not "
+                    "level %s top-%d: %d of %d dates dropped, overlay risk not "
                     "strictly positive (raw ES can be negative at shallow levels).",
-                    level, universe, dropped, scored["date"].nunique(),
+                    format_level(level), universe, dropped, scored["date"].nunique(),
                 )
 
             paired = paired.merge(
-                sizes[["date", "n_days_in", "n_days_out", "n_tail_in", "n_tail_out"]],
+                sizes[[
+                    "date", "n_days_in", "n_days_out", "n_tail_in", "n_tail_out",
+                    "n_days_out_1y", "n_tail_out_1y",
+                ]],
                 on="date", how="left",
             )
             paired["measure"] = MEASURE
@@ -496,10 +638,22 @@ def summarise(gaps: pd.DataFrame) -> pd.DataFrame:
     for level, part in gaps.groupby("level"):
         summary = ivo.summarise(part)
         summary.insert(0, "level", level)
+        # ivo.summarise knows only the quarterly columns, so the annual horizon is
+        # bootstrapped here with the same estimator rather than by widening it.
+        for col in ("gap_out_1y", "gap_out_1y_rel"):
+            stats = {}
+            for universe, cell in part.groupby("universe"):
+                values = cell[col].to_numpy() if col in cell else np.array([])
+                mean, lo, hi, se, block = block_bootstrap_mean(values)
+                stats[universe] = (mean, lo, hi, se, block)
+            for i, suffix in enumerate(("mean", "lo", "hi", "se", "block")):
+                summary[f"{col}_{suffix}"] = summary["universe"].map(
+                    {u: v[i] for u, v in stats.items()}
+                )
         # Median rather than mean: the count is an integer per quarter and varies
         # only with the trading-day count of that quarter.
-        tails = part.groupby("universe")[["n_tail_in", "n_tail_out"]].median()
-        for col in ("n_tail_in", "n_tail_out"):
+        tails = part.groupby("universe")[["n_tail_in", "n_tail_out", "n_tail_out_1y"]].median()
+        for col in ("n_tail_in", "n_tail_out", "n_tail_out_1y"):
             summary[col] = summary["universe"].map(tails[col]).astype(float)
         parts.append(summary)
     return pd.concat(parts, ignore_index=True).sort_values(
@@ -519,8 +673,8 @@ def collapse_regressions(gaps: pd.DataFrame) -> pd.DataFrame:
     for level, part in gaps.groupby("level"):
         if part["universe"].nunique() < 2:
             logger.warning(
-                "Level %d has one universe; skipping its collapse regression "
-                "(a single point has no slope).", level,
+                "Level %s has one universe; skipping its collapse regression "
+                "(a single point has no slope).", format_level(level),
             )
             continue
         reg = ivo.regressions(part)
@@ -583,7 +737,7 @@ def level_regressions(gaps: pd.DataFrame, seed: int = SEED) -> pd.DataFrame:
                     "ci_hi": hi,
                     "se": se,
                     "block": block,
-                    "levels": ",".join(str(lvl) for lvl in levels),
+                    "levels": ",".join(format_level(lvl) for lvl in levels),
                     "n_dates": len(dates),
                     "n_obs": int(Y.size),
                 }
@@ -649,10 +803,10 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
         logger.warning("No cells to plot.")
         return
     fig, axes = plt.subplots(
-        1, len(PLOT_LEVELS), figsize=(4.33 * len(PLOT_LEVELS), 4.4),
+        1, len(UNIVERSE_PANEL_LEVELS), figsize=(4.33 * len(UNIVERSE_PANEL_LEVELS), 4.4),
         sharex=True, sharey=True,
     )
-    for ax, level in zip(axes, PLOT_LEVELS):
+    for ax, level in zip(axes, UNIVERSE_PANEL_LEVELS):
         line = summary[summary["level"] == level].sort_values("universe")
         _draw(ax, line, "universe", STYLES)
         if line.empty:
@@ -661,7 +815,7 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
                 ha="center", va="center", fontsize=9, color="grey",
             )
         _style_gap_axis(ax)
-        ax.set_title(f"ES at {level}%", fontsize=11)
+        ax.set_title(f"ES at {format_level(level)}%", fontsize=11)
         ax.set_xlabel("Universe size")
         # Log spacing keeps 10/50/100 legible, but the decade ticks a log axis
         # picks by default (10, 100) would drop the 50, so label the three
@@ -706,8 +860,13 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
         _style_gap_axis(ax)
         ax.set_title(f"Top-{universe} universe", fontsize=11)
         ax.set_xlabel("ES confidence level (%)")
-        ax.set_xticks(list(PLOT_LEVELS))
-        ax.set_xticklabels([str(lvl) for lvl in PLOT_LEVELS])
+        # Every swept level is drawn, but only the round ones are labelled: 13
+        # ticks at 2.5-point spacing would overprint each other.
+        ax.set_xticks([lvl for lvl in PLOT_LEVELS if lvl in ROUND_LEVELS])
+        ax.set_xticklabels(
+            [format_level(lvl) for lvl in PLOT_LEVELS if lvl in ROUND_LEVELS]
+        )
+        ax.set_xticks(list(PLOT_LEVELS), minor=True)
         ax.set_xlim(min(PLOT_LEVELS) - 3, max(PLOT_LEVELS) + 3)
 
     axes[0].set_ylabel("Mean (overlay - joint) / overlay")
@@ -724,9 +883,11 @@ def _parse_args() -> argparse.Namespace:
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(
-        "--levels", nargs="+", type=int, default=list(LEVELS), choices=list(LEVELS),
-        help="ES confidence levels in percent (default: all six). Every cell is "
-             "re-solved, so scope this to what actually needs rebuilding.",
+        "--levels", nargs="+", type=parse_level, default=list(LEVELS),
+        metavar="LEVEL",
+        help="ES confidence levels in percent, e.g. 72.5 (default: the whole sweep). "
+             "Every cell is re-solved, so scope this to what actually needs "
+             "rebuilding. parse_level rejects anything not in the sweep.",
     )
     parser.add_argument(
         "--universes", nargs="+", type=int, default=list(UNIVERSES), choices=list(UNIVERSES),
@@ -763,7 +924,7 @@ def main() -> None:
         if solved == 0:
             logger.warning(
                 "Nothing solved for levels %s on %s; no shard written.",
-                args.levels, args.universes,
+                [format_level(lvl) for lvl in args.levels], args.universes,
             )
             return
         if args.sweep_only:

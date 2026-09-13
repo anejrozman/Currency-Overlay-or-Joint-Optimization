@@ -3,14 +3,25 @@
 #
 # Runs the two UNREGULARIZED Expected Shortfall strategies -- es_curr_overlay
 # (two-step: assets, then overlay) and es_joint (assets and overlay in one
-# program) -- at six confidence levels on all three universes:
+# program) -- at each confidence level of the sweep, on all three universes:
 #
-#   6 levels (50/60/70/80/90/95) x 2 strategies x 3 universes = 36 jobs
+#   14 levels x 2 strategies x 3 universes = 84 cells
+#
+# The sweep is 50/60/70, then a 2.5-point grid from 72.5 to 97.5. The coarse
+# levels were run first; the dense grid was added to resolve the top end, where
+# the in-sample gap rises fastest and the out-of-sample tail thins fastest.
+#
+#   ./run_es_levels.sh --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
+#
+# is the submission that adds the dense grid to an existing coarse sweep: 48 jobs.
+# Cells whose run is already recorded in results/runs/top_runs_es_at_different_levels.csv
+# are skipped with a notice unless --force is given, so re-running this script
+# after a partial sweep submits only what is missing.
 #
 # Each job is one sbatch submission via run_backtest.sh, so the scheduler spreads
-# them across nodes and they run concurrently; at 4 cores each the sweep needs
-# ~144 of the ls_math share's 640 cores, so the wall clock is set by the slowest
-# single job (es_joint at top-100).
+# them across nodes and they run concurrently; at 4 cores each, 48 jobs need ~192
+# of the ls_math share's 640 cores, so the wall clock is set by the slowest single
+# job (es_joint at top-100).
 #
 # What is pinned, and why
 # -----------------------
@@ -28,60 +39,76 @@
 #
 #   * do NOT substitute --no-grid for --alpha. --no-grid drops the grid entirely
 #     and the optimizers fall back to their own alpha = 0.80 default, which would
-#     silently produce six identical runs per cell.
+#     silently produce identical runs at every level.
 #   * the val_score column in selected_params.csv is recorded, never used. It is
 #     also not comparable across levels: ES at 50% and ES at 95% are different
 #     functionals, not two scores of one objective.
 #
+# Half levels
+# -----------
+# Alpha is computed with %g rather than a fixed number of decimals. At two
+# decimals level 72.5 becomes alpha 0.72 and 77.5 becomes 0.78, so the job would
+# run at a level the sweep does not contain, record that alpha in its config, and
+# be dropped later by the collector as unrecognised -- a whole cell of cluster
+# time for nothing. The job tag is formed the same way, so 0.725 reads as a72.5
+# in squeue rather than colliding with a72 or a73.
+#
 # Statistical caveat at the top end
 # ---------------------------------
 # These programs are unregularized; the only thing bounding the asset block is the
-# ||x||_1 <= 2 leverage cap. The estimation window is ~2500 days while the top-100
-# universe reaches 1161 names, so the level-95 tail is ~125 observations against
+# ||x||_1 <= 2 leverage cap. The estimation window is ~2610 days while the top-100
+# universe reaches 1161 names, so the level-97.5 tail is ~65 observations against
 # ~1161 weights -- the LP optimum then sits on a vertex pinned by a handful of tail
-# days, in-sample ES is driven near zero, and the weights swing hard quarter to
-# quarter. Read the top-50 and top-100 cells at levels 90/95 as a diagnostic of
-# exactly the estimation-error blowup the regularized variants exist to fix, not as
-# a deployable strategy. Top-10 (133 names against 125 tail days) is borderline.
-# Expect some "optimal_inaccurate" solver statuses in those cells.
+# days and the weights swing hard quarter to quarter. Read the top-50 and top-100
+# cells above level 90 as a diagnostic of the estimation-error blowup the
+# regularized variants exist to fix, not as a deployable strategy. Note this
+# concerns the backtests' own estimation; the realized ES they report still pools
+# 5935 days and stays well estimated.
 #
 # Run directories
 # ---------------
 # next_run_dir() names directories after the optimizer FILE, not the strategy plus
-# level, so all 18 overlay runs land in results/runs/es_curr_overlay/ alongside the
-# 15 runs already there, and the 18 joint runs in results/runs/es_joint/. Run
-# numbers are claimed by an atomic mkdir when each job starts, so which number goes
-# to which level depends on scheduling order and cannot be predicted here. Recover
+# level, so every overlay run lands in results/runs/es_curr_overlay/ alongside the
+# runs already there, and every joint run in results/runs/es_joint/. Run numbers
+# are claimed by an atomic mkdir when each job starts, so which number goes to
+# which level depends on scheduling order and cannot be predicted here. Recover
 # the mapping after the fact with:
 #
 #   python code/scripts/collect_es_level_runs.py            # print the table
 #   python code/scripts/collect_es_level_runs.py --write    # update the CSV
 #
 # Usage:
-#   ./run_es_levels.sh              # submit all 36 jobs
-#   ./run_es_levels.sh --dry-run    # print the sbatch plan, submit nothing
-#   ./run_es_levels.sh --demean     # sweep with demean=True instead of False
+#   ./run_es_levels.sh                          # every cell not already recorded
+#   ./run_es_levels.sh --levels "72.5 75 97.5"  # only these levels
+#   ./run_es_levels.sh --dry-run                # print the plan, submit nothing
+#   ./run_es_levels.sh --force                  # resubmit cells already recorded
+#   ./run_es_levels.sh --demean                 # sweep with demean=True instead
 
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$HERE/../../.." && pwd)"
 RUN_ONE="$HERE/run_backtest.sh"
+RUNS_CSV="$ROOT_DIR/results/runs/top_runs_es_at_different_levels.csv"
 
 DRY_RUN=0
+FORCE=0
 DEMEAN_FLAG="--no-demean"
+LEVELS=(50 60 70 72.5 75 77.5 80 82.5 85 87.5 90 92.5 95 97.5)
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         --dry-run) DRY_RUN=1; shift ;;
+        --force)   FORCE=1; shift ;;
         --demean)  DEMEAN_FLAG=""; shift ;;
+        --levels)  read -r -a LEVELS <<< "$2"; shift 2 ;;
         -h|--help)
-            sed -n '2,60p' "${BASH_SOURCE[0]}"
+            sed -n '2,84p' "${BASH_SOURCE[0]}"
             exit 1 ;;
-        *) echo "Error: unknown argument '$1' (expected --dry-run, --demean or --help)."; exit 1 ;;
+        *) echo "Error: unknown argument '$1' (expected --levels, --dry-run, --force, --demean or --help)."; exit 1 ;;
     esac
 done
 
-LEVELS=(50 60 70 80 90 95)
 STRATEGIES=(es_curr_overlay es_joint)
 UNIVERSES=(100 50 10)   # heaviest universe first, so the long poles start first
 
@@ -104,15 +131,46 @@ time_for() {  # time_for <universe>
     esac
 }
 
+# Is this cell's run already recorded? The table is the record of what has landed,
+# so a filled cell means that backtest exists and resubmitting it would spend a
+# 150-336h reservation to produce a duplicate the collector would then have to
+# arbitrate. Matched on the whole first field rather than by regex, because a level
+# like 72.5 carries a dot that a regex would read as a wildcard.
+cell_recorded() {  # cell_recorded <strategy> <level> <universe>
+    [[ -f "$RUNS_CSV" ]] || return 1
+    local col
+    case "$3" in 10) col=2 ;; 50) col=3 ;; 100) col=4 ;; esac
+    awk -F',' -v name="${1}_level_${2}" -v col="$col" '
+        { gsub(/^[ \t]+|[ \t]+$/, "", $1) }
+        $1 == name {
+            gsub(/[ \t]/, "", $col)
+            found = 1
+            if ($col != "") filled = 1
+            exit
+        }
+        END { exit (found && filled) ? 0 : 1 }
+    ' "$RUNS_CSV"
+}
+
 count=0
+skipped=0
 for uni in "${UNIVERSES[@]}"; do
     for strat in "${STRATEGIES[@]}"; do
         for level in "${LEVELS[@]}"; do
-            alpha="$(awk -v l="$level" 'BEGIN { printf "%.2f", l / 100 }')"
+            if (( ! FORCE )) && cell_recorded "$strat" "$level" "$uni"; then
+                printf '  %-16s level=%-5s u%-4s  already recorded, skipping\n' \
+                    "$strat" "$level" "$uni"
+                skipped=$((skipped + 1))
+                continue
+            fi
+            # %g, not %.2f: at two decimals level 72.5 becomes alpha 0.72 and 77.5
+            # becomes 0.78, so the job would silently run at a level the sweep does
+            # not contain and the collector would later drop it as unrecognised.
+            alpha="$(awk -v l="$level" 'BEGIN { printf "%g", l / 100 }')"
             t="$(time_for "$uni")"
             m="$(mem_for "$uni")"
             if (( DRY_RUN )); then
-                printf '  %-16s level=%-3s alpha=%-5s u%-4s time=%-10s mem=%-4s cpus=4 %s\n' \
+                printf '  %-16s level=%-5s alpha=%-6s u%-4s time=%-10s mem=%-4s cpus=4 %s\n' \
                     "$strat" "$level" "$alpha" "$uni" "$t" "$m" "$DEMEAN_FLAG"
             else
                 "$RUN_ONE" --strategy "$strat" --universe "$uni" --alpha "$alpha" \
@@ -124,6 +182,7 @@ for uni in "${UNIVERSES[@]}"; do
 done
 
 echo ""
+(( skipped )) && echo "${skipped} cells skipped (already recorded; --force to resubmit)."
 if (( DRY_RUN )); then
     echo "${count} jobs planned (dry run, nothing submitted)."
 else

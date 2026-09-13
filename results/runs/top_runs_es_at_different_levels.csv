@@ -1,17 +1,33 @@
-strategy_name,            top_10_run, top_50_run, top_100_run
+strategy_name,              top_10_run, top_50_run, top_100_run
 
-equal_weight_optimizer,     1,   2,   3
+equal_weight_optimizer,       1,   2,   3
 
-es_curr_overlay_level_50,  19,  18,  30
-es_curr_overlay_level_60,  20,  17,  16
-es_curr_overlay_level_70,  27,  29,  21
-es_curr_overlay_level_80,  25,  23,  31
-es_curr_overlay_level_90,  26,  22,  32
-es_curr_overlay_level_95,  24,  28,  33
+es_curr_overlay_level_50,    19,  18,  30
+es_curr_overlay_level_60,    20,  17,  16
+es_curr_overlay_level_70,    27,  29,  21
+es_curr_overlay_level_72.5,    ,    ,
+es_curr_overlay_level_75,      ,    ,
+es_curr_overlay_level_77.5,    ,    ,
+es_curr_overlay_level_80,    25,  23,  31
+es_curr_overlay_level_82.5,    ,    ,
+es_curr_overlay_level_85,      ,    ,
+es_curr_overlay_level_87.5,    ,    ,
+es_curr_overlay_level_90,    26,  22,  32
+es_curr_overlay_level_92.5,    ,    ,
+es_curr_overlay_level_95,    24,  28,  33
+es_curr_overlay_level_97.5,    ,    ,
 
-es_joint_level_50,         18,  15,  28
-es_joint_level_60,         20,  16,  27
-es_joint_level_70,         19,  23,  29
-es_joint_level_80,         17,  25,  30
-es_joint_level_90,         21,  24,  31
-es_joint_level_95,         22,  26,  32
+es_joint_level_50,           18,  15,  28
+es_joint_level_60,           20,  16,  27
+es_joint_level_70,           19,  23,  29
+es_joint_level_72.5,           ,    ,
+es_joint_level_75,             ,    ,
+es_joint_level_77.5,           ,    ,
+es_joint_level_80,           17,  25,  30
+es_joint_level_82.5,           ,    ,
+es_joint_level_85,             ,    ,
+es_joint_level_87.5,           ,    ,
+es_joint_level_90,           21,  24,  31
+es_joint_level_92.5,           ,    ,
+es_joint_level_95,           22,  26,  32
+es_joint_level_97.5,           ,    ,
