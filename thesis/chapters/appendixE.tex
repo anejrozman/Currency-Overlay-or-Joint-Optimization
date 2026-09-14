@@ -1,2 +1,63 @@
-\chapter{TODO: Appendix E Title} \label{app:e}
+\chapter{Testing Differences in the Sharpe Ratio} \label{app:sharpe_test}
 
+This appendix details the test used in \Cref{sec:what-survives} to compare the risk-adjusted return of the joint and sequential programs, and reports its results in full. Throughout, $r_{J,t}$ and $r_{O,t}$ denote the realized daily excess returns of the joint and overlay backtests over the same $T$ trading days, net of transaction costs.
+
+\section{The Test and Why It Is Used}\label{sec:sharpe-test-choice}
+
+The quantity of interest is the difference of the two Sharpe ratios,
+\begin{equation}
+\Delta \coloneqq \mathrm{SR}_J - \mathrm{SR}_O,
+\qquad
+\mathrm{SR}_i = \frac{\mu_i}{\sqrt{\gamma_i - \mu_i^2}},
+\qquad
+\mu_i = \mathbb{E}[r_i], \quad \gamma_i = \mathbb{E}[r_i^2],
+\label{eq:sharpe-delta}
+\end{equation}
+under the null hypothesis $H_0: \Delta = 0$.
+
+Two features of this setting rule out the standard tests. First, the two samples are \emph{dependent}: both strategies are evaluated on the same dates, over the same investment universe, from the same price data, and differ only in how the portfolio weights were chosen. Across the $27$ comparisons reported below their daily return series have a correlation between $0.90$ and $0.99$, with a median of $0.98$, so any test that treats the two samples as independent is invalid here. Second, daily equity returns are heavy-tailed and serially dependent, which violates the i.i.d.\ normality assumed by the closed-form test of \cite{JobsonKorkie1981} and its corrected version in \cite{Memmel2003}. \cite{LedoitWolf2008} show that under realistic return distributions this test over-rejects substantially, and propose a studentized bootstrap that is robust to both departures while accommodating dependent samples. It has since become the standard instrument for this comparison, and is what we use.
+
+\section{Implementation}\label{sec:sharpe-test-implementation}
+
+Both Sharpe ratios are smooth functions of the moment vector $\bm{v} = (\mu_J, \mu_O, \gamma_J, \gamma_O)^\T$, so $\Delta = f(\bm{v})$ and the delta method applies. Writing $s_i = \gamma_i - \mu_i^2$, the gradient is
+\begin{equation}
+\nabla f(\bm{v})
+=
+\left(
+\frac{\gamma_J}{s_J^{3/2}},
+\;-\frac{\gamma_O}{s_O^{3/2}},
+\;-\frac{\mu_J}{2 s_J^{3/2}},
+\;\frac{\mu_O}{2 s_O^{3/2}}
+\right)^{\!\T},
+\label{eq:sharpe-gradient}
+\end{equation}
+and the standard error of $\hat\Delta$ is $\widehat{\mathrm{se}}(\hat\Delta) = \sqrt{\nabla f^\T \bm{\Psi} \nabla f / T}$, where $\bm{\Psi}$ is a heteroskedasticity- and autocorrelation-consistent estimate of the long-run covariance of the per-observation contributions
+\begin{equation*}
+\bm{v}_t = \left(r_{J,t} - \mu_J,\; r_{O,t} - \mu_O,\; r_{J,t}^2 - \gamma_J,\; r_{O,t}^2 - \gamma_O \right)^{\!\T}.
+\end{equation*}
+We use a Bartlett kernel,
+\begin{equation}
+\bm{\Psi} = \bm{\Gamma}_0 + \sum_{j=1}^{J} \left(1 - \frac{j}{J+1}\right)\left(\bm{\Gamma}_j + \bm{\Gamma}_j^\T\right),
+\qquad
+\bm{\Gamma}_j = \frac{1}{T}\sum_{t=j+1}^{T} \bm{v}_t \bm{v}_{t-j}^\T ,
+\label{eq:sharpe-hac}
+\end{equation}
+with the Newey--West bandwidth $J = \lceil 4 (T/100)^{2/9} \rceil$.
+
+The distribution of the studentized statistic is obtained by circular block bootstrap:
+\begin{enumerate}
+\item Draw blocks of $b$ consecutive observations, wrapping at the end of the sample, until $T$ positions are filled. The \emph{same} index sequence is applied to both return series, so the dependence between the two strategies is preserved under resampling.
+\item On replication $m$, recompute $\hat\Delta^{*}_m$ and its standard error $\widehat{\mathrm{se}}^{*}_m$ from \eqref{eq:sharpe-gradient}--\eqref{eq:sharpe-hac}, and form $t^{*}_m = (\hat\Delta^{*}_m - \hat\Delta)/\widehat{\mathrm{se}}^{*}_m$.
+\item Report the two-sided $p$-value $B^{-1}\sum_m \mathbf{1}\{|t^{*}_m| \geq |\hat\Delta / \widehat{\mathrm{se}}(\hat\Delta)|\}$ and the interval obtained by inverting the studentized quantiles, $[\hat\Delta - q_{0.975}\widehat{\mathrm{se}}, \; \hat\Delta - q_{0.025}\widehat{\mathrm{se}}]$.
+\end{enumerate}
+We take $b = 5$ trading days and $B = 4999$ replications, with $T = 5935$. All reported figures are annualized by $\sqrt{252}$.
+
+\section{Results and Interpretation}\label{sec:sharpe-test-results}
+
+The test is applied to every pair of joint and overlay production runs recorded in \texttt{top\_runs.csv}: five risk measures, three universe sizes and both families, giving $27$ comparisons once the three cells whose second-order Expected Shortfall backtests have not landed are excluded.
+
+\emph{No comparison is significant at the $5\%$ level, and none at $10\%$.} The smallest $p$-value is $0.183$ and the median $0.645$; the point estimates are as often negative as positive ($15$ of $27$), with a median difference of $+0.0066$ in annualized Sharpe units. The intervals have a median half-width of $0.073$, so improvements above roughly $0.13$ can be excluded. Repeating all $27$ tests with block lengths from $b = 1$ to $b = 63$ trading days leaves every one of them insignificant.
+
+This is not evidence that the two approaches are equivalent; it is a statement about what the Sharpe ratio can resolve. Over $5935$ trading days the denominator of a Sharpe ratio is estimable to about one percent, while the numerator is not estimable to useful precision at all---paired tests on mean returns bound the difference only to within $\pm 25$ to $\pm 160$ basis points per annum. The volatility reduction the joint program achieves at the top-$10$ universe, between $2.5\%$ and $5.7\%$ in relative terms, implies a Sharpe improvement of approximately $0.003$, two orders of magnitude below what these intervals exclude. An effect of the size actually present could not have been detected however the test were constructed.
+
+Two features distinguish this from a failed test. The same bootstrap applied to the same return series does detect differences in volatility and in Expected Shortfall, with intervals clear of zero at the top-$10$ and top-$50$ universes, so the procedure finds effects in these data when the estimand is one the sample can pin down. And the absence of significance is uniform rather than concentrated---no $p$-value below $0.18$, balanced signs, and no systematic variation across measures, universes or families---whereas a genuine but underpowered effect would at least leave the point estimates sharing a sign. Precision does vary, and unhelpfully: the median interval is $65\%$ wider at top-$10$ than at top-$100$, so the test is least able to resolve a difference in precisely the universe where the joint program's risk advantage survives.

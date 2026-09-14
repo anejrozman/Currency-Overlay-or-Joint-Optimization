@@ -31,11 +31,10 @@
 \contentsline {subsection}{\numberline {6.3.1}Across Tail Depth Within One Risk Measure}{29}{subsection.6.3.1}%
 \contentsline {subsection}{\numberline {6.3.2}Across Problem Dimension}{29}{subsection.6.3.2}%
 \contentsline {subsection}{\numberline {6.3.3}Across Risk Measures}{29}{subsection.6.3.3}%
-\contentsline {section}{\numberline {6.4}The Inversion Across Risk Measures}{29}{section.6.4}%
-\contentsline {section}{\numberline {6.5}What Does Not Repair It}{29}{section.6.5}%
-\contentsline {subsection}{\numberline {6.5.1}Regularization}{29}{subsection.6.5.1}%
-\contentsline {subsection}{\numberline {6.5.2}A Mean Term in the Objective}{29}{subsection.6.5.2}%
-\contentsline {section}{\numberline {6.6}When Joint Optimization Is Justified}{29}{section.6.6}%
+\contentsline {section}{\numberline {6.4}What Does Not Repair It}{29}{section.6.4}%
+\contentsline {subsection}{\numberline {6.4.1}Regularization}{29}{subsection.6.4.1}%
+\contentsline {subsection}{\numberline {6.4.2}A Mean Term in the Objective}{29}{subsection.6.4.2}%
+\contentsline {section}{\numberline {6.5}When Joint Optimization Is Justified}{29}{section.6.5}%
 \contentsline {chapter}{\chapternumberline {7}Conclusion}{30}{chapter.7}%
 \contentsline {section}{\numberline {7.1}Findings}{30}{section.7.1}%
 \contentsline {section}{\numberline {7.2}Limitations and Future Research}{30}{section.7.2}%
@@ -64,10 +63,13 @@
 \contentsline {section}{\numberline {B.4}Joint Optimization}{46}{section.B.4}%
 \contentsline {appendix}{\chapternumberline {C}TODO: Appendix C Title}{49}{appendix.C}%
 \contentsline {appendix}{\chapternumberline {D}TODO: Appendix D Title}{50}{appendix.D}%
-\contentsline {appendix}{\chapternumberline {E}TODO: Appendix E Title}{51}{appendix.E}%
-\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{52}{appendix.F}%
-\contentsline {appendix}{\chapternumberline {G}Additional Results}{54}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{54}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{58}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{59}{section.G.3}%
-\contentsline {chapter}{Bibliography}{61}{appendix*.11}%
+\contentsline {appendix}{\chapternumberline {E}Testing Differences in the Sharpe Ratio}{51}{appendix.E}%
+\contentsline {section}{\numberline {E.1}The Test and Why It Is Used}{51}{section.E.1}%
+\contentsline {section}{\numberline {E.2}Implementation}{51}{section.E.2}%
+\contentsline {section}{\numberline {E.3}Results and Interpretation}{52}{section.E.3}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{53}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{55}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{55}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{59}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{60}{section.G.3}%
+\contentsline {chapter}{Bibliography}{62}{appendix*.11}%
