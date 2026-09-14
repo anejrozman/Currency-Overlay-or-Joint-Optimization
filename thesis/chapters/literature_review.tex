@@ -24,3 +24,78 @@ universes due to its built-in dimensionality reduction.
 
 Reproducing and comparing these two baseline frameworks serves as the starting point 
 for the extensions proposed in this thesis.
+
+
+% =============================================================================
+% STRUCTURE INSTRUCTIONS (delete before submission)
+% Nothing above this line has been removed -- the prose on the two baseline
+% papers is kept and should be reused, most of it inside block (4) below.
+%
+% WHY THIS CHAPTER NEEDS RESTRUCTURING
+% The contribution in Chapter~\ref{chap:joint-vs-sequential} is an
+% ESTIMATION-ERROR result: the joint program's in-sample advantage over the
+% sequential overlay is largest precisely where it is least realizable,
+% because the measures that produce the largest in-sample gap are estimated
+% from the fewest observations. If this review covers only currency hedging
+% and risk measures, that contribution has no home when the reader reaches it.
+% The reader must already be standing in the estimation-error literature.
+%
+% PROPOSED BLOCKS, in this order:
+%
+% (1) MULTI-CURRENCY PORTFOLIO CONSTRUCTION
+%     The return decomposition and the currency-exposure problem. Set up why
+%     currency is a separate decision at all. Existing refs:
+%     global_currency_hedging, CHEN2003133, safe_haven_currencies,
+%     common_risk_factors_currency_markets,
+%     carry_trades_and_global_foreign_exchange_volatility,
+%     MenkhoffSarnoSchmelingSchrimpf2012, NeelyWellerUlrich2009.
+%
+% (2) RISK MEASURES BEYOND VARIANCE
+%     Markowitz1952 as the origin; CoherentMeasuresOfRisk for the coherence
+%     axioms; Rockafellar-Uryasev for the CVaR linear program (ADD -- not in
+%     refs.bib yet and it is load-bearing for Chapter 3); Konno-Yamazaki for
+%     MAD (ADD); Krokhmal for higher-moment coherent risk measures / HMCR_2
+%     (ADD -- this is your SOES). goldberg2013minimizingshortfall fits here.
+%     End the block by naming the property your results turn on: deviation
+%     measures use every observation, tail measures use only the tail.
+%
+% (3) ESTIMATION ERROR IN PORTFOLIO OPTIMIZATION  <-- THE LOAD-BEARING BLOCK
+%     This is where your contribution lands, so it deserves the most space
+%     and currently has the least. Existing refs to build on: Michaud1989
+%     (the "estimation-error maximiser"), Jorion1986BayesStein, LedoitWolf2004,
+%     ciliberti2007feasibility and kondor2007noise (noise sensitivity of ES
+%     optimization specifically -- these are the closest existing work to your
+%     level-sweep result and should be discussed, not just cited).
+%     ADD: DeMiguel, Garlappi & Uppal (2009) on 1/N versus optimized
+%     portfolios, which is the canonical statement that in-sample optimality
+%     need not survive; and DeMiguel et al. on norm-constrained portfolios,
+%     which is the regularization-as-estimation-control argument.
+%     The paragraph to end on: the literature establishes that optimized
+%     portfolios overfit, and that the effect scales with dimension. What it
+%     does not establish is that the SIZE of an in-sample advantage predicts
+%     its realizability NEGATIVELY across risk measures. State that gap
+%     explicitly -- it is your contribution's entry point.
+%
+% (4) HEDGING: OVERLAY VERSUS INTEGRATED
+%     The two baseline papers, using the prose already written above.
+%     SparseAndStableInternationalPortfolioOptimization (Burkhardt & Ulrych,
+%     mean-variance, joint beats overlay out of sample with regularization)
+%     and RegularizedMultiCurrencyExpectedShortfallPortfolios (Lucescu &
+%     Ulrych, ES, the dimensional trade-off).
+%     IMPORTANT: state precisely what each paper claims and on which universe
+%     sizes, because your results agree with the second and qualify the first.
+%     Then state what this thesis adds: five risk measures rather than one or
+%     two, a decomposition of the in-sample advantage into a structural part
+%     and an estimation part, and the finding that the in-sample gap is a
+%     measure of overfitting capacity rather than of economic value.
+%
+% REFERENCES TO ADD TO refs.bib (checked -- none are present):
+%   Rockafellar & Uryasev (2000), Optimization of Conditional Value-at-Risk
+%   Konno & Yamazaki (1991), Mean-Absolute Deviation Portfolio Optimization
+%   Krokhmal (2007), Higher Moment Coherent Risk Measures
+%   DeMiguel, Garlappi & Uppal (2009), Optimal Versus Naive Diversification
+%   DeMiguel, Garlappi, Nogales & Uppal (2009), Norm-Constrained Portfolios
+%
+% The line at the top of this file listing topics to cite is superseded by the
+% blocks above; delete it once the blocks are written.
+% =============================================================================
