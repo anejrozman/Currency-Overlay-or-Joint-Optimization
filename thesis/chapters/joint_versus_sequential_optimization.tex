@@ -1,390 +1,205 @@
 \chapter{Joint versus Sequential Optimization}\label{chap:joint-vs-sequential}
 
-% #############################################################################
-% WRITING GUIDE (delete before submission)
-%
-% THE CHAPTER'S CLAIM -- everything in here serves this one sentence:
-%
-%   The joint program's in-sample advantage over the sequential overlay is
-%   inflated by estimation error in proportion to how little of the sample the
-%   risk measure uses. The in-sample gap therefore measures overfitting
-%   capacity rather than economic value, and the measures with the strongest
-%   in-sample case deliver the least out of sample.
-%
-% Note the order of that sentence. The MECHANISM is the claim; the inversion
-% across risk measures is its consequence. This matters for how you defend the
-% chapter: the mechanism is supported by the level sweep (14 levels, one
-% measure, slopes with confidence intervals) and by the universe sweep, both of
-% which are direct evidence. The cross-measure inversion rests on five points
-% and is corroboration. Do not lead with the five-point result and do not let
-% the chapter depend on it.
-%
-% PAGE BUDGET (~16 pages)
-%   6.1  In-sample case ................ 2 pages
-%   6.2  What survives ................. 2-3 pages
-%   6.3  Mechanism ..................... 6 pages   <- the chapter
-%   6.4  The inversion ................. 2 pages
-%   6.5  What does not repair it ....... 2 pages
-%   6.6  When justified ................ 1-2 pages
-%
-% Note 6.3 and 6.4 are SWAPPED relative to the first draft of this outline:
-% mechanism first, inversion as its consequence.
-%
-% TWO THINGS TO FIX BEFORE WRITING
-%
-% (a) SIGN CONVENTION. Your draft in the empirical chapter defines
-%     g = joint - overlay, so NEGATIVE means joint is better. The code, every
-%     figure and every table define gap = overlay - joint, so POSITIVE means
-%     joint is better. Adopt the code's convention and fix the prose.
-%
-% (b) MATERIAL TO MIGRATE from the end of
-%     chapters/empirical_analysis_and_baseline_results.tex:
-%       - the hypothesis paragraphs  -> Section 6.2
-%       - the currency-share arm     -> Section 6.2
-%       - the decomposition derivation g^oos = g^is + Delta_epsilon
-%                                    -> Section 6.1, as the formal backbone
-%     That derivation is good and does real work. It already says what this
-%     chapter proves empirically.
-% #############################################################################
+% TASK NOTE (delete once handled)
+% MIGRATE from the end of empirical_analysis_and_baseline_results.tex: the
+% hypothesis paragraphs -> Section 6.2. The currency-share arm is NOT carried
+% over. The decomposition has already been moved into Section 6.1 and restated
+% with g > 0 meaning the joint program is better, which is the convention the
+% code, every figure and every table use.
 
-% TODO: roadmap paragraph, in the style of the other chapter openers. One
-% paragraph, naming each section and what it establishes, in order.
+\emph{Draft outline; bullets to be replaced by prose.}
+
+This chapter asks whether joint optimization of assets and currencies is worth the additional complexity 
+rather than just doingsequential currency overlay. First we establish that the joint program's
+in-sample advantage is guaranteed by construction, since the overlay's solution
+is feasible for it, we show this across the five risk measures. We further show that the advantage largely fails to survive out of
+sample: it is significant only in the smallest universe, and the share of it
+that is realized falls as the in-sample advantage grows. We
+identify the reason for that inversion, namely that the in-sample advantage is
+inflated by estimation error in proportion to how little of the sample the risk
+measure uses. The central evidence is a sweep of Expected Shortfall over
+fourteen confidence levels, which varies the number of observations entering the
+objective by a factor of sixteen while holding the risk measure, the universe
+and the data fixed; it is corroborated by a comparison across measures that
+separates those using the whole sample from those using only its tail. Neither
+regularization nor the addition of a mean term alters the conclusion. What
+follows is that the in-sample gap is a measure of how much room the joint
+program has to fit noise rather than of its economic value, so that joint
+optimization is justified in small universes and least of all for the tail
+measures whose in-sample case appears strongest.
 
 
 \section{The In-Sample Case for Joint Optimization}\label{sec:joint-in-sample-case}
 
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   Joint optimization weakly dominates the sequential overlay in sample by
-%   construction, and the magnitude of that dominance differs systematically
-%   across risk measures -- it is largest for the tail measures.
-%
-% WHY IT IS TRUE
-%   1. The nesting argument, stated as a proposition in Chapter 3 and recalled
-%      here. The overlay's solution is feasible for the joint program, and the
-%      overlay's second step is a partial minimisation of the same objective:
-%
-%        f(theta_J) = min_{x,psi} f(x,psi) <= min_psi f(x_O, psi) = f(theta_O)
-%
-%      Use the derivation already drafted in the empirical chapter.
-%   2. Then the decomposition, which is the chapter in one equation:
-%
-%        g^oos = [f(theta_J) - f(theta_O)] + [eps(theta_J) - eps(theta_O)]
-%                \_______ g^is _______/     \____ Delta_eps >= 0 ____/
-%
-%      where eps(theta) = f^oos(theta) - f(theta) is the generalization gap.
-%      The second term is non-negative in expectation because theta_J is
-%      selected over a strictly larger set and therefore fits more estimation
-%      noise. State this as the chapter's organising identity: the same
-%      freedom that wins in sample is what costs out of sample. Everything
-%      after this section measures Delta_eps.
-%   3. Empirical verification: gap_in < 0 on 8 of 1365 unregularized
-%      date-cells (0.6%), all at magnitude ~1e-7. Say explicitly that this is
-%      solver tolerance, not violation, and that it doubles as an
-%      implementation correctness check.
-%   4. The in-sample gap by measure, averaged over the three universes:
-%
-%        SOES 7.23%   ES 3.71%   SMV 2.13%   MAD 1.91%   MV 1.45%
-%
-% WHAT THIS SECTION MUST SET UP
-%   The expectation that the tail measures are the most promising place to
-%   apply joint optimization. State that expectation plainly -- it is the one
-%   Section 6.4 overturns, and it has to be on the page to be overturned.
-%
-% DATA: results/in_sample_vs_out_of_sample/gap_summary.csv (unregularized),
-%       gaps.csv for the violation count.
-% ---------------------------------------------------------------------------
+Write the decision vector as $\bm{\theta} = (\bm{x}, \bm{\uppsi})$ and let $\Theta$ denote the feasible set defined by the budget and leverage constraints of \Cref{chap:optimization-framework}. Let $\hat f$ be the empirical risk on the estimation window and $f^{oos}$ the realized risk on the holding quarter. The two programs are
+\begin{equation}
+\hat{\bm{\theta}}_J = \argmin_{\bm{\theta} \in \Theta} \hat f(\bm{\theta}),
+\qquad
+\hat{\bm{x}}_O = \argmin_{\bm{x}} \hat f_A(\bm{x}),
+\quad
+\hat{\bm{\uppsi}}_O = \argmin_{\bm{\uppsi}} \hat f(\hat{\bm{x}}_O, \bm{\uppsi}),
+\label{eq:two-programs}
+\end{equation}
+where $\hat f_A$ is the asset-only risk, which ignores the currency block, and $\hat{\bm{\theta}}_O = (\hat{\bm{x}}_O, \hat{\bm{\uppsi}}_O)$. The sequential program is a restricted minimizer: it chooses $\bm{x}$ against a different objective, then chooses $\bm{\uppsi}$ with $\hat{\bm{x}}_O$ held fixed.
+
+Its output nevertheless satisfies the same constraints, so $\hat{\bm{\theta}}_O \in \Theta$, and its second step is a partial minimization of the same $\hat f$. Hence
+\begin{equation}
+\hat f(\hat{\bm{\theta}}_J)
+= \min_{\bm{x}, \bm{\uppsi}} \hat f(\bm{x}, \bm{\uppsi})
+\;\leq\; \min_{\bm{\uppsi}} \hat f(\hat{\bm{x}}_O, \bm{\uppsi})
+= \hat f(\hat{\bm{\theta}}_O).
+\label{eq:nesting}
+\end{equation}
+Defining the gap so that a positive value means the joint program is better,
+\begin{equation}
+g^{is} \coloneqq \hat f(\hat{\bm{\theta}}_O) - \hat f(\hat{\bm{\theta}}_J) \;\geq\; 0 .
+\label{eq:gap-in-sample}
+\end{equation}
+The in-sample gap is therefore non-negative by construction, and measures what the joint formulation is worth before any estimation error is introduced.
+
+To see what becomes of it out of sample, define the generalization gap of a fitted $\hat{\bm{\theta}}$ as $\epsilon(\hat{\bm{\theta}}) = f^{oos}(\hat{\bm{\theta}}) - \hat f(\hat{\bm{\theta}})$. Writing the realized gap $g^{oos} \coloneqq f^{oos}(\hat{\bm{\theta}}_O) - f^{oos}(\hat{\bm{\theta}}_J)$ in these terms and rearranging,
+\begin{equation}
+g^{oos}
+= \underbrace{\big[\hat f(\hat{\bm{\theta}}_O) - \hat f(\hat{\bm{\theta}}_J)\big]}_{g^{is} \,\geq\, 0}
+\;-\; \underbrace{\big[\epsilon(\hat{\bm{\theta}}_J) - \epsilon(\hat{\bm{\theta}}_O)\big]}_{\Delta\epsilon} .
+\label{eq:gap-decomposition}
+\end{equation}
+The second term is non-negative in expectation. The estimator $\hat{\bm{\theta}}_J$ is selected by minimizing over a strictly larger set than $\hat{\bm{\theta}}_O$, so it fits more of the estimation noise, giving $\mathbb{E}[\epsilon(\hat{\bm{\theta}}_J)] \geq \mathbb{E}[\epsilon(\hat{\bm{\theta}}_O)]$ and hence $\mathbb{E}[\Delta\epsilon] \geq 0$. Therefore
+\begin{equation}
+\mathbb{E}\big[g^{oos}\big] = g^{is} - \mathbb{E}[\Delta\epsilon] \;\leq\; g^{is} .
+\label{eq:gap-bound}
+\end{equation}
+The in-sample advantage bounds the realizable advantage from above: the larger parameter set that lets the joint program win in sample is the same freedom that costs it out of sample. \Cref{eq:gap-decomposition} is the organising identity of this chapter, and everything that follows is a measurement of $\Delta\epsilon$.
+
+Two conditions are worth making explicit, since both are used later. The argument requires that the quantity being scored is the objective being minimized, which fails for the penalized and mean-bearing programs of \Cref{sec:what-does-not-repair}. It also requires that both programs minimize the \emph{same} $\hat f$, which fails for mean-variance: the joint program applies Ledoit--Wolf shrinkage to the stacked asset-currency covariance matrix, while the sequential program shrinks the asset and currency blocks separately and leaves the cross-covariance unshrunk, so the two quadratic forms differ. Mean-variance is the only measure considered here whose programs pass through a covariance estimator at all; the remaining four are scenario-based and evaluate the same empirical functional on both sides.
+
+\begin{itemize}
+  \item Empirical check of \eqref{eq:gap-in-sample}: violated on $8$ of $1365$ unregularized date-cells ($0.6\%$), all of them mean-variance and all at magnitude $\sim 10^{-6}$ against typical gaps of $\sim 10^{-4}$. Consistent with the estimator discrepancy above and with solver tolerance; ES, MAD, SMV and SOES are at $0.0\%$. Doubles as a correctness check.
+  \item In-sample gap by measure: SOES $7.23\%$, ES $3.71\%$, SMV $2.13\%$, MAD $1.91\%$, MV $1.45\%$.
+  \item State the expectation this creates---tail measures look most promising---since \Cref{sec:what-survives} overturns it.
+  \item Figure: the in-sample (blue) series of \Cref{fig:gap-measures}, introduced here and returned to in \Cref{sec:what-survives} for the out-of-sample series.
+\end{itemize}
 
 
 \section{What Survives Out of Sample}\label{sec:what-survives}
 
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   The in-sample advantage does not survive out of sample except in the
-%   smallest universe, and it declines monotonically in the number of assets.
-%
-% WHY IT IS TRUE
-%   Out-of-sample relative gap with bootstrap confidence intervals. Significant
-%   at top-10 for ES, MAD, MV and SMV; at top-50 only for MV and SMV; at
-%   top-100 for nothing; and for SOES nowhere at all.
-%
-% THE HYPOTHESIS (from the migrated text)
-%   The joint program must estimate the asset-currency dependence structure
-%   directly; the overlay sidesteps it by sequencing, which is a form of
-%   dimensionality reduction. So joint should win where estimation is easy and
-%   lose where it is not.
-%
-% THE OBJECTION THIS SECTION MUST SURVIVE
-%   Is the decline driven by the currency share or by the asset count? They
-%   move together in the main grid. The K-reduction arm separates them: hold
-%   the asset universe fixed and cut the tradable currency block to K = 10, 6
-%   (top-50) and K = 10, 6, 3 (top-10). Because s = K/(K + 14N), top-10 at
-%   K = 3 lands at s = 0.021 against top-50's 0.020 with 140 securities rather
-%   than 700. Keep this to a paragraph and a figure -- it is a robustness check
-%   on the hypothesis, not a finding.
-%
-% FIGURE: results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf
-%   (currently fig:gap-vs-currency-share in the empirical chapter; move the
-%   float here rather than duplicating it).
-%
-% DO NOT interpret the cross-measure differences yet. This section establishes
-% that the advantage decays; Section 6.3 explains why; Section 6.4 shows the
-% decay is systematic across measures. Keep them apart or the argument blurs.
-% ---------------------------------------------------------------------------
+\begin{itemize}
+  \item Clear the return question first: no Sharpe difference significant across $27$ comparisons (\Cref{app:sharpe_test}). The signal is in the denominator; the numerator's noise destroys it. Hence the chapter proceeds on the risk measures.
+  \item Out-of-sample gap significant at top-$10$ for ES, MAD, MV, SMV; at top-$50$ only MV and SMV; nowhere at top-$100$; SOES nowhere.
+  \item Hypothesis: joint must estimate the asset--currency dependence directly, while the overlay sidesteps it by sequencing.
+  \item The decay is \emph{ordered}. Share realized: SOES $7\%$, ES $31\%$, MAD $62\%$, SMV $88\%$, MV $105\%$; Spearman $\rho = -0.50, -0.20, -0.60$. Contradicts \Cref{sec:joint-in-sample-case} and hands the question to \Cref{sec:mechanism}.
+  \item One sentence of honesty: five measures is thin; the mechanism evidence is in \Cref{sec:mechanism-level}.
+  \item FIGURE TODO for the inversion: it must place the in-sample magnitude and the realized share in one coordinate system. \Cref{fig:gap-measures} cannot express it, since neither variable of the claim is on an axis.
+\end{itemize}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf}
+  \caption{In-sample and out-of-sample gap between the joint and sequential programs, by risk measure and universe size.}
+  \label{fig:gap-measures}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Unregularized programs. The in-sample series is a ceiling by the nesting argument of \Cref{sec:joint-in-sample-case}; the distance to the out-of-sample series is the part not realized. TODO: expand.
+  \end{minipage}
+\end{figure}
+
 
 
 \section{Mechanism: The Information Budget}\label{sec:mechanism}
 
-% ---------------------------------------------------------------------------
-% THIS IS THE CHAPTER. Six pages. Three converging tests of one mechanism.
-%
-% THE CLAIM
-%   Delta_eps -- the excess generalization gap the joint program pays for its
-%   larger feasible set -- grows as the number of observations the risk measure
-%   uses falls. The in-sample advantage is inflated by exactly that amount.
-%
-% Open the section by stating the mechanism in terms of an information budget:
-% the joint program estimates N + K parameters; what varies across the three
-% tests below is how many observations the objective actually uses to do it.
-% Each test varies one thing and holds the others fixed. Say that explicitly
-% before the subsections -- it is what makes three results into one argument.
-% ---------------------------------------------------------------------------
+The joint program estimates $N + K$ parameters; what varies below is how many observations the objective uses to do it. The two tests below vary that quantity in different ways: the first within a single risk measure, the second across measures.
 
 \subsection{Across Tail Depth Within One Risk Measure}\label{sec:mechanism-level}
 
-% ---------------------------------------------------------------------------
-% PUT THIS FIRST. It is the cleanest test and the chapter's strongest evidence:
-% it holds the risk measure, the universe, the constraint set and the data
-% fixed, and varies only how much of the sample the objective uses.
-%
-% THE CLAIM
-%   Within a single risk measure, looking deeper into the tail raises the
-%   in-sample advantage without raising the realized one. The additional
-%   in-sample advantage is entirely estimation error.
-%
-% THE DESIGN
-%   ES swept over 14 confidence levels (50, 60, 70, then 2.5-point steps from
-%   72.5 to 97.5) on all three universes, 42 cells. Tail observations in the
-%   estimation window fall from 1044 at level 60 to 65 at level 97.5 while the
-%   number of free weights is unchanged. That ratio IS the information budget,
-%   and the sweep varies it by a factor of 16 with nothing else moving.
-%
-% THE NUMBERS
-%   Slope of the relative gap per percentage point of confidence level:
-%
-%                   in-sample                    out-of-sample (annual)
-%     top-10    +0.00162 [0.00135, 0.00186]   +0.00005 [-0.00063, 0.00076]
-%     top-50    +0.00100 [0.00078, 0.00124]   +0.00016 [-0.00029, 0.00064]
-%     top-100   +0.00060 [0.00038, 0.00087]   +0.00037 [-0.00006, 0.00079]
-%
-%   In-sample: significantly positive at every universe. Out-of-sample: zero
-%   at every universe. At top-10 the in-sample gap runs from 3.11% at level 60
-%   to 10.59% at 97.5 while the realized gap sits at 2.2-2.8% throughout.
-%
-%   The overfit ratio (realized decay relative to 1/N's, which optimizes
-%   nothing and so isolates estimation error) rises in the same shape:
-%   top-10 from 1.34 at level 60 to 2.01 at 97.5; top-100 from 3.07 to 5.88.
-%
-% THE SENTENCE TO WRITE
-%   The in-sample gap decomposes into a level-independent structural component
-%   (~2.5% at top-10, which survives) and a level-increasing estimation
-%   component (which does not). Deeper tail targeting buys no additional real
-%   advantage; it buys the joint program more room to overfit a thinning tail.
-%
-% THE OBJECTION THIS MUST SURVIVE -- and it is a real one, so do not bury it.
-%   f_out is scored on the quarter actually held, whose tail thins to ~3
-%   observations at level 95 and ~2 at 97.5. At that point f_out is an extreme
-%   order statistic, not an expectation. A second horizon (the following year,
-%   ~252 days) is therefore scored alongside it, lifting the level-97.5 tail
-%   to ~6 observations. The quarterly horizon suggests the realized gap
-%   DECLINES at high levels; the annual horizon shows it is FLAT and agrees
-%   with the pooled production backtests where the quarterly one does not.
-%   Report both, say which you rely on and why. Handling this openly is what
-%   makes the section credible; an examiner will go looking for it.
-%
-% DATA: results/in_sample_vs_out_of_sample_es_at_diff_levels/
-% ---------------------------------------------------------------------------
+\begin{itemize}
+  \item Cleanest test: measure, universe, constraints and data fixed; only the fraction of the sample used varies. ES over $14$ levels; tail observations $1044 \to 65$, weights unchanged.
+  \item In-sample slope per percentage point: $+0.00162$, $+0.00100$, $+0.00060$, all clear of zero. Out-of-sample: $+0.00005$, $+0.00016$, $+0.00037$, all spanning zero.
+  \item At top-$10$ the in-sample gap runs $3.11\% \to 10.59\%$ while the realized gap stays at $2.2$--$2.8\%$.
+  \item Conclusion: a level-independent structural component, which survives, plus a level-increasing estimation component, which does not.
+  \item Report both horizons. The quarterly tail thins to $\sim 2$ observations at level $97.5$; the annual horizon agrees with the production backtests where the quarterly one does not.
+\end{itemize}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf}
+  \caption{Gap between the joint and sequential programs across Expected Shortfall confidence levels, by universe size.}
+  \label{fig:gap-vs-level}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    The in-sample series rises steeply with the level while the out-of-sample series is flat: the additional in-sample advantage bought by deeper tail targeting is not realized. TODO: expand.
+  \end{minipage}
+\end{figure}
 
-\subsection{Across Problem Dimension}\label{sec:mechanism-dimension}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_universe.pdf}
+  \caption{The same gaps arranged by universe size, one panel per confidence level.}
+  \label{fig:gap-vs-level-universe}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Supporting view of \Cref{fig:gap-vs-level}, showing the level and dimension axes together. Round levels only. TODO: expand.
+  \end{minipage}
+\end{figure}
 
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   Holding the risk measure fixed and raising the number of assets has the
-%   same effect: more parameters against the same observations, so more of the
-%   in-sample advantage is estimation error.
-%
-% THE NUMBERS
-%   Overfit ratios for ES rise from 1.38 at top-10 to 3.09 at top-100. Both
-%   programs overfit more as the universe grows, and the joint program
-%   overfits more than the overlay in 12 of 15 cells (paired, CIs clear of
-%   zero). The three exceptions -- top-10 at levels 60, 70, 80 -- are exactly
-%   the cells where the joint advantage survives out of sample.
-%
-% THE SENTENCE TO WRITE
-%   The joint program's advantage survives if and only if it does not overfit
-%   more than the overlay does. That is a mechanism, not a correlation, and it
-%   is worth stating as the section's punchline.
-%
-% Note that both programs still beat 1/N in absolute realized risk everywhere
-% (0.38 to 0.69 of it). Say so -- it prevents the reader concluding that
-% optimization does not work, when the claim is narrower.
-% ---------------------------------------------------------------------------
 
 \subsection{Across Risk Measures}\label{sec:mechanism-measures}
 
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   The same mechanism operates across risk measures. Deviation measures
-%   (variance, MAD, semi-variance) use every observation; tail measures (ES,
-%   SOES) use only the tail. The tail measures therefore have the largest
-%   in-sample gap and the least realizable one.
-%
-% THE COMPETING EXPLANATION THIS MUST RULE OUT
-%   ES and SOES are not location-free -- they carry an implicit mean. Is their
-%   behaviour driven by that rather than by tail focus? Test by de-meaning,
-%   which makes them location-free. Result: the in-sample ceiling falls but
-%   does not vanish. So the implicit mean explains part and the tail focus the
-%   rest. Report the magnitude of the fall; this is the experiment that
-%   converts a plausible story into a tested one.
-%
-% DATA: results/in_sample_vs_out_of_sample_demeaned/
-% ---------------------------------------------------------------------------
+\begin{itemize}
+  \item Deviation measures use every observation; tail measures only the tail. Hence the largest in-sample gap and the least realizable one.
+  \item Rule out the implicit mean: de-meaning ES and SOES lowers the ceiling but does not remove it, so the mean explains part and the tail focus the rest. Report the size of the fall.
+\end{itemize}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf}
+  \caption{Gap between the joint and sequential programs for the de-meaned Expected Shortfall and second-order Expected Shortfall programs.}
+  \label{fig:gap-demeaned}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    De-meaning makes the two tail measures location-free, isolating the effect of their implicit mean. Compare the in-sample series with the corresponding panels of \Cref{fig:gap-measures}. TODO: expand.
+  \end{minipage}
+\end{figure}
 
-
-\section{The Inversion Across Risk Measures}\label{sec:the-inversion}
-
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   Because the in-sample gap is inflated in proportion to the information
-%   deficit, its magnitude predicts the realized benefit NEGATIVELY across
-%   risk measures.
-%
-% This section is now a CONSEQUENCE of Section 6.3, not an independent
-% finding. Write it that way: "the mechanism implies an ordering, and the
-% ordering is observed." That framing is both more honest and more persuasive
-% than presenting it as a standalone discovery.
-%
-% THE NUMBERS -- averaged over the three universes, unregularized:
-%
-%     measure    in-sample   out-of-sample   share realized
-%     SOES         7.23%        0.47%             7%
-%     ES           3.71%        1.14%            31%
-%     SMV          2.13%        1.87%            88%
-%     MAD          1.91%        1.18%            62%
-%     MV           1.45%        1.52%           105%
-%
-%   Spearman rank correlation between the in-sample and out-of-sample gap
-%   across the five measures: -0.50 (top-10), -0.20 (top-50), -0.60
-%   (top-100). Negative at every universe size.
-%
-% THE HONESTY REQUIREMENT -- do not skip this, it is what makes the claim
-% survive a viva:
-%   Five measures is a thin basis for a rank correlation and the correlation
-%   is not itself a powered test. Say so in one sentence, and point to
-%   Section 6.3.1: the level sweep reproduces the same effect WITHIN one
-%   measure with 14 points and confidence intervals, which is what makes the
-%   cross-measure ordering credible rather than a coincidence over five
-%   points. Presented in that order the thin result is corroboration of a
-%   well-supported mechanism instead of a load-bearing claim.
-%
-% FIGURE: not yet built. Whatever form you choose, it has to put the
-% in-sample magnitude and the realized share in the same coordinate system.
-% The existing five-panel figure cannot express this claim because neither
-% variable of the claim is on an axis.
-% ---------------------------------------------------------------------------
 
 
 \section{What Does Not Repair It}\label{sec:what-does-not-repair}
 
-% ---------------------------------------------------------------------------
-% Defence. Pre-empts the two obvious objections. Two pages, no more.
-% ---------------------------------------------------------------------------
-
 \subsection{Regularization}\label{sec:no-repair-regularization}
 
-% ---------------------------------------------------------------------------
-% METHODOLOGICAL POINT FIRST -- it justifies the scope of the whole chapter.
-%   The in-sample gap framework does NOT extend to penalised programs. The
-%   nesting proposition requires the scorer to be the objective. Regularized
-%   joint and overlay programs minimise Risk + penalty with penalties selected
-%   per date that differ between the two, so they optimise different
-%   objectives while being scored on a third. Nothing is bounded and the
-%   in-sample/out-of-sample difference is not the decay of anything.
-%
-%   EVIDENCE THAT THIS IS NOT HYPOTHETICAL: the ceiling gap_in >= 0 is
-%   violated on 30.0% of regularized date-cells (MV 44.7%, SMV 38.5%,
-%   MAD 20.1%, ES 16.8%) against 0.6% at solver tolerance for unregularized.
-%   Cite these numbers. They turn the restriction of this chapter to the
-%   unregularized family from an apparent omission into a consequence of the
-%   proposition -- which is a much better thing for an examiner to find.
-%
-% THE CLAIM, answered out of sample only, by comparing realized risk of the
-% production backtests (no in-sample quantity, no ceiling required):
-%   Regularization reduces the absolute estimation error both programs suffer
-%   without changing which of them is lower.
-%
-%   ES at level 80, relative reduction in realized ES_80, joint vs overlay:
-%
-%     universe      unregularized     regularized
-%     top-10          +3.00% (sig)     +2.01% (sig)
-%     top-50          +1.76% (sig)     +1.40% (sig)
-%     top-100         +0.15% (ns)      -0.21% (ns)
-%
-%   Same pattern, same cut-off, slightly smaller under regularization. And the
-%   overfit ratio falls sharply: at top-100 from 3.09 to 1.93, with realized
-%   risk relative to 1/N improving from 0.384 to 0.350. Regularization pulls
-%   both programs toward the same floor without changing their ordering.
-% ---------------------------------------------------------------------------
+\begin{itemize}
+  \item The in-sample framework does not extend to penalised programs: joint and overlay minimise $\text{Risk} + \text{penalty}$ with per-date penalties that differ, while scored on a third quantity.
+  \item Not hypothetical: the ordering is violated on $30.0\%$ of regularized date-cells against $0.6\%$ unregularized. Justifies scoping the chapter to the unregularized family.
+  \item Answered out of sample instead. ES at level $80$, relative reduction in realized ES: $+3.00\%$, $+1.76\%$, $+0.15\%$ unregularized against $+2.01\%$, $+1.40\%$, $-0.21\%$ regularized.
+  \item Same pattern, same cut-off: regularization does not change which program realizes less risk, nor the universe size at which the advantage disappears.
+\end{itemize}
 
 \subsection{A Mean Term in the Objective}\label{sec:no-repair-mean}
 
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   Adding a mean term helps the deviation measures substantially and does
-%   little for ES and SOES, which already carry the mean implicitly.
-%
-% Frame as consistent with the mechanism: the measures with information to
-% spare can afford to estimate a mean; the information-starved ones cannot.
-%
-% The nesting proposition fails here too, and for the same reason -- gamma is
-% selected per date and the joint and overlay programs routinely select
-% different values, so the two minimise different objectives. Say so and rely
-% on realized quantities.
-%
-% DATA: results/in_sample_vs_out_of_sample_w_mean/, top_runs_w_mean.csv
-% ---------------------------------------------------------------------------
+\begin{itemize}
+  \item Helps the deviation measures, does little for ES and SOES, which carry the mean implicitly.
+  \item Consistent with the mechanism: measures with information to spare can afford a mean, information-starved ones cannot.
+  \item The nesting proposition fails here too, since risk aversion is selected per date. Rely on realized quantities.
+\end{itemize}
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/realized_risk_comparison/realized_risk_reduction.pdf}
+  \caption{Out-of-sample realized risk of the joint program relative to the sequential overlay, by risk measure, universe size and program family.}
+  \label{fig:realized-risk-reduction}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Realized quantities only: no in-sample series appears, since the nesting argument does not extend to the regularized or mean-bearing programs. Neither family changes the universe size at which the advantage disappears. TODO: expand.
+  \end{minipage}
+\end{figure}
+
 
 
 \section{When Joint Optimization Is Justified}\label{sec:when-justified}
 
-% ---------------------------------------------------------------------------
-% THE CLAIM
-%   Joint optimization is justified in small universes with variance-based
-%   measures, and specifically not with the tail measures that look most
-%   promising in sample.
-%
-% State that this is counterintuitive and that it follows directly from the
-% mechanism: the tail measures' in-sample appeal IS their estimation problem.
-%
-% MAGNITUDE, net of transaction costs (this matters -- the gap analysis
-% ignores costs and the production comparison does not, which closes the
-% objection that higher currency turnover eats the benefit):
-%   At top-10, joint reduces realized volatility by 2.5-5.7% and realized ES
-%   by 1.8-3.9% relative to the overlay, with no detectable effect on mean
-%   return. At top-100 nothing is significant on any measure.
-%
-% THE SHARPE QUESTION, and why it is the wrong instrument:
-%   Sharpe divides an unestimable numerator by the improved denominator. The
-%   implied Sharpe change from a 2.5% volatility reduction is ~0.003 against a
-%   detection threshold of ~0.15 at this sample length. Report it as a bound
-%   ("we can exclude a Sharpe improvement above roughly 0.10") rather than as
-%   a null. Note that the same bootstrap on the same return series DOES detect
-%   the volatility and ES effects, so the null is not a dead instrument -- it
-%   is a statement about what Sharpe can resolve.
-%
-% THE HONEST LIMIT -- state it plainly, hedging would weaken the chapter:
-%   At the universe sizes relevant for international equity portfolios
-%   (700-1400 securities against 14 currencies), the two approaches are
-%   statistically indistinguishable out of sample, and the sequential overlay
-%   is cheaper to compute. That is the practical conclusion.
-% ---------------------------------------------------------------------------
+\begin{itemize}
+  \item Small universes, variance-based measures; not the tail measures that look best in sample. Counterintuitive, and it follows from the mechanism: their in-sample appeal is their estimation problem.
+  \item Net of costs, at top-$10$: volatility $-2.5$ to $-5.7\%$, Expected Shortfall $-1.8$ to $-3.9\%$, no mean effect. At top-$100$ nothing significant.
+  \item Cross-reference \Cref{app:sharpe_test} rather than repeating \Cref{sec:what-survives}.
+  \item The honest limit: at $700$--$1400$ securities against $14$ currencies the two are indistinguishable out of sample, and the overlay is cheaper.
+\end{itemize}

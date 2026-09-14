@@ -439,31 +439,4 @@ universe sizes relevant for international equity portfolios, where $700$ to
 $1400$ securities are held against $14$ currencies and $s$ lies between $1\%$ and
 $2\%$, the joint and overlay approaches are statistically indistinguishable out
 of sample. The sequential overlay, being cheaper computationally, is
-therefore a defensible choice at these dimensions. 
-
-\newpage
-
-Write the decision vector $\theta=(x,\psi)$, the feasible set is $\Theta$, the empirical risk on the estimation window $\hat f$, and the realized risk on the holding quarter $f^{oos}$. The two programs are
-
-$$\hat\theta_J=\arg\min_{\theta\in\Theta}\hat f(\theta),\qquad \hat x_O=\arg\min_{x}\hat f_A(x),\quad \hat\psi_O=\arg\min_{\psi}\hat f(\hat x_O,\psi)$$
-
-where $\hat f_A$ is the asset-only risk that ignores the currency block. The overlay is a restricted minimiser. It optimises $x$ against a different objective, then it optimises $\psi$ and jas fixed $\hat x_O$.
-
-The in-sample gap is therefore non-positive by construction. The overlay's output satisfies the same constraints, so $\hat\theta_O\in\Theta$, and its second step is a partial minimisation of the same $\hat f$
-
-
-$$\hat f(\hat\theta_J)=\min_{x,\psi}\hat f(x,\psi)  \le \min_{\psi}\hat f(\hat x_O,\psi)=\hat f(\hat\theta_O)$$
-
-Hence $g^{is}=\hat f(\hat\theta_J)-\hat f(\hat\theta_O)\le 0$.
-
-Now we decompose the out-of-sample gap $g^{oos}$. We define the generalization gap of a fitted $\hat\theta$ as $\epsilon(\hat\theta)=f^{oos}(\hat\theta)-\hat f(\hat\theta)$. Then 
-
-$$g^{oos}=\underbrace{\big[\hat f(\hat\theta_J)-\hat f(\hat\theta_O)\big]}_{g^{is} \le0}+\underbrace{\big[\epsilon(\hat\theta_J)-\epsilon(\hat\theta_O)\big]}_{\Delta\epsilon}$$
-
-The second term is non-negative in expectation. $\hat\theta_J$ is selected by minimising over a strictly larger set than $\hat\theta_O$, so it fits more of the estimation noise and therefore $\mathbb{E}[\epsilon(\hat\theta_J)]\ge\mathbb{E}[\epsilon(\hat\theta_O)]$, i.e. $\mathbb{E}[\Delta\epsilon]\ge 0$. Therefore
- 
-$$\mathbb{E}\big[g^{oos}\big]=g^{is}+\mathbb{E}[\Delta\epsilon]\ge g^{is}$$
-
-Since $g<0$ means joint is better, $|g^{is}|\ge|g^{oos}|$. The in-sample advantage bounds the realizable advantage from below. The larger parameter set that lets the joint program win in sample is the same freedom that costs it out of sample...
-
-In case of mean variance the above doesnt hold since the covariance matrix is estimated differently for the joint and overlay programs.
+therefore a defensible choice at these dimensions.
