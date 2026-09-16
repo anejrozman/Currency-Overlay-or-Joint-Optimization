@@ -2,12 +2,10 @@
 
 % TASK NOTE (delete once handled)
 % MIGRATE from the end of empirical_analysis_and_baseline_results.tex: the
-% hypothesis paragraphs -> Section 6.2. The currency-share arm is NOT carried
-% over. The decomposition has already been moved into Section 6.1 and restated
-% with g > 0 meaning the joint program is better, which is the convention the
-% code, every figure and every table use.
-
-\emph{Draft outline; bullets to be replaced by prose.}
+% hypothesis paragraphs -> Section 6.2, "Advantage of Joint Optimization". The
+% currency-share arm is NOT carried over. The decomposition has already been
+% moved into Section 6.2 and restated with g > 0 meaning the joint program is
+% better, which is the convention the code, every figure and every table use.
 
 This chapter asks whether joint optimization of assets and currencies is worth the additional complexity 
 rather than just doingsequential currency overlay. First we establish that the joint program's
@@ -28,96 +26,90 @@ program has to fit noise rather than of its economic value, so that joint
 optimization is justified in small universes and least of all for the tail
 measures whose in-sample case appears strongest.
 
+\section{Does Joint Optimization improve Returns?}\label{sec:joint-returns}
 
-\section{The In-Sample Case for Joint Optimization}\label{sec:joint-in-sample-case}
+From the backtests in \Cref{chap:empirical-analysis-and-baseline-results} we found that joint optimization did 
+not provide much improvement in returns over sequential optimization. To formalize this, we perform a Sharpe 
+ration test of \ref{..} on the realized returns of the joint and sequential optimizers. "Describe the test" 
 
-Write the decision vector as $\bm{\theta} = (\bm{x}, \bm{\uppsi})$ and let $\Theta$ denote the feasible set defined by the budget and leverage constraints of \Cref{chap:optimization-framework}. Let $\hat f$ be the empirical risk on the estimation window and $f^{oos}$ the realized risk on the holding quarter. The two programs are
-\begin{equation}
-\hat{\bm{\theta}}_J = \argmin_{\bm{\theta} \in \Theta} \hat f(\bm{\theta}),
-\qquad
+More details on the test and results can be found in Appendix \ref{app:sharpe_test}. 
+The results show that there is no significant difference in the Sharpe ratio between the two optimizers across all five risk measures and all three universe sizes. 
+This suggests that joint optimization does not provide a statistical benefit in terms of returns over sequential optimization.
+
+
+\section{Advantage of Joint Optimization for Risk Minimization}\label{sec:joint-in-sample-case}
+
+In-sample, joint optimization provides a benefit over sequential optimization by construction when it comes to minimizing 
+the target risk measure. We write 
+the decision vector as $\bm{\theta} = (\bm{x}, \bm{\uppsi})$ and let $\Theta$ denote the 
+feasible set defined by the budget and leverage constraints of \Cref{chap:optimization-framework}. 
+Let $\hat f$ be the empirical risk on the estimation window and $f^{oos}$ the realized risk on 
+the holding quarter. The two programs are
+\begin{equation*}
+\hat{\bm{\theta}}_J = \argmin_{\bm{\theta} \in \Theta} \hat f(\bm{\theta})
+\quad \text{and} \quad
 \hat{\bm{x}}_O = \argmin_{\bm{x}} \hat f_A(\bm{x}),
 \quad
 \hat{\bm{\uppsi}}_O = \argmin_{\bm{\uppsi}} \hat f(\hat{\bm{x}}_O, \bm{\uppsi}),
-\label{eq:two-programs}
-\end{equation}
-where $\hat f_A$ is the asset-only risk, which ignores the currency block, and $\hat{\bm{\theta}}_O = (\hat{\bm{x}}_O, \hat{\bm{\uppsi}}_O)$. The sequential program is a restricted minimizer: it chooses $\bm{x}$ against a different objective, then chooses $\bm{\uppsi}$ with $\hat{\bm{x}}_O$ held fixed.
+\end{equation*}
+where $\hat f_A$ is the asset-only risk, which ignores the currency block, and $\hat{\bm{\theta}}_O = (\hat{\bm{x}}_O, \hat{\bm{\uppsi}}_O)$. 
+The subscript $J$ denotes the joint program and $O$ the sequential overlay. 
+The sequential program is a restricted minimizer. It chooses $\bm{x}$ against a different objective, 
+then chooses $\bm{\uppsi}$ with $\hat{\bm{x}}_O$ held fixed. 
 
-Its output nevertheless satisfies the same constraints, so $\hat{\bm{\theta}}_O \in \Theta$, and its second step is a partial minimization of the same $\hat f$. Hence
-\begin{equation}
+Its output satisfies the same constraints, so $\hat{\bm{\theta}}_O \in \Theta$, and its second step is a partial minimization of the same $\hat f$. Hence
+\begin{equation*}
 \hat f(\hat{\bm{\theta}}_J)
 = \min_{\bm{x}, \bm{\uppsi}} \hat f(\bm{x}, \bm{\uppsi})
 \;\leq\; \min_{\bm{\uppsi}} \hat f(\hat{\bm{x}}_O, \bm{\uppsi})
 = \hat f(\hat{\bm{\theta}}_O).
-\label{eq:nesting}
-\end{equation}
-Defining the gap so that a positive value means the joint program is better,
+\end{equation*}
+We define the in-sample gap between the two optimizers as 
 \begin{equation}
 g^{is} \coloneqq \hat f(\hat{\bm{\theta}}_O) - \hat f(\hat{\bm{\theta}}_J) \;\geq\; 0 .
 \label{eq:gap-in-sample}
 \end{equation}
-The in-sample gap is therefore non-negative by construction, and measures what the joint formulation is worth before any estimation error is introduced.
+The in-sample gap is non-negative and measures the advantage of joint optimization over sequential 
+optimization in the estimation window. Naturally, the question we are interested in is whether this advantage is 
+realized out of sample. 
 
-To see what becomes of it out of sample, define the generalization gap of a fitted $\hat{\bm{\theta}}$ as $\epsilon(\hat{\bm{\theta}}) = f^{oos}(\hat{\bm{\theta}}) - \hat f(\hat{\bm{\theta}})$. Writing the realized gap $g^{oos} \coloneqq f^{oos}(\hat{\bm{\theta}}_O) - f^{oos}(\hat{\bm{\theta}}_J)$ in these terms and rearranging,
-\begin{equation}
-g^{oos}
-= \underbrace{\big[\hat f(\hat{\bm{\theta}}_O) - \hat f(\hat{\bm{\theta}}_J)\big]}_{g^{is} \,\geq\, 0}
-\;-\; \underbrace{\big[\epsilon(\hat{\bm{\theta}}_J) - \epsilon(\hat{\bm{\theta}}_O)\big]}_{\Delta\epsilon} .
+We define the out-of-sample error of a fitted $\hat{\bm{\theta}}$ as
+\begin{equation*}
+\epsilon(\hat{\bm{\theta}}) \coloneqq f^{oos}(\hat{\bm{\theta}}) - \hat f(\hat{\bm{\theta}}),
+\end{equation*}
+the amount by which realized risk in the holding quarter exceeds the risk the optimizer achieved in sample. 
+Then the out-of-sample gap is written as
+\begin{align}
+g^{oos} &\coloneqq f^{oos}(\hat{\bm{\theta}}_O) - f^{oos}(\hat{\bm{\theta}}_J) \nonumber \\
+        &= \underbrace{\big[\hat f(\hat{\bm{\theta}}_O) - \hat f(\hat{\bm{\theta}}_J)\big]}_{g^{is} \,\geq\, 0}
+\;-\; \underbrace{\big[\epsilon(\hat{\bm{\theta}}_J) - \epsilon(\hat{\bm{\theta}}_O)\big]}_{\Delta\epsilon}.
 \label{eq:gap-decomposition}
-\end{equation}
-The second term is non-negative in expectation. The estimator $\hat{\bm{\theta}}_J$ is selected by minimizing over a strictly larger set than $\hat{\bm{\theta}}_O$, so it fits more of the estimation noise, giving $\mathbb{E}[\epsilon(\hat{\bm{\theta}}_J)] \geq \mathbb{E}[\epsilon(\hat{\bm{\theta}}_O)]$ and hence $\mathbb{E}[\Delta\epsilon] \geq 0$. Therefore
-\begin{equation}
-\mathbb{E}\big[g^{oos}\big] = g^{is} - \mathbb{E}[\Delta\epsilon] \;\leq\; g^{is} .
-\label{eq:gap-bound}
-\end{equation}
-The in-sample advantage bounds the realizable advantage from above: the larger parameter set that lets the joint program win in sample is the same freedom that costs it out of sample. \Cref{eq:gap-decomposition} is the organising identity of this chapter, and everything that follows is a measurement of $\Delta\epsilon$.
+\end{align}
 
-Two conditions are worth making explicit, since both are used later. The argument requires that the quantity being scored is the objective being minimized, which fails for the penalized and mean-bearing programs of \Cref{sec:what-does-not-repair}. It also requires that both programs minimize the \emph{same} $\hat f$, which fails for mean-variance: the joint program applies Ledoit--Wolf shrinkage to the stacked asset-currency covariance matrix, while the sequential program shrinks the asset and currency blocks separately and leaves the cross-covariance unshrunk, so the two quadratic forms differ. Mean-variance is the only measure considered here whose programs pass through a covariance estimator at all; the remaining four are scenario-based and evaluate the same empirical functional on both sides.
+The sign of $\Delta\epsilon$ is not guaranteed. The literature on estimation error in
+portfolio optimization suggests it should typically be positive, since the joint program selects over a
+larger space and absorbs more noise in doing so (Michaud, 1989; Kan and Zhou, 2007), though a restriction
+can also reduce estimation error rather than merely constrain the optimizer (Jagannathan and Ma, 2003).
+The magnitude is measure-dependent. Expected shortfall estimates are determined by the small fraction of
+tail scenarios that bind at the optimum, so the optimism absorbed by the optimizer is larger and more
+volatile than under variance at comparable sample sizes (Lim et al., 2011; Gotoh et al., 2013), and we
+expect the $\Delta\epsilon$ estimates to be correspondingly noisier for that measure.
 
-\begin{itemize}
-  \item Empirical check of \eqref{eq:gap-in-sample}: violated on $8$ of $1365$ unregularized date-cells ($0.6\%$), all of them mean-variance and all at magnitude $\sim 10^{-6}$ against typical gaps of $\sim 10^{-4}$. Consistent with the estimator discrepancy above and with solver tolerance; ES, MAD, SMV and SOES are at $0.0\%$. Doubles as a correctness check.
-  \item In-sample gap by measure: SOES $7.23\%$, ES $3.71\%$, SMV $2.13\%$, MAD $1.91\%$, MV $1.45\%$.
-  \item State the expectation this creates---tail measures look most promising---since \Cref{sec:what-survives} overturns it.
-  \item Figure: the in-sample (blue) series of \Cref{fig:gap-measures}, introduced here and returned to in \Cref{sec:what-survives} for the out-of-sample series.
-\end{itemize}
+We perform the following gap analysis to investigate the out-of-sample performance of the joint and sequential programs with respect to the risk measure they are minimizing, therefore we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the quarterly rebalancing dates the joint and the sequential overlay program of a given risk measure are solved on the same ten-year estimation window, and under the same budget and leverage constraints from \Cref{chap:empirical-analysis-and-baseline-results}. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\hat f$ and $f^{oos}$ for each of the two programs. Both gaps are reported relative to the risk of the sequential program, $g^{is} / \hat f(\hat{\bm{\theta}}_O)$ and $g^{oos} / f^{oos}(\hat{\bm{\theta}}_O)$ respectively, so they are to be interpreted as the risk reduction achieved by the joint program over the sequential program in percentage points. For each risk measure and universe size we report the mean of the risk reduction across the rebalancing dates together with a circular block bootstrap confidence interval at 95\%, using $10{,}000$ resamples and a block length chosen by the Politis--White rule \cite{ids}.
 
-
-\section{What Survives Out of Sample}\label{sec:what-survives}
-
-\begin{itemize}
-  \item Clear the return question first: no Sharpe difference significant across $27$ comparisons (\Cref{app:sharpe_test}). The signal is in the denominator; the numerator's noise destroys it. Hence the chapter proceeds on the risk measures.
-  \item Out-of-sample gap significant at top-$10$ for ES, MAD, MV, SMV; at top-$50$ only MV and SMV; nowhere at top-$100$; SOES nowhere.
-  \item Hypothesis: joint must estimate the asset--currency dependence directly, while the overlay sidesteps it by sequencing.
-  \item The decay is \emph{ordered}. Share realized: SOES $7\%$, ES $31\%$, MAD $62\%$, SMV $88\%$, MV $105\%$; Spearman $\rho = -0.50, -0.20, -0.60$. Contradicts \Cref{sec:joint-in-sample-case} and hands the question to \Cref{sec:mechanism}.
-  \item One sentence of honesty: five measures is thin; the mechanism evidence is in \Cref{sec:mechanism-level}.
-  \item FIGURE TODO for the inversion: it must place the in-sample magnitude and the realized share in one coordinate system. \Cref{fig:gap-measures} cannot express it, since neither variable of the claim is on an axis.
-\end{itemize}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf}
   \caption{In-sample and out-of-sample gap between the joint and sequential programs, by risk measure and universe size.}
   \label{fig:gap-measures}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Unregularized programs. The in-sample series is a ceiling by the nesting argument of \Cref{sec:joint-in-sample-case}; the distance to the out-of-sample series is the part not realized. TODO: expand.
-  \end{minipage}
 \end{figure}
 
+We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for all risk measures across all universe sizes, which is expected, and that it is largest for the two considered tail measures. The out-of-sample gap is smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being for the variance and semi-variance measures at the smallest universe size. 
+
+\newpage
+\section{Tail Depth}\label{sec:mechanism-level}
 
 
-\section{Mechanism: The Information Budget}\label{sec:mechanism}
-
-The joint program estimates $N + K$ parameters; what varies below is how many observations the objective uses to do it. The two tests below vary that quantity in different ways: the first within a single risk measure, the second across measures.
-
-\subsection{Across Tail Depth Within One Risk Measure}\label{sec:mechanism-level}
-
-\begin{itemize}
-  \item Cleanest test: measure, universe, constraints and data fixed; only the fraction of the sample used varies. ES over $14$ levels; tail observations $1044 \to 65$, weights unchanged.
-  \item In-sample slope per percentage point: $+0.00162$, $+0.00100$, $+0.00060$, all clear of zero. Out-of-sample: $+0.00005$, $+0.00016$, $+0.00037$, all spanning zero.
-  \item At top-$10$ the in-sample gap runs $3.11\% \to 10.59\%$ while the realized gap stays at $2.2$--$2.8\%$.
-  \item Conclusion: a level-independent structural component, which survives, plus a level-increasing estimation component, which does not.
-  \item Report both horizons. The quarterly tail thins to $\sim 2$ observations at level $97.5$; the annual horizon agrees with the production backtests where the quarterly one does not.
-\end{itemize}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf}
@@ -126,29 +118,22 @@ The joint program estimates $N + K$ parameters; what varies below is how many ob
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    The in-sample series rises steeply with the level while the out-of-sample series is flat: the additional in-sample advantage bought by deeper tail targeting is not realized. TODO: expand.
+    At the top-10 universe the joint programs in-sample advantage goes from three to eleven percent, while its realized advantage stays steady at around two to three percent, and in the larger universes there is almost no advantage of joint optimization out of sample. The advantage of deeper tail levels appears to just be estimation error, and the benefit that is realized doensnt increase with tail depth nor does it persist beyond the smallest universe.
+
   \end{minipage}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_universe.pdf}
-  \caption{The same gaps arranged by universe size, one panel per confidence level.}
+  \caption{The same analysis, just visualized like the previous figures.}
   \label{fig:gap-vs-level-universe}
   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Supporting view of \Cref{fig:gap-vs-level}, showing the level and dimension axes together. Round levels only. TODO: expand.
-  \end{minipage}
 \end{figure}
 
 
-\subsection{Across Risk Measures}\label{sec:mechanism-measures}
+\section{Deviation Measures}\label{sec:mechanism-measures}
 
-\begin{itemize}
-  \item Deviation measures use every observation; tail measures only the tail. Hence the largest in-sample gap and the least realizable one.
-  \item Rule out the implicit mean: de-meaning ES and SOES lowers the ceiling but does not remove it, so the mean explains part and the tail focus the rest. Report the size of the fall.
-\end{itemize}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf}
@@ -162,25 +147,8 @@ The joint program estimates $N + K$ parameters; what varies below is how many ob
 \end{figure}
 
 
+\section{Regularization}\label{sec:no-repair-regularization}
 
-\section{What Does Not Repair It}\label{sec:what-does-not-repair}
-
-\subsection{Regularization}\label{sec:no-repair-regularization}
-
-\begin{itemize}
-  \item The in-sample framework does not extend to penalised programs: joint and overlay minimise $\text{Risk} + \text{penalty}$ with per-date penalties that differ, while scored on a third quantity.
-  \item Not hypothetical: the ordering is violated on $30.0\%$ of regularized date-cells against $0.6\%$ unregularized. Justifies scoping the chapter to the unregularized family.
-  \item Answered out of sample instead. ES at level $80$, relative reduction in realized ES: $+3.00\%$, $+1.76\%$, $+0.15\%$ unregularized against $+2.01\%$, $+1.40\%$, $-0.21\%$ regularized.
-  \item Same pattern, same cut-off: regularization does not change which program realizes less risk, nor the universe size at which the advantage disappears.
-\end{itemize}
-
-\subsection{A Mean Term in the Objective}\label{sec:no-repair-mean}
-
-\begin{itemize}
-  \item Helps the deviation measures, does little for ES and SOES, which carry the mean implicitly.
-  \item Consistent with the mechanism: measures with information to spare can afford a mean, information-starved ones cannot.
-  \item The nesting proposition fails here too, since risk aversion is selected per date. Rely on realized quantities.
-\end{itemize}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/realized_risk_comparison/realized_risk_reduction.pdf}
@@ -194,12 +162,22 @@ The joint program estimates $N + K$ parameters; what varies below is how many ob
 \end{figure}
 
 
+\section{Risk-Return Formulation}\label{sec:no-repair-mean}
+
 
 \section{When Joint Optimization Is Justified}\label{sec:when-justified}
 
-\begin{itemize}
-  \item Small universes, variance-based measures; not the tail measures that look best in sample. Counterintuitive, and it follows from the mechanism: their in-sample appeal is their estimation problem.
-  \item Net of costs, at top-$10$: volatility $-2.5$ to $-5.7\%$, Expected Shortfall $-1.8$ to $-3.9\%$, no mean effect. At top-$100$ nothing significant.
-  \item Cross-reference \Cref{app:sharpe_test} rather than repeating \Cref{sec:what-survives}.
-  \item The honest limit: at $700$--$1400$ securities against $14$ currencies the two are indistinguishable out of sample, and the overlay is cheaper.
-\end{itemize}
+We conclude that even though joint optimization does not provide a statistical benefit in terms of returns, it has an advantage over 
+sequential optimization by construction when it comes to minimizing the targeted risk measure. When the risk measures are
+deviation measures, the in-sample benefit from joint optimization falls with an increasing universe size, while it stays stable for the 
+two considered tail measures. Out-of-sample, the advantage falls with universe size for all five of the considered risk measures. 
+Transforming the tail measures into deviation measures by de-meaning them results in a drop in the in-sample advantage as the 
+universe size increases. This leads us to conclude that the implicit risk-return tradeoff is one of the drivers of the in-sample
+advantage of joint optimization, and that it disappears out of sample due to estimation error. When we investigate the 
+tail behavior of the expected shortfall optimizers, the gap between the in-sample and out-of-sample advantage of 
+joint optimization increases with the tail depth, which further supports that the 
+in-sample advantage is driven by estimation error. Neither regularization nor the addition of a mean term to 
+the objective function changes this. In the larger investment universes, there is no detectable 
+benefit from joint optimization out of sample. This leads us to conclude that joint optimization does provide a 
+benefit when it comes to risk reduction, but only when the investment universe is small, or rather, when the 
+number of assets is smaller relative to the number of currencies.
