@@ -767,9 +767,9 @@ def _draw(ax, line: pd.DataFrame, xcol: str, styles: dict) -> None:
     for col, (color, _) in styles.items():
         if line.empty:
             continue
-        ax.plot(line[xcol], line[f"{col}_mean"], marker="s", ms=5, color=color, zorder=3)
+        ax.plot(line[xcol], 100 * line[f"{col}_mean"], marker="s", ms=5, color=color, zorder=3)
         ax.fill_between(
-            line[xcol], line[f"{col}_lo"], line[f"{col}_hi"], color=color, alpha=0.2, lw=0
+            line[xcol], 100 * line[f"{col}_lo"], 100 * line[f"{col}_hi"], color=color, alpha=0.2, lw=0
         )
 
 
@@ -826,7 +826,7 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
         ax.set_xticks([], minor=True)
         ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
 
-    axes[0].set_ylabel("Mean (overlay - joint) / overlay")
+    axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     _legend(axes[0], STYLES)
     fig.suptitle(
         "Joint vs overlay optimization across increasing investable universe sizes, "
@@ -869,7 +869,7 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
         ax.set_xticks(list(PLOT_LEVELS), minor=True)
         ax.set_xlim(min(PLOT_LEVELS) - 3, max(PLOT_LEVELS) + 3)
 
-    axes[0].set_ylabel("Mean (overlay - joint) / overlay")
+    axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     _legend(axes[0], STYLES)
     fig.suptitle(
         "Joint vs overlay optimization across Expected Shortfall confidence levels",

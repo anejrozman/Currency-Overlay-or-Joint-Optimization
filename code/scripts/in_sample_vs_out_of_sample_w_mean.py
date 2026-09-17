@@ -542,11 +542,11 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
             if line.empty:
                 continue
             ax.plot(
-                line["universe"], line[f"{col}_mean"],
+                line["universe"], 100 * line[f"{col}_mean"],
                 marker="s", ms=5, color=color, zorder=3,
             )
             ax.fill_between(
-                line["universe"], line[f"{col}_lo"], line[f"{col}_hi"],
+                line["universe"], 100 * line[f"{col}_lo"], 100 * line[f"{col}_hi"],
                 color=color, alpha=0.2, lw=0,
             )
         if line.empty:
@@ -567,7 +567,7 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
         ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
         ax.grid(True, alpha=0.3)
 
-    axes[0].set_ylabel("Mean (overlay - joint) / overlay")
+    axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     handles = [
         Line2D([], [], color=color, marker="s", label=label)
         for color, label in styles.values()

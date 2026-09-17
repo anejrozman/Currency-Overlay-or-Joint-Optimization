@@ -37,6 +37,12 @@ Andrea Frazzini, Ronen Israel, and Tobias~J. Moskowitz.
 Lisa~R. Goldberg, Michael~Y. Hayes, and Ola Mahmoud.
 \newblock Minimizing shortfall, 2013.
 
+\bibitem{JobsonKorkie1981}
+J.~D. Jobson and Bob~M. Korkie.
+\newblock Performance hypothesis testing with the {S}harpe and {T}reynor
+  measures.
+\newblock {\em The Journal of Finance}, 36(4):889--908, 1981.
+
 \bibitem{Jones2002}
 Charles~M. Jones.
 \newblock A century of stock market liquidity and trading costs.
@@ -66,6 +72,11 @@ Olivier Ledoit and Michael Wolf.
   matrices.
 \newblock {\em Journal of Multivariate Analysis}, 88(2):365--411, 2004.
 
+\bibitem{LedoitWolf2008}
+Olivier Ledoit and Michael Wolf.
+\newblock Robust performance hypothesis testing with the {S}harpe ratio.
+\newblock {\em Journal of Empirical Finance}, 15(5):850--859, 2008.
+
 \bibitem{Li2015}
 Jiahan Li.
 \newblock Sparse and stable portfolio selection with parameter uncertainty.
@@ -81,6 +92,11 @@ Hanno Lustig, Nikolai Roussanov, and Adrien Verdelhan.
 Harry Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
+
+\bibitem{Memmel2003}
+Christoph Memmel.
+\newblock Performance hypothesis testing with the {S}harpe ratio.
+\newblock {\em Finance Letters}, 1(1):21--23, 2003.
 
 \bibitem{carry_trades_and_global_foreign_exchange_volatility}
 LUKAS MENKHOFF, Lucio Sarno, MAIK SCHMELING, and Andreas Schrimpf.
@@ -111,6 +127,17 @@ Johanna~G. NeÅ¡LehovÃ¡.
   published by princeton university press , 2015 . total number of pages: 720.
   isbn: 978-0-691-16627-8 (hardback).
 \newblock {\em Journal of Time Series Analysis}, 37(3):431--432, May 2016.
+
+\bibitem{PattonPolitisWhite2009}
+Andrew Patton, Dimitris~N. Politis, and Halbert White.
+\newblock Correction to ``automatic block-length selection for the dependent
+  bootstrap'' by d. politis and h. white.
+\newblock {\em Econometric Reviews}, 28(4):372--375, 2009.
+
+\bibitem{PolitisWhite2004}
+Dimitris~N. Politis and Halbert White.
+\newblock Automatic block-length selection for the dependent bootstrap.
+\newblock {\em Econometric Reviews}, 23(1):53--70, 2004.
 
 \bibitem{safe_haven_currencies}
 Angelo Ranaldo and Paul Söderlind.

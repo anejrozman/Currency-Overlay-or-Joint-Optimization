@@ -89,6 +89,17 @@ CURRENCY_LABELS = {50: "Top-50 universe, reduced K", 10: "Top-10 universe, reduc
 # Cells solved but left off the figure; (universe, K).
 PLOT_EXCLUDE = {(10, 3)}
 
+# The delta-epsilon figure splits on the taxonomy the mechanism argument uses:
+# deviation measures see every observation, tail measures only the tail.  They are
+# drawn on separate axes because second-order Expected Shortfall runs an order of
+# magnitude above the deviation measures and would flatten them onto one scale.
+MEASURE_PANELS = (
+    ("Deviation measures", ("mv", "mad", "smv"), "lower right"),
+    ("Tail measures", ("es", "soes"), "lower right"),
+)
+MEASURE_COLORS = {"mv": "C0", "mad": "C1", "smv": "C2", "es": "C3", "soes": "C4"}
+MEASURE_MARKERS = {"mv": "o", "mad": "s", "smv": "^", "es": "D", "soes": "v"}
+
 
 def _sorted(rows: list[dict], by: list[str]) -> pd.DataFrame:
     frame = pd.DataFrame(rows)
@@ -432,6 +443,98 @@ def overfitting_table(grid: pd.DataFrame) -> pd.DataFrame:
     return _sorted(rows, ["family", "measure", "universe"])
 
 
+def delta_epsilon_table(grid: pd.DataFrame) -> pd.DataFrame:
+    """
+    The shortfall term of the decomposition, estimated pairwise.
+
+    g_oos = g_is - delta_eps identically at every rebalancing date, so delta_eps is
+    observed per date and needs no separate model.  Bootstrapping the paired
+    difference rather than differencing two marginal intervals is what makes this
+    worth reporting on its own: both gaps move together across dates -- they share a
+    universe, a window and a draw of returns -- so the pairing removes that common
+    variation.  For Expected Shortfall at top-100 the marginal intervals on g_is and
+    g_oos overlap enough to leave the difference ambiguous, while the paired interval
+    is [+3.29, +5.03] percentage points.
+
+    Positive delta_eps means the in-sample gap overstated what the joint program went
+    on to realize.  The sign is not assumed anywhere; it is read off the data.
+    """
+    rows = []
+    for (family, measure, universe), cell in grid.groupby(["family", "measure", "universe"]):
+        paired = (cell["gap_in_rel"] - cell["gap_out_rel"]).to_numpy()
+        mean, lo, hi, se, block = block_bootstrap_mean(paired, SEED)
+        rows.append(
+            {
+                "family": family,
+                "measure": measure,
+                "universe": universe,
+                "delta_eps_mean": mean,
+                "delta_eps_lo": lo,
+                "delta_eps_hi": hi,
+                "delta_eps_se": se,
+                "delta_eps_block": block,
+                "n_dates": cell["date"].nunique(),
+                # Share of dates on which the realized gap exceeded the in-sample one.
+                "frac_negative": float((paired < 0).mean()),
+            }
+        )
+    return _sorted(rows, ["family", "measure", "universe"])
+
+
+def plot_delta_epsilon(table: pd.DataFrame, stem: Path, family: str) -> None:
+    """
+    Delta-epsilon against universe size, one line per risk measure.
+
+    Two panels, not one: see MEASURE_PANELS.  Values are percentage points of the
+    sequential program's risk, since both gaps entering the difference are relative.
+    """
+    table = table[table["family"] == family]
+    if table.empty:
+        return
+    fig, axes = plt.subplots(1, len(MEASURE_PANELS), figsize=(11.0, 4.4), sharex=True)
+
+    for ax, (title, measures, legend_loc) in zip(axes, MEASURE_PANELS):
+        for measure in measures:
+            line = table[table["measure"] == measure].sort_values("universe")
+            if line.empty:
+                continue
+            color = MEASURE_COLORS[measure]
+            ax.plot(
+                line["universe"], 100 * line["delta_eps_mean"],
+                marker=MEASURE_MARKERS[measure], ms=5, color=color,
+                label=MEASURE_LABELS[measure], zorder=3,
+            )
+            ax.fill_between(
+                line["universe"], 100 * line["delta_eps_lo"], 100 * line["delta_eps_hi"],
+                color=color, alpha=0.15, lw=0,
+            )
+        ax.axhline(0.0, color="grey", lw=1.0, zorder=0)
+        ax.set_title(title, fontsize=11)
+        ax.set_xlabel("Universe size")
+        ax.set_xscale("log")
+        ax.set_xticks(list(UNIVERSES))
+        ax.set_xticklabels([str(u) for u in UNIVERSES])
+        ax.set_xticks([], minor=True)
+        ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
+        ax.grid(True, alpha=0.3)
+        ax.legend(fontsize=8, loc=legend_loc, framealpha=0.9)
+        # Labelled on both panels: the two carry the same quantity on deliberately
+        # different scales, and a single left-hand label invites reading the right
+        # panel off the left axis.
+        ax.set_ylabel("In-sample gap not realized, $\\Delta\\epsilon$ (pp)")
+    qualifier = "" if family == "unregularized" else f" ({family} programs)"
+    fig.suptitle(
+        "Part of the joint program's in-sample advantage that is not realized "
+        f"out of sample{qualifier}",
+        fontsize=12,
+    )
+    fig.tight_layout()
+    for ext in ("pdf", "png"):
+        fig.savefig(stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")
+        logger.info("Saved figure: %s", stem.with_suffix(f".{ext}"))
+    plt.close(fig)
+
+
 def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
     summary = summary[summary["family"] == family]
     if summary.empty:
@@ -451,11 +554,11 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
             if line.empty:
                 continue
             ax.plot(
-                line["universe"], line[f"{col}_mean"],
+                line["universe"], 100 * line[f"{col}_mean"],
                 marker="s", ms=5, color=color, zorder=3,
             )
             ax.fill_between(
-                line["universe"], line[f"{col}_lo"], line[f"{col}_hi"],
+                line["universe"], 100 * line[f"{col}_lo"], 100 * line[f"{col}_hi"],
                 color=color, alpha=0.2, lw=0,
             )
         ax.axhline(0.0, color="grey", lw=1.0, zorder=0)
@@ -471,7 +574,7 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
         ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
         ax.grid(True, alpha=0.3)
 
-    axes[0].set_ylabel("Mean (overlay - joint) / overlay")
+    axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     handles = [
         Line2D([], [], color=color, marker="s", label=label)
         for color, label in styles.values()
@@ -570,18 +673,26 @@ def main() -> None:
     reg = regressions(grid)
     overfit = overfitting_table(grid)
 
-    for name, table in (("gap_summary", summary), ("regression", reg), ("overfitting", overfit)):
+    delta_eps = delta_epsilon_table(grid)
+
+    for name, table in (
+        ("gap_summary", summary), ("regression", reg),
+        ("overfitting", overfit), ("delta_epsilon", delta_eps),
+    ):
         table.to_csv(args.out_dir / f"{name}.csv", index=False)
         logger.info("Wrote %s", args.out_dir / f"{name}.csv")
 
     for family in sorted(gaps["family"].unique()):
         suffix = "" if family == "unregularized" else f"_{family}"
         plot(summary, args.out_dir / f"gap_vs_currency_share{suffix}", family)
+        plot_delta_epsilon(delta_eps, args.out_dir / f"delta_epsilon{suffix}", family)
     print(summary.to_string(index=False))
     print()
     print(reg.to_string(index=False))
     print()
     print(overfit.to_string(index=False))
+    print()
+    print(delta_eps.to_string(index=False))
 
 
 if __name__ == "__main__":

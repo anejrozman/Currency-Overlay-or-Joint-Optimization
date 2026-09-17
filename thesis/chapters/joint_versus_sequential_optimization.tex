@@ -28,13 +28,101 @@ measures whose in-sample case appears strongest.
 
 \section{Does Joint Optimization improve Returns?}\label{sec:joint-returns}
 
-From the backtests in \Cref{chap:empirical-analysis-and-baseline-results} we found that joint optimization did 
-not provide much improvement in returns over sequential optimization. To formalize this, we perform a Sharpe 
-ration test of \ref{..} on the realized returns of the joint and sequential optimizers. "Describe the test" 
+The backtests of \Cref{chap:empirical-analysis-and-baseline-results} gave no consistent return advantage
+to joint optimization. To futher inspect this, we test the difference of the two annualized
+Sharpe ratios, 
+\begin{equation*}
+\Delta \coloneqq \mathrm{SR}_J - \mathrm{SR}_O,
+\qquad
+H_0 : \Delta = 0 ,
+\end{equation*} 
+on the realized daily excess returns of the two backtests, net of transaction costs. Two features of the
+setting dictate the choice of test. The two strategies are evaluated on the same dates, over the same
+universe and from the same price data, and differ only in how the weights are chosen, so their return
+series are strongly dependent, with correlations between $0.90$ and $0.99$ across the comparisons reported
+below; this rules out any test that treats the samples as independent. And daily equity returns are
+heavy-tailed and serially dependent, which violates the i.i.d.\ normality assumed by the closed-form test
+of \cite{JobsonKorkie1981} and its correction in \cite{Memmel2003}. We therefore use the studentized
+bootstrap of \cite{LedoitWolf2008}, which is robust to both. The standard error of $\hat\Delta$ follows
+from the delta method applied to the four moments $(\mu_J, \mu_O, \gamma_J, \gamma_O)$ that determine the
+two Sharpe ratios, with a Bartlett HAC estimate of their long-run covariance; its distribution is obtained
+by a circular block bootstrap in which the same index sequence is applied to both return series, so that
+the dependence between the strategies is preserved under resampling. We use blocks of $b = 5$ trading days
+and $B = 4999$ replications on $T = 5935$ daily observations. The test is run on every pair of joint and
+sequential production runs, five risk measures, three universe sizes and both program families, giving
+$27$ comparisons once the three cells whose second-order Expected Shortfall backtests are unavailable are
+dropped. The derivation and the full set of diagnostics are given in Appendix~\ref{app:sharpe_test}.
 
-More details on the test and results can be found in Appendix \ref{app:sharpe_test}. 
-The results show that there is no significant difference in the Sharpe ratio between the two optimizers across all five risk measures and all three universe sizes. 
-This suggests that joint optimization does not provide a statistical benefit in terms of returns over sequential optimization.
+\begin{table}[htbp]
+  \centering
+  \scalebox{0.8}{%
+  \begin{tabular}{lccc|ccc}
+    \toprule
+    & \multicolumn{3}{c|}{\textbf{Unregularized}} & \multicolumn{3}{c}{\textbf{Regularized}} \\
+    \cmidrule(lr){2-4} \cmidrule(lr){5-7}
+    \textbf{Risk Measure} & $\hat{\Delta}$ & $95\%$ CI & $p$ & $\hat{\Delta}$ & $95\%$ CI & $p$ \\
+    \midrule
+    \multicolumn{7}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \midrule
+    Volatility                      & $+0.020$ & $[-0.044,\; 0.087]$ & $0.579$ & $-0.005$ & $[-0.102,\; 0.087]$ & $0.904$ \\
+    Mean Absolute Deviation         & $+0.019$ & $[-0.054,\; 0.092]$ & $0.632$ & $+0.007$ & $[-0.065,\; 0.079]$ & $0.866$ \\
+    Semi-Deviation                  & $-0.006$ & $[-0.086,\; 0.074]$ & $0.895$ & $-0.024$ & $[-0.163,\; 0.094]$ & $0.691$ \\
+    Expected Shortfall              & $+0.002$ & $[-0.093,\; 0.098]$ & $0.970$ & $+0.030$ & $[-0.063,\; 0.124]$ & $0.541$ \\
+    Second-Order Expected Shortfall & $-0.055$ & $[-0.191,\; 0.079]$ & $0.415$ & $-0.117$ & $[-0.318,\; 0.047]$ & $0.209$ \\
+    \midrule
+    \multicolumn{7}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \midrule
+    Volatility                      & $+0.029$ & $[-0.020,\; 0.077]$ & $0.245$ & $-0.000$ & $[-0.060,\; 0.058]$ & $0.988$ \\
+    Mean Absolute Deviation         & $-0.005$ & $[-0.065,\; 0.054]$ & $0.873$ & $+0.025$ & $[-0.028,\; 0.080]$ & $0.380$ \\
+    Semi-Deviation                  & $+0.040$ & $[-0.017,\; 0.097]$ & $0.183$ & $-0.007$ & $[-0.091,\; 0.077]$ & $0.871$ \\
+    Expected Shortfall              & $-0.023$ & $[-0.114,\; 0.060]$ & $0.616$ & $-0.000$ & $[-0.098,\; 0.091]$ & $1.000$ \\
+    Second-Order Expected Shortfall & $+0.067$ & $[-0.098,\; 0.228]$ & $0.424$ & \multicolumn{3}{|c}{--} \\
+    \midrule
+    \multicolumn{7}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \midrule
+    Volatility                      & $+0.018$ & $[-0.022,\; 0.056]$ & $0.376$ & $-0.009$ & $[-0.066,\; 0.045]$ & $0.748$ \\
+    Mean Absolute Deviation         & $-0.002$ & $[-0.059,\; 0.050]$ & $0.940$ & $+0.015$ & $[-0.044,\; 0.074]$ & $0.645$ \\
+    Semi-Deviation                  & $+0.017$ & $[-0.033,\; 0.067]$ & $0.510$ & $+0.007$ & $[-0.060,\; 0.076]$ & $0.839$ \\
+    Expected Shortfall              & $+0.036$ & $[-0.047,\; 0.117]$ & $0.395$ & $+0.017$ & $[-0.103,\; 0.128]$ & $0.760$ \\
+    Second-Order Expected Shortfall & \multicolumn{3}{c}{--}                  & \multicolumn{3}{|c}{--} \\
+    \bottomrule
+  \end{tabular}%
+  }
+  \caption{Tests of the difference in Sharpe ratio between the joint and the sequential program.}
+  \label{tab:sharpe-test}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:sharpe-test} reports the difference in annualized Sharpe ratio between the joint and the
+  sequential program, $\hat{\Delta} = \widehat{\mathrm{SR}}_J - \widehat{\mathrm{SR}}_O$, so that a positive
+  entry favours joint optimization. Each cell is a separate application of the studentized circular block
+  bootstrap test of \cite{LedoitWolf2008} to the two realized daily return series, net of transaction costs,
+  over the common out-of-sample period from June 2000 to June 2023 ($T = 5935$ daily observations), with
+  block length $b = 5$ and $B = 4999$ replications. The interval is obtained by inverting the studentized
+  bootstrap quantiles and the $p$-value is two-sided. Entries marked -- are cells whose second-order
+  Expected Shortfall backtest is unavailable. No entry in the table is significant at the $10\%$ level.
+  Details of the test are given in Appendix~\ref{app:sharpe_test}.
+  \end{minipage}
+\end{table}
+
+The results are reported in \Cref{tab:sharpe-test}. Not one of the $27$ comparisons is significant, at the
+$5\%$ level or at the $10\%$: the smallest $p$-value is $0.183$ and the median $0.645$, the point estimates
+are as often negative as positive, $15$ of $27$ favouring the joint program, with a median difference of
+$+0.007$ annualized Sharpe units, and there is no systematic variation across risk measures, universe sizes
+or families. Repeating every test with block lengths from $b = 1$ to $b = 63$ trading days leaves all of
+them insignificant.
+
+This is not evidence that the two approaches deliver the same risk-adjusted return; it is a statement about
+what the Sharpe ratio can resolve on a sample of this length. The intervals have a median half-width of
+$0.073$, so they exclude improvements above roughly $0.13$ Sharpe units, while the volatility reduction the
+joint program actually achieves at the top-$10$ universe, between $2.5\%$ and $5.7\%$ in relative terms,
+implies a Sharpe improvement of about $0.003$, two orders of magnitude below what these intervals can
+exclude. An effect of the size that is present could not have been detected however the test were
+constructed. That the same bootstrap applied to the same return series does find differences in volatility
+and in Expected Shortfall, with intervals clear of zero at the top-$10$ and top-$50$ universes, confirms
+that the procedure detects effects in these data whenever the estimand is one the sample can pin down. The
+remainder of this chapter therefore evaluates joint optimization on the quantity it actually targets, the
+risk measure itself.
 
 
 \section{Advantage of Joint Optimization for Risk Minimization}\label{sec:joint-in-sample-case}
@@ -95,16 +183,37 @@ tail scenarios that bind at the optimum, so the optimism absorbed by the optimiz
 volatile than under variance at comparable sample sizes (Lim et al., 2011; Gotoh et al., 2013), and we
 expect the $\Delta\epsilon$ estimates to be correspondingly noisier for that measure.
 
-We perform the following gap analysis to investigate the out-of-sample performance of the joint and sequential programs with respect to the risk measure they are minimizing, therefore we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the quarterly rebalancing dates the joint and the sequential overlay program of a given risk measure are solved on the same ten-year estimation window, and under the same budget and leverage constraints from \Cref{chap:empirical-analysis-and-baseline-results}. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\hat f$ and $f^{oos}$ for each of the two programs. Both gaps are reported relative to the risk of the sequential program, $g^{is} / \hat f(\hat{\bm{\theta}}_O)$ and $g^{oos} / f^{oos}(\hat{\bm{\theta}}_O)$ respectively, so they are to be interpreted as the risk reduction achieved by the joint program over the sequential program in percentage points. For each risk measure and universe size we report the mean of the risk reduction across the rebalancing dates together with a circular block bootstrap confidence interval at 95\%, using $10{,}000$ resamples and a block length chosen by the Politis--White rule \cite{ids}.
+We perform the following gap analysis to investigate the out-of-sample performance of the joint and sequential programs with respect to the risk measure they are minimizing, therefore we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the quarterly rebalancing dates the joint and the sequential overlay program of a given risk measure are solved on the same ten-year estimation window, and under the same budget and leverage constraints from \Cref{chap:empirical-analysis-and-baseline-results}. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\hat f$ and $f^{oos}$ for each of the two programs. Both gaps are reported relative to the risk of the sequential program, $g^{is} / \hat f(\hat{\bm{\theta}}_O)$ and $g^{oos} / f^{oos}(\hat{\bm{\theta}}_O)$ respectively, so they are to be interpreted as the risk reduction achieved by the joint program over the sequential program, expressed as a percentage of the latter's risk. For each risk measure and universe size we report the mean of the risk reduction across the rebalancing dates together with a circular block bootstrap confidence interval at 95\%, using $10{,}000$ resamples and a block length chosen by the Politis--White rule \cite{PolitisWhite2004, PattonPolitisWhite2009}. 
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf}
   \caption{In-sample and out-of-sample gap between the joint and sequential programs, by risk measure and universe size.}
   \label{fig:gap-measures}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Unregularized programs, as a percentage of the sequential program's risk, with $95\%$ circular block bootstrap intervals. The in-sample series is positive everywhere by \eqref{eq:gap-in-sample}; the vertical distance to the out-of-sample series is the part that is not realized, quantified in \Cref{fig:delta-epsilon}. Out of sample the advantage is significant at top-$10$ for every measure except second-order Expected Shortfall, at top-$50$ for volatility and semi-deviation only, and at top-$100$ for none of the five.
+  \end{minipage}
 \end{figure}
 
-We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for all risk measures across all universe sizes, which is expected, and that it is largest for the two considered tail measures. The out-of-sample gap is smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being for the variance and semi-variance measures at the smallest universe size. 
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/delta_epsilon.pdf}
+  \caption{The part of the joint program's in-sample advantage that is not realized out of sample, $\Delta\epsilon$, by risk measure and universe size.}
+  \label{fig:delta-epsilon}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Unregularized programs, percentage points of the sequential program's risk. $\Delta\epsilon = g^{is} - g^{oos}$ of \eqref{eq:gap-decomposition}, estimated by bootstrapping the paired difference at each rebalancing date rather than differencing two separate intervals. The two panels carry the same quantity on different scales. TODO: expand.
+  \end{minipage}
+\end{figure}
+
+We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for all risk measures across all universe sizes, which is expected, and that it is largest for the two considered tail measures. The out-of-sample gap is smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being for the variance and semi-variance measures at the smallest universe size. Out of sample the picture depends on the size of the investment universe. At the top-$10$ universe the advantage is significant for four of the five risk measures, the exception being second-order Expected Shortfall; at top-$50$ only volatility and semi-deviation survive, and at top-$100$ none of the five do. The in-sample series separates the two groups of risk measures in a second way. For the deviation measures the in-sample advantage falls sharply as the universe grows, from $2.45\%$ to $0.63\%$ for volatility, from $2.67\%$ to $1.26\%$ for mean absolute deviation and from $3.08\%$ to $1.37\%$ for semi-deviation, whereas for the two tail measures it barely moves, from $3.95\%$ to $3.49\%$ for Expected Shortfall and from $7.73\%$ to $5.81\%$ for second-order Expected Shortfall. Read together with the out-of-sample series this produces an inversion. Ordered by their in-sample advantage at top-$10$, the measures run second-order Expected Shortfall, Expected Shortfall, semi-deviation, mean absolute deviation and volatility, while the share of that advantage which is actually realized runs broadly the other way, at $23\%$, $70\%$, $119\%$, $81\%$ and $133\%$ respectively (Spearman $\rho = -0.90$). The risk measures whose in-sample case is strongest are those that keep the least of it. Five risk measures is a small sample on which to rest an ordering, and we return to it in \Cref{sec:mechanism-level} with an experiment that varies the same quantity within a single risk measure.
+
+\Cref{fig:gap-measures} shows both gaps, but the quantity that \eqref{eq:gap-decomposition} turns on is their difference, and that difference cannot be read off the figure with any precision. The two series move together across rebalancing dates, sharing a universe, an estimation window and a draw of returns, so differencing their confidence intervals discards the pairing and overstates the uncertainty. For Expected Shortfall at the top-$100$ universe the in-sample gap is $[2.81, 4.15]$ and the out-of-sample gap $[-1.54, 0.32]$, which differenced in that way would leave even the sign of $\Delta\epsilon$ open; bootstrapping the paired difference at each rebalancing date instead gives $[3.28, 5.03]$ percentage points. \Cref{fig:delta-epsilon} reports $\Delta\epsilon$ obtained this way, with the deviation and the tail measures on separate panels because the latter run an order of magnitude higher.
+
+Two features stand out. The ordering across risk measures follows how much of the estimation window each objective uses: second-order Expected Shortfall forfeits between $5.8$ and $8.5$ percentage points and Expected Shortfall between $1.2$ and $4.2$, while the three deviation measures never leave a band of $\pm 1.5$ percentage points. Second, $\Delta\epsilon$ grows with the universe size for Expected Shortfall, from $1.17$ to $2.36$ to $4.16$ percentage points, with its confidence interval tightening as it does, while the deviation measures stay flat. The loss therefore has two distinct sources, the number of assets whose weights must be estimated and the share of the sample the risk measure is willing to look at, and only the second separates the tail measures from the deviation measures. We do not read the two negative points as evidence that joint optimization does better out of sample than in: volatility and semi-deviation at top-$10$ both have intervals that cross zero, and no cell in the figure is significantly negative. We also note that $\Delta\epsilon$ is negative on between a quarter and two fifths of the individual rebalancing dates even in the cells whose mean is clearly positive, so what the figure reports is a tendency rather than a rule.
 
 \newpage
 \section{Tail Depth}\label{sec:mechanism-level}
@@ -128,8 +237,9 @@ We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimiza
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_universe.pdf}
   \caption{The same analysis, just visualized like the previous figures.}
   \label{fig:gap-vs-level-universe}
-  \vspace{0.5em}
+  \vspace{0.5em} 
 \end{figure}
+
 
 
 \section{Deviation Measures}\label{sec:mechanism-measures}
