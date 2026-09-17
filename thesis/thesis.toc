@@ -25,7 +25,7 @@
 \contentsline {section}{\numberline {5.3}Backtest Results of Mean Absolute Deviation Optimization Approaches}{20}{section.5.3}%
 \contentsline {section}{\numberline {5.4}The Effects of Universe Size on Portfolio Performance}{25}{section.5.4}%
 \contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{28}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Does Joint Optimization improve Returns?}{28}{section.6.1}%
+\contentsline {section}{\numberline {6.1}Does Joint Optimization improve Risk Adjusted Returns?}{28}{section.6.1}%
 \contentsline {section}{\numberline {6.2}Advantage of Joint Optimization for Risk Minimization}{30}{section.6.2}%
 \contentsline {section}{\numberline {6.3}Tail Depth}{33}{section.6.3}%
 \contentsline {section}{\numberline {6.4}Deviation Measures}{33}{section.6.4}%

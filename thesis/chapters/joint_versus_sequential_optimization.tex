@@ -26,33 +26,30 @@ program has to fit noise rather than of its economic value, so that joint
 optimization is justified in small universes and least of all for the tail
 measures whose in-sample case appears strongest.
 
-\section{Does Joint Optimization improve Returns?}\label{sec:joint-returns}
+\section{Does Joint Optimization improve Risk Adjusted Returns?}\label{sec:joint-returns}
 
-The backtests of \Cref{chap:empirical-analysis-and-baseline-results} gave no consistent return advantage
-to joint optimization. To futher inspect this, we test the difference of the two annualized
+The backtests of \Cref{chap:empirical-analysis-and-baseline-results} showed no consistent return advantage
+of the joint program over the overlay. To futher inspect this, we test the difference of the two annualized
 Sharpe ratios, 
 \begin{equation*}
 \Delta \coloneqq \mathrm{SR}_J - \mathrm{SR}_O,
 \qquad
 H_0 : \Delta = 0 ,
 \end{equation*} 
-on the realized daily excess returns of the two backtests, net of transaction costs. Two features of the
-setting dictate the choice of test. The two strategies are evaluated on the same dates, over the same
+on the realized daily excess returns of the two backtests, net of transaction costs. Two considerations in this
+setting decide our choice of test. The pairs of strategies are evaluated on the same dates, over the same
 universe and from the same price data, and differ only in how the weights are chosen, so their return
-series are strongly dependent, with correlations between $0.90$ and $0.99$ across the comparisons reported
-below; this rules out any test that treats the samples as independent. And daily equity returns are
-heavy-tailed and serially dependent, which violates the i.i.d.\ normality assumed by the closed-form test
-of \cite{JobsonKorkie1981} and its correction in \cite{Memmel2003}. We therefore use the studentized
-bootstrap of \cite{LedoitWolf2008}, which is robust to both. The standard error of $\hat\Delta$ follows
-from the delta method applied to the four moments $(\mu_J, \mu_O, \gamma_J, \gamma_O)$ that determine the
-two Sharpe ratios, with a Bartlett HAC estimate of their long-run covariance; its distribution is obtained
-by a circular block bootstrap in which the same index sequence is applied to both return series, so that
-the dependence between the strategies is preserved under resampling. We use blocks of $b = 5$ trading days
-and $B = 4999$ replications on $T = 5935$ daily observations. The test is run on every pair of joint and
-sequential production runs, five risk measures, three universe sizes and both program families, giving
-$27$ comparisons once the three cells whose second-order Expected Shortfall backtests are unavailable are
-dropped. The derivation and the full set of diagnostics are given in Appendix~\ref{app:sharpe_test}.
-
+series are dependent, this rules out any test that treats the samples as independent. 
+And daily equity returns are
+heavy-tailed and serially dependent \cite{smt}, which violates the i.i.d.\ normality that is commonly assumed by closed-form tests, for example
+\cite{JobsonKorkie1981, Memmel2003}. We therefore use the studentized bootstrap test presented in
+\cite{LedoitWolf2008}, which resamples the two series in blocks and applies the same
+blocks to both, so that neither the serial dependence within a series nor the dependence
+between the two optimizers is affected by the resampling. We use blocks of $5$ trading days
+and $4999$ replications on $5935$ daily observations. The test is run on every pair of joint and
+overlay optimizers (regularized and unregularized), five risk measures, and all three universe sizes, giving us
+$30$ comparisons in total. A more deatiled description of the test and its results are given in Appendix~\ref{app:sharpe_test}.
+ 
 \begin{table}[htbp]
   \centering
   \scalebox{0.8}{%
@@ -88,43 +85,30 @@ dropped. The derivation and the full set of diagnostics are given in Appendix~\r
     \bottomrule
   \end{tabular}%
   }
-  \caption{Tests of the difference in Sharpe ratio between the joint and the sequential program.}
+  \caption{Tests of the difference in Sharpe ratio between the joint and the currency overlay program.}
   \label{tab:sharpe-test}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     Table \ref{tab:sharpe-test} reports the difference in annualized Sharpe ratio between the joint and the
-  sequential program, $\hat{\Delta} = \widehat{\mathrm{SR}}_J - \widehat{\mathrm{SR}}_O$, so that a positive
-  entry favours joint optimization. Each cell is a separate application of the studentized circular block
-  bootstrap test of \cite{LedoitWolf2008} to the two realized daily return series, net of transaction costs,
-  over the common out-of-sample period from June 2000 to June 2023 ($T = 5935$ daily observations), with
-  block length $b = 5$ and $B = 4999$ replications. The interval is obtained by inverting the studentized
-  bootstrap quantiles and the $p$-value is two-sided. Entries marked -- are cells whose second-order
-  Expected Shortfall backtest is unavailable. No entry in the table is significant at the $10\%$ level.
-  Details of the test are given in Appendix~\ref{app:sharpe_test}.
+  overlay programs, $\hat{\Delta} = \widehat{\mathrm{SR}}_J - \widehat{\mathrm{SR}}_O$, the $95\%$ confidence intervals are shown in brackets and 
+  the $p$-values of the studentized circular block bootstrap test of \cite{LedoitWolf2008} are reported in the last column.
+  Each cell is a separate application of the test to the two realized daily return series, net of transaction costs,
+  over the common out-of-sample period from June 2000 to June 2023, with block length of $5$ and $4999$ replications.
   \end{minipage}
 \end{table}
 
-The results are reported in \Cref{tab:sharpe-test}. Not one of the $27$ comparisons is significant, at the
-$5\%$ level or at the $10\%$: the smallest $p$-value is $0.183$ and the median $0.645$, the point estimates
-are as often negative as positive, $15$ of $27$ favouring the joint program, with a median difference of
-$+0.007$ annualized Sharpe units, and there is no systematic variation across risk measures, universe sizes
-or families. Repeating every test with block lengths from $b = 1$ to $b = 63$ trading days leaves all of
-them insignificant.
-
-This is not evidence that the two approaches deliver the same risk-adjusted return; it is a statement about
-what the Sharpe ratio can resolve on a sample of this length. The intervals have a median half-width of
-$0.073$, so they exclude improvements above roughly $0.13$ Sharpe units, while the volatility reduction the
-joint program actually achieves at the top-$10$ universe, between $2.5\%$ and $5.7\%$ in relative terms,
-implies a Sharpe improvement of about $0.003$, two orders of magnitude below what these intervals can
-exclude. An effect of the size that is present could not have been detected however the test were
-constructed. That the same bootstrap applied to the same return series does find differences in volatility
-and in Expected Shortfall, with intervals clear of zero at the top-$10$ and top-$50$ universes, confirms
-that the procedure detects effects in these data whenever the estimand is one the sample can pin down. The
-remainder of this chapter therefore evaluates joint optimization on the quantity it actually targets, the
-risk measure itself.
-
-
+The results are reported in \Cref{tab:sharpe-test}. None of the $30$ comparisons are statistically significant,
+at the $5\%$ level or at the $10\%$. The smallest $p$-value is $0.183$ and the average is $0.648$, and the point
+estimates have an average difference of $+0.005$ annualized Sharpe units. The estimates are also as often
+negative as positive, $15$ of the $30$ favouring the joint program. The intervals tighten as the universe grows, with an average half-width of $0.102$ at
+top-$10$ against $0.065$ at top-$100$. The two tail measures have the widest intervals, an
+  average half-width of $0.117$ against $0.067$ for the others. Regularization doesn't change the results. We therefore find no statistically
+significant return advantage for joint optimization. The next question we ask is what benefit does joint
+optimization actually provide? In the remainder of the chapter we investigate what effect it has on the
+risk of the constructed portfolios, specifically the specific risk measures the optimizers are minimizing.
+ 
+\newpage
 \section{Advantage of Joint Optimization for Risk Minimization}\label{sec:joint-in-sample-case}
 
 In-sample, joint optimization provides a benefit over sequential optimization by construction when it comes to minimizing 
