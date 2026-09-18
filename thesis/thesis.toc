@@ -61,12 +61,15 @@
 \contentsline {appendix}{\chapternumberline {C}TODO: Appendix C Title}{54}{appendix.C}%
 \contentsline {appendix}{\chapternumberline {D}TODO: Appendix D Title}{55}{appendix.D}%
 \contentsline {appendix}{\chapternumberline {E}Testing Differences in the Sharpe Ratio}{56}{appendix.E}%
-\contentsline {section}{\numberline {E.1}The Test and Why It Is Used}{56}{section.E.1}%
-\contentsline {section}{\numberline {E.2}Implementation}{56}{section.E.2}%
-\contentsline {section}{\numberline {E.3}Results and Interpretation}{57}{section.E.3}%
-\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{58}{appendix.F}%
-\contentsline {appendix}{\chapternumberline {G}Additional Results}{60}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{60}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{64}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{65}{section.G.3}%
-\contentsline {chapter}{Bibliography}{67}{appendix*.11}%
+\contentsline {section}{\numberline {E.1}Setup and Notation}{56}{section.E.1}%
+\contentsline {section}{\numberline {E.2}The Estimator and Its Limiting Distribution}{56}{section.E.2}%
+\contentsline {subsection}{\numberline {E.2.1}Delta method and gradient}{57}{subsection.E.2.1}%
+\contentsline {subsection}{\numberline {E.2.2}The long-run covariance}{57}{subsection.E.2.2}%
+\contentsline {section}{\numberline {E.3}The Studentized Circular Block Bootstrap}{57}{section.E.3}%
+\contentsline {section}{\numberline {E.4}Results}{58}{section.E.4}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{60}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{62}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{62}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{66}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{67}{section.G.3}%
+\contentsline {chapter}{Bibliography}{69}{appendix*.11}%

@@ -29,11 +29,20 @@ series, non-normal and serially correlated.
     2. HAC standard error by the delta method.  Each ratio is a smooth function
        of a small vector of moments, so Var(Delta) = grad' Psi grad / T with Psi
        a Newey-West (Bartlett kernel) estimate of the long-run covariance of the
-       moment contributions.
+       moment contributions.  Ledoit and Wolf use a prewhitened kernel with an
+       Andrews-type automatic bandwidth; the simpler Bartlett estimator with the
+       4(T/100)^(2/9) rule is used here, which truncates at 10 lags against the
+       O(T^(1/3)) ~ 18 the optimal rate would suggest and so understates Psi
+       slightly when the autocovariances are positive, as they are here.
     3. Circular block bootstrap in which the SAME resampled indices are applied
        to both series, preserving the dependence between them.  On each
-       replication the studentized statistic (Delta* - Delta)/se* is formed, and
-       the p-value is the fraction of |t*| at least as large as the observed |t|.
+       replication the studentized statistic (Delta* - Delta)/se* is formed,
+       with se* from the Gotze-Kunsch block-sum estimator rather than the HAC
+       kernel -- see _blocksum_se.  Centring at Delta rather than at 0 does not
+       impose the null; it makes t* mimic the pivot (Delta_hat - Delta)/se, and
+       not having to impose the null is the point of the procedure.  The
+       p-value and the 95% interval are both obtained by SYMMETRIC inversion of
+       the |t*| distribution, so they are the same test.
 
 Sharpe and Sortino are handled this way in full.  The Expected Shortfall ratio
 is not: see below.
@@ -185,6 +194,32 @@ def _hac_se(r1: np.ndarray, r2: np.ndarray, ratio: str, bandwidth: int | None = 
     return float(np.sqrt(var)) if var > 0 else float("nan")
 
 
+def _blocksum_se(r1: np.ndarray, r2: np.ndarray, ratio: str, block: int) -> float:
+    """
+    Delta-method standard error using the Gotze-Kunsch block-sum estimate of the
+    long-run covariance,
+
+        Psi* = l^-1 sum_j zeta_j zeta_j',   zeta_j = b^-1/2 sum_{t in block j} c_t.
+
+    This is the estimator to use INSIDE the bootstrap.  A resample is a
+    concatenation of independently drawn blocks, so its autocovariance across a
+    block junction is zero by construction; running a HAC kernel on it (with a
+    bandwidth that here exceeds the block length) would spend most of its weight
+    estimating that zero and would break the second-order refinement the
+    studentized block bootstrap is meant to deliver.
+    """
+    grad, contrib = _moment_parts(r1, r2, ratio)
+    T = len(r1)
+    n_full = T // block                       # whole blocks only
+    if n_full < 2:
+        return float("nan")
+    zeta = contrib[: n_full * block].reshape(n_full, block, -1).sum(axis=1) / np.sqrt(block)
+    zeta = zeta - zeta.mean(axis=0)
+    psi = zeta.T @ zeta / n_full
+    var = float(grad @ psi @ grad / T)
+    return float(np.sqrt(var)) if var > 0 else float("nan")
+
+
 # Bootstrap
 
 
@@ -211,19 +246,28 @@ def studentized_test(r1, r2, ratio, block, n_boot, seed=0) -> dict:
     stats = np.empty(n_boot)
     for i, rows in enumerate(idx):
         a, b = r1[rows], r2[rows]
-        se_b = _hac_se(a, b, ratio)
+        se_b = _blocksum_se(a, b, ratio, block)
         stats[i] = (fn(a) - fn(b) - delta) / se_b if se_b > 0 else np.nan
     stats = stats[np.isfinite(stats)]
 
-    lo_q, hi_q = np.percentile(stats, [2.5, 97.5])
+    if not (se > 0) or stats.size == 0:
+        return {"delta": delta, "se": se, "t": float("nan"), "p_value": float("nan"),
+                "ci_lo": float("nan"), "ci_hi": float("nan"), "method": "LW studentized"}
+
+    t_obs = delta / se
+    # Symmetric inversion for BOTH the p-value and the interval, so the two are
+    # the same test: the interval excludes zero exactly when p < alpha.  The
+    # (+1)/(B+1) correction keeps the p-value exact under the null.
+    n_eff = stats.size
+    p_value = (float((np.abs(stats) >= abs(t_obs)).sum()) + 1.0) / (n_eff + 1.0)
+    q_sym = float(np.quantile(np.abs(stats), 0.95))
     return {
         "delta": delta,
         "se": se,
-        "t": delta / se if se > 0 else float("nan"),
-        "p_value": float((np.abs(stats) >= abs(delta / se)).mean()) if se > 0 else float("nan"),
-        # Studentized intervals invert, so the upper quantile gives the lower bound.
-        "ci_lo": delta - hi_q * se,
-        "ci_hi": delta - lo_q * se,
+        "t": t_obs,
+        "p_value": p_value,
+        "ci_lo": delta - q_sym * se,
+        "ci_hi": delta + q_sym * se,
         "method": "LW studentized",
     }
 
@@ -241,8 +285,11 @@ def percentile_test(r1, r2, ratio, block, n_boot, seed=0) -> dict:
     draws = np.array([fn(r1[rows]) - fn(r2[rows]) for rows in idx])
     draws = draws[np.isfinite(draws)]
     lo, hi = np.percentile(draws, [2.5, 97.5])
-    # Bootstrap p-value by interval inversion: twice the smaller tail mass.
-    p = 2.0 * min((draws <= 0).mean(), (draws >= 0).mean())
+    # Bootstrap p-value by interval inversion: twice the smaller tail mass,
+    # with the same (+1)/(B+1) correction used by the studentized test.
+    n_eff = draws.size
+    p = 2.0 * min((float((draws <= 0).sum()) + 1.0) / (n_eff + 1.0),
+                  (float((draws >= 0).sum()) + 1.0) / (n_eff + 1.0))
     return {
         "delta": delta, "se": float(draws.std(ddof=1)), "t": float("nan"),
         "p_value": float(min(p, 1.0)), "ci_lo": lo, "ci_hi": hi,

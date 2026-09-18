@@ -1,5 +1,17 @@
 \begin{thebibliography}{10}
 
+\bibitem{Andrews1991}
+Donald W.~K. Andrews.
+\newblock Heteroskedasticity and autocorrelation consistent covariance matrix
+  estimation.
+\newblock {\em Econometrica}, 59(3):817--858, 1991.
+
+\bibitem{AndrewsMonahan1992}
+Donald W.~K. Andrews and J.~Christopher Monahan.
+\newblock An improved heteroskedasticity and autocorrelation consistent
+  covariance matrix estimator.
+\newblock {\em Econometrica}, 60(4):953--966, 1992.
+
 \bibitem{CoherentMeasuresOfRisk}
 Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath.
 \newblock Coherent measures of risk.
@@ -36,6 +48,12 @@ Andrea Frazzini, Ronen Israel, and Tobias~J. Moskowitz.
 \bibitem{goldberg2013minimizingshortfall}
 Lisa~R. Goldberg, Michael~Y. Hayes, and Ola Mahmoud.
 \newblock Minimizing shortfall, 2013.
+
+\bibitem{GotzeKunsch1996}
+Friedrich G{\"o}tze and Hans~R. K{\"u}nsch.
+\newblock Second-order correctness of the blockwise bootstrap for stationary
+  observations.
+\newblock {\em The Annals of Statistics}, 24(5):1914--1933, 1996.
 
 \bibitem{JobsonKorkie1981}
 J.~D. Jobson and Bob~M. Korkie.
@@ -83,6 +101,11 @@ Jiahan Li.
 \newblock {\em Journal of Business \& Economic Statistics}, 33(3):381--392,
   2015.
 
+\bibitem{Lo2002}
+Andrew~W. Lo.
+\newblock The statistics of {S}harpe ratios.
+\newblock {\em Financial Analysts Journal}, 58(4):36--52, 2002.
+
 \bibitem{common_risk_factors_currency_markets}
 Hanno Lustig, Nikolai Roussanov, and Adrien Verdelhan.
 \newblock Common risk factors in currency markets.
@@ -120,6 +143,12 @@ Christopher~J. Neely, Paul~A. Weller, and Joshua~M. Ulrich.
 \newblock {\em Journal of Financial and Quantitative Analysis}, 44(2):467--488,
   2009.
 
+\bibitem{NeweyWest1987}
+Whitney~K. Newey and Kenneth~D. West.
+\newblock A simple, positive semi-definite, heteroskedasticity and
+  autocorrelation consistent covariance matrix.
+\newblock {\em Econometrica}, 55(3):703--708, 1987.
+
 \bibitem{QuantitativeRiskManagement2016}
 Johanna~G. NeÅ¡LehovÃ¡.
 \newblock Quantitative risk management: Concepts, techniques and tools , by
@@ -133,6 +162,12 @@ Andrew Patton, Dimitris~N. Politis, and Halbert White.
 \newblock Correction to ``automatic block-length selection for the dependent
   bootstrap'' by d. politis and h. white.
 \newblock {\em Econometric Reviews}, 28(4):372--375, 2009.
+
+\bibitem{PolitisRomano1992}
+Dimitris~N. Politis and Joseph~P. Romano.
+\newblock A circular block-resampling procedure for stationary data.
+\newblock In Raoul LePage and Lynne Billard, editors, {\em Exploring the Limits
+  of Bootstrap}, pages 263--270. Wiley, New York, 1992.
 
 \bibitem{PolitisWhite2004}
 Dimitris~N. Politis and Halbert White.
