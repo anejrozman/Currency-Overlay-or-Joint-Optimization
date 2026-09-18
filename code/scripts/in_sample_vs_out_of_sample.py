@@ -483,10 +483,22 @@ def delta_epsilon_table(grid: pd.DataFrame) -> pd.DataFrame:
 
 def plot_delta_epsilon(table: pd.DataFrame, stem: Path, family: str) -> None:
     """
-    Delta-epsilon against universe size, one line per risk measure.
+    The unrealized part of the joint program's advantage, against universe size.
 
-    Two panels, not one: see MEASURE_PANELS.  Values are percentage points of the
-    sequential program's risk, since both gaps entering the difference are relative.
+    What is plotted per date is the difference of the two RELATIVE gaps,
+
+        g_is_rel - g_out_rel
+            = g_is / f_is(theta_O)  -  g_oos / f_oos(theta_O),
+
+    which is not the absolute delta_eps of the decomposition divided by anything:
+    the two terms carry different denominators, the overlay's in-sample risk and
+    its out-of-sample risk.  The two coincide only if the overlay itself has no
+    optimism, which is the very thing this section measures and finds non-zero.
+    It is still exactly "percentage advantage in sample minus percentage advantage
+    out of sample", which is the quantity the argument uses, and being a difference
+    of two ratios its unit is percentage points.
+
+    Two panels, not one: see MEASURE_PANELS.
     """
     table = table[table["family"] == family]
     if table.empty:
@@ -521,11 +533,11 @@ def plot_delta_epsilon(table: pd.DataFrame, stem: Path, family: str) -> None:
         # Labelled on both panels: the two carry the same quantity on deliberately
         # different scales, and a single left-hand label invites reading the right
         # panel off the left axis.
-        ax.set_ylabel("In-sample gap not realized, $\\Delta\\epsilon$ (pp)")
+        ax.set_ylabel(r"$\tilde{g}^{\mathrm{IS}} - \tilde{g}^{\mathrm{OOS}}$ (pp)")
     qualifier = "" if family == "unregularized" else f" ({family} programs)"
     fig.suptitle(
-        "Part of the joint program's in-sample advantage that is not realized "
-        f"out of sample{qualifier}",
+        "Unrealized in-sample advantage of Joint optimization across Risk Measures "
+        f"and Investable Universe Sizes{qualifier}",
         fontsize=12,
     )
     fig.tight_layout()
@@ -539,54 +551,77 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
     summary = summary[summary["family"] == family]
     if summary.empty:
         return
-    fig, axes = plt.subplots(
-        1, len(MEASURES), figsize=(4.33 * len(MEASURES), 4.4), sharex=True, sharey=True
-    )
+
+    # Two rows rather than one, so the panels are large enough to read.  The
+    # deviation measures occupy the top row and the two tail measures the
+    # bottom, which is the split the section's argument turns on.  Each row
+    # shares a y axis; the rows do not share one with each other, because the
+    # tail measures run several times higher and would flatten the top row.
+    rows = (("mv", "mad", "smv"), ("es", "soes"))
+    # Six columns lets the two bottom panels sit centred under the three above:
+    # the top row spans (0,2), (2,4), (4,6) and the bottom row (1,3), (3,5).
+    spans = ((0, 2, 4), (1, 3))
+
+    fig = plt.figure(figsize=(13.0, 8.6))
+    grid = fig.add_gridspec(2, 6, hspace=0.32, wspace=0.55)
     styles = {"gap_in_rel": ("C0", "In-sample"), "gap_out_rel": ("C3", "Out-of-sample")}
 
-    for ax, measure in zip(axes, MEASURES):
-        part = summary[summary["measure"] == measure]
-        # Grid arm only: one point per universe size, plotted against the asset
-        # universe rather than the currency share.  The currency arm is still
-        # solved and summarised into gap_summary.csv, it is simply not drawn.
-        line = part[part["arm"] == "grid"].sort_values("universe")
-        for col, (color, label) in styles.items():
-            if line.empty:
-                continue
-            ax.plot(
-                line["universe"], 100 * line[f"{col}_mean"],
-                marker="s", ms=5, color=color, zorder=3,
+    axes_by_row = []
+    for r, (measures, starts) in enumerate(zip(rows, spans)):
+        row_axes = []
+        for c, measure in zip(starts, measures):
+            ax = fig.add_subplot(
+                grid[r, c:c + 2],
+                sharey=row_axes[0] if row_axes else None,
             )
-            ax.fill_between(
-                line["universe"], 100 * line[f"{col}_lo"], 100 * line[f"{col}_hi"],
-                color=color, alpha=0.2, lw=0,
-            )
-        ax.axhline(0.0, color="grey", lw=1.0, zorder=0)
-        ax.set_title(MEASURE_LABELS[measure], fontsize=11)
-        ax.set_xlabel("Universe size")
-        # Log spacing keeps 10/50/100 legible, but the decade ticks a log axis
-        # picks by default (10, 100) would drop the 50, so label the three
-        # universes explicitly and drop the minor ticks between them.
-        ax.set_xscale("log")
-        ax.set_xticks(list(UNIVERSES))
-        ax.set_xticklabels([str(u) for u in UNIVERSES])
-        ax.set_xticks([], minor=True)
-        ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
-        ax.grid(True, alpha=0.3)
+            row_axes.append(ax)
 
-    axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
+            part = summary[summary["measure"] == measure]
+            # Grid arm only: one point per universe size, plotted against the
+            # asset universe rather than the currency share.  The currency arm
+            # is still solved and summarised into gap_summary.csv, it is simply
+            # not drawn.
+            line = part[part["arm"] == "grid"].sort_values("universe")
+            for col, (color, _label) in styles.items():
+                if line.empty:
+                    continue
+                ax.plot(
+                    line["universe"], 100 * line[f"{col}_mean"],
+                    marker="s", ms=5, color=color, zorder=3,
+                )
+                ax.fill_between(
+                    line["universe"], 100 * line[f"{col}_lo"], 100 * line[f"{col}_hi"],
+                    color=color, alpha=0.2, lw=0,
+                )
+            ax.axhline(0.0, color="grey", lw=1.0, zorder=0)
+            ax.set_title(MEASURE_LABELS[measure], fontsize=11)
+            ax.set_xlabel("Universe size")
+            # Log spacing keeps 10/50/100 legible, but the decade ticks a log
+            # axis picks by default (10, 100) would drop the 50, so label the
+            # three universes explicitly and drop the minor ticks between them.
+            ax.set_xscale("log")
+            ax.set_xticks(list(UNIVERSES))
+            ax.set_xticklabels([str(u) for u in UNIVERSES])
+            ax.set_xticks([], minor=True)
+            ax.set_xlim(min(UNIVERSES) * 0.8, max(UNIVERSES) * 1.25)
+            ax.grid(True, alpha=0.3)
+            # The panels are offset between rows, so none sits directly above
+            # another and every one keeps its own tick labels.
+            ax.tick_params(labelleft=True)
+        row_axes[0].set_ylabel("Risk reduction (%)")
+        axes_by_row.append(row_axes)
+
     handles = [
         Line2D([], [], color=color, marker="s", label=label)
         for color, label in styles.values()
     ]
-    axes[0].legend(handles=handles, fontsize=7, loc="lower left", framealpha=0.9)
+    axes_by_row[0][0].legend(handles=handles, fontsize=8, loc="lower left", framealpha=0.9)
     qualifier = "" if family == "unregularized" else f" ({family} programs)"
     fig.suptitle(
-        "Joint vs overlay optimization across risk measures and "
-        f"increasing investable universe sizes{qualifier}",
-        fontsize=12,
+        "Joint vs Overlay Optimization across Risk Measures and "
+        f"Investable Universe Sizes{qualifier}",
+        fontsize=13,
     )
-    fig.tight_layout()
     for ext in ("pdf", "png"):
         fig.savefig(stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")
         logger.info("Saved figure: %s", stem.with_suffix(f".{ext}"))
