@@ -261,6 +261,18 @@ separately in \Cref{sec:mechanism-level} and \Cref{sec:mechanism-measures}.
 \end{figure}
 
  
+As discussed in \Cref{chap:empirical-analysis-and-baseline-results, chap:optimization-framework}, Expected Shortfall and its second-order variant are coherent risk measures rather than deviation
+measures. Unlike volatility, mean absolute deviation and semi-deviation, they are not invariant to a
+shift in location, so
+a portfolio is rewarded for a high mean even when its dispersion is unchanged. Their objectives
+therefore carry an implicit risk-return tradeoff that the three deviation measures do not. De-meaning the returns before applying the risk measure,
+\begin{equation}
+\mathcal{D}(X) = \mathcal{R}\big(X - \mathbb{E}[X]\big),
+\label{eq:demean-transformation}
+\end{equation}
+transforms the measure into a deviation measure. Check  \Cref{thm:demeaning} in
+Appendix \ref{app:demeaning}. We perform the same gap analysis as in \Cref{sec:joint-in-sample-case} on the de-meaned Expected Shortfall and second-order Expected Shortfall programs, and report the results in \Cref{fig:gap-demeaned}.
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf}
@@ -272,6 +284,18 @@ separately in \Cref{sec:mechanism-level} and \Cref{sec:mechanism-measures}.
     De-meaning makes the two tail measures location-free, isolating the effect of their implicit mean. Compare the in-sample series with the corresponding panels of \Cref{fig:gap-measures}. TODO: expand.
   \end{minipage}
 \end{figure}
+
+De-meaning steepens the decline of the in-sample advantage without removing it. For Expected Shortfall
+the in-sample gap falls from $3.66\%$ to $2.15\%$ across the three universes, against $3.95\%$ to
+$3.49\%$ for the raw measure, and for second-order Expected Shortfall from $7.54\%$ to $4.09\%$ against
+$7.73\%$ to $5.81\%$. The drop across universes therefore roughly triples for Expected Shortfall and
+nearly doubles for its second-order variant once the mean term is gone. This indicates that the implicit
+risk-return tradeoff is one of the things holding the tail measures' in-sample advantage up as the
+universe grows: with it removed, they begin to decay in the way the deviation measures do. They do not
+become deviation measures in their behaviour, however. At top-$100$ the de-meaned Expected Shortfall gap
+is still $2.15\%$ against $0.63\%$ for volatility, so the mean term accounts for part of the persistence
+and the tail depth of \Cref{fig:gap-vs-level-es} for the rest.
+
 
 
 \newpage

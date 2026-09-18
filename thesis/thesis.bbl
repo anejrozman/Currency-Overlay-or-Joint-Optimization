@@ -72,6 +72,11 @@ Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
 \newblock Noise sensitivity of portfolio selection under various risk measures.
 \newblock {\em Journal of Banking \& Finance}, 31(5):1545--1573, 2007.
 
+\bibitem{Krokhmal2007}
+Pavlo~A. Krokhmal.
+\newblock Higher moment coherent risk measures.
+\newblock {\em Quantitative Finance}, 7(4):373--387, 2007.
+
 \bibitem{LedoitWolf2003}
 Olivier Ledoit and Michael Wolf.
 \newblock Honey, i shrunk the sample covariance matrix.
@@ -172,6 +177,11 @@ Dimitris~N. Politis and Halbert White.
 Angelo Ranaldo and Paul Söderlind.
 \newblock Safe haven currencies.
 \newblock {\em Review of Finance}, 14(3):385--407, 07 2010.
+
+\bibitem{RockafellarUryasevZabarankin2006}
+R.~Tyrrell Rockafellar, Stan Uryasev, and Michael Zabarankin.
+\newblock Generalized deviations in risk analysis.
+\newblock {\em Finance and Stochastics}, 10(1):51--74, 2006.
 
 \bibitem{RockafellarUryasev2000}
 R.~Tyrrell Rockafellar and Stanislav Uryasev.

@@ -28,9 +28,9 @@
 \contentsline {section}{\numberline {6.1}Does Joint Optimization improve Risk Adjusted Returns?}{28}{section.6.1}%
 \contentsline {section}{\numberline {6.2}Advantage of Joint Optimization for Risk Minimization}{30}{section.6.2}%
 \contentsline {section}{\numberline {6.3}Tail Measures}{34}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Deviation Measures}{35}{section.6.4}%
-\contentsline {section}{\numberline {6.5}Regularization and Risk-Return Formulation}{35}{section.6.5}%
-\contentsline {section}{\numberline {6.6}Conclusion}{35}{section.6.6}%
+\contentsline {section}{\numberline {6.4}Deviation Measures}{36}{section.6.4}%
+\contentsline {section}{\numberline {6.5}Regularization and Risk-Return Formulation}{36}{section.6.5}%
+\contentsline {section}{\numberline {6.6}Conclusion}{36}{section.6.6}%
 \contentsline {chapter}{\chapternumberline {7}Conclusion}{37}{chapter.7}%
 \contentsline {section}{\numberline {7.1}Findings}{37}{section.7.1}%
 \contentsline {section}{\numberline {7.2}Limitations and Future Research}{37}{section.7.2}%
@@ -58,17 +58,17 @@
 \contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{52}{subsection.B.3.2}%
 \contentsline {section}{\numberline {B.4}Joint Optimization}{53}{section.B.4}%
 \contentsline {appendix}{\chapternumberline {C}TODO: Appendix C Title}{56}{appendix.C}%
-\contentsline {appendix}{\chapternumberline {D}TODO: Appendix D Title}{57}{appendix.D}%
-\contentsline {appendix}{\chapternumberline {E}Testing Differences in the Sharpe Ratio}{58}{appendix.E}%
-\contentsline {section}{\numberline {E.1}Setup and Notation}{58}{section.E.1}%
-\contentsline {section}{\numberline {E.2}The Estimator and Its Limiting Distribution}{58}{section.E.2}%
-\contentsline {subsection}{\numberline {E.2.1}Delta method and gradient}{59}{subsection.E.2.1}%
-\contentsline {subsection}{\numberline {E.2.2}The long-run covariance}{59}{subsection.E.2.2}%
-\contentsline {section}{\numberline {E.3}The Studentized Circular Block Bootstrap}{59}{section.E.3}%
-\contentsline {section}{\numberline {E.4}Results}{60}{section.E.4}%
-\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{62}{appendix.F}%
-\contentsline {appendix}{\chapternumberline {G}Additional Results}{64}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{64}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{68}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{69}{section.G.3}%
-\contentsline {chapter}{Bibliography}{71}{appendix*.11}%
+\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{57}{appendix.D}%
+\contentsline {appendix}{\chapternumberline {E}Testing Differences in the Sharpe Ratio}{60}{appendix.E}%
+\contentsline {section}{\numberline {E.1}Setup and Notation}{60}{section.E.1}%
+\contentsline {section}{\numberline {E.2}The Estimator and Its Limiting Distribution}{60}{section.E.2}%
+\contentsline {subsection}{\numberline {E.2.1}Delta method and gradient}{61}{subsection.E.2.1}%
+\contentsline {subsection}{\numberline {E.2.2}The long-run covariance}{61}{subsection.E.2.2}%
+\contentsline {section}{\numberline {E.3}The Studentized Circular Block Bootstrap}{61}{section.E.3}%
+\contentsline {section}{\numberline {E.4}Results}{62}{section.E.4}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{64}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{66}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{66}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{70}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{71}{section.G.3}%
+\contentsline {chapter}{Bibliography}{73}{appendix*.11}%
