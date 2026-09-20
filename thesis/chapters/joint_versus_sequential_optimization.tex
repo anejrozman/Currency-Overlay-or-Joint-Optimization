@@ -311,8 +311,31 @@ and the tail depth in \Cref{fig:gap-vs-level-es,fig:gap-vs-level-soes} seems to 
 \newpage
 \section{Deviation Measures}\label{sec:mechanism-measures}
 
+\textcolor{red}{TODO: Revise this draft}
 
+For the three considered deviation measures the advantage of joint optimization is smaller in-sample, 
+and most of it survives out of sample. If we compare the two series from \Cref{fig:gap-measures} measure by
+measure, the realized gap $\tilde g^{\text{OOS}}$ as a fraction of the in-sample gap $\tilde g^{\text{IS}}$
+is $133\%$, $70\%$ and $67\%$ for volatility across the top-$10$, top-$50$ and top-$100$ universes,
+$81\%$, $35\%$ and $59\%$ for mean absolute deviation, and $119\%$, $71\%$ and $42\%$ for semi-deviation.
+At the smallest universe volatility and semi-deviation realize more than the entire in-sample gap, so the
+mean of $\Delta\epsilon_t$ is negative.
+The tail measures realize less. The same ratio is $70\%$, $36\%$ and $-19\%$ for Expected Shortfall
+and $23\%$, $-4\%$ and $0\%$ for second-order Expected Shortfall. 
 
+Volatility,
+mean absolute deviation and semi-deviation are smooth functionals of the return distribution to which every
+observation in the ten-year window contributes, so the objective, and with it the gap between the two
+programs, is estimated with higher accuracy and carries over to the next quarter. Expected Shortfall and its
+second-order variant are determined by a small fraction of the
+observations at the confidence levels, so the same gap is a far noisier
+quantity. \Cref{fig:gap-vs-level-es,fig:gap-vs-level-soes} make this explicit, as the tail is made thinner the in-sample gap
+grows while the realized gap stays flat or decays. Additinaly, the absence of an implicit risk-return tradeoff.
+The deviation measures are translation invariant, so the joint program cannot manufacture an in-sample
+advantage by tilting the currency leg towards a high realized mean, whereas the tail measures can, and
+\Cref{fig:gap-demeaned} shows that removing the mean term accounts for part of their persistence across
+universes. Taken together, the deviation measures are left with a present but small advantage that shrinks both in-sample and out-of-sample
+as the asset universe grows.
 
 \section{Regularization and Risk-Return Formulation}\label{sec:reg-and-rr-formulation}
 
