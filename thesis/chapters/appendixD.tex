@@ -1,6 +1,6 @@
 \chapter{Coherent Risk Measures and Deviation Measures} \label{app:demeaning}
 
-In this appendix, we define the notion of a deviation measure and a coherent risk measure, and prove that a strictly expectation bounded coherent risk measure can be transformed into a deviation measure by a simple de-meaning operation. This result is used in \Cref{sec:mechanism-level} to de-mean expected shortfall and second-order expected shortfall and transform them into deviation measures. Throughout the appendix, let $X \in L^2(\Omega)$ denote a
+In this appendix, we define the notion of a deviation measure and a coherent risk measure, and prove that a strictly expectation bounded coherent risk measure can be transformed into a deviation measure by a simple de-meaning operation. This result is used in \Cref{sec:mechanism-level} to de-mean expected shortfall and second-order expected shortfall risk measures and transform them into deviation measures. Throughout this appendix, let $X \in L^2(\Omega)$ denote a square-integrable
 random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$.
 
 \begin{definition}[Deviation measure]\label{def:deviation}
@@ -15,7 +15,7 @@ $X, X' \in L^2(\Omega)$, every constant $C$ and every $\lambda > 0$,
 \end{definition}
 
 
-The property D1 is the one that distinguishes deviation measures from coherent risk measures. It is a form of translation invariance. The other three properties are shared between the two definitions.
+The property \emph{(D1)} is the main one that distinguishes deviation measures from coherent risk measures. It is a form of translation invariance. 
 
 \begin{definition}[Coherent and strictly expectation bounded risk measure]\label{def:coherent}
 A functional $\mathcal{R} : L^2(\Omega) \to (-\infty, \infty]$ is a \emph{coherent risk measure} if
@@ -31,11 +31,11 @@ and it is \emph{strictly expectation bounded} if in addition
 \end{align*}
 \end{definition}
 
-Properties R1 and D1 are incompatible, so no functional can be  a risk measure and a deviation
-measure at once. The de-meaning transformation is what moves between the two classes. We state and prove only the operation for transforming a coherent and strictly bounded  risk measure into a deviation measure. This is a special case of the more general result of theorem 2 in \cite{RockafellarUryasevZabarankin2006}.
+As mentioned above, properties \emph{(R1)} and \emph{(D1)} are incompatible, so no non-degenerate functional can be a risk measure and a deviation
+measure at once. The de-meaning transformation is what moves between the two classes. We state and prove only the operation for transforming a coherent and strictly expectation bounded  risk measure into a deviation measure. This is one direction of the more general result of Theorem 2 in \cite{RockafellarUryasevZabarankin2006}.
 
 \begin{theorem}\label{thm:demeaning}
-Let $\mathcal{R}$ be a strictly expectation bounded risk measure. Then
+Let $\mathcal{R}$ be a strictly expectation bounded coherent risk measure. Then
 \begin{equation}
 \mathcal{D}(X) \coloneqq \mathcal{R}\big(X - \mathbb{E}[X]\big)
 \label{eq:demeaning}
@@ -44,38 +44,42 @@ is a deviation measure.
 \end{theorem}
 
 \begin{proof}
-The proof is a straightforward verification of the four properties in \Cref{def:deviation}.
+The proof is a straightforward verification of the four properties in Definition \ref{def:deviation}.
 Write $\bar X = X - \mathbb{E}[X]$, then $\mathcal{D}(X) = \mathcal{R}(\bar X)$.
 
 \emph{(D1):} For any constant $C$ we have $(X + C) - \mathbb{E}[X + C] = \bar X$, hence
 $\mathcal{D}(X + C) = \mathcal{R}(\bar X) = \mathcal{D}(X)$.
 
-\emph{(D2):} Taking $X = 0$ gives $\mathcal{D}(0) = \mathcal{R}(0) = 0$ by R2. For $\lambda > 0$,
-$\lambda X - \mathbb{E}[\lambda X] = \lambda \bar X$, so R2 gives
+\emph{(D2):} Taking $X = 0$ gives $\mathcal{D}(0) = \mathcal{R}(0) = 0$ by \emph{(R2)}. For $\lambda > 0$,
+$\lambda X - \mathbb{E}[\lambda X] = \lambda \bar X$, so again, \emph{(R2)} gives
 $\mathcal{D}(\lambda X) = \mathcal{R}(\lambda \bar X) = \lambda \mathcal{R}(\bar X) = \lambda \mathcal{D}(X)$.
 
-\emph{(D3):} Since $(X + X') - \mathbb{E}[X + X'] = \bar X + \bar X'$, R3 gives
+\emph{(D3):} Since $(X + X') - \mathbb{E}[X + X'] = \bar X + \bar X'$, \emph{(R3)} gives
 $\mathcal{D}(X + X') = \mathcal{R}(\bar X + \bar X') \leq \mathcal{R}(\bar X) + \mathcal{R}(\bar X')
 = \mathcal{D}(X) + \mathcal{D}(X')$.
 
 \emph{(D4):} If $X$ is constant then $\bar X = 0$ and $\mathcal{D}(X) = 0$. If $X$ is nonconstant then so
-is $\bar X$, and R5 applied to $\bar X$ gives
+is $\bar X$, and \emph{(R5)} applied to $\bar X$ gives
 $\mathcal{D}(X) = \mathcal{R}(\bar X) > \mathbb{E}[-\bar X] = 0$.
 \end{proof}
 
-The proof uses the properties R2, R3 and R5 only. Monotonicity R4 is never used, which is the reason the
-original theorem in \cite{RockafellarUryasevZabarankin2006} is stated for  strictly expectation bounded risk
+The proof uses the properties \emph{(R2)}, \emph{(R3)} and \emph{(R5)} only. Monotonicity \emph{(R4)} is never used, which is the reason the
+original Theorem in \cite{RockafellarUryasevZabarankin2006} is stated more genetally for strictly expectation bounded risk
 measures rather than coherent risk measures.
 
 We now show that both expected shortfall and second-order expected shortfall are strictly expectation bounded coherent risk measures, and we can therefore apply    
-\Cref{thm:demeaning} in  \Cref{sec:mechanism-level}. Write $z^{+} = \max\{z, 0\}$ and $z^{-} = \max\{-z, 0\}$, fix a confidence level
-$\alpha \in (0,1)$ and set $\kappa \coloneqq (1-\alpha)^{-1} > 1$. In the Rockafellar--Uryasev form
-\cite{RockafellarUryasev2000} the two measures are
+\Cref{thm:demeaning} to transform them into deviation measures. Write $z^{+} = \max\{z, 0\}$ and $z^{-} = \max\{-z, 0\}$, fix a confidence level
+$\alpha \in (0,1)$ and set $\kappa \coloneqq (1-\alpha)^{-1} > 1$. 
+In the Rockafellar--Uryasev form \cite{RockafellarUryasev2002} the expected shortfall is
 \begin{equation}
 \mathrm{ES}_\alpha(X) = \min_{\eta \in \mathbb{R}} \varphi(X, \eta),
-\qquad
+\label{eq:es-ru-form} 
+\end{equation}
+and its second-order analogue, obtained by replacing the expectation in $\varphi$ with the
+$L^2$ norm \cite{Krokhmal2007}, is
+\begin{equation}
 \mathrm{SOES}_\alpha(X) = \min_{\eta \in \mathbb{R}} \psi(X, \eta),
-\label{eq:ru-forms}
+\label{eq:soes-ru-form}
 \end{equation}
 where
 \begin{equation*}
@@ -84,7 +88,7 @@ where
 \psi(X, \eta) = \eta + \kappa\, \big\| (-X-\eta)^{+} \big\|_2 .
 \end{equation*}
 Both $\varphi(X, \cdot)$ and $\psi(X, \cdot)$ are convex, and both diverge as $|\eta| \to \infty$, so
-the minima in \eqref{eq:ru-forms} are attained. Check Appendix \ref{app:es_auxiliary_formulation} for additional details on the Rockafellar--Uryasev formulation. It is well known that $\mathrm{ES}_\alpha$ is a coherent risk measure, and is very straighforward to prove. We focus on showing it is strictly expectation bounded. 
+the minima in \eqref{eq:es-ru-form} and \eqref{eq:soes-ru-form} are attained. Appendix \ref{app:es_auxiliary_formulation} provides additional details on the Rockafellar--Uryasev formulation. It is well known that $\mathrm{ES}_\alpha$ is a coherent risk measure, see, for example Proposition 3.1 and Corollary 4.3 in \cite{acerbi2002coherenceexpectedshortfall}. We focus on showing it is strictly expectation bounded. 
 
 \begin{proposition}[Expected Shortfall]\label{prop:es-seb}
 $\mathrm{ES}_\alpha$ is strictly expectation bounded.
@@ -93,18 +97,19 @@ $\mathrm{ES}_\alpha$ is strictly expectation bounded.
 \begin{proof}
 Fix $\eta$, write $\mu = \mathbb{E}[X]$ and put $Y = -X - \eta$, so that
 $\mathbb{E}[Y] = -\mu - \eta$ and hence $\eta + \mu = -\mathbb{E}[Y]$. Using
-$\mathbb{E}[Y] = \mathbb{E}[Y^{+}] - \mathbb{E}[Y^{-}]$,
-\begin{equation*}
+$\mathbb{E}[Y] = \mathbb{E}[Y^{+}] - \mathbb{E}[Y^{-}]$ we write
+\begin{align*}
 \varphi(X, \eta) - \mathbb{E}[-X]
-= \eta + \mu + \kappa\, \mathbb{E}[Y^{+}]
-= -\mathbb{E}[Y] + \kappa\, \mathbb{E}[Y^{+}]
-= \mathbb{E}[Y^{-}] + (\kappa - 1)\,\mathbb{E}[Y^{+}] .
-\end{equation*}
-Both terms on the right are non-negative, since $\kappa > 1$, so
-$\varphi(X, \eta) \geq \mathbb{E}[-X]$ for every $\eta$. Equality forces
-$\mathbb{E}[Y^{+}] = \mathbb{E}[Y^{-}] = 0$, hence $Y = 0$ almost surely, which says $X = -\eta$ almost
-surely. For nonconstant $X$ the inequality is therefore strict at every $\eta$, so $\mathrm{ES}_\alpha(X) > \mathbb{E}[-X]$. For constant $X = C$ the choice $\eta = -C$ gives
-$\varphi(X, \eta) = -C = \mathbb{E}[-X]$, and we achieve the lower bound.
+&= \eta + \mu + \kappa\, \mathbb{E}[Y^{+}] \\
+&= -\mathbb{E}[Y] + \kappa\, \mathbb{E}[Y^{+}]\\
+&= \mathbb{E}[Y^{-}] + (\kappa - 1)\,\mathbb{E}[Y^{+}] .
+\end{align*}
+Both terms on the right are non-negative, the second because $\kappa > 1$, so
+$\varphi(X, \eta) \geq \mathbb{E}[-X]$ for every $\eta$, with equality if and only if
+$Y = 0$ almost surely, that is $X \equiv -\eta$. If $X$ is nonconstant the inequality is
+therefore strict at every $\eta$, and since the
+minimum is attained, $\mathrm{ES}_\alpha(X) > \mathbb{E}[-X]$. If $X \equiv C$, then $\eta = -C$ attains equality,
+so $\mathrm{ES}_\alpha(X) = \mathbb{E}[-X]$.
 \end{proof}
 
 \begin{proposition}[Second-order Expected Shortfall]\label{prop:soes-coherent}
@@ -118,7 +123,7 @@ $\mathbb{R}$ so does $\eta'$, so minimizing both sides gives
 $\mathrm{SOES}_\alpha(X + C) = \mathrm{SOES}_\alpha(X) - C$.
 
 \emph{(R2):} For $X = 0$ we have $\psi(0, \eta) = \eta + \kappa\, \eta^{-}$, which equals $\eta \geq 0$ for
-$\eta \geq 0$ and $(1-\kappa)\eta > 0$ for $\eta < 0$; the minimum is $0$, attained at $\eta = 0$. For
+$\eta \geq 0$ and $(1-\kappa)\eta > 0$ for $\eta < 0$. The minimum is $0$, attained at $\eta = 0$. For
 $\lambda > 0$, substituting $\eta = \lambda \eta'$ and using positive homogeneity of $z \mapsto z^{+}$
 and of the norm,
 \begin{equation*}
@@ -148,10 +153,7 @@ $\mathrm{SOES}_\alpha(X) \leq \mathrm{SOES}_\alpha(X')$.
 \emph{(R5):} On a probability space $\|Z\|_2 \geq \|Z\|_1$, so for $Z = (-X-\eta)^{+} \geq 0$ we have
 $\|(-X-\eta)^{+}\|_2 \geq \mathbb{E}[(-X-\eta)^{+}]$ and hence $\psi(X, \eta) \geq \varphi(X, \eta)$ for
 every $\eta$. Minimizing over $\eta$ gives $\mathrm{SOES}_\alpha(X) \geq \mathrm{ES}_\alpha(X)$, and
-\Cref{prop:es-seb} then gives $\mathrm{SOES}_\alpha(X) > \mathbb{E}[-X]$ for nonconstant $X$, with
-equality for constant $X$ by R1 and R2.
+Proposition \ref{prop:es-seb} then gives $\mathrm{SOES}_\alpha(X) > \mathbb{E}[-X]$ for nonconstant $X$, with
+equality for constant $X$ by \emph{(R1)} and \emph{(R2)}.
 \end{proof}
 
-Expected Shortfall is coherent \cite{CoherentMeasuresOfRisk, RockafellarUryasev2000}, and
-\Cref{prop:es-seb,prop:soes-coherent} supply the remaining hypothesis for each measure, so
-\Cref{thm:demeaning} applies to both.
