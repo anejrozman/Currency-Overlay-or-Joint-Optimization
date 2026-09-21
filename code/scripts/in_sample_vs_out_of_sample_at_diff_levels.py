@@ -3,16 +3,23 @@ Does the joint program's in-sample edge over the currency overlay depend on wher
 in the loss distribution the risk measure looks?
 
 The same measurement in_sample_vs_out_of_sample.py makes, with the risk measure
-held fixed at Expected Shortfall and its confidence level swept instead: 50, 60
-and 70 percent, then a 2.5-point grid from 72.5 to 97.5 (the sweep is
-portfolio_backtest.utils.levels.ES_LEVELS).  The sibling scripts vary the measure
-across panels; this one varies the level, so where they ask whether the joint
-program's advantage is a property of the functional, this one asks whether it is a
-property of the tail depth -- ES at 0.50 is a whole-lower-half average, ES at 0.95
-is a tail average, and the overlay's sequential split could plausibly cost more at
-one than at the other.
+held fixed and its confidence level swept instead: 50, 60 and 70 percent, then a
+2.5-point grid from 72.5 to 97.5 (the sweep is
+portfolio_backtest.utils.levels.SWEEP_LEVELS).  The sibling scripts vary the
+measure across panels; this one varies the level, so where they ask whether the
+joint program's advantage is a property of the functional, this one asks whether
+it is a property of the tail depth -- ES at 0.50 is a whole-lower-half average,
+ES at 0.95 is a tail average, and the overlay's sequential split could plausibly
+cost more at one than at the other.
 
-At every quarterly rebalancing date the unregularized ES joint and overlay
+--es and --soes pick which measure is held fixed: Expected Shortfall, or its
+second-order variant HMCR_2.  Both are swept over the same levels, so their
+panels can be read side by side, and both write to their own table and results
+directory, so neither run can overwrite the other.  Neither is a default; a
+84-cell sweep is too expensive to start by accident on the wrong measure.  What
+each measure is called and where its artifacts go is in levels.SWEEP_MEASURES.
+
+At every quarterly rebalancing date the unregularized joint and overlay
 programs are fit on the ten-year estimation window and scored twice by one shared
 empirical scorer: on that window (f_in, the ceiling) and on the following quarter
 (f_out).  The signed gap g = f_overlay - f_joint is positive when joint is better.
@@ -24,16 +31,16 @@ weight's, the absolute penalty both pay where their difference does not.
 Two regressions turn the two sweeps into slopes.  Per level, the relative gap is
 regressed on the currency share s = 14 / (14 + 14 * top_N) across the three
 universes -- the collapse the sibling scripts measure, now resolved by level.  Per
-universe, it is regressed on the level itself across the six levels, which is the
+universe, it is regressed on the level itself across the fourteen levels, which is the
 slope this script exists for.  Both use block-bootstrapped standard errors.
 
 Four things differ from in_sample_vs_out_of_sample.py, each forced by the sweep:
 
-  * The scorer's alpha follows the cell.  Level 95 weights are scored by ES_95 and
-    level 50 weights by ES_50, so each cell is measured against the functional its
+  * The scorer's alpha follows the cell.  Level 95 weights are scored at 95 and
+    level 50 weights at 50, so each cell is measured against the functional its
     programs actually minimized -- the same principle by which the sibling scripts
     score each measure by its own functional.  The relative gap is dimensionless,
-    so the panels stay comparable despite being six different functionals.
+    so the panels stay comparable despite being fourteen different functionals.
   * Hyperparameters come from the production runs, not from the registry grid.
     isa._fixed_hyperparams reads the registry, where ALPHA is fixed at 0.80 and
     DEMEAN at True; both are wrong for every cell here, since the sweep pinned
@@ -42,7 +49,7 @@ Four things differ from in_sample_vs_out_of_sample.py, each forced by the sweep:
     production actually held, so those are read, and each is checked against the
     cell it is claimed to belong to -- see _require_level.
   * Scoring is on raw returns, with no centering.  The swept runs set
-    demean = False, so their objective is the raw ES that also rewards a high
+    demean = False, so their objective is the raw measure that also rewards a high
     mean; centering the scoring windows, as in_sample_vs_out_of_sample_demeaned.py
     does, would measure an object these programs were not minimizing.
   * The currency-count arm is dropped, as in the de-meaned and mean-bearing
@@ -78,7 +85,7 @@ horizon, and any date whose f_out could not be relativized is counted and logged
 rather than silently dropped.
 
 Only the unregularized programs were swept across levels, so there is no --family
-flag: results/runs/top_runs.csv records the regularized ES runs at alpha = 0.80
+flag: results/runs/top_runs.csv records the regularized runs at alpha = 0.80
 alone.  The shards still carry a "family" column, fixed at "unregularized", so
 ivo.summarise, ivo.regressions and ivo.overfitting_table apply unchanged.
 
@@ -91,14 +98,15 @@ columns; _read_shards fills them with NaN and says which cells are affected, so 
 directory holding both generations still tabulates as one frame.
 
 Two things follow from the sharding, both of which the cluster submission in
-euler/run_gap_analysis_es_levels.sh depends on.  A cell that has landed is
+euler/run_gap_analysis_levels.sh depends on.  A cell that has landed is
 durable: a job killed by its wall-clock limit keeps what it already solved.  And
 the 42 cells can be solved by 42 concurrent jobs sharing one output directory,
 because each writes a filename no other job touches -- there is no shared file to
 race on and no merge step.  Re-solving a cell overwrites its own shard.
 
-Every cell needs a filled entry in results/runs/top_runs_es_at_different_levels.csv
-whose run directory carries selected_params.csv; a cell filled in when the backtest
+Every cell needs a filled entry in the measure's own
+results/runs/top_runs_<measure>_at_different_levels.csv, written by
+collect_level_runs.py, whose run directory carries selected_params.csv; a cell filled in when the backtest
 was submitted is not yet enough.  A level missing any of its requested universes is
 skipped whole, since the per-level collapse regression contrasts a level's
 universes against each other.  That drop is scoped to what one invocation asks
@@ -113,13 +121,13 @@ tabulated in both.  Level 50 is excluded from both figures and kept in the table
 (PLOT_EXCLUDE_LEVELS).
 
 Usage:
-    python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py
-    python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --levels 72.5 --universes 10
-    python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only
+    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --es
+    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --soes --levels 72.5 --universes 10
+    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --soes --plot-only
 
 One cell per job on the cluster, then the tables and figures once they land:
-    code/scripts/euler/run_gap_analysis_es_levels.sh
-    python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only
+    code/scripts/euler/run_gap_analysis_levels.sh --soes
+    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --soes --plot-only
 
 Author: Anej Rozman
 """
@@ -142,18 +150,19 @@ from portfolio_backtest import config
 from portfolio_backtest.strategy_registry import STRATEGY_REGISTRY
 from portfolio_backtest.utils.bootstrap import block_bootstrap_mean
 from portfolio_backtest.utils.levels import (
-    ES_LEVELS,
     ROUND_LEVELS,
+    SWEEP_LEVELS,
+    SWEEP_MEASURES,
+    SweepMeasure,
     alpha_of,
     format_level,
     parse_level,
 )
 
-logger = logging.getLogger("in_sample_vs_out_of_sample_es_at_diff_levels")
+logger = logging.getLogger("in_sample_vs_out_of_sample_at_diff_levels")
 
-MEASURE = "es"
 FAMILY = "unregularized"
-LEVELS = ES_LEVELS
+LEVELS = SWEEP_LEVELS
 UNIVERSES = (10, 50, 100)
 
 # Trading days in the secondary out-of-sample window. f_out is scored on the one
@@ -184,16 +193,37 @@ PLOT_LEVELS = tuple(lvl for lvl in LEVELS if lvl not in PLOT_EXCLUDE_LEVELS)
 # the by-level figure exists to show. Every level is still tabulated in both.
 UNIVERSE_PANEL_LEVELS = tuple(lvl for lvl in ROUND_LEVELS if lvl in LEVELS)
 
-# The two strategies swept across levels, by the role they play in the gap.
-STRATEGIES = {"joint": "es_joint", "overlay": "es_curr_overlay"}
-
-# The level sweep is recorded in its own table. top_runs.csv and
-# top_demeaned_runs.csv both point at alpha = 0.80 runs, so reusing either would
-# score one level's weights under six different level labels.
-RUNS_FILE = config.RUNS_DIR / "top_runs_es_at_different_levels.csv"
-OUT_DIR = config.RESULTS_DIR / "in_sample_vs_out_of_sample_es_at_diff_levels"
+# Which measure is being swept, and the four things that follow from it. Set by
+# _configure() from --es/--soes before anything reads them; module globals rather
+# than threaded arguments because nearly every helper below needs one of them and
+# the script runs exactly one measure per invocation.
+#
+# MEASURE     the key isa.evaluate_risk dispatches on
+# STRATEGIES  the swept pair, by the role each plays in the gap
+# RUNS_FILE   the sweep's own table. top_runs.csv and top_demeaned_runs.csv both
+#             point at alpha = 0.80 runs, so reusing either would score one
+#             level's weights under fourteen different level labels.
+# OUT_DIR     where this measure's shards, tables and figures land. Separate per
+#             measure: the shard filenames carry the level and universe but not
+#             the measure, so one shared directory would have ES and SOES cells
+#             overwriting each other.
+MEASURE: str
+MEASURE_LABEL: str
+STRATEGIES: dict[str, str]
+RUNS_FILE: Path
+OUT_DIR: Path
 
 SEED = ivo.SEED
+
+
+def _configure(measure: SweepMeasure) -> None:
+    """Point the module at one measure of the sweep."""
+    global MEASURE, MEASURE_LABEL, STRATEGIES, RUNS_FILE, OUT_DIR
+    MEASURE = measure.key
+    MEASURE_LABEL = measure.label
+    STRATEGIES = measure.strategies
+    RUNS_FILE = config.RUNS_DIR / measure.runs_file
+    OUT_DIR = config.RESULTS_DIR / measure.out_dir
 
 
 # Run lookup
@@ -217,6 +247,16 @@ def _run_dir(role: str, run: int) -> Path:
 
 def _top_run(role: str, level: int, universe: int) -> int:
     row_name = _row_name(role, level)
+    # The table is written by collect_level_runs.py after the backtests land, so a
+    # measure whose sweep has not been collected yet has no file at all. Say that,
+    # rather than letting pandas raise a bare FileNotFoundError on a path whose
+    # provenance is two scripts away.
+    if not RUNS_FILE.is_file():
+        raise ValueError(
+            f"No sweep table at {RUNS_FILE}. Submit the backtests with "
+            f"euler/run_levels.sh --{MEASURE}, then record them with "
+            f"collect_level_runs.py --{MEASURE} --write."
+        )
     table = pd.read_csv(RUNS_FILE)
     table.columns = [c.strip() for c in table.columns]
     table["strategy_name"] = table["strategy_name"].astype(str).str.strip()
@@ -291,15 +331,15 @@ def _require_level(label: str, level: int, params: dict) -> None:
         )
     if "demean" not in params:
         raise ValueError(
-            f"{label} records no 'demean' setting. This script scores raw ES, which "
-            f"matches the sweep's --no-demean runs; use "
+            f"{label} records no 'demean' setting. This script scores the raw "
+            f"measure, which matches the sweep's --no-demean runs; use "
             f"in_sample_vs_out_of_sample_demeaned.py for the de-meaned programs."
         )
     if bool(params["demean"]):
         raise ValueError(
             f"{label} was run with demean=True. The level sweep was submitted with "
-            f"--no-demean and this script scores raw ES accordingly; a de-meaned run "
-            f"belongs to in_sample_vs_out_of_sample_demeaned.py."
+            f"--no-demean and this script scores the raw measure accordingly; a "
+            f"de-meaned run belongs to in_sample_vs_out_of_sample_demeaned.py."
         )
 
 
@@ -308,10 +348,10 @@ def _hyperparams(role: str, level: int, universe: int) -> dict:
     Per-date settings of one cell, keyed by rebalancing date.
 
     Read from the production run rather than from the registry grid.  The
-    unregularized ES programs declare no penalties, so their grid is a singleton
+    unregularized programs declare no penalties, so their grid is a singleton
     and one dict would serve every date -- but the singleton in the registry is
-    alpha = 0.80, demean = True, which is the cell this sweep does not contain six
-    of.  What production held is recorded per date, so that is what is read, and
+    alpha = 0.80, demean = True, which is one cell of the fourteen this sweep
+    covers and the wrong one for the other thirteen.  What production held is recorded per date, so that is what is read, and
     every date is checked against the cell.
     """
     run = _top_run(role, level, universe)
@@ -537,7 +577,7 @@ def _read_shards(out_dir: Path) -> pd.DataFrame:
         )
         logger.warning(
             "%d cell(s) predate the annual out-of-sample horizon and carry no "
-            "gap_out_1y: %s. Re-solve them (run_gap_analysis_es_levels.sh --force) "
+            "gap_out_1y: %s. Re-solve them (run_gap_analysis_levels.sh --force) "
             "to fill that arm.",
             len(stale), ", ".join(stale),
         )
@@ -591,7 +631,7 @@ def grid_arm(solver, levels, universes, out_dir: Path) -> int:
             if dropped:
                 logger.warning(
                     "level %s top-%d: %d of %d dates dropped, overlay risk not "
-                    "strictly positive (raw ES can be negative at shallow levels).",
+                    "strictly positive (the raw measure can be negative at shallow levels).",
                     format_level(level), universe, dropped, scored["date"].nunique(),
                 )
 
@@ -882,10 +922,19 @@ def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
+    measure = parser.add_mutually_exclusive_group(required=True)
+    measure.add_argument(
+        "--es", dest="measure", action="store_const", const="es",
+        help="Sweep Expected Shortfall.",
+    )
+    measure.add_argument(
+        "--soes", dest="measure", action="store_const", const="soes",
+        help="Sweep second-order Expected Shortfall.",
+    )
     parser.add_argument(
         "--levels", nargs="+", type=parse_level, default=list(LEVELS),
         metavar="LEVEL",
-        help="ES confidence levels in percent, e.g. 72.5 (default: the whole sweep). "
+        help="Confidence levels in percent, e.g. 72.5 (default: the whole sweep). "
              "Every cell is re-solved, so scope this to what actually needs "
              "rebuilding. parse_level rejects anything not in the sweep.",
     )
@@ -899,7 +948,13 @@ def _parse_args() -> argparse.Namespace:
         help="Write the cell shards and stop, skipping the tables and figures. Use for a "
              "job covering one cell, whose regressions would have nothing to contrast.",
     )
-    parser.add_argument("--out-dir", type=Path, default=OUT_DIR)
+    # Resolved against the chosen measure in main(); it cannot be defaulted here
+    # because the parser is built before --es/--soes has been read.
+    parser.add_argument(
+        "--out-dir", type=Path, default=None,
+        help="Override where the shards, tables and figures go "
+             "(default: the measure's own results/ directory).",
+    )
     parser.add_argument(
         "--plot-only", action="store_true",
         help="Build the tables and figures from the shards already in --out-dir, "
@@ -911,20 +966,24 @@ def _parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = _parse_args()
+    _configure(SWEEP_MEASURES[args.measure])
     logging.basicConfig(
         level=getattr(logging, args.log_level),
         format="%(asctime)s  %(levelname)-8s  %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
     )
+    if args.out_dir is None:
+        args.out_dir = OUT_DIR
     args.out_dir.mkdir(parents=True, exist_ok=True)
+    logger.info("Sweeping %s into %s", MEASURE_LABEL, args.out_dir)
 
     if not args.plot_only:
         solver = isa._pick_solver()[0]
         solved = grid_arm(solver, args.levels, args.universes, args.out_dir)
         if solved == 0:
             logger.warning(
-                "Nothing solved for levels %s on %s; no shard written.",
-                [format_level(lvl) for lvl in args.levels], args.universes,
+                "Nothing solved for %s at levels %s on %s; no shard written.",
+                MEASURE, [format_level(lvl) for lvl in args.levels], args.universes,
             )
             return
         if args.sweep_only:

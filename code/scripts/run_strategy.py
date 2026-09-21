@@ -143,7 +143,7 @@ def main() -> None:
 
     # Grid overrides. Each pins one axis of the strategy's grid to a single value,
     # collapsing the validation search along that axis by design: this is how the
-    # ES-level sweep (code/scripts/euler/run_es_levels.sh) runs one optimizer at
+    # The level sweep (code/scripts/euler/run_levels.sh) runs one optimizer at
     # 0.50 ... 0.95 rather than at the single ALPHA in backtest_config.py.
     #
     # An override naming a key the strategy's grid does not have is an error, not a

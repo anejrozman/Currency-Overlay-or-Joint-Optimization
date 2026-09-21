@@ -1,8 +1,12 @@
 #!/bin/bash
-# Submit the ES-level sweep to the Euler cluster.
+# Submit a level sweep to the Euler cluster.
 #
-# Runs the two UNREGULARIZED Expected Shortfall strategies -- es_curr_overlay
-# (two-step: assets, then overlay) and es_joint (assets and overlay in one
+# --es or --soes picks the measure. There is no default: 84 cells is too much
+# cluster time to spend on the wrong measure by omission, and the two sweeps are
+# recorded in separate tables, so a silent default would fill the wrong one.
+#
+# Runs the two UNREGULARIZED strategies of the chosen measure -- <m>_curr_overlay
+# (two-step: assets, then overlay) and <m>_joint (assets and overlay in one
 # program) -- at each confidence level of the sweep, on all three universes:
 #
 #   14 levels x 2 strategies x 3 universes = 84 cells
@@ -11,10 +15,11 @@
 # levels were run first; the dense grid was added to resolve the top end, where
 # the in-sample gap rises fastest and the out-of-sample tail thins fastest.
 #
-#   ./run_es_levels.sh --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
+#   ./run_levels.sh --es --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
 #
 # is the submission that adds the dense grid to an existing coarse sweep: 48 jobs.
-# Cells whose run is already recorded in results/runs/top_runs_es_at_different_levels.csv
+# Cells whose run is already recorded in the measure's
+# results/runs/top_runs_<measure>_at_different_levels.csv
 # are skipped with a notice unless --force is given, so re-running this script
 # after a partial sweep submits only what is missing.
 #
@@ -29,7 +34,7 @@
 # be varied from the registry. --alpha pins the 'alpha' axis of the strategy's
 # grid to one value per job; --no-demean pins 'demean' to False, overriding the
 # global DEMEAN = True. Both land in the run's config.json under "grid_overrides",
-# which is how collect_es_level_runs.py later tells a swept run from a default one.
+# which is how collect_level_runs.py later tells a swept run from a default one.
 #
 # The grids of OVERLAY_CONFIG and JOINT_CONFIG are alpha x leverage x demean, and
 # all three axes are singletons once alpha and demean are pinned. So each job's
@@ -74,23 +79,23 @@
 # which level depends on scheduling order and cannot be predicted here. Recover
 # the mapping after the fact with:
 #
-#   python code/scripts/collect_es_level_runs.py            # print the table
-#   python code/scripts/collect_es_level_runs.py --write    # update the CSV
+#   python code/scripts/collect_level_runs.py --es          # print the table
+#   python code/scripts/collect_level_runs.py --es --write  # update the CSV
 #
 # Usage:
-#   ./run_es_levels.sh                          # every cell not already recorded
-#   ./run_es_levels.sh --levels "72.5 75 97.5"  # only these levels
-#   ./run_es_levels.sh --dry-run                # print the plan, submit nothing
-#   ./run_es_levels.sh --force                  # resubmit cells already recorded
-#   ./run_es_levels.sh --demean                 # sweep with demean=True instead
+#   ./run_levels.sh --es                          # every cell not already recorded
+#   ./run_levels.sh --soes --levels "72.5 75 97.5"  # only these levels
+#   ./run_levels.sh --soes --dry-run              # print the plan, submit nothing
+#   ./run_levels.sh --es --force                  # resubmit cells already recorded
+#   ./run_levels.sh --es --demean                 # sweep with demean=True instead
 
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(cd "$HERE/../../.." && pwd)"
 RUN_ONE="$HERE/run_backtest.sh"
-RUNS_CSV="$ROOT_DIR/results/runs/top_runs_es_at_different_levels.csv"
 
+MEASURE=""
 DRY_RUN=0
 FORCE=0
 DEMEAN_FLAG="--no-demean"
@@ -98,6 +103,8 @@ LEVELS=(50 60 70 72.5 75 77.5 80 82.5 85 87.5 90 92.5 95 97.5)
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --es)      MEASURE="es"; shift ;;
+        --soes)    MEASURE="soes"; shift ;;
         --dry-run) DRY_RUN=1; shift ;;
         --force)   FORCE=1; shift ;;
         --demean)  DEMEAN_FLAG=""; shift ;;
@@ -105,11 +112,20 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             sed -n '2,84p' "${BASH_SOURCE[0]}"
             exit 1 ;;
-        *) echo "Error: unknown argument '$1' (expected --levels, --dry-run, --force, --demean or --help)."; exit 1 ;;
+        *) echo "Error: unknown argument '$1' (expected --es, --soes, --levels, --dry-run, --force, --demean or --help)."; exit 1 ;;
     esac
 done
 
-STRATEGIES=(es_curr_overlay es_joint)
+if [[ -z "$MEASURE" ]]; then
+    echo "Error: one of --es or --soes is required."
+    exit 1
+fi
+
+# The strategy names and the table are both derived from the measure, so the two
+# can never disagree -- a mismatch here would submit one measure's backtests and
+# record them against the other's table.
+STRATEGIES=("${MEASURE}_curr_overlay" "${MEASURE}_joint")
+RUNS_CSV="$ROOT_DIR/results/runs/top_runs_${MEASURE}_at_different_levels.csv"
 UNIVERSES=(100 50 10)   # heaviest universe first, so the long poles start first
 
 # Same tiers as run_all_backtests.sh gives its light strategies. The LP has q + N + 1
@@ -187,5 +203,5 @@ if (( DRY_RUN )); then
     echo "${count} jobs planned (dry run, nothing submitted)."
 else
     echo "${count} jobs submitted. Track with: squeue --me"
-    echo "When they finish: python code/scripts/collect_es_level_runs.py --write"
+    echo "When they finish: python code/scripts/collect_level_runs.py --${MEASURE} --write"
 fi

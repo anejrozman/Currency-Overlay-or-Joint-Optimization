@@ -1,13 +1,16 @@
 #!/bin/bash
-# Submit the ES-level joint-vs-overlay gap experiment to the Euler cluster.
+# Submit the level-sweep joint-vs-overlay gap experiment to the Euler cluster.
 #
-# Runs code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py as one job per
+# --es or --soes picks the measure; there is no default, because the two write to
+# separate shard directories and a silent default would fill the wrong one.
+#
+# Runs code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py as one job per
 # cell: 14 confidence levels (50/60/70, then 2.5-point steps from 72.5 to 97.5)
 # x three universes (10, 50, 100) = 42 independent jobs, each solving the
 # unregularized ES joint and overlay programs plus the 1/N control at ~91 quarterly
 # rebalancing dates.
 #
-#   ./run_gap_analysis_es_levels.sh --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
+#   ./run_gap_analysis_levels.sh --es --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
 #
 # is the submission that adds the dense grid to an existing coarse sweep: 24 jobs.
 # Cells whose shard already exists in the output directory are skipped unless
@@ -54,10 +57,10 @@
 # are in gap_summary.csv, with the median realized tail count of each.
 #
 # The tables and figures are built separately, once the cells have landed:
-#   python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only
+#   python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --es --plot-only
 #
 # Usage:
-#   ./run_gap_analysis_es_levels.sh [options]
+#   ./run_gap_analysis_levels.sh --es|--soes [options]
 #
 # Options:
 #   --level N            Submit one level alone, e.g. 72.5 (default: all 14)
@@ -76,6 +79,7 @@
 
 set -euo pipefail
 
+MEASURE=""
 LEVEL=""
 UNIVERSE=""
 TIME_LIMIT=""
@@ -92,11 +96,12 @@ UNIVERSES_ALL=(10 50 100)
 
 usage() {
     cat <<'USAGE'
-Submit the ES-level joint-vs-overlay gap experiment to the Euler cluster.
+Submit the level-sweep joint-vs-overlay gap experiment to the Euler cluster.
 
 Usage:
-  ./run_gap_analysis_es_levels.sh [options]
+  ./run_gap_analysis_levels.sh --es|--soes [options]
 
+  --es | --soes        Which measure to sweep (required, no default)
   --level N            Submit one level alone, e.g. 72.5 (default: all 14)
   --levels "A B C"     Submit this set of levels
   --force              Submit cells whose shard already exists
@@ -113,6 +118,8 @@ USAGE
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
+        --es)            MEASURE="es"; shift ;;
+        --soes)          MEASURE="soes"; shift ;;
         --level)         LEVEL="$2"; shift 2 ;;
         --levels)        read -r -a LEVELS_SET <<< "$2"; shift 2 ;;
         --force)         FORCE=1; shift ;;
@@ -127,6 +134,15 @@ while [[ $# -gt 0 ]]; do
         *)               echo "Error: unknown argument '$1'"; usage ;;
     esac
 done
+
+# No default measure: an 84-cell sweep is too expensive to start on the wrong one
+# by omission, and the two measures write to separate directories, so a silent
+# default would quietly fill the other measure's.
+if [[ -z "$MEASURE" ]]; then
+    echo "Error: one of --es or --soes is required."
+    exit 1
+fi
+PASSTHROUGH+=("--${MEASURE}")
 
 is_sweep_level() {
     local candidate="$1" known
@@ -209,7 +225,7 @@ tier_mem() {
 # Heaviest universe first, so the long poles start before the short jobs.
 IFS=$'\n' read -r -d '' -a UNIVERSES < <(printf '%s\n' "${UNIVERSES[@]}" | sort -rn && printf '\0')
 
-SHARD_DIR="${OUT_DIR:-$ROOT_DIR/results/in_sample_vs_out_of_sample_es_at_diff_levels}"
+SHARD_DIR="${OUT_DIR:-$ROOT_DIR/results/in_sample_vs_out_of_sample_${MEASURE}_at_diff_levels}"
 
 count=0
 skipped=0
@@ -223,12 +239,12 @@ for universe in "${UNIVERSES[@]}"; do
         fi
         job_time="${TIME_LIMIT:-$(tier_time "$universe")}"
         job_mem="${MEM_PER_CPU:-$(tier_mem "$universe")}"
-        JOB_NAME="gap_es_l${level}_top${universe}"
+        JOB_NAME="gap_${MEASURE}_l${level}_top${universe}"
 
         echo "Submitting: ${JOB_NAME}  (time=${job_time}, cpus=${CPUS}, mem-per-cpu=${job_mem})"
         count=$((count + 1))
         if (( DRY_RUN )); then
-            echo "  python in_sample_vs_out_of_sample_es_at_diff_levels.py" \
+            echo "  python in_sample_vs_out_of_sample_at_diff_levels.py" \
                  "--levels ${level} --universes ${universe} --sweep-only" \
                  "${PASSTHROUGH[*]:-}"
             continue
@@ -250,7 +266,7 @@ module load gurobi/13.0.0
 source ${VENV}
 
 echo "Starting ${JOB_NAME} at \$(date) on \$(hostname)"
-python in_sample_vs_out_of_sample_es_at_diff_levels.py \
+python in_sample_vs_out_of_sample_at_diff_levels.py \
     --levels ${level} \
     --universes ${universe} \
     --sweep-only ${PASSTHROUGH[*]:-}
@@ -269,4 +285,4 @@ else
     echo "${count} jobs submitted. Check status with: squeue --me"
 fi
 echo "Once they have finished:"
-echo "  python code/scripts/in_sample_vs_out_of_sample_es_at_diff_levels.py --plot-only"
+echo "  python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --${MEASURE} --plot-only"

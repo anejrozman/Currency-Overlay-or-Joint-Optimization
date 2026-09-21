@@ -1,7 +1,7 @@
 """
-Fill in results/runs/top_runs_es_at_different_levels.csv from the runs on disk.
+Fill in results/runs/top_runs_<measure>_at_different_levels.csv from the runs on disk.
 
-The ES-level sweep (code/scripts/euler/run_es_levels.sh) submits one concurrent
+The level sweep (code/scripts/euler/run_levels.sh) submits one concurrent
 job per cell -- 14 levels x 2 strategies x 3 universes = 84 -- and next_run_dir()
 claims a run number with an atomic mkdir when each job starts. Which number ends
 up holding which level is therefore decided by the scheduler, and every overlay
@@ -20,17 +20,17 @@ The row name carries the strategy AND the level, but the run directory is named
 after the optimizer file only. To find a run, strip the "_level_<L>" suffix from
 the row name and use that as the directory:
 
-    row es_joint_level_95,   cell top_100_run = 21 -> results/runs/es_joint/run_21
-    row es_joint_level_72.5, cell top_10_run  = 40 -> results/runs/es_joint/run_40
+    row es_joint_level_95,     cell top_100_run = 21 -> results/runs/es_joint/run_21
+    row soes_joint_level_72.5, cell top_10_run  = 40 -> results/runs/soes_joint/run_40
 
 Whole levels are spelled without a decimal point and half levels with one, which
 is what portfolio_backtest.utils.levels.format_level guarantees; the six levels
 run first therefore keep the row names they were written under.
 
 Usage:
-    python code/scripts/collect_es_level_runs.py            # print, change nothing
-    python code/scripts/collect_es_level_runs.py --write     # rewrite the CSV
-    python code/scripts/collect_es_level_runs.py --demean    # sweep run with demean=True
+    python code/scripts/collect_level_runs.py --es             # print, change nothing
+    python code/scripts/collect_level_runs.py --soes --write   # rewrite the SOES CSV
+    python code/scripts/collect_level_runs.py --es --demean    # the demean=True arm
 
 Author: Anej Rozman
 """
@@ -43,12 +43,32 @@ import json
 from pathlib import Path
 
 from portfolio_backtest import config
-from portfolio_backtest.utils.levels import ES_LEVELS, format_level, level_of_alpha
+from portfolio_backtest.utils.levels import (
+    SWEEP_LEVELS,
+    SWEEP_MEASURES,
+    SweepMeasure,
+    format_level,
+    level_of_alpha,
+)
 
-STRATEGIES: tuple[str, ...] = ("es_curr_overlay", "es_joint")
-LEVELS: tuple[float, ...] = ES_LEVELS
+LEVELS: tuple[float, ...] = SWEEP_LEVELS
 UNIVERSES: tuple[int, ...] = (10, 50, 100)
-TABLE_FILE: str = "top_runs_es_at_different_levels.csv"
+
+# Set from --es/--soes before anything reads them. Module globals rather than
+# threaded arguments because every helper below needs the same three, and the
+# script runs one measure per invocation by construction.
+MEASURE: SweepMeasure
+STRATEGIES: tuple[str, ...]
+TABLE_FILE: str
+
+
+def _configure(measure: SweepMeasure) -> None:
+    """Point the module at one measure's strategies and table."""
+    global MEASURE, STRATEGIES, TABLE_FILE
+    MEASURE = measure
+    # Overlay first, matching the order the rows are rendered in.
+    STRATEGIES = (measure.overlay, measure.joint)
+    TABLE_FILE = measure.runs_file
 
 # Artifacts a finished run always writes. A run directory exists from the moment the
 # job starts (next_run_dir creates it to claim the number), so its presence says
@@ -165,7 +185,7 @@ def _render(resolved: dict[tuple[str, int, int], int], path: Path) -> str:
         # still reads back as spaces rather than NaN, because the column alignment
         # puts the name's padding inside the next field. Consumers of this table
         # treat a whitespace-only cell as blank; see _top_run in
-        # in_sample_vs_out_of_sample_es_at_diff_levels.py.
+        # in_sample_vs_out_of_sample_at_diff_levels.py.
         return (padded + " " + ", ".join(f"{c:>3}" for c in cells)).rstrip()
 
     blocks: list[list[str]] = [[line(header[0], header[1:])]]
@@ -188,12 +208,21 @@ def _render(resolved: dict[tuple[str, int, int], int], path: Path) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Fill in the ES-level sweep table from the runs on disk.",
+        description="Fill in a level-sweep table from the runs on disk.",
+    )
+    measure = parser.add_mutually_exclusive_group(required=True)
+    measure.add_argument(
+        "--es", dest="measure", action="store_const", const="es",
+        help="Collect the Expected Shortfall sweep.",
+    )
+    measure.add_argument(
+        "--soes", dest="measure", action="store_const", const="soes",
+        help="Collect the second-order Expected Shortfall sweep.",
     )
     parser.add_argument(
         "--write",
         action="store_true",
-        help=f"Rewrite results/runs/{TABLE_FILE} (default: print only).",
+        help="Rewrite the measure's table under results/runs/ (default: print only).",
     )
     parser.add_argument(
         "--demean",
@@ -201,6 +230,7 @@ def main() -> None:
         help="Collect the demean=True arm of the sweep (default: demean=False).",
     )
     args = parser.parse_args()
+    _configure(SWEEP_MEASURES[args.measure])
 
     path = config.RUNS_DIR / TABLE_FILE
     resolved, notes = _collect(demean=args.demean)
@@ -208,7 +238,10 @@ def main() -> None:
 
     expected = len(STRATEGIES) * len(LEVELS) * len(UNIVERSES)
     print(table)
-    print(f"{len(resolved)}/{expected} cells filled (demean={args.demean}).")
+    print(
+        f"{len(resolved)}/{expected} {MEASURE.key} cells filled "
+        f"(demean={args.demean})."
+    )
     for note in notes:
         print(f"  note: {note}")
 
