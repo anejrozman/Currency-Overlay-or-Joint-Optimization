@@ -1,0 +1,30 @@
+{
+  "strategy": "soes_joint",
+  "label": "SOES Joint (top-50)",
+  "run_date": "2026-09-21T17:42:35.902259",
+  "optimizer": "SecondOrderExpectedShortfallJointOptimizer",
+  "param_grid": {
+    "alpha": [
+      0.8
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "demean": [
+      false
+    ]
+  },
+  "grid_overrides": {
+    "alpha": 0.8,
+    "demean": false
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_50_202603081747.csv",
+  "universe_size": 50,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}

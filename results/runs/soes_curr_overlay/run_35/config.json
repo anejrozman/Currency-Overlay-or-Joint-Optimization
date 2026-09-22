@@ -1,0 +1,30 @@
+{
+  "strategy": "soes_curr_overlay",
+  "label": "SOES Currency Overlay (top-10)",
+  "run_date": "2026-09-21T17:44:07.901013",
+  "optimizer": "SecondOrderExpectedShortfallCurrencyOverlayOptimizer",
+  "param_grid": {
+    "alpha": [
+      0.875
+    ],
+    "leverage_limit": [
+      2.0
+    ],
+    "demean": [
+      false
+    ]
+  },
+  "grid_overrides": {
+    "alpha": 0.875,
+    "demean": false
+  },
+  "window_years": 10,
+  "val_years": 1,
+  "rebalancing_frequency": "quarterly",
+  "asset_return_key": "R_fh",
+  "training_return_key": null,
+  "universe_file": "currency_alocation_10_202603081747.csv",
+  "universe_size": 10,
+  "return_filter": 1.0,
+  "rf_source": "us_risk_free_rates.csv"
+}
