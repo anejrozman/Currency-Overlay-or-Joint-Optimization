@@ -209,6 +209,7 @@ UNIVERSE_PANEL_LEVELS = tuple(lvl for lvl in ROUND_LEVELS if lvl in LEVELS)
 #             overwriting each other.
 MEASURE: str
 MEASURE_LABEL: str
+MEASURE_SHORT: str
 STRATEGIES: dict[str, str]
 RUNS_FILE: Path
 OUT_DIR: Path
@@ -218,9 +219,10 @@ SEED = ivo.SEED
 
 def _configure(measure: SweepMeasure) -> None:
     """Point the module at one measure of the sweep."""
-    global MEASURE, MEASURE_LABEL, STRATEGIES, RUNS_FILE, OUT_DIR
+    global MEASURE, MEASURE_LABEL, MEASURE_SHORT, STRATEGIES, RUNS_FILE, OUT_DIR
     MEASURE = measure.key
     MEASURE_LABEL = measure.label
+    MEASURE_SHORT = measure.short
     STRATEGIES = measure.strategies
     RUNS_FILE = config.RUNS_DIR / measure.runs_file
     OUT_DIR = config.RESULTS_DIR / measure.out_dir
@@ -855,7 +857,7 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
                 ha="center", va="center", fontsize=9, color="grey",
             )
         _style_gap_axis(ax)
-        ax.set_title(f"ES at {format_level(level)}%", fontsize=11)
+        ax.set_title(f"{MEASURE_SHORT} at {format_level(level)}%", fontsize=11)
         ax.set_xlabel("Universe size")
         # Log spacing keeps 10/50/100 legible, but the decade ticks a log axis
         # picks by default (10, 100) would drop the 50, so label the three
@@ -870,7 +872,7 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
     _legend(axes[0], STYLES)
     fig.suptitle(
         "Joint vs overlay optimization across increasing investable universe sizes, "
-        "by Expected Shortfall confidence level",
+        f"by {MEASURE_LABEL} confidence level",
         fontsize=12,
     )
     _save(fig, stem)
@@ -899,7 +901,7 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
             )
         _style_gap_axis(ax)
         ax.set_title(f"Top-{universe} universe", fontsize=11)
-        ax.set_xlabel("ES confidence level (%)")
+        ax.set_xlabel(f"{MEASURE_SHORT} confidence level (%)")
         # Every swept level is drawn, but only the round ones are labelled: 13
         # ticks at 2.5-point spacing would overprint each other.
         ax.set_xticks([lvl for lvl in PLOT_LEVELS if lvl in ROUND_LEVELS])
@@ -912,7 +914,7 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
     axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     _legend(axes[0], STYLES)
     fig.suptitle(
-        "Joint vs overlay optimization across Expected Shortfall confidence levels",
+        f"Joint vs overlay optimization across {MEASURE_LABEL} confidence levels",
         fontsize=12,
     )
     _save(fig, stem)

@@ -158,7 +158,7 @@ separately in \Cref{sec:mechanism-level} and \Cref{sec:mechanism-measures}.
   We see in \Cref{fig:gap-vs-level-es} that the in-sample advantage of joint optimization for minimizing Expected Shortfall grows with the confidence level and the growth is more pronounced in the smaller universe. The out-of-sample advantage is much smaller and does not rise with the confidence level at any universe size. In the small top-10 universe, the in-sample advantage grows from $3.11\%$ at level $60\%$ to $10.59\%$ at level $97.5\%$, while the realized advantage stays in the $1.30-2.92\%$ range. In the larger universes the in-sample advantage grows at a lower rate, going from $3.23\%$ to $7.39\%$ at top-50 and from $3.86\%$ to $5.78\%$ at top-100, while the realized advantage never exceeds $1.32\%$ and $0.09\%$ respectively. The in-sample advantage of joint optimization is therefore inflated by estimation error, which grows with the confidence level and the tail depth. The out-of-sample advantage is small and decays with universe size, irrespective of the confidence level. 
 \begin{figure}[htbp]
   \centering
-  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf}
+  \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf}
   \caption{Gap between the joint and overlay optimizers across second-order Expected Shortfall confidence levels, by universe size.}
   \label{fig:gap-vs-level-soes}
   \vspace{0.5em}
@@ -174,7 +174,36 @@ separately in \Cref{sec:mechanism-level} and \Cref{sec:mechanism-measures}.
   \end{minipage}
 \end{figure}
 
-\textcolor{red}{TODO: Write a paragraph about the second-order Expected Shortfall results once you have them}
+We see in \Cref{fig:gap-vs-level-soes} that second-order Expected Shortfall repeats the pattern of
+\Cref{fig:gap-vs-level-es} in a more extreme form, and that it stops responding to the confidence level
+entirely above a point that arrives earlier the larger the universe. In the top-$10$ universe the
+in-sample advantage rises from $4.00\%$ at level $60\%$ to $16.28\%$, a fourfold increase, and is flat
+from level $92.5\%$ on. At top-$50$ it rises from $3.44\%$ to $8.52\%$ and is flat from level $85\%$, and
+at top-$100$ from $3.83\%$ to $5.81\%$ and flat from level $75\%$, so that ten of the thirteen levels
+report the same number. The flat stretch is not a property of the two programs but of the measure. As the
+confidence level rises the second-order Expected Shortfall of a fixed portfolio tends to its worst-case
+loss, and once the optimized loss distribution is tight enough for that limit to be reached the program
+becomes a minimax one and the level ceases to enter it. A larger universe gives the optimizer more
+diversification and hence a tighter tail, which is why the saturation point falls as the universe grows.
+Only the levels below it are informative about tail depth.
+
+Out of sample the advantage does not follow. In the top-$10$ universe it is significant at the five
+shallowest levels and decays across them, from $3.41\%$ at level $60\%$ to $2.70\%$ at $77.5\%$; from
+level $80\%$ on the interval covers zero and the point estimates scatter between $-0.74\%$ and $1.78\%$
+with no trend. In the top-$50$ and top-$100$ universes the realized advantage is indistinguishable from
+zero at every level, and its point estimate is negative at most of them, between $-0.93\%$ and $0.58\%$ at
+top-$50$ and between $-0.73\%$ and $0.07\%$ at top-$100$. The two series therefore move in opposite
+directions as the tail is made thinner: at top-$10$ the unrealized part of the advantage grows from
+$0.59$ to $15.51$ percentage points, while the half-width of the realized interval widens from $1.36$ to
+$5.65$ percentage points over the same range.
+
+The conclusion is the one \Cref{fig:gap-vs-level-es} reaches, drawn more sharply. Deeper tails buy the
+joint program a larger in-sample advantage and no realized one, and the deeper the tail the less of the
+sample is left to estimate it with, so the realized advantage is not merely absent but progressively
+harder to measure. Second-order Expected Shortfall makes this starker than Expected Shortfall does
+because it weights the tail more heavily: its in-sample advantage at top-$10$ reaches $16.28\%$ against
+$10.59\%$, while its realized advantage loses significance at level $80\%$ rather than surviving to
+$87.5\%$.
 
  
 As discussed in \Cref{chap:empirical-analysis-and-baseline-results,chap:optimization-framework}, Expected Shortfall and its second-order variant are coherent risk measures rather than deviation 

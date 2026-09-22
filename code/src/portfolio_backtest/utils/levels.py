@@ -59,6 +59,7 @@ class SweepMeasure:
 
     key: str            # the risk-measure key in_sample_analysis.evaluate_risk takes
     label: str          # for log lines and figure titles
+    short: str          # for axis labels and panel titles, where label is too long
     joint: str          # strategy_registry key of the joint program
     overlay: str        # strategy_registry key of the sequential overlay
     runs_file: str      # table under results/runs/ recording which run is which cell
@@ -77,6 +78,7 @@ SWEEP_MEASURES: dict[str, SweepMeasure] = {
     "es": SweepMeasure(
         key="es",
         label="Expected Shortfall",
+        short="ES",
         joint="es_joint",
         overlay="es_curr_overlay",
         runs_file="top_runs_es_at_different_levels.csv",
@@ -85,6 +87,7 @@ SWEEP_MEASURES: dict[str, SweepMeasure] = {
     "soes": SweepMeasure(
         key="soes",
         label="Second-Order Expected Shortfall",
+        short="SOES",
         joint="soes_joint",
         overlay="soes_curr_overlay",
         runs_file="top_runs_soes_at_different_levels.csv",
