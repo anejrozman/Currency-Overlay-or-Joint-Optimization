@@ -1,1 +1,22 @@
-% Intentionally empty.
+\chapter{Numerical Implementation of the Optimization Problems} \label{app:optimization-implementation}
+
+In this appendix, we provide details on the numerical implementation of the optimization problems 
+discussed in the thesis. We describe the algorithms used, 
+the software libraries employed, and any specific considerations taken into account to 
+ensure efficient and accurate solutions. Additionally, we discuss the 
+computational complexity of the optimization problems and provide insights 
+into the performance of the implemented algorithms across different scenarios.
+
+\section{The CVXPY Library}\label{sec:cvxpy}
+
+The optimization problems were implemented using the CVXPY library in Python, 
+which provides a user-friendly interface for defining and solving convex optimization problems. For the 
+considered risk measures in the thesis, we implemented the optimization 
+problems as linear programs where possible, quadratic programs in most cases due to the $L_2$ regularization norm, 
+and second-order cone programs for the second-order expected shortfall risk measure. 
+
+The CVXPY library is structured as follows: TODO: summarize the documentation of the library.
+
+\section{Computational Complexity and Performance}\label{sec:computational-complexity}
+
+

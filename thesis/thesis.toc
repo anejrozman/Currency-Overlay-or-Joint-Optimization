@@ -56,11 +56,23 @@
 \contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{52}{subsection.B.3.1}%
 \contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{52}{subsection.B.3.2}%
 \contentsline {section}{\numberline {B.4}Joint Optimization}{53}{section.B.4}%
-\contentsline {appendix}{\chapternumberline {C}TODO: Appendix C Title}{56}{appendix.C}%
+\contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{56}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Linear Program Represenation of the Mean Absolute Deviation Portfolio Optimization Problem}{56}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Regularization}{56}{section.C.2}%
+\contentsline {subsection}{\numberline {C.2.1}$L_1, L_2$ Regularization and Leverage Constraint}{56}{subsection.C.2.1}%
+\contentsline {subsection}{\numberline {C.2.2}Quadratic Program Representaion of the Regularized Portfolio Optimization Problem}{56}{subsection.C.2.2}%
+\contentsline {section}{\numberline {C.3}Sequential Overlay Optimization}{56}{section.C.3}%
+\contentsline {subsection}{\numberline {C.3.1}Asset Optimizaiton}{56}{subsection.C.3.1}%
+\contentsline {subsection}{\numberline {C.3.2}Currency Overlay Optimization}{56}{subsection.C.3.2}%
+\contentsline {section}{\numberline {C.4}Joint Optimization}{56}{section.C.4}%
+\contentsline {section}{\numberline {C.5}Adding the Mean Term}{56}{section.C.5}%
 \contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{57}{appendix.D}%
-\contentsline {appendix}{\chapternumberline {E}Transaction Costs}{60}{appendix.E}%
-\contentsline {appendix}{\chapternumberline {F}Additional Results}{62}{appendix.F}%
-\contentsline {section}{\numberline {F.1}Hyperparameter Sensitivity Analysis}{62}{section.F.1}%
-\contentsline {section}{\numberline {F.2}Portfolio Sparsity Analysis}{66}{section.F.2}%
-\contentsline {section}{\numberline {F.3}Risk Aversion Instability under Mean Variance Optimization}{67}{section.F.3}%
-\contentsline {chapter}{Bibliography}{69}{appendix*.11}%
+\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{60}{appendix.E}%
+\contentsline {section}{\numberline {E.1}The CVXPY Library}{60}{section.E.1}%
+\contentsline {section}{\numberline {E.2}Computational Complexity and Performance}{60}{section.E.2}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{61}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{63}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{63}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{67}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{68}{section.G.3}%
+\contentsline {chapter}{Bibliography}{70}{appendix*.11}%
