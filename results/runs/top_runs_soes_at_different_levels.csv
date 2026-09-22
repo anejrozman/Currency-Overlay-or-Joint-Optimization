@@ -1,0 +1,33 @@
+strategy_name,                top_10_run, top_50_run, top_100_run
+
+equal_weight_optimizer,         1,   2,   3
+
+soes_curr_overlay_level_50,    49,  30,  44
+soes_curr_overlay_level_60,    46,  26,  18
+soes_curr_overlay_level_70,    48,  29,  10
+soes_curr_overlay_level_72.5,  47,  25,  14
+soes_curr_overlay_level_75,    42,  27,  11
+soes_curr_overlay_level_77.5,  43,  24,  19
+soes_curr_overlay_level_80,    40,  28,  13
+soes_curr_overlay_level_82.5,  41,  33,  17
+soes_curr_overlay_level_85,    45,  32,  20
+soes_curr_overlay_level_87.5,  35,  31,  15
+soes_curr_overlay_level_90,    37,  34,   8
+soes_curr_overlay_level_92.5,  36,  12,   9
+soes_curr_overlay_level_95,    38,  16,  22
+soes_curr_overlay_level_97.5,  39,  21,  23
+
+soes_joint_level_50,           43,  10,  15
+soes_joint_level_60,           44,  19,  21
+soes_joint_level_70,           36,  24,  18
+soes_joint_level_72.5,         35,  22,  12
+soes_joint_level_75,           34,   9,  17
+soes_joint_level_77.5,         33,  14,  16
+soes_joint_level_80,           39,  25,  13
+soes_joint_level_82.5,         38,  20,  11
+soes_joint_level_85,           32,  47,  23
+soes_joint_level_87.5,         31,  45,  50
+soes_joint_level_90,           48,  46,  29
+soes_joint_level_92.5,         49,  42,  28
+soes_joint_level_95,           41,  37,  26
+soes_joint_level_97.5,         40,  30,  27
