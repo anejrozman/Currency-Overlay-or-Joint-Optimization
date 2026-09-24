@@ -280,12 +280,51 @@ as the asset universe grows.
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Realized quantities only: no in-sample series appears, since the nesting argument does not extend to the regularized or mean-bearing programs. Neither family changes the universe size at which the advantage disappears. TODO: expand.
+    Figure \ref{fig:realized-risk-reduction} reports the realized risk of the joint program relative to
+  the sequential overlay, $(\rho_O - \rho_J)/\rho_O$, evaluated on the full out-of-sample return series
+  of the production backtests, net of transaction costs and with drifted weights. One panel per risk
+  measure, the horizontal axis the universe size and one line per program family. Bands give the $95\%$
+  circular block bootstrap interval, with the same resampled indices applied to both return series so
+  that the dependence between them is preserved. No in-sample series appears: the nesting argument of
+  \Cref{sec:joint-in-sample-case} does not extend to these two families, so the comparison is made
+  entirely out of sample. The mean-bearing second-order Expected Shortfall panel is empty because that
+  pair of backtests has not been run.
   \end{minipage}
 \end{figure}
 
+The two families considered so far leave the gap analysis of \Cref{sec:joint-in-sample-case} intact
+because their objective is the risk measure itself. Regularized programs instead minimize the risk plus a
+penalty, and mean-bearing ones the risk minus a multiple of the estimated mean, with the penalty weights
+and the risk aversion selected on the validation window and routinely differing between the joint and the
+overlay arm. The joint program therefore no longer minimizes the quantity we score it on, and the
+in-sample gap $g_t^{\text{IS}}$ is no longer guaranteed to be non-negative. Empirically it is violated on
+$30.0\%$ of the regularized date-cells and $22.2\%$ of the mean-bearing ones, against $0.6\%$ at solver
+tolerance for the unregularized programs. We therefore drop the in-sample side entirely and compare the
+two programs on realized risk alone, evaluating each measure's own functional on the full out-of-sample
+return series of the production backtests. This is a narrower question than the one
+\Cref{sec:joint-in-sample-case} asks, but it is the one that remains available, and it is also the
+quantity an investor actually receives.
 
+We see in \Cref{fig:realized-risk-reduction} that both modifications weaken the advantage rather than
+leave it unchanged. Unregularized, the joint program realizes significantly less risk than the overlay in
+all five measures at top-$10$ and at top-$50$, and in three of the five at top-$100$. Regularized, that
+falls to three of five at top-$10$ and one of five at top-$50$; with a mean term, to three of four at
+top-$10$ and one of four at top-$50$, and none at top-$100$. The reduction that survives is also smaller
+where it survives at all, for example $0.84\%$ against $3.08\%$ for volatility at top-$10$. Both
+modifications do what they are intended to do, which is to constrain how far the optimizer may follow the
+estimation window, and both consequently remove part of the advantage joint optimization had over the
+overlay. That advantage was in large part the freedom to fit the currency block to the same window.
 
+The mean term does more than weaken it. For semi-deviation the realized risk of the joint program is
+significantly \emph{higher} than the overlay's at top-$50$, $-1.62\%$ with interval
+$[-3.10, -0.21]$, and at top-$100$, $-2.67\%$ with interval $[-4.44, -0.98]$. Volatility and mean
+absolute deviation turn negative over the same range without the intervals clearing zero. The three
+deviation measures are translation invariant, so a mean term added to their objective is not part of the
+risk being measured but a separate estimated quantity competing with it, and the joint program has
+$14$ more coefficients with which to fit it. This is the same mechanism \Cref{fig:gap-demeaned} isolates
+from the other direction: there, removing the mean from a tail objective made its in-sample advantage
+decay like a deviation measure's, and here, adding one to a deviation objective is enough to turn the
+realized advantage negative.
 
 
 \section{Conclusion}\label{sec:conclusion-joint-vs-sequential}
@@ -299,8 +338,11 @@ universe size increases. This leads us to conclude that the implicit risk-return
 advantage of joint optimization, and that it disappears out of sample due to estimation error. When we investigate the 
 tail behavior of the expected shortfall optimizers, the gap between the in-sample and out-of-sample advantage of 
 joint optimization increases with the tail depth, which further supports that the 
-in-sample advantage is driven by estimation error. Neither regularization nor the addition of a mean term to 
-the objective function changes this. In the larger investable universes, we observe no  
-benefit from joint optimization out of sample. This leads us to conclude that joint optimization does provide a 
+in-sample advantage is driven by estimation error. Regularizing the programs or adding a mean term to the
+objective removes the nesting argument and with it the in-sample side of the comparison, and measured on
+realized risk alone both weaken the advantage further rather than restore it. With a mean term the joint
+program realizes significantly more semi-deviation than the overlay in the two larger universes. In the
+largest investable universe, the realized advantage is absent for most measures and for every measure
+once a mean term is added. This leads us to conclude that joint optimization does provide a 
 benefit when it comes to risk reduction, but only when the investable universe is small, or rather, when the 
 number of assets is smaller relative to the number of currencies.
