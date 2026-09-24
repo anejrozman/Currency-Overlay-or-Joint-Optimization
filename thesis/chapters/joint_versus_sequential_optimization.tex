@@ -1,17 +1,16 @@
 \chapter{Joint versus Sequential Optimization}\label{chap:joint-vs-sequential}
 
-In this chapter, we compare the performance of joint and sequential overlay optimization approaches for international equity portfolios. We begin by establishing that the joint program's in-sample advantage
-holds by construction, since the overlay's solution is feasible for it, defining the in-sample and realized gaps
-between the two optimizer programs, with the decomposition that links them, and measuring both across the five risk
-measures and three investment universes. The
-results separate the risk measures into the same two groups introduced in
-Chapter~\ref{chap:optimization-framework}, which we then analyze separately. In Section~\ref{sec:mechanism-level} we focus on
-the tail measures, perform the gap analysis across confidence levels to vary the amount of data used to estimate the risk, and transform the objectives to remove the implicit risk-return
-tradeoff they have. In
-Section~\ref{sec:mechanism-measures} we focus on the deviation measures, which use the whole estimation window and
-carry no mean term. Finally, in Section~\ref{sec:reg-and-rr-formulation} we repeat the analysis for the regularized versions of the
-optimizers and the
-formulations with an added mean term.
+In this chapter, we compare and analyze the performance of the joint and sequential overlay programs in terms of risk minimization. We first
+show in \Cref{sec:joint-in-sample-case} that the joint program has an advantage over the sequential program by construction in terms of 
+minimizing the target risk measure, since the overlay's solution is feasible for the joint program. We define the in-sample and out-of-sample gaps between the 
+two programs and investigate the realized advantage of joint optimization across the five risk measures for investable universes of different sizes. The results, 
+ as in \Cref{chap:empirical-analysis-and-baseline-results}, separate the risk measures into two groups, deviation and tail measures. In \Cref{sec:mechanism-level} we further investigate the 
+tail measures, perform the same gap analysis across different confidence levels and show that the in-sample advantage of joint optimization grows with the tail depth, 
+while the out-of-sample advantage does not. We then transform the tail measures into deviation measures and show that the in-sample advantage of joint optimization begins to fall
+with the universe size. In \Cref{sec:mechanism-measures} we focus on the deviation measures. We argue why a larger percentage of 
+the in-sample advantage of joint optimization is realized out of sample than for the tail measures. Finally, in \Cref{sec:reg-and-rr-formulation} 
+we show that regularization and the addition of a mean term to the objective function weaken the advantage of joint over sequential optimization out of sample.
+
 
 \section{Advantage of Joint Optimization for Risk Minimization}\label{sec:joint-in-sample-case}
 
@@ -19,32 +18,32 @@ In-sample, joint optimization provides a benefit over sequential optimization by
 the target risk measure. We write 
 the weight vector as $\bm{\theta} = (\bm{x}, \bm{\uppsi})$ and let $\Theta$ denote the 
 feasible set defined by the budget and leverage constraints of \Cref{chap:optimization-framework}. 
-For a rebalancing period $t \in \{1, \dots, T\}$, let $f_t^{\text{IS}}$ be the in-sample risk on the 
-estimation window and $f_t^{\text{OOS}}$ the realized risk on the next holding period. Let $\hat{\bm{\theta}}_t$ denote
+For a rebalancing period $t \in \{1, \dots, T\}$, let $\rho_t^{\text{IS}}$ be the in-sample risk on the 
+estimation window and $\rho_t^{\text{OOS}}$ the realized risk on the next holding period. Let $\hat{\bm{\theta}}_t$ denote
 the weight vector an 
-optimizer returns on the estimation window, and $f_t^{\text{OOS}}(\hat{\bm{\theta}}_t)$ the risk these weight vectors realize on the next holding period. The two optimization programs are therefore written as
+optimizer returns on the estimation window, and $\rho_t^{\text{OOS}}(\hat{\bm{\theta}}_t)$ the risk these weight vectors realize on the next holding period. The two optimization programs are therefore written as
 \begin{equation*}
-\hat{\bm{\theta}}_{J,t} = \argmin_{\bm{\theta} \in \Theta} f_t^{\text{IS}}(\bm{\theta})
+\hat{\bm{\theta}}_{J,t} = \argmin_{\bm{\theta} \in \Theta} \rho_t^{\text{IS}}(\bm{\theta})
 \quad \text{and} \quad
-\hat{\bm{x}}_{O,t} = \argmin_{\bm{x}} f_{A,t}^{\text{IS}}(\bm{x}),
+\hat{\bm{x}}_{O,t} = \argmin_{\bm{x}} \rho_{A,t}^{\text{IS}}(\bm{x}),
 \quad
-\hat{\bm{\uppsi}}_{O,t} = \argmin_{\bm{\uppsi}} f_t^{\text{IS}}(\hat{\bm{x}}_{O,t}, \bm{\uppsi}),
+\hat{\bm{\uppsi}}_{O,t} = \argmin_{\bm{\uppsi}} \rho_t^{\text{IS}}(\hat{\bm{x}}_{O,t}, \bm{\uppsi}),
 \end{equation*}
-where $f_{A,t}^{\text{IS}}$ is the in-sample asset-only risk, which ignores the risk terms related to the currency overlay, and $\hat{\bm{\theta}}_{i,t} = (\hat{\bm{x}}_{i,t}, \hat{\bm{\uppsi}}_{i,t})$, $i\in\{J, O\}$. 
+where $\rho_{A,t}^{\text{IS}}$ is the in-sample asset-only risk, which ignores the risk terms related to the currency overlay, and $\hat{\bm{\theta}}_{i,t} = (\hat{\bm{x}}_{i,t}, \hat{\bm{\uppsi}}_{i,t})$, $i\in\{J, O\}$. 
 The subscript $J$ denotes the joint and $O$ the sequential overlay optimizers. 
 The overlay program is a restricted minimizer. It first minimizes over $\bm{x}$ against a different objective, 
 then over $\bm{\uppsi}$ with $\hat{\bm{x}}_{O,t}$ held fixed. 
 
-Its output satisfies the same constraints, so $\hat{\bm{\theta}}_{O,t} \in \Theta$, and its second step is a partial minimization of the same $f_t^{\text{IS}}$. Hence
+Its output satisfies the same constraints, so $\hat{\bm{\theta}}_{O,t} \in \Theta$, and its second step is a partial minimization of the same $\rho_t^{\text{IS}}$. Hence
 \begin{equation*}
-f_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t})
-= \min_{\bm{x}, \bm{\uppsi}} f_t^{\text{IS}}(\bm{x}, \bm{\uppsi})
-\;\leq\; \min_{\bm{\uppsi}} f_t^{\text{IS}}(\hat{\bm{x}}_{O,t}, \bm{\uppsi})
-= f_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}).
+\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t})
+= \min_{\bm{x}, \bm{\uppsi}} \rho_t^{\text{IS}}(\bm{x}, \bm{\uppsi})
+\;\leq\; \min_{\bm{\uppsi}} \rho_t^{\text{IS}}(\hat{\bm{x}}_{O,t}, \bm{\uppsi})
+= \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}).
 \end{equation*}
 We define the in-sample gap between the two optimizers as 
 \begin{equation}
-g_t^{\text{IS}} \coloneqq f_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}) - f_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t}) \;\geq\; 0 .
+g_t^{\text{IS}} \coloneqq \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}) - \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t}) \;\geq\; 0 .
 \label{eq:gap-in-sample}
 \end{equation}
 The in-sample gap is non-negative and measures the advantage of joint optimization over sequential 
@@ -53,7 +52,7 @@ realized out of sample.
 
 We define the out-of-sample error of a fitted $\hat{\bm{\theta}}_t$ as
 \begin{equation*}
-\epsilon_t(\hat{\bm{\theta}}_t) \coloneqq f_t^{\text{OOS}}(\hat{\bm{\theta}}_t) - f_t^{\text{IS}}(\hat{\bm{\theta}}_t),
+\epsilon_t(\hat{\bm{\theta}}_t) \coloneqq \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_t) - \rho_t^{\text{IS}}(\hat{\bm{\theta}}_t),
 \end{equation*}
 the amount by which realized risk in the holding quarter exceeds the risk the optimizer achieved in 
 sample.\footnote{This quantity is known in the statistical learning literature as the optimism of the 
@@ -61,8 +60,8 @@ fitted weights \cite[\S7.4]{HastieTibshiraniFriedman2009}, here evaluated on a s
 rather than in expectation over estimation windows.} 
 Then the out-of-sample gap is written as
 \begin{align}
-g_t^{\text{OOS}} &\coloneqq f_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t}) - f_t^{\text{OOS}}(\hat{\bm{\theta}}_{J,t}) \nonumber \\
-        &= \underbrace{\big[f_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}) - f_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t})\big]}_{g_t^{\text{IS}} \,\geq\, 0}
+g_t^{\text{OOS}} &\coloneqq \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t}) - \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{J,t}) \nonumber \\
+        &= \underbrace{\big[\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}) - \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t})\big]}_{g_t^{\text{IS}} \,\geq\, 0}
 \;-\; \underbrace{\big[\epsilon_t(\hat{\bm{\theta}}_{J,t}) - \epsilon_t(\hat{\bm{\theta}}_{O,t})\big]}_{\Delta\epsilon_t}.
 \label{eq:gap-decomposition}
 \end{align}
@@ -75,11 +74,11 @@ The magnitude is measure-dependent. Tail measure estimates (in our case Expected
 tail scenarios, than, for example, variance, so the out-of-sample error absorbed by the optimizer should be larger and more volatile at comparable sample sizes, and we
 expect the $\Delta\epsilon$ estimates to be noisier for such measures.
 
-We perform the following gap analysis to investigate the out-of-sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing, therefore we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints from \Cref{chap:empirical-analysis-and-baseline-results}. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $f_t^{\text{IS}}$ and $f_t^{\text{OOS}}$ for each of the two programs. Both gaps are reported relative to the risk of the overlay optimizer,
+We perform the following gap analysis to investigate the out-of-sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing, therefore we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints from \Cref{chap:empirical-analysis-and-baseline-results}. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. Both gaps are reported relative to the risk of the overlay optimizer,
 \begin{equation}
-\tilde g_t^{\text{IS}} \coloneqq \frac{g_t^{\text{IS}}}{f_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t})}
+\tilde g_t^{\text{IS}} \coloneqq \frac{g_t^{\text{IS}}}{\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t})}
 \qquad \text{and} \qquad
-\tilde g_t^{\text{OOS}} \coloneqq \frac{g_t^{\text{OOS}}}{f_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t})},
+\tilde g_t^{\text{OOS}} \coloneqq \frac{g_t^{\text{OOS}}}{\rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t})},
 \label{eq:gap-relative}
 \end{equation}
 so they are to be interpreted as the risk reduction achieved by the joint optimizer over the overlay, expressed as a percentage of the latter's risk. For each risk measure and universe size we report the mean of the risk reduction across the rebalancing dates together with a circular block bootstrap confidence interval at the level 95\%, using $10{,}000$ resamples and a block length chosen by the Politis--White rule \cite{PolitisWhite2004, PattonPolitisWhite2009}. 
