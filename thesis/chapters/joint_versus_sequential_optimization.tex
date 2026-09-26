@@ -69,33 +69,32 @@ g_t^{\text{OOS}} &\coloneqq \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t}) - \rho_
 The difference between the out-of-sample errors $\Delta\epsilon_t$ can be either positive or negative. For the variance, the in-sample risk of an optimized portfolio is known to understate its true risk, and the more
 weights are fitted relative to the sample size, the larger this understatement becomes \cite{ElKaroui2010}. Since the joint program fits all of its weights to the same in-sample objective, we expect it to
 adapt more closely to the noise in the estimation window than the sequential overlay, and hence $\Delta\epsilon_t$ to be typically positive. The restriction imposed
-by the sequential overlay could also reduce its estimation error rather than just constrain the optimizer, which works in the same direction, and if $\Delta\epsilon_t$ exceeds $g_t^{\text{IS}}$, the overlay could even realize lower risk than the joint program out of sample. We expect the magnitude to be measure-dependent. Tail measures, in our case Expected Shortfall and second-order Expected Shortfall, are estimated from
+by the sequential overlay could also reduce its estimation error rather than just constrain the optimizer, which works in the same direction, and if $\Delta\epsilon_t$ exceeds $g_t^{\text{IS}}$, the overlay could in some cases realize lower risk than the joint program out of sample. We expect $\Delta\epsilon_t$ to be measure-dependent. Tail measures, in our case Expected Shortfall and second-order Expected Shortfall, are estimated from
 a smaller fraction of the sample, whereas among the deviation measures, variance and mean absolute deviation use every observation and semi-variance
-only those below the mean, roughly half of the sample. For a given sample size, we therefore expect the in-sample risk estimate to be less precise under the tail measures,
-and $\Delta\epsilon_t$ to be larger and more volatile for them.
+only those below the mean. For a given sample size, we therefore expect  $\Delta\epsilon_t$ to be larger and more volatile under the tail measures. 
 
-We perform the following gap analysis to investigate the out-of-sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing. The in-sample gap is guaranteed to be non-negative only when each program minimizes the risk measure it is scored on, so we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. For variance and semi-variance we score their square roots, volatility and semi-deviation. The square root leaves the minimizers and the sign of the in-sample gap unchanged, and makes all five measures positively homogeneous, so that the relative gaps are comparable across measures. Both gaps are reported relative to the risk of the overlay optimizer,
+We perform the following gap analysis to investigate the in and out of sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing. The in-sample gap is guaranteed to be non-negative only when each program minimizes the risk measure it is scored on, so we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. For variance and semi-variance we score their square roots, volatility and semi-deviation. The square root leaves the minimizers and the sign of the in-sample gap unchanged, and makes all five measures positively homogeneous, so that the gaps are comparable across measures. Both gaps are reported relative to the risk of the overlay optimizer,
 \begin{equation*}
 \tilde g_t^{\text{IS}} \coloneqq \frac{g_t^{\text{IS}}}{\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t})}
 \qquad \text{and} \qquad
 \tilde g_t^{\text{OOS}} \coloneqq \frac{g_t^{\text{OOS}}}{\rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t})},
 \label{eq:gap-relative}
 \end{equation*}
-so they are to be interpreted as the risk reduction achieved by the joint optimizer over the overlay, expressed as a percentage of the latter's risk. For each risk measure and universe size we report the mean of the risk reduction across the rebalancing dates together with a 95\% circular block bootstrap confidence interval based on $10{,}000$ resamples. We resample blocks of consecutive dates rather than individual dates because the gaps are serially dependent, strongly so for the in-sample gaps since consecutive estimation windows share 39 of their 40 quarters, and an ordinary bootstrap would ignore this dependence and understate the width of the interval.
+so they are to be interpreted as the risk reduction achieved by the joint optimizer over the overlay, expressed as a percentage of the latter's risk. For each risk measure and universe size we report the mean of the risk reduction across the rebalancing dates together with a 95\% bootstrap confidence interval based on $10{,}000$ resamples.
 
 \begin{figure}[htbp] 
   \centering
   \includegraphics[width=0.95\textwidth]{../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf}
-  \caption{In-sample and out-of-sample gap between the unregularized joint and overlay optimizers, by risk measure and universe size.}
+  \caption{In-sample and out-of-sample relative gaps between the unregularized joint and overlay optimizers, by risk measure and universe size.}
   \label{fig:gap-measures}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Figure \ref{fig:gap-measures} reports the mean in-sample and out-of-sample gap between the unregularized joint and overlay optimizers, expressed as a percentage of the overlay's risk.     Each panel reports one risk measure. The horizontal axis is the size of the asset
+    Figure \ref{fig:gap-measures} reports the mean in-sample and out-of-sample relative gaps between the unregularized joint and overlay optimizers, expressed as a percentage of the overlay's risk.     Each panel reports one risk measure. The horizontal axis is the size of the investable
   universe and the vertical axis the risk reduction the joint program achieves over the
   sequential overlay. Squares mark the mean across the $T = 91$ quarterly rebalancing dates,
   in blue for the in-sample gap $\tilde g_t^{\text{IS}}$ and in red for the realized gap
-  $\tilde g_t^{\text{OOS}}$, with bands giving the $95\%$ bootstrapped confidence interval.
+  $\tilde g_t^{\text{OOS}}$. Shaded areas mark the $95\%$ bootstrapped confidence interval.
   \end{minipage}
 \end{figure}
 
