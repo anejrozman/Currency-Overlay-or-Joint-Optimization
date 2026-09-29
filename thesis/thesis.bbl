@@ -31,6 +31,12 @@ Stefano Ciliberti, Imre Kondor, and Marc M{\'e}zard.
   shortfall.
 \newblock {\em Quantitative Finance}, 7(4):389--396, 2007.
 
+\bibitem{ElKaroui2010}
+Noureddine El~Karoui.
+\newblock High-dimensionality effects in the {M}arkowitz problem and other
+  quadratic programs with linear constraints: Risk underestimation.
+\newblock {\em The Annals of Statistics}, 38(6):3487--3566, 2010.
+
 \bibitem{FrazziniIsraelMoskowitz2018}
 Andrea Frazzini, Ronen Israel, and Tobias~J. Moskowitz.
 \newblock Trading costs.
@@ -126,17 +132,6 @@ Johanna~G. NeÅ¡LehovÃ¡.
   published by princeton university press , 2015 . total number of pages: 720.
   isbn: 978-0-691-16627-8 (hardback).
 \newblock {\em Journal of Time Series Analysis}, 37(3):431--432, May 2016.
-
-\bibitem{PattonPolitisWhite2009}
-Andrew Patton, Dimitris~N. Politis, and Halbert White.
-\newblock Correction to ``automatic block-length selection for the dependent
-  bootstrap'' by d. politis and h. white.
-\newblock {\em Econometric Reviews}, 28(4):372--375, 2009.
-
-\bibitem{PolitisWhite2004}
-Dimitris~N. Politis and Halbert White.
-\newblock Automatic block-length selection for the dependent bootstrap.
-\newblock {\em Econometric Reviews}, 23(1):53--70, 2004.
 
 \bibitem{safe_haven_currencies}
 Angelo Ranaldo and Paul Söderlind.

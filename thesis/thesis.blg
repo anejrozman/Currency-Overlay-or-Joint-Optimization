@@ -1,7 +1,7 @@
 This is BibTeX, Version 0.99d (TeX Live 2025)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: thesis.aux
-White space in argument---line 431 of file thesis.aux
+White space in argument---line 469 of file thesis.aux
  : \citation{DeMiguel
  :                    et al. 2009}
 I'm skipping whatever remains of this command
@@ -14,45 +14,45 @@ I'm skipping whatever remains of this entry
 Warning--I didn't find a database entry for "getsomething"
 Warning--empty journal in FrazziniIsraelMoskowitz2018
 Warning--empty journal in Jones2002
-You've used 32 entries,
+You've used 31 entries,
             2118 wiz_defined-function locations,
-            715 strings with 9535 characters,
-and the built_in function-call counts, 9823 in all, are:
-= -- 971
-> -- 436
+            710 strings with 9371 characters,
+and the built_in function-call counts, 9459 in all, are:
+= -- 935
+> -- 412
 < -- 1
-+ -- 177
-- -- 140
-* -- 724
-:= -- 1676
-add.period$ -- 97
-call.type$ -- 32
-change.case$ -- 164
++ -- 168
+- -- 132
+* -- 693
+:= -- 1613
+add.period$ -- 94
+call.type$ -- 31
+change.case$ -- 157
 chr.to.int$ -- 0
-cite$ -- 34
-duplicate$ -- 335
-empty$ -- 790
-format.name$ -- 140
-if$ -- 2010
+cite$ -- 33
+duplicate$ -- 324
+empty$ -- 767
+format.name$ -- 132
+if$ -- 1938
 int.to.chr$ -- 0
-int.to.str$ -- 32
-missing$ -- 30
-newline$ -- 162
-num.names$ -- 64
-pop$ -- 146
+int.to.str$ -- 31
+missing$ -- 29
+newline$ -- 157
+num.names$ -- 62
+pop$ -- 141
 preamble$ -- 1
-purify$ -- 134
+purify$ -- 128
 quote$ -- 0
-skip$ -- 231
+skip$ -- 223
 stack$ -- 0
-substring$ -- 661
-swap$ -- 30
+substring$ -- 643
+swap$ -- 29
 text.length$ -- 1
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 122
+type$ -- 118
 warning$ -- 2
-while$ -- 99
-width$ -- 34
-write$ -- 347
+while$ -- 95
+width$ -- 33
+write$ -- 336
 (There were 2 error messages)

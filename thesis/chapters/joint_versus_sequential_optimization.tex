@@ -69,11 +69,11 @@ g_t^{\text{OOS}} &\coloneqq \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t}) - \rho_
 The difference between the out-of-sample errors $\Delta\epsilon_t$ can be either positive or negative. For the variance, the in-sample risk of an optimized portfolio is known to understate its true risk, and the more
 weights are fitted relative to the sample size, the larger this understatement becomes \cite{ElKaroui2010}. Since the joint program fits all of its weights to the same in-sample objective, we expect it to
 adapt more closely to the noise in the estimation window than the sequential overlay, and hence $\Delta\epsilon_t$ to be typically positive. The restriction imposed
-by the sequential overlay could also reduce its estimation error rather than just constrain the optimizer, which works in the same direction, and if $\Delta\epsilon_t$ exceeds $g_t^{\text{IS}}$, the overlay could in some cases realize lower risk than the joint program out of sample. We expect $\Delta\epsilon_t$ to be measure-dependent. Tail measures, in our case Expected Shortfall and second-order Expected Shortfall, are estimated from
+by the sequential overlay could also reduce its estimation error rather than just constrain the optimizer. If $\Delta\epsilon_t$ exceeds $g_t^{\text{IS}}$, the overlay could in some cases realize lower risk than the joint program out of sample. We expect $\Delta\epsilon_t$ to be measure-dependent. Tail measures, in our case Expected Shortfall and second-order Expected Shortfall, are estimated from
 a smaller fraction of the sample, whereas among the deviation measures, variance and mean absolute deviation use every observation and semi-variance
-only those below the mean. For a given sample size, we therefore expect  $\Delta\epsilon_t$ to be larger and more volatile under the tail measures. 
+only those below the mean. For a given sample size, we therefore expect  $\Delta\epsilon_t$ to be larger and more volatile for the tail measures. 
 
-We perform the following gap analysis to investigate the in and out of sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing. The in-sample gap is guaranteed to be non-negative only when each program minimizes the risk measure it is scored on, so we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. For variance and semi-variance we score their square roots, volatility and semi-deviation. The square root leaves the minimizers and the sign of the in-sample gap unchanged, and makes all five measures positively homogeneous, so that the gaps are comparable across measures. Both gaps are reported relative to the risk of the overlay optimizer,
+We perform the following gap analysis to investigate the in and out of sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing. The in-sample gap is guaranteed to be non-negative only when each program minimizes the risk measure it is scored on, so we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. For variance and semi-variance we score their square roots, volatility and semi-deviation. The square root does not change the minimizers, and makes all five measures positively homogeneous, so that the gaps are comparable across measures. Both gaps are reported relative to the risk of the overlay optimizer,
 \begin{equation*}
 \tilde g_t^{\text{IS}} \coloneqq \frac{g_t^{\text{IS}}}{\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t})}
 \qquad \text{and} \qquad
@@ -94,11 +94,11 @@ so they are to be interpreted as the risk reduction achieved by the joint optimi
   universe and the vertical axis the risk reduction the joint program achieves over the
   sequential overlay. Squares mark the mean across the $T = 91$ quarterly rebalancing dates,
   in blue for the in-sample gap $\tilde g_t^{\text{IS}}$ and in red for the realized gap
-  $\tilde g_t^{\text{OOS}}$. Shaded areas mark the $95\%$ bootstrapped confidence interval.
+  $\tilde g_t^{\text{OOS}}$. Shaded areas mark the $95\%$ bootstrapped confidence intervals.
   \end{minipage}
 \end{figure}
 
-We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for all risk measures across all universe sizes, and that it is largest for the two considered tail measures. The out-of-sample gap is smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being for the variance and semi-variance measures at the smallest universe size. Out-of-sample we see a negative dependence on the size of the investable universe. At the top-$10$ universe the realized out-of-sample advantage of joint optimization is significant for four of the five risk measures considered, between $2.17\%$ and $3.67\%$, with second-order Expected Shortfall being the least significant at $1.78\%$. At top-$50$, the advantage drops to zero for second-order Expected Shortfall, and remains around $1\%$ for the other measures, and at top-$100$ the advantage for Expected Shortfall drops below zero while the remaining measures stay below $1\%$. The in-sample series separates the two groups of risk measures the same way as in \Cref{chap:empirical-analysis-and-baseline-results}, that is, whether they are deviation or tail measures. The in-sample advantage falls as the universe grows, from $2.45\%$ to $0.63\%$ for volatility, from $2.67\%$ to $1.26\%$ for mean absolute deviation and from $3.08\%$ to $1.37\%$ for semi-deviation, whereas for the two tail measures it remains larger and more stable, from $3.95\%$ to $3.49\%$ for Expected Shortfall and from $7.73\%$ to $5.81\%$ for second-order Expected Shortfall. For the deviation measures the two series fall together, from $2.45\%$ to $0.63\%$ in sample against $3.25\%$ to $0.42\%$ out of sample for volatility and similarly for the other two, so the advantage these measures show in sample is not inflated in the way the tail measures are. It simply shrinks as the investable universe grows.
+We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for all risk measures across all universe sizes, and that it is largest for the two considered tail measures. The out-of-sample gap is smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being the volatility and semi-deviation measures at the smallest universe size. Out-of-sample we see a negative dependence on the size of the investable universe. At the top-$10$ universe the realized out-of-sample advantage of joint optimization is in the range between $1.78\%$ and $3.67\%$, with second-order Expected Shortfall having the smallest benefit and Semi-Deviation having the largest. At top-$50$, the advantage drops to zero for second-order Expected Shortfall, and remains around $1\%$ for the other measures, and at top-$100$ the advantage for Expected Shortfall drops below zero while the remaining measures stay below $1\%$. The in-sample series separates the two groups of risk measures the same way as in \Cref{chap:empirical-analysis-and-baseline-results}, that is, whether they are deviation or tail measures. The in-sample advantage falls as the universe grows, from $2.45\%$ to $0.63\%$ for volatility, from $2.67\%$ to $1.26\%$ for mean absolute deviation and from $3.08\%$ to $1.37\%$ for semi-deviation, whereas for the two tail measures it remains larger and more stable, from $3.95\%$ to $3.49\%$ for Expected Shortfall and from $7.73\%$ to $5.81\%$ for second-order Expected Shortfall. For the deviation measures the in-sample and out-of-sample series fall together, whereas for the tail measures, the out-of-sample series falls, and the in-sample series remains high. We visualize the difference between the two series in \Cref{fig:delta-epsilon}. 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/delta_epsilon.pdf}
@@ -110,82 +110,91 @@ We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimiza
     Figure \ref{fig:delta-epsilon} reports
   $\tilde g_t^{\text{IS}} - \tilde g_t^{\text{OOS}}$ for the unregularized optimizers, the percentage
   advantage the joint optimizer holds in sample minus the percentage advantage it realizes out-of-sample. For every risk measure, we mark the mean difference
-  across the $91$ quarterly rebalancing dates, with bands giving the $95\%$ circular block bootstrap
-  interval obtained the same way as in Figure \ref{fig:gap-measures}. Being a
+  across the $91$ quarterly rebalancing dates, with shaded areas marking the $95\%$  bootstrap intervals obtained the same way as in Figure \ref{fig:gap-measures}. Being a
   difference of two ratios, the quantity reported is measured in percentage points. The deviation and the tail
-  measures are drawn on separate panels, with independent vertical scales, because the latter are an
-  order of magnitude higher.
+  measures are shown on separate panels, with independent vertical scales, because the latter are an
+  order of magnitude larger.
   \end{minipage}
 \end{figure}
 
 The first thing we notice in \Cref{fig:delta-epsilon} is that the bootstrapped confidence intervals for
-the two tail measures are much wider than those for the three deviation measures, averaging $4.37$
+the two tail measures are wider than those for the three deviation measures, averaging $4.37$
 against $1.41$ percentage points.
-This is expected, since the tail measures are estimated on a smaller fraction of the sample and
-their out-of-sample error is therefore more volatile. The second thing is the size of the unrealized
-advantage itself, which is between $1.17$ and $8.50$ percentage points for the tail measures while the
-three deviation measures are between $-0.81$ and $1.16$ percentage points. Read together with the in-sample
+This is expected, since the tail measures are estimated on a smaller fraction of the sample. The second thing is the size of the unrealized
+advantage itself, which is between $1.17$ and $8.50$ percentage points for the two tail measures while the
+three deviation measures are between $-0.81$ and $1.16$ percentage points. This, together with the in-sample
 series of \Cref{fig:gap-measures}, which for the tail measures stays between $3.49\%$ and $8.14\%$ at
-every universe size, this indicates that the tail measures hold on to a large in-sample
-advantage that is not realized out-of-sample, whereas for the deviation measures the advantage that is possible in-sample is realized but drops with universe size. The two groups therefore behave in different ways, and we investigate them
-separately in \Cref{sec:mechanism-level} and \Cref{sec:mechanism-measures}.
+every universe size, the tail measures hold on to a large in-sample
+advantage that is not realized out-of-sample, whereas for the deviation measures the advantage that is possible in-sample is realized but drops with universe size. The two groups produce different results, and we investigate them
+separately in \Cref{sec:mechanism-level,sec:mechanism-measures}.
 
 \newpage
 
 \section{Tail Measures}\label{sec:mechanism-level}
 
+To investigate the mechanism behind the in-sample advantage of joint optimization for the two tail measures, Expected Shortfall and second-order Expected Shortfall, we perform the same gap analysis as in \Cref{sec:joint-in-sample-case} across different confidence levels. We report the results in \Cref{fig:gap-vs-level-es,fig:gap-vs-level-soes}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf}
-  \caption{Gap between the joint and overlay optimizers across Expected Shortfall confidence levels, by universe size.}
+  \caption{In-sample and out-of-sample relative gaps between the unregularized joint and overlay Expected Shortfall optimizers, by confidence level and universe size.}
   \label{fig:gap-vs-level-es}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Figure \ref{fig:gap-vs-level-es} reports the mean in-sample and out-of-sample gap between the joint
+    Figure \ref{fig:gap-vs-level-es} reports the mean in-sample and out-of-sample relative gaps between the unregularized joint
   and overlay Expected Shortfall optimizers, expressed as a percentage of the overlay's risk, with the
   confidence level on the horizontal axis and one panel per universe size.
   Squares mark the mean across the $T = 91$ quarterly rebalancing dates, in blue for the in-sample gap
-  $\tilde g_t^{\text{IS}}$ and in red for the realized gap $\tilde g_t^{\text{OOS}}$, with bands giving
-  the $95\%$ bootstrapped confidence interval. The figures cover thirteen levels from $60\%$ to
+  $\tilde g_t^{\text{IS}}$ and in red for the realized gap $\tilde g_t^{\text{OOS}}$. Shaded areas mark
+  the $95\%$ bootstrapped confidence intervals. The figures cover thirteen confidence levels from $60\%$ to
   $97.5\%$.
   \end{minipage}
 \end{figure}
 
-  We see in \Cref{fig:gap-vs-level-es} that the in-sample advantage of joint optimization for minimizing Expected Shortfall grows with the confidence level and the growth is more pronounced in the smaller universe. The out-of-sample advantage is much smaller and does not rise with the confidence level at any universe size. In the small top-10 universe, the in-sample advantage grows from $3.11\%$ at level $60\%$ to $10.59\%$ at level $97.5\%$, while the realized advantage stays in the $1.30-2.92\%$ range. In the larger universes the in-sample advantage grows at a lower rate, going from $3.23\%$ to $7.39\%$ at top-50 and from $3.86\%$ to $5.78\%$ at top-100, while the realized advantage never exceeds $1.32\%$ and $0.09\%$ respectively. The in-sample advantage of joint optimization is therefore inflated by estimation error, which grows with the confidence level and the tail depth. The out-of-sample advantage is small and decays with universe size, irrespective of the confidence level. 
+  We see in \Cref{fig:gap-vs-level-es} that the in-sample advantage of joint optimization for minimizing Expected Shortfall 
+  grows with the confidence level and the growth is more pronounced in the smaller universe. 
+  The out-of-sample advantage is much smaller and does not rise with the confidence level at any universe size. 
+  In the small top-10 universe, the in-sample advantage rises from $3.11\%$ at confidence level $60\%$ to $10.59\%$ at level $97.5\%$. 
+  
+  
+  advantage grows from $3.11\%$ at level $60\%$ to $10.59\%$ at level $97.5\%$, 
+  while the realized advantage stays in the $1.30-2.92\%$ range. In the larger universes the in-sample advantage grows at a 
+  lower rate, going from $3.23\%$ to $7.39\%$ at top-50 and from $3.86\%$ to $5.78\%$ at top-100, while the 
+  realized advantage never exceeds $1.32\%$ and $0.09\%$ respectively.  
+
+  Expected Shortfall at confidence level $\alpha$ is an average over the worst $(1-\alpha)$ fraction of the estimation window, so at level $97.5\%$ it has sixteen times fewer observations than at $60\%$. The joint program can use its additional freedom in $\bm{x}$ to push the specific worst scenarios of the window down, which the overlay, having fixed $\bm{x}$ against the fully hedged objective, cannot. These scenarios do not recur in the holding quarter, so the extra in-sample reduction is fitted to noise and $\Delta\epsilon_t$ grows at the same rate as $g_t^{\text{IS}}$. This is in line with the known instability of Expected Shortfall optimization, where the estimation error depends on the number of weights relative to the number of tail observations rather than the full sample size \cite{CilibertiKondorMezard2007}.
+
+The ordering across universe sizes follows from what the joint program gains over the overlay. The overlay already chooses all $N$ asset weights freely, and the joint program adds only the coupling between them and the $M$ currency positions. As the universe grows, the currency positions make up a smaller share of the decision variables, and the overlay's first step alone has enough freedom to fit the tail scenarios of the window, so the joint program's in-sample advantage grows more slowly with the level. Out of sample, both programs are fitted to few tail observations with many weights, and at top-100 the joint program's structural advantage is no longer distinguishable from zero at any level.
+
+
+
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf}
-  \caption{Gap between the joint and overlay optimizers across second-order Expected Shortfall confidence levels, by universe size.}
+  \caption{In-sample and out-of-sample relative gaps between the unregularized joint and overlay second-order Expected Shortfall optimizers, by confidence level and universe size.}
   \label{fig:gap-vs-level-soes}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Figure \ref{fig:gap-vs-level-soes} reports the mean in-sample and out-of-sample gap between the joint
-  and overlay second-order Expected Shortfall optimizers, expressed as a percentage of the overlay's risk, with the
-  confidence level on the horizontal axis and one panel per universe size.
-  Squares mark the mean across the $T = 91$ quarterly rebalancing dates, in blue for the in-sample gap
-  $\tilde g_t^{\text{IS}}$ and in red for the realized gap $\tilde g_t^{\text{OOS}}$, with bands giving
-  the $95\%$ bootstrapped confidence interval. The figures cover thirteen levels from $60\%$ to
-  $97.5\%$.
+    Figure \ref{fig:gap-vs-level-soes} reports 
+the mean in-sample and out-of-sample relative gaps between the unregularized joint and overlay second-order Expected Shortfall optimizers, expressed as a percentage of the overlay's risk, with the confidence level on the horizontal axis and one panel per universe size. Squares mark the mean across the $T = 91$ quarterly rebalancing dates, in blue for the in-sample gap $\tilde g_t^{\text{IS}}$ and in red for the realized gap $\tilde g_t^{\text{OOS}}$. Shaded areas mark the $95\%$ bootstrapped confidence intervals. The figures cover thirteen confidence levels from $60\%$ to $97.5\%$.
   \end{minipage}
 \end{figure}
 
-We see in \Cref{fig:gap-vs-level-soes} that second-order Expected Shortfall repeats the pattern of
-\Cref{fig:gap-vs-level-es} in a more extreme form, and that it stops responding to the confidence level
-entirely above a point that arrives earlier the larger the universe. In the top-$10$ universe the
-in-sample advantage rises from $4.00\%$ at level $60\%$ to $16.28\%$, a fourfold increase, and is flat
-from level $92.5\%$ on. At top-$50$ it rises from $3.44\%$ to $8.52\%$ and is flat from level $85\%$, and
-at top-$100$ from $3.83\%$ to $5.81\%$ and flat from level $75\%$, so that ten of the thirteen levels
-report the same number. The flat stretch is not a property of the two programs but of the measure. As the
-confidence level rises the second-order Expected Shortfall of a fixed portfolio tends to its worst-case
+In \Cref{fig:gap-vs-level-soes} we see that second-order Expected Shortfall behaves similarly to Expected Shortfall in a more extreme form, and that it stops growing at higher confidence levels. In the top-$10$ universe the
+in-sample advantage rises from $4.00\%$ at level $60\%$ to $16.28\%$, and is flat
+from level $92.5\%$ on. At top-$50$ it rises from $3.44\%$ to $8.52\%$ and is flat from level $85\%$ on, and
+at top-$100$ from $3.83\%$ to $5.81\%$ and flat from level $75\%$ on.
+As we increase the
+confidence level, the second-order Expected Shortfall of a fixed portfolio tends to its worst-case
 loss, and once the optimized loss distribution is tight enough for that limit to be reached the program
-becomes a minimax one and the level ceases to enter it. A larger universe gives the optimizer more
+becomes a minimax optimization problem, so the level ceases to enter it. A larger universe gives the optimizer more
 diversification and hence a tighter tail, which is why the saturation point falls as the universe grows.
-Only the levels below it are informative about tail depth.
 
-Out of sample the advantage does not follow. In the top-$10$ universe it is significant at the five
+\newpage
+
+Out of sample in the top-$10$ universe it is significant at the five
 shallowest levels and decays across them, from $3.41\%$ at level $60\%$ to $2.70\%$ at $77.5\%$; from
 level $80\%$ on the interval covers zero and the point estimates scatter between $-0.74\%$ and $1.78\%$
 with no trend. In the top-$50$ and top-$100$ universes the realized advantage is indistinguishable from
@@ -195,34 +204,26 @@ directions as the tail is made thinner: at top-$10$ the unrealized part of the a
 $0.59$ to $15.51$ percentage points, while the half-width of the realized interval widens from $1.36$ to
 $5.65$ percentage points over the same range.
 
-The conclusion is the one \Cref{fig:gap-vs-level-es} reaches, drawn more sharply. Deeper tails buy the
-joint program a larger in-sample advantage and no realized one, and the deeper the tail the less of the
-sample is left to estimate it with, so the realized advantage is not merely absent but progressively
-harder to measure. Second-order Expected Shortfall makes this starker than Expected Shortfall does
-because it weights the tail more heavily: its in-sample advantage at top-$10$ reaches $16.28\%$ against
-$10.59\%$, while its realized advantage loses significance at level $80\%$ rather than surviving to
-$87.5\%$.
-
  
-As discussed in \Cref{chap:empirical-analysis-and-baseline-results,chap:optimization-framework}, Expected Shortfall and its second-order variant are coherent risk measures rather than deviation 
+As discussed in \Cref{chap:empirical-analysis-and-baseline-results,chap:optimization-framework}, Expected Shortfall and second-order Expected Shortfall are coherent (strictly expectation bounded) risk measures rather than deviation 
 measures. Unlike volatility, mean absolute deviation and semi-deviation, they are not invariant to translation, so
 a portfolio return is scored favorably for a high mean even when its dispersion is unchanged. The objectives
-therefore carry an implicit risk-return tradeoff that the three deviation measures do not. De-meaning the returns before applying the risk measure
+therefore carry an implicit risk-return tradeoff that the three deviation measures do not. De-meaning the returns in a coherent (strictly expectation bounded) risk measure functional $\mathcal{R}$
 \begin{equation*}
 \mathcal{D}(X) = \mathcal{R}\big(X - \mathbb{E}[X]\big),
 \end{equation*}
-transforms them into deviation measures. See \Cref{thm:demeaning} in
+transforms it into a deviation measure. See \Cref{thm:demeaning} in
 Appendix \ref{app:demeaning}. We perform the same gap analysis as in \Cref{sec:joint-in-sample-case} on the de-meaned Expected Shortfall and second-order Expected Shortfall optimization programs, and report the results in \Cref{fig:gap-demeaned}.
  
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\textwidth]{../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf}
-  \caption{Gap between the joint and sequential overlay programs for the de-meaned Expected Shortfall and second-order Expected Shortfall programs.}
+  \caption{In-sample and out-of-sample relative gaps between the unregularized joint and overlay de-meaned Expected Shortfall and second-order Expected Shortfall optimizers, by universe size.}
   \label{fig:gap-demeaned}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Figure \ref{fig:gap-demeaned} reports the mean in-sample and out-of-sample gap between the de-meaned Expected Shortfall and second-order Expected Shortfall joint and overlay optimizers, expressed as a percentage of the overlay's risk. Squares mark the mean across the $T = 91$ quarterly rebalancing dates, in blue for the in-sample gap $\tilde g_t^{\text{IS}}$ and in red for the realized gap $\tilde g_t^{\text{OOS}}$, with bands giving the $95\%$ bootstrapped confidence interval.
+    Figure \ref{fig:gap-demeaned} reports the mean in-sample and out-of-sample relative gaps between the unregularized joint and overlay de-meaned Expected Shortfall and second-order Expected Shortfall optimizers, expressed as a percentage of the overlay's risk, with the universe size on the horizontal axis. Squares mark the mean across the $T = 91$ quarterly rebalancing dates, in blue for the in-sample gap $\tilde g_t^{\text{IS}}$ and in red for the realized gap $\tilde g_t^{\text{OOS}}$. Shaded areas mark the $95\%$ bootstrapped confidence intervals.
   \end{minipage}
 \end{figure}
 
@@ -239,7 +240,6 @@ and the tail depth in \Cref{fig:gap-vs-level-es,fig:gap-vs-level-soes} seems to 
 
 
 
-\newpage
 \section{Deviation Measures}\label{sec:mechanism-measures}
 
 \textcolor{red}{TODO: Revise this draft}
@@ -249,8 +249,7 @@ and most of it survives out of sample. If we compare the two series from \Cref{f
 measure, the realized gap $\tilde g^{\text{OOS}}$ as a fraction of the in-sample gap $\tilde g^{\text{IS}}$
 is $133\%$, $70\%$ and $67\%$ for volatility across the top-$10$, top-$50$ and top-$100$ universes,
 $81\%$, $35\%$ and $59\%$ for mean absolute deviation, and $119\%$, $71\%$ and $42\%$ for semi-deviation.
-At the smallest universe volatility and semi-deviation realize more than the entire in-sample gap, so the
-mean of $\Delta\epsilon_t$ is negative.
+At the smallest universe volatility and semi-deviation realize more than the entire in-sample gap.
 The tail measures realize less. The same ratio is $70\%$, $36\%$ and $-19\%$ for Expected Shortfall
 and $23\%$, $-4\%$ and $0\%$ for second-order Expected Shortfall. 
 
@@ -261,10 +260,10 @@ programs, is estimated with higher accuracy and carries over to the next quarter
 second-order variant are determined by a small fraction of the
 observations at the confidence levels, so the same gap is a far noisier
 quantity. \Cref{fig:gap-vs-level-es,fig:gap-vs-level-soes} make this explicit, as the tail is made thinner the in-sample gap
-grows while the realized gap stays flat or decays. Additinaly, the absence of an implicit risk-return tradeoff.
+grows while the realized gap stays flat or decays. Additinaly, the absence of an implicit risk-return tradeoff 
 The deviation measures are translation invariant, so the joint program cannot manufacture an in-sample
 advantage by tilting the currency leg towards a high realized mean, whereas the tail measures can, and
-\Cref{fig:gap-demeaned} shows that removing the mean term accounts for part of their persistence across
+\Cref{fig:gap-demeaned} shows that removing the mean term accounts for part of this across
 universes. Taken together, the deviation measures are left with a present but small advantage that shrinks both in-sample and out-of-sample
 as the asset universe grows.
 
