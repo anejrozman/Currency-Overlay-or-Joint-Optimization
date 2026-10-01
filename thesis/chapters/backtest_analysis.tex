@@ -1,12 +1,12 @@
-\chapter{Empirical Analysis}\label{chap:empirical-analysis-and-baseline-results}
+\chapter{Backtest Analysis}\label{chap:backtest-analysis}
 
-In this chapter, we present an empirical analysis of the multi-currency portfolio optimization problem using historical data. We apply the model-free return representation derived in chapter \ref{chap:model-free-returns} to compute realized returns for the portfolio strategies derived in section \ref{todo}. We evalutate the performance of the various strategies on two investment universes, a large investment universe consisting of 50 biggest stocks in the 14 largest developed markets and a small investment universe consisting of 10 biggest stocks in the same markets. We compare the performance of the optimized portfolios to a benchmark equally weighted portfolio. 
+
 
 
 \section{Backtest Results of Expected Shortfall Optimization Approaches}
 
 \begin{table}%[htbp]
-  \centering
+  \centering 
   \scalebox{0.82}{%
   \begin{tabular}{lcccccccc}
     \toprule
@@ -444,7 +444,7 @@ therefore a defensible choice at these dimensions.
 
 FINISH WITH THIS SO YOU MOTIVATE THE NEXT CHAPTER:
 
-The backtests of \Cref{chap:empirical-analysis-and-baseline-results} showed no consistent return advantage of
+The backtests of \Cref{chap:backtest-analysis} showed no consistent return advantage of
 joint optimization over the sequential currency overlay. Across the five risk measures, the three universe sizes
 and both program families, neither approach reliably outperforms the other in terms of raw returns. Both programs are risk minimizers, so the question that remains is whether solving for asset and
 currency weights simultaneously delivers a lower value of the risk measure being minimized, and whether that advantage is consistenly realized out-of-sample. 

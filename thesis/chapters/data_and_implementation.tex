@@ -105,7 +105,7 @@ documented \citep{global_currency_hedging, safe_haven_currencies}.
 This is the dependence structure the overlay optimization approach discards. It sets asset weights first, using only equity information, and adds the currency hedge afterwards, whereas the joint model can act on it
 directly. The structure barely changes across universe sizes, and this matters for the
 results that follow. A shift
-in the relative performance of the joint and overlay approaches in \Cref{chap:empirical-analysis-and-baseline-results} should therefore
+in the relative performance of the joint and overlay approaches in \Cref{chap:backtest-analysis} should therefore
 be attributed to estimation error rather than a change in the underlying dependence structure.
 
 \begin{figure}[htbp]
@@ -133,7 +133,7 @@ be attributed to estimation error rather than a change in the underlying depende
 \newpage
 \section{Backtesting Framework} \label{sec:backtesting-framework}
 
-In \Cref{chap:empirical-analysis-and-baseline-results} we evaluate a range of optimization strategies under different objectives (Mean-Variance,  Expected Shortfall, Mean Absolute Deviation), their treatment of
+In \Cref{chap:backtest-analysis} we evaluate a range of optimization strategies under different objectives (Mean-Variance,  Expected Shortfall, Mean Absolute Deviation), their treatment of
 currency exposure (overlay or joint), and the size of the investable
 universe. To keep these comparisons fair, the
 backtesting framework separates between the
@@ -257,7 +257,7 @@ The estimators and solver internals invoked inside the methods \texttt{fit} and
 
 The backtest itself is implemented in the \texttt{Backtester.run} method, which
 advances through the data sample on a set rebalancing frequency (daily, weekly, monthly, quarterly, or annual). The
-empirical analysis in \Cref{chap:empirical-analysis-and-baseline-results} and Appendix \ref{app:additional-results} uses monthly and quarterly rebalancing on the daily data. At each
+empirical analysis in \Cref{chap:backtest-analysis} and Appendix \ref{app:additional-results} uses monthly and quarterly rebalancing on the daily data. At each
 rebalancing date, the optimizer is calibrated and deployed using a fixed rolling lookback window, partitioned into  an estimation window and a validation window. Hyperparameters are selected by a grid search over
 this partition. Each configuration is fitted on the estimation window
 via \texttt{fit}, used to produce weights via \texttt{optimize}, and evaluated on

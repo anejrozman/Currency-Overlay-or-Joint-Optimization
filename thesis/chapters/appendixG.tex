@@ -2,7 +2,7 @@
 
 In this appendix, we justify the bounded hyperparameter grids over which the
 regularization penalties are selected in the empirical analysis of
-\Cref{chap:empirical-analysis-and-baseline-results}. In
+\Cref{chap:backtest-analysis}. In
 \Cref{app:hyperparameter-sensitivity} we describe the sensitivity analysis used to
 determine these bounds, following a similar approach as
 \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}.
@@ -214,7 +214,7 @@ The number of active positions is sensitive to this recalibration, an L1-dominan
 
 \section{Risk Aversion Instability under Mean Variance Optimization} \label{app:instability-mv}
 
-In \Cref{chap:empirical-analysis-and-baseline-results} we report backtest results for the mean-variance optimizers under infinite risk aversion, 
+In \Cref{chap:backtest-analysis} we report backtest results for the mean-variance optimizers under infinite risk aversion, 
 which corresponds to the minimum variance problem. We do this because the mean-variance optimization problem is 
 is unstable under finite risk aversion \cite{DeMiguel et al. 2009}. We showcase this by runnign the 
 regularized overlay and joint optimizers under finite risk aversion on the top 10 universe and report the results in 
