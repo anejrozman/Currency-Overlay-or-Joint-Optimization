@@ -21,59 +21,59 @@
 \contentsline {section}{\numberline {4.4}Performance Evaluation Metrics}{13}{section.4.4}%
 \contentsline {chapter}{\chapternumberline {5}Backtest Analysis}{16}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Backtest Results of Expected Shortfall Optimization Approaches}{16}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Backtest Results of Mean-Variance Optimization Approaches}{20}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Backtest Results of Mean Absolute Deviation Optimization Approaches}{20}{section.5.3}%
-\contentsline {section}{\numberline {5.4}The Effects of Universe Size on Portfolio Performance}{25}{section.5.4}%
-\contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{28}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Advantage of Joint Optimization for Risk Minimization}{28}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Tail Measures}{32}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Level Analysis}{32}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}De-meaning the Tail Measures}{33}{subsection.6.2.2}%
-\contentsline {section}{\numberline {6.3}Deviation Measures}{34}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Conclusion}{35}{section.6.4}%
-\contentsline {chapter}{\chapternumberline {7}Conclusion}{36}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Findings}{36}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Limitations and Future Research}{36}{section.7.2}%
-\contentsline {chapter}{Appendices}{37}{section*.3}%
-\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall}{38}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Derivation of the Auxiliary Expected Shortfall Formulation}{38}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Linear Program Representation of Portfolio Optimization}{40}{section.A.2}%
-\contentsline {section}{\numberline {A.3}Regularization}{41}{section.A.3}%
-\contentsline {subsection}{\numberline {A.3.1}$L_1$ Regularization}{41}{subsection.A.3.1}%
-\contentsline {subsection}{\numberline {A.3.2}$L_2$ Regularization}{42}{subsection.A.3.2}%
-\contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{42}{subsection.A.3.3}%
-\contentsline {subsection}{\numberline {A.3.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{42}{subsection.A.3.4}%
-\contentsline {section}{\numberline {A.4}Separate (Currency Overlay) Optimization}{43}{section.A.4}%
-\contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{43}{subsection.A.4.1}%
-\contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{44}{subsection.A.4.2}%
-\contentsline {section}{\numberline {A.5}Joint Optimization}{44}{section.A.5}%
-\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{47}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{47}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Regularization}{48}{section.B.2}%
-\contentsline {subsection}{\numberline {B.2.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{48}{subsection.B.2.1}%
-\contentsline {subsection}{\numberline {B.2.2}Estimators}{49}{subsection.B.2.2}%
-\contentsline {subsection}{\numberline {B.2.3}Quadratic Program Representation of the Regularized Portfolio Optimization}{50}{subsection.B.2.3}%
-\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{50}{section.B.3}%
-\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{51}{subsection.B.3.1}%
-\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{51}{subsection.B.3.2}%
-\contentsline {section}{\numberline {B.4}Joint Optimization}{52}{section.B.4}%
-\contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{55}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Linear Program Represenation of the Mean Absolute Deviation Portfolio Optimization Problem}{55}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Regularization}{55}{section.C.2}%
-\contentsline {subsection}{\numberline {C.2.1}$L_1, L_2$ Regularization and Leverage Constraint}{55}{subsection.C.2.1}%
-\contentsline {subsection}{\numberline {C.2.2}Quadratic Program Representaion of the Regularized Portfolio Optimization Problem}{55}{subsection.C.2.2}%
-\contentsline {section}{\numberline {C.3}Sequential Overlay Optimization}{55}{section.C.3}%
-\contentsline {subsection}{\numberline {C.3.1}Asset Optimizaiton}{55}{subsection.C.3.1}%
-\contentsline {subsection}{\numberline {C.3.2}Currency Overlay Optimization}{55}{subsection.C.3.2}%
-\contentsline {section}{\numberline {C.4}Joint Optimization}{55}{section.C.4}%
-\contentsline {section}{\numberline {C.5}Adding the Mean Term}{55}{section.C.5}%
-\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{56}{appendix.D}%
-\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{59}{appendix.E}%
-\contentsline {section}{\numberline {E.1}The CVXPY Library}{59}{section.E.1}%
-\contentsline {section}{\numberline {E.2}Computational Complexity and Performance}{59}{section.E.2}%
-\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{60}{appendix.F}%
-\contentsline {appendix}{\chapternumberline {G}Additional Results}{62}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{62}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{66}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{67}{section.G.3}%
-\contentsline {chapter}{Bibliography}{69}{appendix*.11}%
+\contentsline {section}{\numberline {5.2}Backtest Results of Mean-Variance Optimization Approaches}{19}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Backtest Results of Mean Absolute Deviation Optimization Approaches}{19}{section.5.3}%
+\contentsline {section}{\numberline {5.4}The Effects of Universe Size on Portfolio Performance}{21}{section.5.4}%
+\contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{24}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Advantage of Joint Optimization for Risk Minimization}{24}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Tail Measures}{28}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Level Analysis}{28}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}De-meaning the Tail Measures}{29}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Deviation Measures}{30}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Conclusion}{31}{section.6.4}%
+\contentsline {chapter}{\chapternumberline {7}Conclusion}{32}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Findings}{32}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Limitations and Future Research}{32}{section.7.2}%
+\contentsline {chapter}{Appendices}{33}{section*.3}%
+\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall}{34}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Derivation of the Auxiliary Expected Shortfall Formulation}{34}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Linear Program Representation of Portfolio Optimization}{36}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Regularization}{37}{section.A.3}%
+\contentsline {subsection}{\numberline {A.3.1}$L_1$ Regularization}{37}{subsection.A.3.1}%
+\contentsline {subsection}{\numberline {A.3.2}$L_2$ Regularization}{38}{subsection.A.3.2}%
+\contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{38}{subsection.A.3.3}%
+\contentsline {subsection}{\numberline {A.3.4}Quadratic Program Representation of the Regularized Portfolio Optimization}{38}{subsection.A.3.4}%
+\contentsline {section}{\numberline {A.4}Separate (Currency Overlay) Optimization}{39}{section.A.4}%
+\contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{39}{subsection.A.4.1}%
+\contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{40}{subsection.A.4.2}%
+\contentsline {section}{\numberline {A.5}Joint Optimization}{40}{section.A.5}%
+\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{43}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{43}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Regularization}{44}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{44}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}Estimators}{45}{subsection.B.2.2}%
+\contentsline {subsection}{\numberline {B.2.3}Quadratic Program Representation of the Regularized Portfolio Optimization}{46}{subsection.B.2.3}%
+\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{46}{section.B.3}%
+\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{47}{subsection.B.3.1}%
+\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{47}{subsection.B.3.2}%
+\contentsline {section}{\numberline {B.4}Joint Optimization}{48}{section.B.4}%
+\contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{51}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Linear Program Represenation of the Mean Absolute Deviation Portfolio Optimization Problem}{51}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Regularization}{51}{section.C.2}%
+\contentsline {subsection}{\numberline {C.2.1}$L_1, L_2$ Regularization and Leverage Constraint}{51}{subsection.C.2.1}%
+\contentsline {subsection}{\numberline {C.2.2}Quadratic Program Representaion of the Regularized Portfolio Optimization Problem}{51}{subsection.C.2.2}%
+\contentsline {section}{\numberline {C.3}Sequential Overlay Optimization}{51}{section.C.3}%
+\contentsline {subsection}{\numberline {C.3.1}Asset Optimizaiton}{51}{subsection.C.3.1}%
+\contentsline {subsection}{\numberline {C.3.2}Currency Overlay Optimization}{51}{subsection.C.3.2}%
+\contentsline {section}{\numberline {C.4}Joint Optimization}{51}{section.C.4}%
+\contentsline {section}{\numberline {C.5}Adding the Mean Term}{51}{section.C.5}%
+\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{52}{appendix.D}%
+\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{55}{appendix.E}%
+\contentsline {section}{\numberline {E.1}The CVXPY Library}{55}{section.E.1}%
+\contentsline {section}{\numberline {E.2}Computational Complexity and Performance}{55}{section.E.2}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{56}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{58}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{58}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{62}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{63}{section.G.3}%
+\contentsline {chapter}{Bibliography}{65}{appendix*.11}%

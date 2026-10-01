@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  1 OCT 2026 16:55
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  1 OCT 2026 16:57
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1600,263 +1600,143 @@ l.414
 
 LaTeX Warning: Reference `todo' on page 16 undefined on input line 70.
 
-<../results/figures/cumulative_returns/es_top10.pdf, id=838, 641.64977pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/es_top10.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/es_top10.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/es_top10.pdf  used on input line 83.
-(pdftex.def)             Requested size: 443.0pt x 244.38814pt.
-<../results/figures/cumulative_returns/es_top50.pdf, id=840, 641.54095pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/es_top50.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/es_top50.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/es_top50.pdf  used on input line 96.
-(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
 
 
 [16
 
-
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.1}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.105 \end{figure}
-                   <../results/figures/cumulative_returns/es_top10.pdf>]
+]
 
 [17
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.105 \end{figure}
-                  ]
-<../results/figures/cumulative_returns/es_top100.pdf, id=861, 641.54095pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/es_top100.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/es_top100.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/es_top100.pdf  used on input line 109.
-(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
-
-
-[18
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.2}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.120 \newpage
-               <../results/figures/cumulative_returns/es_top50.pdf>]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 124.
+l.81 \newpage
+             ]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 85.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
 
-[19
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.3}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.137 \newpage
-              {/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc} <../results/figures/cumulative_returns/es_top100.pdf>]
-Overfull \hbox (11.55086pt too wide) in paragraph at lines 140--140
+[18{/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}]
+Overfull \hbox (11.55086pt too wide) in paragraph at lines 101--101
 []\T1/lmr/bx/n/14.4 (-20) Backtest Re-sults of Mean-Variance Op-ti-miza-tion Ap-proaches 
  []
 
 
-LaTeX Warning: Reference `todo' on page 20 undefined on input line 204.
-
-<../results/figures/cumulative_returns/mv_top10.pdf, id=892, 641.49648pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/mv_top10.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/mv_top10.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/mv_top10.pdf  used on input line 210.
-(pdftex.def)             Requested size: 443.0pt x 244.44754pt.
-<../results/figures/cumulative_returns/mv_top50.pdf, id=894, 641.54095pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/mv_top50.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/mv_top50.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/mv_top50.pdf  used on input line 223.
-(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
-<../results/figures/cumulative_returns/mv_top100.pdf, id=896, 641.54095pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/mv_top100.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/mv_top100.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/mv_top100.pdf  used on input line 236.
-(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
-
-LaTeX Warning: Reference `todo' on page 20 undefined on input line 314.
-
-<../results/figures/cumulative_returns/mad_top10.pdf, id=899, 641.64977pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/mad_top10.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/mad_top10.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/mad_top10.pdf  used on input line 320.
-(pdftex.def)             Requested size: 443.0pt x 244.38814pt.
-<../results/figures/cumulative_returns/mad_top50.pdf, id=901, 641.54095pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/mad_top50.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/mad_top50.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/mad_top50.pdf  used on input line 333.
-(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
-<../results/figures/cumulative_returns/mad_top100.pdf, id=903, 641.54095pt x 353.96616pt>
-File: ../results/figures/cumulative_returns/mad_top100.pdf Graphic file (type pdf)
-<use ../results/figures/cumulative_returns/mad_top100.pdf>
-Package pdftex.def Info: ../results/figures/cumulative_returns/mad_top100.pdf  used on input line 346.
-(pdftex.def)             Requested size: 443.0pt x 244.42055pt.
+LaTeX Warning: Reference `todo' on page 19 undefined on input line 165.
 
 
-[20
+LaTeX Warning: Reference `todo' on page 19 undefined on input line 236.
+
+
+
+[19
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.358 \newpage
+l.240 \newpage
               ]
 
-[21
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.4}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.358 \newpage
-              
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.5}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.358 \newpage
-               <../results/figures/cumulative_returns/mv_top10.pdf> <../results/figures/cumulative_returns/mv_top50.pdf>]
-
-[22
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.6}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.358 \newpage
-              
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.7}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.358 \newpage
-               <../results/figures/cumulative_returns/mv_top100.pdf> <../results/figures/cumulative_returns/mad_top10.pdf>]
-
-[23
+[20
 pdfTeX warning (ext4): destination with the same identifier (name{table.5.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.358 \newpage
+l.240 \newpage
               ]
 
+[21]) (./chapters/joint_versus_sequential_optimization.tex
+
+[22]
+
+[23]
+
 [24
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.8}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.358 \newpage
-              
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.9}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.358 \newpage
-               <../results/figures/cumulative_returns/mad_top50.pdf> <../results/figures/cumulative_returns/mad_top100.pdf>]
-<../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf, id=982, 769.70685pt x 585.63568pt>
-File: ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf Graphic file (type pdf)
-<use ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf>
-Package pdftex.def Info: ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf  used on input line 391.
-(pdftex.def)             Requested size: 443.0pt x 337.0596pt.
-
-
-[25]
-
-[26
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.10}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.408 
-       <../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf>]
-<../results/in_sample_analysis/overfitting_by_measure.pdf, id=1056, 1528.07005pt x 314.42242pt>
-File: ../results/in_sample_analysis/overfitting_by_measure.pdf Graphic file (type pdf)
-<use ../results/in_sample_analysis/overfitting_by_measure.pdf>
-Package pdftex.def Info: ../results/in_sample_analysis/overfitting_by_measure.pdf  used on input line 414.
-(pdftex.def)             Requested size: 443.0pt x 91.15137pt.
-) (./chapters/joint_versus_sequential_optimization.tex
-
-[27
-pdfTeX warning (ext4): destination with the same identifier (name{figure.5.11}) has been already used, duplicate ignored
-<argument> ...shipout:D \box_use:N \l_shipout_box 
-                                                  \__shipout_drop_firstpage_...
-l.1 \chapter
-            {Joint versus Sequential Optimization}\label{chap:joint-vs-seque... <../results/in_sample_analysis/overfitting_by_measure.pdf>]
-
-[28
 
 ]
 
-[29]
+[25]
+<../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf, id=901, 769.70685pt x 585.63568pt>
 File: ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf  used on input line 86.
 (pdftex.def)             Requested size: 420.84865pt x 320.20616pt.
-<../results/in_sample_vs_out_of_sample/delta_epsilon.pdf, id=1147, 787.80046pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample/delta_epsilon.pdf, id=906, 787.80046pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample/delta_epsilon.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample/delta_epsilon.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample/delta_epsilon.pdf  used on input line 103.
 (pdftex.def)             Requested size: 443.0pt x 176.80939pt.
 
 
-[30
+[26
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.118 
-      ]
+       <../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf>]
 
-[31
+[27
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.130 \newpage
                <../results/in_sample_vs_out_of_sample/delta_epsilon.pdf>]
-<../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf, id=1235, 1011.39667pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf, id=1056, 1011.39667pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf  used on input line 141.
 (pdftex.def)             Requested size: 443.0pt x 137.71779pt.
-<../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf, id=1238, 1011.38982pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf, id=1059, 1011.38982pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf  used on input line 179.
 (pdftex.def)             Requested size: 443.0pt x 137.71779pt.
 
 
-[32
+[28
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.188 \end{figure}
                    <../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf>]
 
-[33
+[29
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.212 
        <../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf>]
 Package hyperref Info: bookmark level for unknown demeaningthmDthree defaults to 0 on input line 214.
-<../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf, id=1371, 618.24101pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf, id=1191, 618.24101pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf  used on input line 227.
 (pdftex.def)             Requested size: 354.40135pt x 180.24454pt.
 
 
-[34
+[30
 pdfTeX warning (ext4): destination with the same identifier (name{figure.6.5}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.254 
        <../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf>]) (./chapters/conclusion.tex
 
-[35])
+[31])
 
-[36
+[32
 
 ]
 
-[37
+[33
 
 ] (./chapters/appendixA.tex
 
-[38
+[34
 
 ]
 
-[39]
+[35]
 
-[40]
+[36]
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <12> on input line 200.
 
@@ -1874,7 +1754,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 
-[41]
+[37]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 233.
@@ -1889,17 +1769,17 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 
+[38]
+
+[39]
+
+[40]) (./chapters/appendixB.tex
+
+[41]
+
 [42]
 
-[43]
-
-[44]) (./chapters/appendixB.tex
-
-[45]
-
-[46]
-
-[47
+[43
 
 ]
 
@@ -1928,24 +1808,24 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 
 
-[48]
+[44]
 
-[49]
+[45]
 
-[50]
+[46]
 
-[51]
+[47]
 Overfull \hbox (11.35751pt too wide) detected at line 423
 \OML/lmm/b/it/10.95 q[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 L \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;
  []
 
 
 
-[52]
+[48]
 
-[53]) (./chapters/appendixC.tex
+[49]) (./chapters/appendixC.tex
 
-[54]
+[50]
 
 Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 (hyperref)                removing `math shift' on input line 15.
@@ -1964,7 +1844,7 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 ) (./chapters/appendixD.tex
 
-[55
+[51
 
 ]
 Package hyperref Info: bookmark level for unknown definition defaults to 0 on input line 6.
@@ -1976,22 +1856,22 @@ Overfull \hbox (0.1575pt too wide) in paragraph at lines 21--22
 Package hyperref Info: bookmark level for unknown theorem defaults to 0 on input line 37.
 
 
-[56
+[52
 
 ]
 Package hyperref Info: bookmark level for unknown proof defaults to 0 on input line 47.
 Package hyperref Info: bookmark level for unknown proposition defaults to 0 on input line 93.
 
 
-[57]) (./chapters/appendixE.tex
+[53]) (./chapters/appendixE.tex
 
-[58]) (./chapters/appendixF.tex
+[54]) (./chapters/appendixF.tex
 
-[59
+[55
 
 ]
 
-[60
+[56
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{equation.F.1}) has been already used, duplicate ignored
@@ -2000,35 +1880,35 @@ pdfTeX warning (ext4): destination with the same identifier (name{equation.F.1})
 l.26 \begin{align*}
                    ]) (./chapters/appendixG.tex
 
-[61]
+[57]
 
-Package natbib Warning: Citation `getsomething' on page 62 undefined on input line 41.
+Package natbib Warning: Citation `getsomething' on page 58 undefined on input line 41.
 
-<../results/figures/boundary_plots/es_top10_dinf.pdf, id=1762, 642.23833pt x 447.70543pt>
+<../results/figures/boundary_plots/es_top10_dinf.pdf, id=1582, 642.23833pt x 447.70543pt>
 File: ../results/figures/boundary_plots/es_top10_dinf.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/es_top10_dinf.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_dinf.pdf  used on input line 53.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
 
 
-[62
+[58
 
 ]
-<../results/figures/boundary_plots/es_top10_gross.pdf, id=1769, 643.23625pt x 447.70543pt>
+<../results/figures/boundary_plots/es_top10_gross.pdf, id=1589, 643.23625pt x 447.70543pt>
 File: ../results/figures/boundary_plots/es_top10_gross.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/es_top10_gross.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_gross.pdf  used on input line 65.
 (pdftex.def)             Requested size: 443.0pt x 308.34323pt.
 
 
-[63
+[59
 pdfTeX warning (ext4): destination with the same identifier (name{figure.G.1}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.119 \end{table}
                   <../results/figures/boundary_plots/es_top10_dinf.pdf>]
 
-[64
+[60
 pdfTeX warning (ext4): destination with the same identifier (name{figure.G.2}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -2039,24 +1919,24 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.G.1}) ha
                                                   \__shipout_drop_firstpage_...
 l.121 \newpage
                <../results/figures/boundary_plots/es_top10_gross.pdf>]
-<../results/figures/boundary_plots/mv_top10_dinf.pdf, id=1819, 642.23833pt x 447.70543pt>
+<../results/figures/boundary_plots/mv_top10_dinf.pdf, id=1640, 642.23833pt x 447.70543pt>
 File: ../results/figures/boundary_plots/mv_top10_dinf.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/mv_top10_dinf.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/mv_top10_dinf.pdf  used on input line 126.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
-<../results/figures/boundary_plots/mv_top10_gross.pdf, id=1822, 643.23625pt x 447.70543pt>
+<../results/figures/boundary_plots/mv_top10_gross.pdf, id=1643, 643.23625pt x 447.70543pt>
 File: ../results/figures/boundary_plots/mv_top10_gross.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/mv_top10_gross.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/mv_top10_gross.pdf  used on input line 138.
 (pdftex.def)             Requested size: 443.0pt x 308.34323pt.
-<../results/figures/sparsity_analysis/normal/es_assets.pdf, id=1830, 787.65733pt x 286.65495pt>
+<../results/figures/sparsity_analysis/normal/es_assets.pdf, id=1651, 787.65733pt x 286.65495pt>
 File: ../results/figures/sparsity_analysis/normal/es_assets.pdf Graphic file (type pdf)
 <use ../results/figures/sparsity_analysis/normal/es_assets.pdf>
 Package pdftex.def Info: ../results/figures/sparsity_analysis/normal/es_assets.pdf  used on input line 188.
 (pdftex.def)             Requested size: 443.0pt x 161.22551pt.
 
 
-[65
+[61
 pdfTeX warning (ext4): destination with the same identifier (name{figure.G.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -2068,7 +1948,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.G.2}) ha
 l.191 \end{figure}
                    <../results/figures/boundary_plots/mv_top10_dinf.pdf>]
 
-[66
+[62
 pdfTeX warning (ext4): destination with the same identifier (name{figure.G.4}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
@@ -2079,41 +1959,41 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.G.5}) h
                                                   \__shipout_drop_firstpage_...
 l.195 R
        egularization stabilizes the weight vector conditional on the penalty... <../results/figures/boundary_plots/mv_top10_gross.pdf> <../results/figures/sparsity_analysis/normal/es_assets.pdf>]
-<../results/figures/sparsity_analysis/normal/mv_assets.pdf, id=1898, 787.65733pt x 286.65495pt>
+<../results/figures/sparsity_analysis/normal/mv_assets.pdf, id=1719, 787.65733pt x 286.65495pt>
 File: ../results/figures/sparsity_analysis/normal/mv_assets.pdf Graphic file (type pdf)
 <use ../results/figures/sparsity_analysis/normal/mv_assets.pdf>
 Package pdftex.def Info: ../results/figures/sparsity_analysis/normal/mv_assets.pdf  used on input line 208.
 (pdftex.def)             Requested size: 443.0pt x 161.22551pt.
 
 
-Package natbib Warning: Citation `DeMiguel et al. 2009' on page 67 undefined on input line 219.
+Package natbib Warning: Citation `DeMiguel et al. 2009' on page 63 undefined on input line 219.
 
 )
 
-[67
+[63
 pdfTeX warning (ext4): destination with the same identifier (name{figure.G.6}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.220 \backmatter
                   <../results/figures/sparsity_analysis/normal/mv_assets.pdf>]
 
-[68
+[64
 pdfTeX warning (ext4): destination with the same identifier (name{table.G.3}) has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
 l.220 \backmatter
                  ] (./thesis.bbl
 
-[69
+[65
 
 
 ])
-<declaration-originality.pdf, id=1938, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=1758, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 225.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=1940, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=1760, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 225.
@@ -2124,7 +2004,7 @@ Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 
 (pdftex.def)             Requested size: 597.57834pt x 845.1138pt.
 
 
-[70]
+[66]
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 225.
@@ -2139,7 +2019,7 @@ File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 225.
 (pdftex.def)             Requested size: 597.57834pt x 845.1138pt.
-[71
+[67
 
  <./declaration-originality.pdf>]
 \tf@thm=\write6
@@ -2161,25 +2041,22 @@ L3 programming layer <2020/03/25>
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: BFBC0586DB188FC6896C598F9A0425E5;17187.
  ) 
 Here is how much of TeX's memory you used:
- 41313 strings out of 473190
- 801343 string characters out of 5715800
- 1497821 words of memory out of 5000000
- 62937 multiletter control sequences out of 15000+600000
+ 41206 strings out of 473190
+ 796128 string characters out of 5715800
+ 1491007 words of memory out of 5000000
+ 62845 multiletter control sequences out of 15000+600000
  762825 words of font info for 408 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,19n,125p,1949b,2201s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (77 pages, 2952941 bytes).
+Output written on thesis.pdf (73 pages, 1490779 bytes).
 PDF statistics:
- 2219 PDF objects out of 2487 (max. 8388607)
- 1405 compressed objects within 15 object streams
- 288 named destinations out of 1000 (max. 500000)
- 114022 words of extra memory for PDF output out of 128383 (max. 10000000)
+ 2038 PDF objects out of 2073 (max. 8388607)
+ 1320 compressed objects within 14 object streams
+ 273 named destinations out of 1000 (max. 500000)
+ 113972 words of extra memory for PDF output out of 128383 (max. 10000000)
 
