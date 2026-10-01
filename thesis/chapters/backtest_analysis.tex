@@ -2,6 +2,60 @@
 
 
 
+\section{Baseline Backtests} \label{sec:baseline-backtests}
+
+WHAT TO COVER:
+
+Define the baselin
+
+three metric tables, one per universe size
+
+three cumulative return plots, one per universe size
+
+First, read tables. which measure is the best performer, where does joint beat overlay and by how much, where is it the reverse
+
+Second, the universe size pattern. At top-10 the joint and overlay results differ most, and the direction of the difference depends on the measure. At top-100 they converge.
+
+Third, the main claim. On realized Sharpe, joint and overlay are close across configurations, and no single risk measure delivers a consistent advantage for joint. This sets up what the modifications in the next two sections do or do not change.
+
+\section{The Effects of Regularization} \label{sec:effects-of-regularization}
+
+Opens with a one-paragraph lead stating that this section repeats the baseline comparison with the regularized versions of the joint and overlay programs. Point back to the Optimization Framework chapter for the regularization scheme.
+
+Rather than repeating the three full tables, show one comparison figure and one summary table. The figure has three panels, one per universe. Each panel shows regularized vs unregularized Sharpe (or your headline metric) for joint and overlay across the five measures. Simple bar chart or dot plot with lines connecting the regularized and unregularized points, so the reader sees the direction and size of the change in one glance.
+
+The summary table shows the delta: regularized minus unregularized, by strategy and measure, at each universe. One row per measure, columns grouped by strategy, three sub-columns per group (one per universe). Negative deltas mean regularization hurt Sharpe, positive means it helped.
+
+The full regularized tables with all metrics go in the appendix.
+
+What to write. Two or three paragraphs.
+
+First, what regularization does to the levels. Does it improve Sharpe, hurt it, or move it only slightly. State the direction cleanly.
+
+Second, what it does to the joint-overlay gap. If regularization narrows the gap, say so and give the numbers. If it leaves the gap unchanged, say that. This is the main point of the section because it foreshadows the next chapter's mechanism argument.
+
+Third, any measure-specific or universe-specific surprises. If regularization helps the tail measures more than the deviation measures, or vice versa, say so. If one universe behaves differently, flag it. Do not force a story that is not there.
+
+\section{The Effects of Adding a Mean Term} \label{sec:effects-of-adding-a-mean-term}
+
+Opens with a one-paragraph lead stating that this section adds a mean term to the unregularized joint and overlay programs, repeating the baseline comparison. Point to the Optimization Framework chapter for how the mean term is specified and calibrated.
+
+Same visual structure as Section 2: one comparison figure (three panels, one per universe) showing with-mean-term vs no-mean-term Sharpe for joint and overlay across measures, plus a delta table.
+
+Then the extra analysis you have in mind. A second table that groups the delta by deviation measures vs tail measures. Average delta Sharpe for the three deviation measures and for the two tail measures, by strategy and universe. This is the table that shows the group split. If the mean term helps the deviation measures more than the tail measures (or less), it will be visible here.
+
+The full tables go in the appendix.
+
+What to write. Three paragraphs.
+
+First, levels. Does adding the mean term improve realized performance overall. State the direction. The expectation is that it helps, since the mean term adds a return-seeking component to a pure risk minimizer. If it does not, say so and discuss why briefly.
+
+Second, the deviation vs tail split. The tail measures are already translation-equivariant and carry an implicit mean term, so adding an explicit mean term with your calibrated kappa should strengthen an existing channel. The deviation measures do not have this channel, so the mean term is giving them something new. Predict what you expect to see (deviation measures benefit more if the new channel is strong, less if the existing tail-measure mean channel was already most of what mattered), then say which the data support.
+
+Third, joint vs overlay with the mean term. Does the mean term widen or narrow the joint-overlay gap. The key claim here is that if the mean term helps joint and overlay by similar amounts, the "joint lets you exploit covariance with the mean" story is weak, because that story predicts joint benefits more. This matters because it closes off the obvious defense of joint optimization. State the result cleanly.
+
+\section{Conclusion} \label{sec:backtest-conclusion}
+
 
 \section{Backtest Results of Expected Shortfall Optimization Approaches}
 
