@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  2 OCT 2026 13:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  2 OCT 2026 13:26
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1662,23 +1662,12 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.3}) h
 l.235 \newpage
                <../results/figures/cumulative_and_difference/unregularized_top100.pdf>]
 
-LaTeX Warning: Reference `tab:regularized' on page 23 undefined on input line 310.
-
-
-
 [23]
-<../results/figures/cumulative_and_difference/regularized_top10.pdf, id=1060, 658.8391pt x 550.20718pt>
+<../results/figures/cumulative_and_difference/regularized_top10.pdf, id=1061, 658.8391pt x 550.20718pt>
 File: ../results/figures/cumulative_and_difference/regularized_top10.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_and_difference/regularized_top10.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/regularized_top10.pdf  used on input line 326.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
-
-
-LaTeX Warning: Reference `fig:regularized-top10' on page 24 undefined on input line 332.
-
-
-LaTeX Warning: Reference `tab:regularized' on page 24 undefined on input line 337.
-
 
 
 [24
@@ -1687,18 +1676,11 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.5.4}) ha
                                                   \__shipout_drop_firstpage_...
 l.340 
       ]
-<../results/figures/cumulative_and_difference/regularized_top50.pdf, id=1066, 658.84064pt x 550.20718pt>
+<../results/figures/cumulative_and_difference/regularized_top50.pdf, id=1069, 658.84064pt x 550.20718pt>
 File: ../results/figures/cumulative_and_difference/regularized_top50.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_and_difference/regularized_top50.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/regularized_top50.pdf  used on input line 343.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
-
-
-LaTeX Warning: Reference `fig:regularized-top50' on page 25 undefined on input line 349.
-
-
-LaTeX Warning: Reference `tab:regularized' on page 25 undefined on input line 354.
-
 
 
 [25
@@ -1707,18 +1689,11 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.4}) h
                                                   \__shipout_drop_firstpage_...
 l.357 
        <../results/figures/cumulative_and_difference/regularized_top10.pdf>]
-<../results/figures/cumulative_and_difference/regularized_top100.pdf, id=1127, 658.84064pt x 550.20718pt>
+<../results/figures/cumulative_and_difference/regularized_top100.pdf, id=1132, 658.84064pt x 550.20718pt>
 File: ../results/figures/cumulative_and_difference/regularized_top100.pdf Graphic file (type pdf)
 <use ../results/figures/cumulative_and_difference/regularized_top100.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/regularized_top100.pdf  used on input line 360.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
-
-
-LaTeX Warning: Reference `fig:regularized-top100' on page 26 undefined on input line 366.
-
-
-LaTeX Warning: Reference `tab:regularized' on page 26 undefined on input line 371.
-
 
 
 [26
@@ -1748,12 +1723,12 @@ File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ]
 
 [31]
-<../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf, id=1274, 769.70685pt x 585.63568pt>
+<../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf, id=1281, 769.70685pt x 585.63568pt>
 File: ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf  used on input line 86.
 (pdftex.def)             Requested size: 420.84865pt x 320.20616pt.
-<../results/in_sample_vs_out_of_sample/delta_epsilon.pdf, id=1279, 787.80046pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample/delta_epsilon.pdf, id=1286, 787.80046pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample/delta_epsilon.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample/delta_epsilon.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample/delta_epsilon.pdf  used on input line 103.
@@ -1773,12 +1748,12 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.6.2}) h
                                                   \__shipout_drop_firstpage_...
 l.130 \newpage
                <../results/in_sample_vs_out_of_sample/delta_epsilon.pdf>]
-<../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf, id=1429, 1011.39667pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf, id=1436, 1011.39667pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample_es_at_diff_levels/gap_vs_level.pdf  used on input line 141.
 (pdftex.def)             Requested size: 443.0pt x 137.71779pt.
-<../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf, id=1432, 1011.38982pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf, id=1439, 1011.38982pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf  used on input line 179.
@@ -1799,7 +1774,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.6.4}) h
 l.212 
        <../results/in_sample_vs_out_of_sample_soes_at_diff_levels/gap_vs_level.pdf>]
 Package hyperref Info: bookmark level for unknown demeaningthmDthree defaults to 0 on input line 214.
-<../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf, id=1565, 618.24101pt x 314.42242pt>
+<../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf, id=1572, 618.24101pt x 314.42242pt>
 File: ../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf Graphic file (type pdf)
 <use ../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf>
 Package pdftex.def Info: ../results/in_sample_vs_out_of_sample_demeaned/gap_vs_universe.pdf  used on input line 227.
@@ -1977,7 +1952,7 @@ l.26 \begin{align*}
 
 Package natbib Warning: Citation `getsomething' on page 64 undefined on input line 41.
 
-<../results/figures/boundary_plots/es_top10_dinf.pdf, id=1956, 642.23833pt x 447.70543pt>
+<../results/figures/boundary_plots/es_top10_dinf.pdf, id=1963, 642.23833pt x 447.70543pt>
 File: ../results/figures/boundary_plots/es_top10_dinf.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/es_top10_dinf.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_dinf.pdf  used on input line 53.
@@ -1987,7 +1962,7 @@ Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_dinf.pdf  us
 [64
 
 ]
-<../results/figures/boundary_plots/es_top10_gross.pdf, id=1963, 643.23625pt x 447.70543pt>
+<../results/figures/boundary_plots/es_top10_gross.pdf, id=1970, 643.23625pt x 447.70543pt>
 File: ../results/figures/boundary_plots/es_top10_gross.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/es_top10_gross.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_gross.pdf  used on input line 65.
@@ -2012,17 +1987,17 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.G.1}) ha
                                                   \__shipout_drop_firstpage_...
 l.121 \newpage
                <../results/figures/boundary_plots/es_top10_gross.pdf>]
-<../results/figures/boundary_plots/mv_top10_dinf.pdf, id=2013, 642.23833pt x 447.70543pt>
+<../results/figures/boundary_plots/mv_top10_dinf.pdf, id=2020, 642.23833pt x 447.70543pt>
 File: ../results/figures/boundary_plots/mv_top10_dinf.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/mv_top10_dinf.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/mv_top10_dinf.pdf  used on input line 126.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
-<../results/figures/boundary_plots/mv_top10_gross.pdf, id=2016, 643.23625pt x 447.70543pt>
+<../results/figures/boundary_plots/mv_top10_gross.pdf, id=2023, 643.23625pt x 447.70543pt>
 File: ../results/figures/boundary_plots/mv_top10_gross.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/mv_top10_gross.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/mv_top10_gross.pdf  used on input line 138.
 (pdftex.def)             Requested size: 443.0pt x 308.34323pt.
-<../results/figures/sparsity_analysis/normal/es_assets.pdf, id=2024, 787.65733pt x 286.65495pt>
+<../results/figures/sparsity_analysis/normal/es_assets.pdf, id=2031, 787.65733pt x 286.65495pt>
 File: ../results/figures/sparsity_analysis/normal/es_assets.pdf Graphic file (type pdf)
 <use ../results/figures/sparsity_analysis/normal/es_assets.pdf>
 Package pdftex.def Info: ../results/figures/sparsity_analysis/normal/es_assets.pdf  used on input line 188.
@@ -2052,7 +2027,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.G.5}) h
                                                   \__shipout_drop_firstpage_...
 l.195 R
        egularization stabilizes the weight vector conditional on the penalty... <../results/figures/boundary_plots/mv_top10_gross.pdf> <../results/figures/sparsity_analysis/normal/es_assets.pdf>]
-<../results/figures/sparsity_analysis/normal/mv_assets.pdf, id=2093, 787.65733pt x 286.65495pt>
+<../results/figures/sparsity_analysis/normal/mv_assets.pdf, id=2100, 787.65733pt x 286.65495pt>
 File: ../results/figures/sparsity_analysis/normal/mv_assets.pdf Graphic file (type pdf)
 <use ../results/figures/sparsity_analysis/normal/mv_assets.pdf>
 Package pdftex.def Info: ../results/figures/sparsity_analysis/normal/mv_assets.pdf  used on input line 208.
@@ -2109,12 +2084,12 @@ l.220 \backmatter
 
 
 ])
-<declaration-originality.pdf, id=2147, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=2154, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 225.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=2149, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=2156, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 225.
@@ -2162,25 +2137,22 @@ L3 programming layer <2020/03/25>
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: A3ED08F116CE4CFF807944F5E611E7A1;16657.
+(rerunfilecheck)             Checksum: 8F5CF848D462206ABDFFFF0C1DD6E1A0;16503.
  ) 
 Here is how much of TeX's memory you used:
  41302 strings out of 473190
  800394 string characters out of 5715800
- 1511718 words of memory out of 5000000
+ 1512574 words of memory out of 5000000
  62920 multiletter control sequences out of 15000+600000
  762938 words of font info for 409 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,19n,125p,1949b,2201s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (81 pages, 3994594 bytes).
+Output written on thesis.pdf (81 pages, 3994559 bytes).
 PDF statistics:
- 2430 PDF objects out of 2487 (max. 8388607)
- 1410 compressed objects within 15 object streams
+ 2437 PDF objects out of 2487 (max. 8388607)
+ 1417 compressed objects within 15 object streams
  292 named destinations out of 1000 (max. 500000)
  114010 words of extra memory for PDF output out of 128383 (max. 10000000)
 
