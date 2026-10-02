@@ -251,6 +251,127 @@ Second, what it does to the joint-overlay gap. If regularization narrows the gap
 
 Third, any measure-specific or universe-specific surprises. If regularization helps the tail measures more than the deviation measures, or vice versa, say so. If one universe behaves differently, flag it. Do not force a story that is not there.
 
+\begin{table}[H]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.82}{%
+  \begin{tabular}{l*{11}{c}}
+    \multicolumn{12}{c}{\textbf{Regularized Backtest Performance across Universe Sizes}} \\[2pt]
+    \toprule
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics of the regularized optimizers in the small, medium and large investment universes}
+  \label{tab:regularized}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:regularized} reports out-of-sample performance metrics for the regularized optimizers in
+  the three investment universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
+  medium and Panel C the large investment universe. Each panel reports the regularized sequential currency
+  overlay (Overlay) and joint (Joint) optimizers, together with the equally weighted portfolio (EW) as a
+  benchmark. Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean
+  absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
+  out-of-sample statistics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
+  (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average annual asset and currency turnover,
+  respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
+  formed in June 2000. Details on the optimization approaches and performance metrics are provided in
+  \Cref{chap:optimization-framework,chap:data-and-implementation}.
+  \end{minipage}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
+  \label{fig:regularized-top10}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:regularized-top10} shows the out-of-sample performance of the regularized optimizers in
+  the small investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
+  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
+  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
+  net of transaction costs. The corresponding performance metrics are reported in Panel A of Table
+  \ref{tab:regularized}.
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
+  \label{fig:regularized-top50}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:regularized-top50} shows the out-of-sample performance of the regularized optimizers in
+  the medium investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
+  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
+  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
+  net of transaction costs. The corresponding performance metrics are reported in Panel B of Table
+  \ref{tab:regularized}.
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/regularized_top100.pdf}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the large investment universe (top 100 stocks per economy).}
+  \label{fig:regularized-top100}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:regularized-top100} shows the out-of-sample performance of the regularized optimizers in
+  the large investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
+  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
+  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
+  net of transaction costs. The corresponding performance metrics are reported in Panel C of Table
+  \ref{tab:regularized}.
+  \end{minipage}
+\end{figure}
+
 \section{The Effects of Adding a Mean Term} \label{sec:effects-of-adding-a-mean-term}
 
 Opens with a one-paragraph lead stating that this section adds a mean term to the unregularized joint and overlay programs, repeating the baseline comparison. Point to the Optimization Framework chapter for how the mean term is specified and calibrated.
