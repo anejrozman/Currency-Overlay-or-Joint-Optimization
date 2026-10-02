@@ -18,7 +18,7 @@ Second, the universe size pattern. At top-10 the joint and overlay results diffe
 
 Third, the main claim. On realized Sharpe, joint and overlay are close across configurations, and no single risk measure delivers a consistent advantage for joint. This sets up what the modifications in the next two sections do or do not change.
 
-\begin{table}[htbp]
+\begin{table}[H]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -61,20 +61,35 @@ Third, the main claim. On realized Sharpe, joint and overlay are close across co
   \begin{minipage}{\textwidth}
   \raggedright\small
     Table \ref{tab:baseline-top10} reports out-of-sample performance metrics for the international portfolio
-  optimization in the small investment universe, made up of the 10 largest companies by market capitalization
-  in each economy, with portfolios rebalanced quarterly. Panel A reports the unregularized currency overlay
+  optimization in the small investment universe, with portfolios rebalanced quarterly. Panel A reports the unregularized sequential currency overlay
   (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted portfolio (EW) and
   the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped by the risk measure
-  that is minimized: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
+  that is minimized, that is, variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
   second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are the annualized
   excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR),
-  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. The sample
+  and average annual asset and currency turnover, respectively. The sample
   period runs from June 1990 to June 2023, and the first out-of-sample portfolio is formed in June 2000.
-  Details on the optimization approaches and performance metrics are provided in section \ref{todo}.
+  Details on the optimization approaches and performance metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
 \end{table}
 
-\begin{table}[htbp]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/unregularized_top10.pdf}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
+  \label{fig:baseline-top10}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:baseline-top10} shows the out-of-sample performance of the unregularized optimizers in the
+  small investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
+  weighted portfolio. The bottom panel shows the cumulative sum of the
+  daily return differences between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
+  transaction costs. The corresponding performance metrics are reported in Table \ref{tab:baseline-top10}.
+  \end{minipage}
+\end{figure}
+
+\begin{table}[H]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -117,20 +132,35 @@ Third, the main claim. On realized Sharpe, joint and overlay are close across co
   \begin{minipage}{\textwidth}
   \raggedright\small
     Table \ref{tab:baseline-top50} reports out-of-sample performance metrics for the international portfolio
-  optimization in the medium investment universe, comprising the 50 largest companies by market capitalization
-  in each economy, with portfolios rebalanced quarterly. Panel A reports the unregularized currency overlay
+  optimization in the medium investment universe, with portfolios rebalanced quarterly. Panel A reports the unregularized sequential currency overlay
   (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted portfolio (EW) and
   the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped by the risk measure
-  that is minimized: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
+  that is minimized, that is, variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
   second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are the annualized
   excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR),
-  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. The sample
+  and average annual asset and currency turnover, respectively. The sample
   period runs from June 1990 to June 2023, and the first out-of-sample portfolio is formed in June 2000.
-  Details on the optimization approaches and performance metrics are provided in section \ref{todo}.
+  Details on the optimization approaches and performance metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
 \end{table}
 
-\begin{table}[htbp]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/unregularized_top50.pdf}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
+  \label{fig:baseline-top50}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:baseline-top50} shows the out-of-sample performance of the unregularized optimizers in the
+  medium investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
+  weighted portfolio. The bottom panel shows the cumulative sum of the
+  daily return differences between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
+  transaction costs. The corresponding performance metrics are reported in Table \ref{tab:baseline-top50}.
+  \end{minipage}
+\end{figure}
+
+\begin{table}[H]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -173,19 +203,33 @@ Third, the main claim. On realized Sharpe, joint and overlay are close across co
   \begin{minipage}{\textwidth}
   \raggedright\small
     Table \ref{tab:baseline-top100} reports out-of-sample performance metrics for the international portfolio
-  optimization in the large investment universe, consisting of the 100 largest companies by market
-  capitalization in each economy, with portfolios rebalanced quarterly. Panel A reports the unregularized
-  currency overlay (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted
-  portfolio (EW) and the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped
-  by the risk measure that is minimized: variance, semi-variance, mean absolute deviation (MAD), Expected
-  Shortfall (ES) and second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are
-  the annualized excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the
-  Sortino Ratio (SOR), and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$,
-  respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
-  formed in June 2000. Details on the optimization approaches and performance metrics are provided in section
-  \ref{todo}.
+  optimization in the large investment universe, with portfolios rebalanced quarterly. Panel A reports the unregularized sequential currency overlay
+  (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted portfolio (EW) and
+  the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped by the risk measure
+  that is minimized, that is, variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
+  second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are the annualized
+  excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR),
+  and average annual asset and currency turnover, respectively. The sample
+  period runs from June 1990 to June 2023, and the first out-of-sample portfolio is formed in June 2000.
+  Details on the optimization approaches and performance metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
 \end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/unregularized_top100.pdf}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the currency overlay in the large investment universe (top 100 stocks per economy).}
+  \label{fig:baseline-top100}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:baseline-top100} shows the out-of-sample performance of the unregularized optimizers in the
+  large investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
+  weighted portfolio. The bottom panel shows the cumulative sum of the
+  daily return differences between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
+  transaction costs. The corresponding performance metrics are reported in Table \ref{tab:baseline-top100}.
+  \end{minipage}
+\end{figure}
 
 
 \newpage
@@ -228,14 +272,6 @@ Third, joint vs overlay with the mean term. Does the mean term widen or narrow t
 \section{Conclusion} \label{sec:backtest-conclusion}
 
 
-\section{Backtest Results of Expected Shortfall Optimization Approaches}
-
-We can see in table \ref{tab:es-universe-sizes} that the performance of the expected shortfall optimization approaches varies across 
-different universe sizes. In the small universe, the optimized portfolios generally outperform the equal weight benchmark in terms of 
-risk-adjusted returns, as measured by the Sharpe Ratio and Sortino Ratio. However, as we increase the universe size to medium and large, 
-the performance of the optimized portfolios relative to the equal weight benchmark deteriorates, with some strategies even underperforming 
-the benchmark in terms of risk-adjusted returns. This suggests that the benefits of optimization may diminish as the investment universe expands, 
-potentially due to increased estimation error and model uncertainty in larger universes. 
 
 \newpage
 % checklist of what to compare 
@@ -254,12 +290,7 @@ List of results interpretations to write up
 
 \end{itemize}
 
-\newpage
 
-
-\section{Backtest Results of Mean-Variance Optimization Approaches}
-
-\section{Backtest Results of Mean Absolute Deviation Optimization Approaches}
 
 FINISH WITH THIS SO YOU MOTIVATE THE NEXT CHAPTER:
 
