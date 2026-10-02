@@ -18,6 +18,177 @@ Second, the universe size pattern. At top-10 the joint and overlay results diffe
 
 Third, the main claim. On realized Sharpe, joint and overlay are close across configurations, and no single risk measure delivers a consistent advantage for joint. This sets up what the modifications in the next two sections do or do not change.
 
+\begin{table}[htbp]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.82}{%
+  \begin{tabular}{l*{11}{c}}
+    \multicolumn{12}{c}{\textbf{Baseline Backtest Performance: Small Universe (top 10 stocks per economy)}} \\[2pt]
+    \toprule
+    \multicolumn{12}{c}{\textbf{Panel A: Unregularized Overlay and Joint Optimizers}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          &                  & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel B: Benchmarks}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics of the baseline backtests in the small investment universe (top 10 stocks per economy)}
+  \label{tab:baseline-top10}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:baseline-top10} reports out-of-sample performance metrics for the international portfolio
+  optimization in the small investment universe, made up of the 10 largest companies by market capitalization
+  in each economy, with portfolios rebalanced quarterly. Panel A reports the unregularized currency overlay
+  (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted portfolio (EW) and
+  the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped by the risk measure
+  that is minimized: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
+  second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are the annualized
+  excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR),
+  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. The sample
+  period runs from June 1990 to June 2023, and the first out-of-sample portfolio is formed in June 2000.
+  Details on the optimization approaches and performance metrics are provided in section \ref{todo}.
+  \end{minipage}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.82}{%
+  \begin{tabular}{l*{11}{c}}
+    \multicolumn{12}{c}{\textbf{Baseline Backtest Performance: Medium Universe (top 50 stocks per economy)}} \\[2pt]
+    \toprule
+    \multicolumn{12}{c}{\textbf{Panel A: Unregularized Overlay and Joint Optimizers}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          &                  & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel B: Benchmarks}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics of the baseline backtests in the medium investment universe (top 50 stocks per economy)}
+  \label{tab:baseline-top50}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:baseline-top50} reports out-of-sample performance metrics for the international portfolio
+  optimization in the medium investment universe, comprising the 50 largest companies by market capitalization
+  in each economy, with portfolios rebalanced quarterly. Panel A reports the unregularized currency overlay
+  (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted portfolio (EW) and
+  the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped by the risk measure
+  that is minimized: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and
+  second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are the annualized
+  excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR),
+  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. The sample
+  period runs from June 1990 to June 2023, and the first out-of-sample portfolio is formed in June 2000.
+  Details on the optimization approaches and performance metrics are provided in section \ref{todo}.
+  \end{minipage}
+\end{table}
+
+\begin{table}[htbp]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.82}{%
+  \begin{tabular}{l*{11}{c}}
+    \multicolumn{12}{c}{\textbf{Baseline Backtest Performance: Large Universe (top 100 stocks per economy)}} \\[2pt]
+    \toprule
+    \multicolumn{12}{c}{\textbf{Panel A: Unregularized Overlay and Joint Optimizers}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          &                  & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel B: Benchmarks}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero}    & \textbf{Full}    & \textbf{Zero} \\
+    \midrule
+    ER (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    Vol (\%)                 &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    MD (\%)                  &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SR                       &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    SOR                      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^a$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    $\text{Turnover}^c$      &                  &                  &                  &                  &                  &                  &                  &                  &                  &                  & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics of the baseline backtests in the large investment universe (top 100 stocks per economy)}
+  \label{tab:baseline-top100}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:baseline-top100} reports out-of-sample performance metrics for the international portfolio
+  optimization in the large investment universe, consisting of the 100 largest companies by market
+  capitalization in each economy, with portfolios rebalanced quarterly. Panel A reports the unregularized
+  currency overlay (Overlay) and joint (Joint) optimizers, and Panel B the benchmarks, the equally weighted
+  portfolio (EW) and the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero). Columns are grouped
+  by the risk measure that is minimized: variance, semi-variance, mean absolute deviation (MAD), Expected
+  Shortfall (ES) and second-order Expected Shortfall (SOES). The realized out-of-sample statistics shown are
+  the annualized excess return (ER), volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the
+  Sortino Ratio (SOR), and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$,
+  respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
+  formed in June 2000. Details on the optimization approaches and performance metrics are provided in section
+  \ref{todo}.
+  \end{minipage}
+\end{table}
+
+
+\newpage
 \section{The Effects of Regularization} \label{sec:effects-of-regularization}
 
 Opens with a one-paragraph lead stating that this section repeats the baseline comparison with the regularized versions of the joint and overlay programs. Point back to the Optimization Framework chapter for the regularization scheme.
