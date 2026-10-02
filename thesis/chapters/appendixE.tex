@@ -17,6 +17,49 @@ and second-order cone programs for the second-order expected shortfall risk meas
 
 The CVXPY library is structured as follows: TODO: summarize the documentation of the library.
 
+\section{Numerical Implementation} \label{sec:numerical-implementation}
+
+The optimization problems derived in \Cref{chap:optimization-framework} are
+not assembled in their explicit matrix form in code. Each problem is instead
+expressed directly in the high-level modeling syntax of \texttt{CVXPY},
+converted automatically into the standard form, and finally passed to the solver. For example,
+the $L_1$ penalty is written with \texttt{CVXPY}'s \texttt{norm1} atom, so the
+positive-negative variable split used in the derivation is internal to the solver and never appears explicitly in the code. The resulting problem
+class depends only on the regularization. The Expected Shortfall
+optimizer is a linear program when it is left unregularized, since both the
+Rockafellar--Uryasev objective and its constraints are linear, whereas the
+$L_2$ ridge penalty introduces a quadratic term that turns every regularized
+Expected Shortfall problem into a quadratic program. The mean--variance problems
+are quadratic programs by construction, through the variance term in their
+objective.
+
+All programs are solved with Gurobi, a state-of-the-art solver for linear and
+quadratic programs, accessed through \texttt{CVXPY}.\footnote{Gurobi is a commercial solver and requires a license to use, a free fallback solver is available in the project codebase.} The solver is configured to use the
+barrier (interior point) method with tight convergence and accuracy tolerances,
+so that the large number of problems solved across rebalancing dates, universes,
+and hyperparameter configurations return reproducible results. The
+exact configuration is
+
+\begin{lstlisting}[language=Python]
+problem.solve(
+    solver=cp.GUROBI,
+    verbose=False,
+    BarConvTol=1e-8,
+    Method=2,
+    ScaleFlag=0,
+    AggFill=0,
+    PreDual=1,
+    Presolve=1,
+    Threads=3,
+    FeasibilityTol=1e-9,
+    OptimalityTol=1e-9,
+)
+\end{lstlisting}
+
+The barrier method (\texttt{Method=2}) is paired with a barrier convergence
+tolerance of $10^{-8}$ and feasibility and optimality tolerances of $10^{-9}$,
+the remaining flags specify the presolve, scaling, and threading behavior, which were optimized for the problem sizes considered in the thesis.
+
 \section{Computational Complexity and Performance}\label{sec:computational-complexity}
 
 

@@ -9,6 +9,22 @@ determine these bounds, following a similar approach as
 
 TODO: Summarize the sparsity analysis and its purpose.
 
+
+\textcolor{red}{this is from the data chapter, maybe it will come in handy}
+Hyperparameter selection follows the walk-forward grid search described in
+\Cref{sec:backtesting-framework}. The tuned hyperparameters are the $L_1$ and
+$L_2$ regularization coefficients applied separately to the asset and currency
+weights, $\lambda_1^a$, $\lambda_2^a$, $\lambda_1^c$, and $\lambda_2^c$, and the
+grid is the full cartesian product of their individual ranges. Each candidate
+configuration is scored by computing, on the validation window, the objective the
+optimizer minimizes, evaluated at the weights that configuration produces. The
+other parameters specific to the optimziation problems (these include the
+risk-aversion coefficient, the leverage budget, and the net currency exposure
+bounds) are fixed a priori rather than tuned. For each penalty the lower bound is
+zero, corresponding to the absence of that regularization term, while the upper bounds
+differ across parameters and are chosen so that larger values leave the optimal
+weights essentially unchanged. 
+
 \section{Hyperparameter Sensitivity Analysis} \label{app:hyperparameter-sensitivity}
 
 The regularized portfolio optimization problems include four regularization parameters, the asset penalties
