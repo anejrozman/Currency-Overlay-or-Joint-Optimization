@@ -559,7 +559,7 @@ SOES_GAMMA_GRID = [0.5]  # was [3, 1, 0.5, 0.3, 0.2, 0.1, 0.05]
 # list rather than a two-point grid: demeaned and raw ES are different risk
 # measures, not competing hyperparameters, so the validation search must not
 # choose between them.
-DEMEAN: bool = True
+DEMEAN: bool = False
 DEMEAN_GRID = [DEMEAN]
 
 # Every MV program is now mean-free, so no risk-aversion coefficient survives: with
