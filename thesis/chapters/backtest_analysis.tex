@@ -3,31 +3,36 @@
 In this chapter, we analyze the out-of-sample performance of the joint and sequential overlay programs across the five 
 risk measures and three universe sizes introduced in \Cref{chap:optimization-framework,chap:data-and-implementation}. In \Cref{sec:baseline-backtests} we report the 
 baseline backtests of the unregularized joint and overlay optimizers, together with the equally weighted, fully 
-hedged and unhedged benchmarks. We show that the optimized strategies trade excess return for lower volatility, 
-that their risk-adjusted returns are not meaningfully better than the benchmarks, and that joint and overlay 
+hedged and unhedged benchmarks. We show that the optimized strategies trade excess return for lower risk, 
+that their risk-adjusted returns are not consistently better than the benchmarks, and that joint and overlay optimization approaches
 produce similar realized performance across measures and universes. In \Cref{sec:effects-of-regularization} we 
-repeat the analysis for the regularized joint and overlay programs and show that regularization does not meaningfully improve the results. In \Cref{sec:effects-of-adding-a-mean-term} we consider the mean-risk formulation of the optimizers and show that the 
-deviation measures benefit substantially while the tail measures barely change. This split motivates the implicit 
-risk-return tradeoff that is formalized in \Cref{chap:joint-vs-sequential}. The absence of a meaningful difference 
-between joint and overlay optimizers on out-of-sample returns motivates the next chapter, where we investigate the differences in risk minimization. 
+repeat the analysis for the regularized joint and overlay programs and show that regularization does not meaningfully change the results. In \Cref{sec:effects-of-adding-a-mean-term} we consider the mean-risk formulation of the optimizers and show that the 
+deviation measures benefit from it substantially more than the tail measures. This split motivates the 
+risk-return tradeoff analysis in \Cref{chap:joint-vs-sequential}. The absence of a meaningful difference 
+between joint and overlay optimizers on out-of-sample returns motivates the next chapter, where we investigate their performance on risk minimization. 
 
 
 \section{Baseline Backtest Results} \label{sec:baseline-backtests}
 
-
-
 We first report the baseline backtests of the 
 unregularized joint and sequential overlay optimizers across the five 
-risk measures and three universe sizes. We compare them against the 
-equally weighted benchmark and the two reference strategies 
-introduced in \Cref{chap:optimization-framework}, the fully hedged 
-(asset-zero) and unhedged (asset-full) portfolios. For each universe 
-size we report the realized annualized excess return, annualized 
-volatility, maximum drawdown, Sharpe ratio, Sortino ratio, asset 
-turnover and currency turnover in \Cref{tab:baseline-top10,tab:baseline-top50,tab:baseline-top100}, and the cumulative  
-out-of-sample returns of the joint optimizers together with the 
-equally weighted benchmark, and the cumulative difference between the 
-joint and overlay optimizers, in \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100}. 
+risk measures and three universe sizes considered in the thesis. 
+We compare them against three reference strategies introduced in \Cref{chap:optimization-framework}: the equally weighted benchmark, the fully hedged 
+portfolio (asset-zero) and the unhedged portfolio (asset-full). The equally 
+weighted benchmark serves as the no-optimization baseline, the fully hedged 
+portfolio as the reference for the overlay's first step, and the unhedged 
+portfolio as the reference for optimizing the asset allocation across various economies without doing any currency trading.
+
+For each universe size we report the out-of-sample annualized excess return, 
+annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, asset 
+turnover and currency turnover in \Cref{tab:baseline-top10,tab:baseline-top50,tab:baseline-top100}. All quantities are computed on the out-of-sample return 
+series produced by the backtest configuration presented in \Cref{todo}. We also 
+report in \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} the 
+cumulative out-of-sample returns of the joint optimizers together with the 
+equally weighted benchmark, and in the lower panel of each figure the 
+cumulative difference between the joint and overlay optimizers for each risk 
+measure. The latter helps us visualize the realized performance difference  
+between the two optimization approaches over time.
 
 \begin{table}[H]
   \centering
@@ -295,16 +300,6 @@ Third, any measure-specific or universe-specific surprises. If regularization he
   \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
   \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
   \label{fig:regularized-top10}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Figure \ref{fig:regularized-top10} shows the out-of-sample performance of the regularized optimizers in
-  the small investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
-  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
-  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
-  net of transaction costs. The corresponding performance metrics are reported in Panel A of Table
-  \ref{tab:regularized}.
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
@@ -312,16 +307,6 @@ Third, any measure-specific or universe-specific surprises. If regularization he
   \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
   \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
   \label{fig:regularized-top50}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Figure \ref{fig:regularized-top50} shows the out-of-sample performance of the regularized optimizers in
-  the medium investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
-  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
-  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
-  net of transaction costs. The corresponding performance metrics are reported in Panel B of Table
-  \ref{tab:regularized}.
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
@@ -332,12 +317,13 @@ Third, any measure-specific or universe-specific surprises. If regularization he
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Figure \ref{fig:regularized-top100} shows the out-of-sample performance of the regularized optimizers in
-  the large investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
-  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
-  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
-  net of transaction costs. The corresponding performance metrics are reported in Panel C of Table
-  \ref{tab:regularized}.
+    \Cref{fig:regularized-top10,fig:regularized-top50,fig:regularized-top100} show the out-of-sample
+  performance of the regularized optimizers in the small, medium and large investment universes, respectively.
+  In each figure, the top panel shows the cumulative wealth of the joint optimizers and the equally weighted
+  portfolio, and the bottom panel shows the cumulative sum of the daily return differences between the joint
+  and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction
+  costs. The corresponding performance metrics are reported in Panels A, B and C of \Cref{tab:regularized},
+  respectively.
   \end{minipage}
 \end{figure}
 
@@ -434,16 +420,6 @@ Third, joint vs overlay with the mean term. Does the mean term widen or narrow t
   \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
   \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
   \label{fig:mean-risk-top10}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Figure \ref{fig:mean-risk-top10} shows the out-of-sample performance of the mean-risk optimizers in the
-  small investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
-  weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences between the
-  joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
-  transaction costs. The corresponding performance metrics are reported in Panel A of Table
-  \ref{tab:mean-risk}.
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
@@ -451,16 +427,6 @@ Third, joint vs overlay with the mean term. Does the mean term widen or narrow t
   \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
   \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
   \label{fig:mean-risk-top50}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Figure \ref{fig:mean-risk-top50} shows the out-of-sample performance of the mean-risk optimizers in the
-  medium investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
-  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
-  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
-  net of transaction costs. The corresponding performance metrics are reported in Panel B of Table
-  \ref{tab:mean-risk}.
-  \end{minipage}
 \end{figure}
 
 \begin{figure}[H]
@@ -471,12 +437,12 @@ Third, joint vs overlay with the mean term. Does the mean term widen or narrow t
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
-    Figure \ref{fig:mean-risk-top100} shows the out-of-sample performance of the mean-risk optimizers in the
-  large investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
-  weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences between the
-  joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
-  transaction costs. The corresponding performance metrics are reported in Panel C of Table
-  \ref{tab:mean-risk}.
+    \Cref{fig:mean-risk-top10,fig:mean-risk-top50,fig:mean-risk-top100} show the out-of-sample performance of
+  the mean-risk optimizers in the small, medium and large investment universes, respectively. In each figure,
+  the top panel shows the cumulative wealth of the joint optimizers and the equally weighted portfolio, and
+  the bottom panel shows the cumulative sum of the daily return differences between the joint and the currency
+  overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction costs. The
+  corresponding performance metrics are reported in Panels A, B and C of \Cref{tab:mean-risk}, respectively.
   \end{minipage}
 \end{figure}
 
