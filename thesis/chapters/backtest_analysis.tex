@@ -390,6 +390,127 @@ Second, the deviation vs tail split. The tail measures are already translation-e
 
 Third, joint vs overlay with the mean term. Does the mean term widen or narrow the joint-overlay gap. The key claim here is that if the mean term helps joint and overlay by similar amounts, the "joint lets you exploit covariance with the mean" story is weak, because that story predicts joint benefits more. This matters because it closes off the obvious defense of joint optimization. State the result cleanly.
 
+\begin{table}[H]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.82}{%
+  \begin{tabular}{l*{11}{c}}
+    \multicolumn{12}{c}{\textbf{Mean-Risk Backtest Performance across Universe Sizes}} \\[2pt]
+    \toprule
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  & 1.77             & 3.21             & 3.13             & 3.75             & 3.75             & 2.81             & 3.05             & 0.96             & 1.01             &                  & \\
+    Vol (\%)                 & 13.96            & 8.56             & 8.40             & 9.85             & 9.81             & 8.31             & 8.13             & 8.20             & 7.95             &                  & \\
+    MD (\%)                  & 54.77            & 26.41            & 25.91            & 30.52            & 30.17            & 26.52            & 25.58            & 29.58            & 27.57            &                  & \\
+    SR                       & 0.13             & 0.37             & 0.37             & 0.38             & 0.38             & 0.34             & 0.37             & 0.12             & 0.13             &                  & \\
+    SOR                      & 0.17             & 0.51             & 0.51             & 0.53             & 0.53             & 0.46             & 0.51             & 0.16             & 0.17             &                  & \\
+    $\text{Turnover}^a$      & 0.30             & 0.94             & 0.92             & 1.17             & 1.22             & 1.13             & 1.13             & 1.30             & 1.28             &                  & \\
+    $\text{Turnover}^c$      & 0.92             & 2.36             & 2.41             & 2.65             & 2.61             & 2.14             & 2.25             & 2.15             & 2.35             &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  & 4.09             & 4.54             & 4.66             & 4.78             & 5.21             & 3.59             & 3.82             & 3.15             & 3.26             &                  & \\
+    Vol (\%)                 & 12.50            & 6.37             & 6.33             & 7.79             & 7.95             & 5.68             & 5.57             & 5.68             & 5.58             &                  & \\
+    MD (\%)                  & 55.75            & 37.66            & 36.85            & 40.93            & 41.50            & 36.19            & 37.92            & 39.52            & 38.75            &                  & \\
+    SR                       & 0.33             & 0.71             & 0.74             & 0.61             & 0.66             & 0.63             & 0.69             & 0.55             & 0.58             &                  & \\
+    SOR                      & 0.44             & 0.96             & 1.00             & 0.83             & 0.90             & 0.87             & 0.95             & 0.75             & 0.79             &                  & \\
+    $\text{Turnover}^a$      & 0.27             & 1.17             & 1.21             & 1.43             & 1.52             & 1.64             & 1.69             & 1.78             & 1.80             &                  & \\
+    $\text{Turnover}^c$      & 0.92             & 2.62             & 2.71             & 3.15             & 3.10             & 1.60             & 2.01             & 0.99             & 1.72             &                  & \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \midrule
+                             &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric}          & \textbf{EW}      & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ER (\%)                  & 4.26             & 5.02             & 5.26             & 5.57             & 6.39             & 3.20             & 3.25             & 3.30             & 3.66             &                  & \\
+    Vol (\%)                 & 11.66            & 5.73             & 5.76             & 7.36             & 7.59             & 4.79             & 4.68             & 4.59             & 4.57             &                  & \\
+    MD (\%)                  & 56.26            & 31.32            & 30.62            & 37.45            & 37.04            & 31.43            & 33.29            & 31.65            & 30.47            &                  & \\
+    SR                       & 0.37             & 0.87             & 0.91             & 0.76             & 0.84             & 0.67             & 0.70             & 0.72             & 0.80             &                  & \\
+    SOR                      & 0.49             & 1.17             & 1.23             & 1.03             & 1.16             & 0.89             & 0.91             & 0.95             & 1.07             &                  & \\
+    $\text{Turnover}^a$      & 0.28             & 1.24             & 1.29             & 1.56             & 1.65             & 1.74             & 1.85             & 1.89             & 1.92             &                  & \\
+    $\text{Turnover}^c$      & 0.91             & 2.88             & 2.95             & 3.40             & 3.36             & 1.37             & 1.94             & 0.97             & 1.49             &                  & \\
+    \bottomrule
+  \end{tabular}%
+}
+  \caption{Performance metrics of the mean-risk optimizers in the small, medium and large investment universes}
+  \label{tab:mean-risk}
+   \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Table \ref{tab:mean-risk} reports out-of-sample performance metrics for the mean-risk optimizers in the
+  three investment universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
+  medium and Panel C the large investment universe. Each panel reports the unregularized sequential currency
+  overlay (Overlay) and joint (Joint) optimizers with an added mean term, together with the equally weighted
+  portfolio (EW) as a benchmark. Columns are grouped by the risk measure in the mean-risk objective, that is,
+  variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected
+  Shortfall (SOES). The realized out-of-sample statistics shown are the annualized excess return (ER),
+  volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average annual
+  asset and currency turnover, respectively. The sample period runs from June 1990 to June 2023, and the first
+  out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and performance
+  metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
+  \end{minipage}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
+  \label{fig:mean-risk-top10}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:mean-risk-top10} shows the out-of-sample performance of the mean-risk optimizers in the
+  small investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
+  weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences between the
+  joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
+  transaction costs. The corresponding performance metrics are reported in Panel A of Table
+  \ref{tab:mean-risk}.
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
+  \label{fig:mean-risk-top50}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:mean-risk-top50} shows the out-of-sample performance of the mean-risk optimizers in the
+  medium investment universe. The top panel shows the cumulative wealth of the joint optimizers and the
+  equally weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences
+  between the joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported
+  net of transaction costs. The corresponding performance metrics are reported in Panel B of Table
+  \ref{tab:mean-risk}.
+  \end{minipage}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.8\textwidth]{../results/figures/cumulative_and_difference/w_mean_top100.pdf}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the large investment universe (top 100 stocks per economy).}
+  \label{fig:mean-risk-top100}
+  \vspace{0.5em}
+  \begin{minipage}{\textwidth}
+  \raggedright\small
+    Figure \ref{fig:mean-risk-top100} shows the out-of-sample performance of the mean-risk optimizers in the
+  large investment universe. The top panel shows the cumulative wealth of the joint optimizers and the equally
+  weighted portfolio. The bottom panel shows the cumulative sum of the daily return differences between the
+  joint and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of
+  transaction costs. The corresponding performance metrics are reported in Panel C of Table
+  \ref{tab:mean-risk}.
+  \end{minipage}
+\end{figure}
+
 \section{Conclusion} \label{sec:backtest-conclusion}
 
 
