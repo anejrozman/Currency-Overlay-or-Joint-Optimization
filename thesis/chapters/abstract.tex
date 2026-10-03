@@ -1,21 +1,14 @@
 \begin{abstract}
     Multi-currency portfolio construction requires managing asset and currency exposures together, yet it 
     remains unclear whether these decisions are best made simultaneously or sequentially as the investable universe grows. 
-    This thesis builds on the regularized multi-currency Expected Shortfall framework of Lucescu and Ulrych (2026), 
-    in which portfolios are formed by minimizing a risk objective subject to $L^1$ and $L^2$ penalties, with currency 
-    exposures either optimized jointly with assets or handled through a separate overlay. 
-    First we replicate the framework's core strategies, then extend it along two dimensions,
-    the size of the investable universe, and the choice of objective function, implementing both Expected Shortfall 
-    and mean-variance formulations of the joint and overlay optimizers.
-    
-    Across both objectives, the joint optimizer's out-of-sample performance 
-    deteriorates relative to the separate overlay as the universe expands. 
-    This motivates the central question of the thesis, is this deterioration a structural 
-    property of joint optimization, or is it modulated by the choice of objective function? 
-    To answer it, we develop a general regularized optimization framework that admits arbitrary 
-    objective functions within a single, common formulation. We validate the framework by showing that 
-    it exactly reproduces the existing Expected Shortfall and mean-variance optimizers, and then use it 
-    to measure how the rate of the joint optimizer's breakdown varies as dimensionality increases.
-    
-    Sentence on results. 
+    In this thesis, we build on the work of \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios,SparseAndStableInternationalPortfolioOptimization}. 
+    We investigate whether joint optimization of asset and currency weights provides a benefit over the standard sequential currency overlay, 
+    across five risk measures and three universe sizes. The empirical backtests show that joint optimization does not deliver a meaningful 
+    improvement in realized excess returns or risk-adjusted returns over the overlay, in any configuration tested, 
+    with the possible exception of the smallest universe. This motivates a closer 
+    look at where joint optimization differs from the overlay by 
+    construction, which is risk minimization. The thesis identifies two mechanisms behind the joint program's in-sample risk advantage for the tail 
+    measures, a tail-fitting mechanism and an implicit risk-return tradeoff, and shows that neither generalizes out of sample. For the deviation measures, 
+    the in-sample advantage is small and most of it survives out of sample. The out-of-sample advantage of joint optimization is positive only in 
+    the small universe, where the currency weights are a larger share of the decision variables.
 \end{abstract}
