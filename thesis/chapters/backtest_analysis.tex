@@ -18,7 +18,7 @@ We first report the baseline backtests of the
 unregularized joint and sequential overlay optimizers across the five 
 risk measures and three universe sizes considered in the thesis. 
 We compare them against three reference strategies introduced in \Cref{chap:optimization-framework}: the equally weighted benchmark, the fully hedged 
-portfolio (asset-zero) and the unhedged portfolio (asset-full). The equally 
+portfolio (Asset-Full) and the unhedged portfolio (Asset-Zero). The equally 
 weighted benchmark serves as the no-optimization baseline, the fully hedged 
 portfolio as the reference for the overlay's first step, and the unhedged 
 portfolio as the reference for optimizing the asset allocation across various economies without doing any currency trading.
@@ -172,6 +172,65 @@ between the two optimization approaches over time.
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
 \end{table}
+
+Across the five risk measures, the Overlay and Joint optimizers achieve lower volatility than 
+the equally weighted and unhedged (Zero) benchmarks, and comparable to the fully hedged 
+(Full) benchmark. In the top-$10$ universe, Joint volatility ranges from $7.71\%$ (MAD) to $8.
+72\%$ (SOES) and Overlay from $7.87\%$ to $9.17\%$, against $13.96\%$ for the equally 
+weighted portfolio and $11.70-12.35\%$ for the Zero benchmark. The same pattern holds at 
+larger universes, with Joint and Overlay volatility falling to $5.09-5.64\%$ at top-$50$ and 
+$4.19-4.66\%$ at top-$100$, roughly $35\%$ and $45\%$ below the Zero benchmark at each size. 
+We observe the opposite effect for excess returns. Joint and Overlay deliver lower excess 
+returns than the Zero benchmark across almost every measure and universe, with the gap 
+widening as the universe grows. At top-$10$, Joint and Overlay excess returns are below Zero 
+in all five measures, by between $1-2$ percentage points. The optimizers trade return for 
+lower volatility relative to the unhedged benchmarks.
+
+If we look at the Sharpe ratio, we see that the performance of Overlay and Joint optimizers 
+improves as we increase the universe size. At top-$10$, Zero outperforms both optimizers on 
+Sharpe for every measure, by between $0.09$ and $0.19$. At top-$50$ the this reverses for 
+most measures, and at top-$100$ the Overlay and Joint optimizers outperform Zero on Sharpe 
+for every measure except MAD, by up to $0.19$ for Joint-ES. The Full benchmark is harder to 
+beat. At top-$10$ and top-$50$ the optimized Sharpe is close to Full's, but at top-$100$ Full 
+outperforms both optimizers across every measure, with, for example, Full-Semi-Variance at $0.
+83$ against Joint-Semi-Variance's $0.66$ and Full-ES at $0.90$ against Joint-ES's $0.76$. We 
+note that Full is run with regularization while Overlay and Joint are not, so part of the gap 
+at top-$100$ reflects the regularization difference as well as the currency decision, and we 
+revisit the comparison in \Cref{sec:effects-of-regularization}. Sortino ratios track Sharpe 
+ratios closely across all strategies and universes and preserve the same orderings, so the 
+downside-only risk adjustment does not change the comparison.
+
+
+Maximum drawdowns are substantially lower for the optimized strategies than for the equally 
+weighted and Zero benchmarks at every universe size, and comparable to the Full benchmark. At 
+top-$10$, Joint drawdowns range from $27.31\%$ (MAD) to $35.38\%$ (SOES) against $54.77\%$ 
+for equally weighted and $40.88-44.84\%$ for Zero, a reduction of between $18$ and $30$ 
+percentage points relative to Zero. At top-$50$ and top-$100$ the drawdowns are close the 
+Full benchmark, with Joint-ES at $30.46\%$ in top-$100$ against $31.60\%$ for Full-ES and $35.
+12\%$ for Zero-ES. The Overlay and Joint strategies control the drawdown similarly as full 
+hedging, without translating this into higher risk-adjusted returns relative to Full.
+
+Asset turnover is similar between Joint and Overlay optimizers in every cell, which is 
+expected since neither optimizer re-optimizes the asset weights with a different structure, 
+only against different objectives. The difference between the two optimizers is in currency 
+turnover, where Joint is higher than Overlay in every measure-universe combination, by 
+between $11\%$ and $82\%$. At top-$50$ Joint-ES has currency turnover $1.67$ against 
+Overlay-ES's $0.97$, a $72\%$ increase, and at top-$10$ Joint-ES is at $2.98$ against $2.39$, 
+a $25\%$ increase.  Returns are reported net of transaction costs, so the comparisons above 
+already incorporate this, and the extra currency turnover does not reduce the risk-adjusted 
+returns of Joint optimization relative to Overlay. 
+
+Overall, we see a consitent pattern across all the considered risk measures. The Overlay and 
+Joint optimizers reduce volatility and drawdowns substantially relative to the unhedged 
+benchmarks, at the cost of lower excess returns. The Sharpe comparison depends on the 
+universe size. Unhedged benchmarks perform better in the small universe and the Overlay and 
+Joint optimizers perform better in the larger universes. Against the fully hedged benchmark, 
+the optimized strategies do not meaningfully improve risk-adjusted returns. Joint and Overlay 
+optimizers produce very similar out-of-sample metrics across all risk measures and universe 
+sizes, with Joint consistently delivering lower volatility and higher currency turnover but 
+no consistent advantage on risk-adjusted returns. 
+
+
 
 \begin{figure}[H]
   \centering
