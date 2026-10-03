@@ -1,8 +1,20 @@
 \chapter{Backtest Analysis}\label{chap:backtest-analysis}
 
+In this chapter, we analyze the out-of-sample performance of the joint and sequential overlay programs across the five 
+risk measures and three universe sizes introduced in \Cref{chap:optimization-framework,chap:data-and-implementation}. In \Cref{sec:baseline-backtests} we report the 
+baseline backtests of the unregularized joint and overlay optimizers, together with the equally weighted, fully 
+hedged and unhedged benchmarks. We show that the optimized strategies trade excess return for lower volatility, 
+that their risk-adjusted returns are not meaningfully better than the benchmarks, and that joint and overlay 
+produce similar realized performance across measures and universes. In \Cref{sec:effects-of-regularization} we 
+repeat the analysis for the regularized joint and overlay programs and show that regularization does not meaningfully improve the results. In \Cref{sec:effects-of-adding-a-mean-term} we consider the mean-risk formulation of the optimizers and show that the 
+deviation measures benefit substantially while the tail measures barely change. This split motivates the implicit 
+risk-return tradeoff that is formalized in \Cref{chap:joint-vs-sequential}. The absence of a meaningful difference 
+between joint and overlay optimizers on out-of-sample returns motivates the next chapter, where we investigate the differences in risk minimization. 
 
 
-\section{Baseline Backtests} \label{sec:baseline-backtests}
+\section{Baseline Backtest Results} \label{sec:baseline-backtests}
+
+
 
 WHAT TO COVER:
 
