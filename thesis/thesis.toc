@@ -35,7 +35,7 @@
 \contentsline {section}{\numberline {7.1}Findings}{38}{section.7.1}%
 \contentsline {section}{\numberline {7.2}Limitations and Future Research}{38}{section.7.2}%
 \contentsline {chapter}{Appendices}{39}{section*.3}%
-\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall}{40}{appendix.A}%
+\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall and Second-Order Expected Shortfall}{40}{appendix.A}%
 \contentsline {section}{\numberline {A.1}Derivation of the Auxiliary Expected Shortfall Formulation}{40}{section.A.1}%
 \contentsline {section}{\numberline {A.2}Linear Program Representation of Portfolio Optimization}{42}{section.A.2}%
 \contentsline {section}{\numberline {A.3}Regularization}{43}{section.A.3}%
@@ -47,7 +47,7 @@
 \contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{45}{subsection.A.4.1}%
 \contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{46}{subsection.A.4.2}%
 \contentsline {section}{\numberline {A.5}Joint Optimization}{46}{section.A.5}%
-\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Mean-Variance}{49}{appendix.B}%
+\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Variance and Semi-Variance}{49}{appendix.B}%
 \contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{49}{section.B.1}%
 \contentsline {section}{\numberline {B.2}Regularization}{50}{section.B.2}%
 \contentsline {subsection}{\numberline {B.2.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{50}{subsection.B.2.1}%
