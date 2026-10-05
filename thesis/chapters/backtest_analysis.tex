@@ -15,23 +15,23 @@ between joint and overlay optimizers on out-of-sample returns motivates the next
 \section{Baseline Backtest Results} \label{sec:baseline-backtests}
 
 We first report the baseline backtests of the 
-unregularized joint and sequential overlay optimizers across the five 
+unregularized Joint and sequential Overlay optimizers across the five 
 risk measures and three universe sizes considered in the thesis. 
-We compare them against three reference strategies introduced in \Cref{chap:optimization-framework}: the equally weighted benchmark, the fully hedged 
-portfolio (Asset-Full) and the unhedged portfolio (Asset-Zero). The equally 
-weighted benchmark serves as the no-optimization baseline, the fully hedged 
-portfolio as the reference for the overlay's first step, and the unhedged 
-portfolio as the reference for optimizing the asset allocation across various economies without doing any currency trading.
+We compare them against three reference strategies introduced in \Cref{chap:optimization-framework}: the equally weighted portfolio, the fully hedged 
+portfolio (Full) and the unhedged portfolio (Zero). The equally 
+weighted portfolio serves as the no-optimization benchmark, the fully hedged 
+portfolio as the benchmark for the Overlay's first optimization step, and the unhedged 
+portfolio as the benchmark for optimizing the asset allocation across various economies, without doing any currency trading.
 
 For each universe size we report the out-of-sample annualized excess return, 
 annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, asset 
-turnover and currency turnover in \Cref{tab:baseline-top10,tab:baseline-top50,tab:baseline-top100}. All quantities are computed on the out-of-sample return 
+turnover and currency turnover in \Cref{tab:baseline-top10,tab:baseline-top50,tab:baseline-top100}. All quantities are computed on the out-of-sample excess return 
 series produced by the backtest configuration presented in \Cref{todo}. We also 
 report in \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} the 
-cumulative out-of-sample returns of the joint optimizers together with the 
+cumulative out-of-sample returns of the Joint optimizers together with the 
 equally weighted benchmark, and in the lower panel of each figure the 
-cumulative difference between the joint and overlay optimizers for each risk 
-measure. The latter helps us visualize the realized performance difference  
+cumulative difference between the Joint and Overlay optimizers for each risk 
+measure. The latter helps us visualize the realized return difference  
 between the two optimization approaches over time.
 
 \begin{table}[H]
@@ -165,35 +165,35 @@ between the two optimization approaches over time.
   equally weighted portfolio (EW) and the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero).
   Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean absolute
   deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
-  out-of-sample statistics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
+  out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
   (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average annual asset and currency turnover,
   respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
-  formed in June 2000. Details on the optimization approaches and performance metrics are provided in
+  formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
 \end{table}
 
 Across the five risk measures, the Overlay and Joint optimizers achieve lower volatility than 
-the equally weighted and unhedged (Zero) benchmarks, and comparable to the fully hedged 
-(Full) benchmarks. In the top-$10$ universe, Joint volatility ranges from $7.71\%$ (MAD) to $8.
-72\%$ (SOES) and Overlay from $7.87\%$ to $9.17\%$, against $13.96\%$ for the equally 
+the equally weighted and Zero benchmarks, and comparable to the Full benchmarks. 
+In the top-$10$ universe, the volatility of the Joint optimizers ranges from $7.71\%$ to $8.
+72\%$ and Overlay from $7.87\%$ to $9.17\%$, against $13.96\%$ for the equally 
 weighted portfolio and $11.70-12.35\%$ for the Zero benchmark. The same pattern holds at 
 larger universes, with Joint and Overlay volatility falling to $5.09-5.64\%$ at top-$50$ and 
 $4.19-4.66\%$ at top-$100$, roughly $35\%$ and $45\%$ below the Zero benchmark at each size. 
 We observe the opposite effect for excess returns. Joint and Overlay deliver lower excess 
 returns than the Zero benchmark across almost every measure and universe, with the gap 
 widening as the universe grows. At top-$10$, Joint and Overlay excess returns are below Zero 
-in all five measures, by between $1-2$ percentage points. The optimizers trade return for 
+in all five measures, by between $1$ and $2$ percentage points. The optimizers trade return for 
 lower volatility relative to the unhedged benchmarks. This is a consequence of the optimizers minimizing risk 
 without any explicit return term in objective function.
 
 If we look at the Sharpe ratio, we see that the performance of Overlay and Joint optimizers 
-improves as we increase the universe size. At top-$10$, Zero outperforms both optimizers on 
+improves relative to the benchmarks as we increase the universe size. At top-$10$, Zero outperforms both optimizers on 
 Sharpe for every measure, by between $0.09$ and $0.19$. At top-$50$ this reverses for 
 most measures, and at top-$100$ the Overlay and Joint optimizers outperform Zero on Sharpe 
-for every measure except MAD, by up to $0.19$ for Joint-ES. This reversal at larger universes likely reflects baseline asset volatility falling with diversification. The Full benchmark is harder to 
-beat. At top-$10$ and top-$50$ the optimized Sharpe is close to Full's, but at top-$100$ Full 
-outperforms both optimizers across every measure, with, for example, Full-Semi-Variance at $0.
+for every measure except MAD, by up to $0.19$ for Joint-ES. This reversal at larger universes reflects baseline asset volatility falling with diversification. The Full benchmark is harder to 
+beat. At top-$10$ and top-$50$ the Joint and Overlay optimizers Sharpe is close to Full's, but at top-$100$ Full 
+outperforms both optimizers across every measure, for example, Full-Semi-Variance at $0.
 83$ against Joint-Semi-Variance's $0.66$ and Full-ES at $0.90$ against Joint-ES's $0.76$. 
 Sortino ratios track Sharpe 
 ratios closely across all strategies and universes, so the 
@@ -202,10 +202,10 @@ downside-only risk adjustment does not change the comparison.
 
 Maximum drawdowns are substantially lower for the Overlay and Joint optimizers than for the equally 
 weighted and Zero benchmarks at every universe size, and comparable to the Full benchmark. At 
-top-$10$, Joint drawdowns range from $27.31\%$ (MAD) to $35.38\%$ (SOES) against $54.77\%$ 
+top-$10$, Joint drawdowns range from $27.31\%$ to $35.38\%$ against $54.77\%$ 
 for equally weighted and $40.88-44.84\%$ for Zero, a reduction of between $18$ and $30$ 
 percentage points. At top-$50$ and top-$100$ the drawdowns are close the 
-Full benchmark, with Joint-ES at $30.46\%$ in top-$100$ against $31.60\%$ for Full-ES and $35.
+Full benchmark, for example, Joint-ES at $30.46\%$ in top-$100$ against $31.60\%$ for Full-ES and $35.
 12\%$ for Zero-ES. The Overlay and Joint optimizers control the drawdown similarly as full 
 hedging, without translating this into higher risk-adjusted returns relative to Full.
 
@@ -250,30 +250,16 @@ returns of Joint optimization relative to Overlay.
   \end{minipage}
 \end{figure}
 
-Figures \ref{fig:baseline-top10}-\ref{fig:baseline-top100} confirm that the Overlay and 
-Joint optimizers lose far less than the equally weighted portfolio in each of the three major 
-crashes in the sample (dot-com, 2008, COVID), and that their underperformance on terminal 
-wealth is a late-sample effect. In each universe the joint optimizers lead the equally 
-weighted portfolio throughout the 2000s, with the dot-com bust widening the lead to between 
-$+6\%$ and $+19\%$ against the equally weighted portfolio's $-30\%$ to $-32\%$ at top-$50$ 
-and top-$100$. The equally weighted portfolio takes the lead only after the COVID recovery, 
-between mid-$2020$ and mid-$2022$ depending on the measure and universe. The final terminal 
-wealth values from the top panels mirror the excess returns in the tables, with the equally 
-weighted portfolio ending at $2.10$, $3.55$ and $3.69$ across the three universes against 
-$1.46-1.93$, $2.50-2.75$ and $2.42-3.07$ for the joint optimizers.
+\Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} present the cumulative performance of the Overlay and Joint optimizers 
+alongside the equally weighted benchmark. In each universe, the top panel shows that the Overlay and Joint optimizers perform better 
+than the equally weighted portfolio during the first major market crashes in the sample, the dot-com bust and the global financial 
+crisis. This advantage is particularly evident in the medium and large universes during the 2008 financial crisis, where the optimizer 
+strategies exhibit a much smaller drawdown compared to the equally weighted portfolio. The equally weighted portfolio recovers rapidly 
+after the COVID-19 shock and ultimately attains the highest terminal wealth across all three universes, albeit at considerably higher 
+volatility and with deeper drawdowns throughout the sample. In contrast, the Overlay and Joint optimizers follow more stable growth 
+paths, consistent with their lower realized volatility reported in \Cref{tab:baseline-top10,tab:baseline-top50,tab:baseline-top100}.
 
-The bottom panels, showing the cumulative daily return difference between Joint and Overlay, 
-confirm that the two optimizers track each other closely through time. In every universe and 
-for every measure except SOES at top-$10$, the cumulative difference stays within 
-$\pm 0.05$ of zero over the entire sample, so the small per-cell differences in the tables 
-do not hide any time-varying trend. The exception is SOES in the top-$10$ universe, where 
-the Joint optimizer drifts below Overlay from late $2001$ onward and ends at $-0.12$ in 
-cumulative difference, consistent with the $-0.50$pp excess return gap in Table 
-\ref{tab:baseline-top10}. The 2008 crisis is also informative: in all three universes and 
-for almost every measure, the Joint optimizer outperforms Overlay during the crash, with ES 
-and SOES delivering the largest crisis-period gains in the top-$10$ universe. This is 
-consistent with Joint's extra freedom in choosing currency weights being most valuable when 
-asset risk is highest.
+The bottom panels show the cumulative daily return difference between the Joint and Overlay optimizers for each risk measure, and confirm that the two optimization approaches track each other closely throughout the sample. The cumulative differences remain close around zero in every universe size and for every measure, with the sole exception of second-order Expected Shortfall in the small universe, where the Joint optimizer drifts persistently below the Overlay optimizer from the early $2010$s onward. 
 
 Overall, we see a consitent pattern across all the considered risk measures. The Overlay and 
 Joint optimizers reduce volatility and drawdowns substantially relative to the unhedged 
