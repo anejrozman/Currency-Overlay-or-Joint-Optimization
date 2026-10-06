@@ -120,7 +120,24 @@ def _configure_logging(level: str) -> None:
     )
 
 
-def main() -> None: 
+def _save_solver_fallbacks(optimizer_cls, run_dir: Path, log: logging.Logger) -> None:
+    """Write the solves that needed a fallback solver, for optimizers that record them."""
+    events = getattr(optimizer_cls, "solver_fallbacks", None)
+    if events is None:
+        return
+    if not events:
+        log.info("Solver fallbacks: none.")
+        return
+    path = run_dir / "solver_fallbacks.csv"
+    pd.DataFrame(events).to_csv(path, index=False)
+    accepted = pd.Series([event["accepted"] for event in events]).value_counts().to_dict()
+    log.warning(
+        "Solver fallbacks: %d solves needed one (accepted: %s). Details saved to %s",
+        len(events), accepted, path,
+    )
+
+
+def main() -> None:
     args = _parse_args()
     _configure_logging(args.log_level)
     log = logging.getLogger(__name__)
@@ -326,7 +343,11 @@ def main() -> None:
         training_return_key=training_return_key,
         logging=True,
     )
-    oos_returns = backtester.run(data_bundle)
+    try:
+        oos_returns = backtester.run(data_bundle)
+    finally:
+        # Also on failure, so a run that dies still records the solves that preceded it.
+        _save_solver_fallbacks(optimizer_cls, run_dir, log)
 
     # Save OOS returns
     oos_df = oos_returns.rename("return").to_frame()

@@ -108,6 +108,16 @@ indicator matrix the Backtester already assembles and restricts to the window's
 valid assets.  Its columns are R_c's columns in order, so economy k and currency k
 are the same object.
 
+Solver fallback.  The production Gurobi settings stalled short of their tolerances
+partway through every cluster run of this program over the full gamma grid, which
+cvxpy reports as ``user_limit``.  Each solve in both steps therefore goes through
+``utils.solver_fallback.solve_with_fallback``: the production solve first,
+unchanged, then Gurobi with robust settings, then Clarabel.  A fallback solves to
+looser tolerances than the production settings, so its solution is also checked
+against the budget and the leverage or overlay cap before it is used.  Every
+fallback is logged and kept in :attr:`solver_fallbacks`, which run_strategy.py
+writes to ``solver_fallbacks.csv``.
+
 Author: Anej Rozman
 """
 
@@ -123,6 +133,7 @@ from ..utils.estimation import (
     economy_ids_from_indicator,
     pooled_asset_mean,
 )
+from ..utils.solver_fallback import solve_with_fallback
 
 from .base_optimizer import BaseOptimizer
 
@@ -138,6 +149,10 @@ except ImportError:
 
 _warned_fallback = False
 
+# How far a fallback solution may miss the budget or exceed the leverage or overlay
+# cap before it is rejected.
+_CAP_FAIL_TOL = 1e-4
+
 
 class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     """
@@ -149,6 +164,10 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
     subject to an L1 cap on psi -- which this program, being degree-one, requires
     for boundedness.
     """
+
+    # One record per solve that needed a fallback solver, across every instance the
+    # Backtester creates in this run; run_strategy.py writes it to the run directory.
+    solver_fallbacks: list[dict] = []
 
     def __init__(self, hyperparams: dict | None = None) -> None:
         """
@@ -188,6 +207,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         self.N: int = 0
         self.K: int = 0
         self.q: int = 0
+        self.window: tuple[str, str] | None = None
         self.x_opt: np.ndarray | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
@@ -210,6 +230,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         self.Y_c = np.asarray(R_c.values, dtype=float)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
+        self.window = (str(R_fh.index[0])[:10], str(R_fh.index[-1])[:10])
 
         self.economy_ids = economy_ids_from_indicator(train_bundle.get("C"), self.N)
         self.mu_a, w_a = pooled_asset_mean(self.Y_fh, self.economy_ids)
@@ -219,12 +240,15 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
             w_a, len(np.unique(self.economy_ids)), np.abs(self.mu_c).sum(),
         )
 
-    def _solve(self, problem: cp.Problem) -> None:
-        try:
-            if self.solver == cp.GUROBI:
-                problem.solve(
-                    solver=cp.GUROBI,
-                    verbose=False,
+    def _solve(self, problem: cp.Problem, context: dict) -> str:
+        """Solve ``problem`` and return the attempt that was accepted.
+
+        On Gurobi this is ``"gurobi"``, ``"gurobi_robust"`` or ``"clarabel"``; see
+        the module docstring.  Any other configured solver is used on its own."""
+        if self.solver == cp.GUROBI:
+            return solve_with_fallback(
+                problem,
+                dict(
                     BarConvTol=1e-8,
                     # BarConvTol does not govern the conic path; this is its QCP
                     # counterpart, and the SOC epigraph of ||u||_2 makes both steps
@@ -238,20 +262,27 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
                     Threads=3,
                     FeasibilityTol=1e-9,
                     OptimalityTol=1e-9,
-                )
-            else:
-                problem.solve(solver=self.solver, verbose=False)
+                ),
+                context=context,
+                events=type(self).solver_fallbacks,
+                log=logger,
+            )
+
+        try:
+            problem.solve(solver=self.solver, verbose=False)
         except cp.error.SolverError as exc:
             raise RuntimeError(f"Solver error: {exc}") from exc
 
         if problem.status not in ("optimal", "optimal_inaccurate"):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
+        return str(self.solver)
 
-    def _optimize_assets(self, Y_fh: np.ndarray, mu_a: np.ndarray) -> np.ndarray:
+    def _optimize_assets(self, Y_fh: np.ndarray, mu_a: np.ndarray, context: dict) -> np.ndarray:
         """Step 1: mean-HMCR_2 on R_fh with a leverage cap and full investment.
 
         Bounded by its constraints: sum(x) = 1 with an L1 leverage cap is a compact
-        feasible set, so unlike step 2 this needs no cap of its own."""
+        feasible set, so unlike step 2 this needs no cap of its own.  ``context``
+        identifies the solve if it needs a fallback solver."""
         q, N = Y_fh.shape
         tail_prob = 1.0 - self.alpha
 
@@ -271,21 +302,34 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
                 l1_norm <= self.leverage_limit,
             ],
         )
-        self._solve(problem)
+        attempt = self._solve(problem, context)
 
         weights = x.value
         if weights is None:
             raise RuntimeError("Solver returned None weights in step 1.")
+        if attempt in ("gurobi_robust", "clarabel"):
+            budget, gross = weights.sum(), np.abs(weights).sum()
+            if abs(budget - 1.0) > _CAP_FAIL_TOL or gross > self.leverage_limit + _CAP_FAIL_TOL:
+                raise RuntimeError(
+                    f"Fallback solution from {attempt} breaks step 1's constraints: "
+                    f"sum(x) = {budget:.9f}, ||x||_1 = {gross:.9f} > {self.leverage_limit}."
+                )
         return (weights / weights.sum()).flatten()
 
     def _optimize_overlay(
-        self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray, mu_c: np.ndarray
+        self,
+        Y_fh: np.ndarray,
+        Y_c: np.ndarray,
+        x_fixed: np.ndarray,
+        mu_c: np.ndarray,
+        context: dict,
     ) -> np.ndarray:
         """Step 2: mean-HMCR_2 of (R_fh @ x_fixed + R_c @ psi) over psi, capped in L1.
 
         The constant mu_a' x* is dropped: it cannot move the argmin.  The
         base-currency weight is pinned to zero so it cannot consume overlay budget
-        for nothing; see the module docstring."""
+        for nothing; see the module docstring.  ``context`` identifies the solve if
+        it needs a fallback solver."""
         q, K = Y_c.shape
         tail_prob = 1.0 - self.alpha
 
@@ -307,11 +351,18 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         if base.size:
             constraints.append(psi[base] == 0)
 
-        self._solve(cp.Problem(cp.Minimize(objective), constraints))
+        attempt = self._solve(cp.Problem(cp.Minimize(objective), constraints), context)
 
         overlay = psi.value
         if overlay is None:
             raise RuntimeError("Solver returned None weights in step 2.")
+        if attempt in ("gurobi_robust", "clarabel"):
+            gross = np.abs(overlay).sum()
+            if gross > self.overlay_limit + _CAP_FAIL_TOL:
+                raise RuntimeError(
+                    f"Fallback solution from {attempt} breaks the overlay cap: "
+                    f"||psi||_1 = {gross:.9f} > {self.overlay_limit}."
+                )
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
@@ -343,15 +394,27 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
                 "step 2 is unbounded below without it for gamma under ~0.026."
             )
 
+        context = {
+            "window_start": self.window[0],
+            "window_end": self.window[1],
+            "n_obs": self.q,
+            "n_assets": self.N,
+            "gamma": self.gamma,
+        }
+
         logger.debug(
             "Step 1: optimizing asset weights on %d obs, %d assets.", self.q, self.N
         )
-        self.x_opt = self._optimize_assets(self.Y_fh, self.mu_a)
+        self.x_opt = self._optimize_assets(
+            self.Y_fh, self.mu_a, {"solve": "step 1 (assets)", **context}
+        )
 
         logger.debug(
             "Step 2: optimizing currency overlay on %d obs, %d currencies.", self.q, self.K
         )
-        psi_opt = self._optimize_overlay(self.Y_fh, self.Y_c, self.x_opt, self.mu_c)
+        psi_opt = self._optimize_overlay(
+            self.Y_fh, self.Y_c, self.x_opt, self.mu_c, {"solve": "step 2 (overlay)", **context}
+        )
 
         return {"x": self.x_opt, "psi": psi_opt}
 
@@ -433,7 +496,15 @@ class SecondOrderExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         # the production refit conditions on.
         mu_c_val = conditional_currency_mean(val_bundle.get("F"), Y_c_val)
 
-        psi_val = self._optimize_overlay(Y_fh_val, Y_c_val, self.x_opt, mu_c_val)
+        context = {
+            "solve": "step 2 (overlay), validation re-solve",
+            "window_start": str(R_fh_val.index[0])[:10],
+            "window_end": str(R_fh_val.index[-1])[:10],
+            "n_obs": Y_fh_val.shape[0],
+            "n_assets": Y_fh_val.shape[1],
+            "gamma": self.gamma,
+        }
+        psi_val = self._optimize_overlay(Y_fh_val, Y_c_val, self.x_opt, mu_c_val, context)
         port_rets = Y_fh_val @ self.x_opt + Y_c_val @ psi_val
 
         tail_prob = 1.0 - self.alpha

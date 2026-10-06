@@ -94,6 +94,16 @@ at all but conditioned on the forward premium as the carry -f_t.
 mv_curr_overlay_w_mean.py records what each channel actually forecasts over the
 following quarter -- mu_c genuinely, mu_a not, cross-sectionally.
 
+Solver fallback.  The production Gurobi settings stalled short of their tolerances
+partway through every cluster run of this program, which cvxpy reports as
+``user_limit``.  Each solve therefore goes through
+``utils.solver_fallback.solve_with_fallback``: the production solve first,
+unchanged, then Gurobi with robust settings, then Clarabel.  A fallback solves to
+looser tolerances than the production settings, so its solution is also checked
+against the leverage and overlay caps before it is used.  Every fallback is logged
+and kept in :attr:`solver_fallbacks`, which run_strategy.py writes to
+``solver_fallbacks.csv``.
+
 Author: Anej Rozman
 """
 
@@ -109,6 +119,7 @@ from ..utils.estimation import (
     economy_ids_from_indicator,
     pooled_asset_mean,
 )
+from ..utils.solver_fallback import solve_with_fallback
 
 from .base_optimizer import BaseOptimizer
 
@@ -130,6 +141,10 @@ _warned_fallback = False
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
+# How far a fallback solution may exceed the leverage or overlay cap before it is
+# rejected.  Matches the budget abort threshold.
+_CAP_FAIL_TOL = 1e-4
+
 
 class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
     """
@@ -140,6 +155,10 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
     leverage cap on x and an L1 cap on psi -- which this program, being degree-one,
     requires for boundedness.
     """
+
+    # One record per solve that needed a fallback solver, across every instance the
+    # Backtester creates in this run; run_strategy.py writes it to the run directory.
+    solver_fallbacks: list[dict] = []
 
     def __init__(self, hyperparams: dict | None = None) -> None:
         """
@@ -179,6 +198,7 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         self.N: int = 0
         self.K: int = 0
         self.q: int = 0
+        self.window: tuple[str, str] | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
         """
@@ -205,6 +225,7 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         self.Y_c = np.ascontiguousarray(R_c.values, dtype=float)
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
+        self.window = (str(R_fh.index[0])[:10], str(R_fh.index[-1])[:10])
 
         self.economy_ids = economy_ids_from_indicator(train_bundle.get("C"), self.N)
         self.mu_a, w_a = pooled_asset_mean(self.Y_fh, self.economy_ids)
@@ -214,12 +235,15 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
             w_a, len(np.unique(self.economy_ids)), np.abs(self.mu_c).sum(),
         )
 
-    def _solve(self, problem: cp.Problem) -> None:
-        try:
-            if self.solver == cp.GUROBI:
-                problem.solve(
-                    solver=cp.GUROBI,
-                    verbose=False,
+    def _solve(self, problem: cp.Problem, context: dict) -> str:
+        """Solve ``problem`` and return the attempt that was accepted.
+
+        On Gurobi this is ``"gurobi"``, ``"gurobi_robust"`` or ``"clarabel"``; see
+        the module docstring.  Any other configured solver is used on its own."""
+        if self.solver == cp.GUROBI:
+            return solve_with_fallback(
+                problem,
+                dict(
                     BarConvTol=1e-8,
                     # BarConvTol does not govern the conic path; this is its QCP
                     # counterpart, and the SOC epigraph of ||u||_2 makes this an
@@ -233,14 +257,20 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
                     Threads=3,
                     FeasibilityTol=1e-9,
                     OptimalityTol=1e-9,
-                )
-            else:
-                problem.solve(solver=self.solver, verbose=False)
+                ),
+                context=context,
+                events=type(self).solver_fallbacks,
+                log=logger,
+            )
+
+        try:
+            problem.solve(solver=self.solver, verbose=False)
         except cp.error.SolverError as exc:
             raise RuntimeError(f"Solver error: {exc}") from exc
 
         if problem.status not in ("optimal", "optimal_inaccurate"):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
+        return str(self.solver)
 
     def _optimize_joint(
         self,
@@ -248,11 +278,13 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         Y_c: np.ndarray,
         mu_a: np.ndarray,
         mu_c: np.ndarray,
+        context: dict,
     ) -> dict[str, np.ndarray]:
         """Jointly minimize mean-HMCR_2 of (R_fh @ x + R_c @ psi) over x and psi.
 
         The base-currency weight is pinned to zero and psi is capped in L1; both
-        are required once the mean term is present.  See the module docstring."""
+        are required once the mean term is present.  See the module docstring.
+        ``context`` identifies the solve if it needs a fallback solver."""
         q, N = Y_fh.shape
         K = Y_c.shape[1]
         tail_prob = 1.0 - self.alpha
@@ -278,7 +310,7 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         if base.size:
             constraints.append(psi[base] == 0)
 
-        self._solve(cp.Problem(cp.Minimize(objective), constraints))
+        attempt = self._solve(cp.Problem(cp.Minimize(objective), constraints), context)
 
         weights = x.value
         if weights is None:
@@ -300,6 +332,17 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
             )
         if budget_error > _BUDGET_WARN_TOL:
             logger.warning("sum(x) = %.9f, off budget by %.2e.", weights.sum(), budget_error)
+
+        if attempt in ("gurobi_robust", "clarabel"):
+            for name, gross, cap in (
+                ("||x||_1", np.abs(weights).sum(), self.leverage_limit),
+                ("||psi||_1", np.abs(overlay).sum(), self.overlay_limit),
+            ):
+                if gross > cap + _CAP_FAIL_TOL:
+                    raise RuntimeError(
+                        f"Fallback solution from {attempt} breaks the cap: "
+                        f"{name} = {gross:.9f} > {cap}."
+                    )
 
         return {"x": weights, "psi": overlay}
 
@@ -336,7 +379,15 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
             "Joint mean-HMCR_2 optimization on %d obs, %d assets, %d currencies.",
             self.q, self.N, self.K,
         )
-        return self._optimize_joint(self.Y_fh, self.Y_c, self.mu_a, self.mu_c)
+        context = {
+            "solve": "joint",
+            "window_start": self.window[0],
+            "window_end": self.window[1],
+            "n_obs": self.q,
+            "n_assets": self.N,
+            "gamma": self.gamma,
+        }
+        return self._optimize_joint(self.Y_fh, self.Y_c, self.mu_a, self.mu_c, context)
 
     def score(
         self,
@@ -419,7 +470,15 @@ class SecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         mu_a_val, _ = pooled_asset_mean(Y_fh_val, economy_ids)
         mu_c_val = conditional_currency_mean(val_bundle.get("F"), Y_c_val)
 
-        result = self._optimize_joint(Y_fh_val, Y_c_val, mu_a_val, mu_c_val)
+        context = {
+            "solve": "joint, validation re-solve",
+            "window_start": str(R_fh_val.index[0])[:10],
+            "window_end": str(R_fh_val.index[-1])[:10],
+            "n_obs": Y_fh_val.shape[0],
+            "n_assets": Y_fh_val.shape[1],
+            "gamma": self.gamma,
+        }
+        result = self._optimize_joint(Y_fh_val, Y_c_val, mu_a_val, mu_c_val, context)
         port_rets = Y_fh_val @ result["x"] + Y_c_val @ result["psi"]
 
         tail_prob = 1.0 - self.alpha
