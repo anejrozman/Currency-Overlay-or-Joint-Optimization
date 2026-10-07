@@ -21,15 +21,12 @@ between joint and overlay optimizers on out-of-sample returns motivates the next
 We first report the baseline backtests of the 
 unregularized Joint and sequential Overlay optimizers across the five 
 risk measures and three universe sizes considered in the thesis. 
-We compare them against three reference strategies introduced in \Cref{chap:optimization-framework}: the equally weighted portfolio, the fully hedged 
-portfolio (Full) and the unhedged portfolio (Zero). The equally 
-weighted portfolio serves as the no-optimization benchmark, the fully hedged 
-portfolio as the benchmark for the Overlay's first optimization step, and the unhedged 
-portfolio as the benchmark for optimizing the asset allocation across various economies, without doing any currency trading.
+We compare them against the equally weighted portfolio which serves as the no-optimization benchmark.
 
-For each universe size we report the out-of-sample annualized excess return, 
-annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, average asset 
-turnover and average currency turnover in \Cref{tab:baseline}. All quantities are computed on the out-of-sample excess return 
+For the small, medium and large universes, we report the out-of-sample annualized excess return,
+annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, average asset
+turnover and average currency turnover of the Overlay and Joint optimizers and of the equally weighted portfolio
+in Panels A, B and C of \Cref{tab:baseline}, respectively. All quantities are computed on the out-of-sample excess return 
 series produced by the backtest configuration presented in \Cref{sec:backtest-configuration}. We also 
 report in \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} the 
 cumulative out-of-sample returns of the Joint optimizers together with the 
@@ -97,11 +94,10 @@ between the two optimization approaches over time.
     Table \ref{tab:baseline} reports out-of-sample performance metrics for the unregularized optimizers in
   the three investment universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
   medium and Panel C the large investment universe. Each panel reports the unregularized sequential currency
-  overlay (Overlay) and joint (Joint) optimizers, together with the equally weighted portfolio (EW) as a
-  benchmark. Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean
+  overlay (Overlay) and joint (Joint) optimizers, together with the equally weighted portfolio (EW). Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean
   absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
   out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
-  (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average annual asset and currency turnover,
+  (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average asset and currency turnover,
   respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
   formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
