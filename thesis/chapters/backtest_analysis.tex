@@ -1,13 +1,17 @@
 \chapter{Backtest Analysis}\label{chap:backtest-analysis}
 
 In this chapter, we analyze the out-of-sample performance of the joint and sequential overlay programs across the five 
-risk measures and three universe sizes introduced in \Cref{chap:optimization-framework,chap:data-and-implementation}. In \Cref{sec:baseline-backtests} we report the 
-baseline backtests of the unregularized joint and overlay optimizers, together with the equally weighted, fully 
-hedged and unhedged benchmarks. We show that the optimized strategies trade excess return for lower risk, 
-that their risk-adjusted returns are not consistently better than the benchmarks, and that joint and overlay optimization approaches
-produce similar realized performance across measures and universes. In \Cref{sec:effects-of-regularization} we 
-repeat the analysis for the regularized joint and overlay programs and show that regularization does not meaningfully change the results. In \Cref{sec:effects-of-adding-a-mean-term} we consider the mean-risk formulation of the optimizers and show that the 
-deviation measures benefit from it substantially more than the tail measures. This split motivates the 
+risk measures and three universe sizes introduced in \Cref{chap:optimization-framework,chap:data-and-implementation}. In \Cref{sec:baseline-backtests} we report the
+baseline backtests of the unregularized joint and overlay optimizers, together with the equally weighted benchmark.
+We show that the optimized strategies trade excess return for lower volatility and drawdowns, that their
+risk-adjusted returns exceed those of the equally weighted portfolio in the medium and large universes but not consistently
+in the small universe, and that joint and overlay optimization approaches produce similar realized performance across
+measures and universes. In \Cref{sec:effects-of-regularization} we repeat the analysis for the regularized joint and
+overlay programs and compare them against the regularized asset-only benchmarks, the fully hedged and unhedged portfolios. 
+We show that regularization does not meaningfully change the results, and that the risk-adjusted
+returns of the joint and overlay optimizers are not consistently better than those of the asset-only benchmarks. In \Cref{sec:effects-of-adding-a-mean-term} we consider the mean-risk formulation of the optimizers and show that adding a mean term
+substantially raises excess and risk-adjusted returns. We further show that the
+deviation measures benefit from the mean term more than the tail measures. This split motivates the 
 risk-return tradeoff analysis in \Cref{chap:joint-vs-sequential}. The absence of a meaningful difference 
 between joint and overlay optimizers on out-of-sample returns motivates the next chapter, where we investigate their performance on risk minimization. 
  

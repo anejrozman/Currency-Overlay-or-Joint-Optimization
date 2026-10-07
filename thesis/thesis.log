@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  7 OCT 2026 11:22
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  7 OCT 2026 11:43
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1944,7 +1944,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.5.1}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.121 
+l.125 
       ]
 <../results/figures/cumulative_and_difference/unregularized_top10.pdf, id=852, 
 658.84064pt x 550.20718pt>
@@ -1952,7 +1952,7 @@ File: ../results/figures/cumulative_and_difference/unregularized_top10.pdf Grap
 hic file (type pdf)
 <use ../results/figures/cumulative_and_difference/unregularized_top10.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/unregular
-ized_top10.pdf  used on input line 156.
+ized_top10.pdf  used on input line 160.
 (pdftex.def)             Requested size: 310.09865pt x 258.9752pt.
 
 
@@ -1963,7 +1963,7 @@ File: ../results/figures/cumulative_and_difference/unregularized_top50.pdf Grap
 hic file (type pdf)
 <use ../results/figures/cumulative_and_difference/unregularized_top50.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/unregular
-ized_top50.pdf  used on input line 163.
+ized_top50.pdf  used on input line 167.
 (pdftex.def)             Requested size: 310.09865pt x 258.9752pt.
 <../results/figures/cumulative_and_difference/unregularized_top100.pdf, id=858,
  658.74268pt x 550.20718pt>
@@ -1971,7 +1971,7 @@ File: ../results/figures/cumulative_and_difference/unregularized_top100.pdf Gra
 phic file (type pdf)
 <use ../results/figures/cumulative_and_difference/unregularized_top100.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/unregular
-ized_top100.pdf  used on input line 170.
+ized_top100.pdf  used on input line 174.
 (pdftex.def)             Requested size: 310.09865pt x 259.00879pt.
 
 
@@ -1980,13 +1980,13 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.1})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.185 
+l.189 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.2}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.185 
+l.189 
        <../results/figures/cumulative_and_difference/unregularized_top10.pdf> <
 ../results/figures/cumulative_and_difference/unregularized_top50.pdf>]
 
@@ -1995,7 +1995,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.3})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.211 
+l.215 
        <../results/figures/cumulative_and_difference/unregularized_top100.pdf>]
 
 
@@ -2006,7 +2006,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.5.2}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.313 
+l.317 
       ]
 
 [22
@@ -2014,7 +2014,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.5.3}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.370 
+l.374 
       ]
 <../results/figures/cumulative_and_difference/regularized_top10.pdf, id=1054, 6
 58.8391pt x 550.20718pt>
@@ -2022,7 +2022,7 @@ File: ../results/figures/cumulative_and_difference/regularized_top10.pdf Graphi
 c file (type pdf)
 <use ../results/figures/cumulative_and_difference/regularized_top10.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/regulariz
-ed_top10.pdf  used on input line 373.
+ed_top10.pdf  used on input line 377.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
 
 
@@ -2031,7 +2031,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.5.4}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.377 
+l.381 
       ]
 <../results/figures/cumulative_and_difference/regularized_top50.pdf, id=1060, 6
 58.84064pt x 550.20718pt>
@@ -2039,7 +2039,7 @@ File: ../results/figures/cumulative_and_difference/regularized_top50.pdf Graphi
 c file (type pdf)
 <use ../results/figures/cumulative_and_difference/regularized_top50.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/regulariz
-ed_top50.pdf  used on input line 380.
+ed_top50.pdf  used on input line 384.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
 <../results/figures/cumulative_and_difference/regularized_top100.pdf, id=1061, 
 658.94012pt x 550.20718pt>
@@ -2047,7 +2047,7 @@ File: ../results/figures/cumulative_and_difference/regularized_top100.pdf Graph
 ic file (type pdf)
 <use ../results/figures/cumulative_and_difference/regularized_top100.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/regulariz
-ed_top100.pdf  used on input line 387.
+ed_top100.pdf  used on input line 391.
 (pdftex.def)             Requested size: 354.40135pt x 295.9153pt.
 
 
@@ -2056,13 +2056,13 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.4})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.402 
+l.406 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.5}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.402 
+l.406 
        <../results/figures/cumulative_and_difference/regularized_top10.pdf> <..
 /results/figures/cumulative_and_difference/regularized_top50.pdf>]
 
@@ -2071,7 +2071,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.6})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.417 S
+l.421 S
        econd, the deviation vs tail split. The tail measures are already tra...
  <../results/figures/cumulative_and_difference/regularized_top100.pdf>]
 
@@ -2082,7 +2082,7 @@ File: ../results/figures/cumulative_and_difference/w_mean_top10.pdf Graphic fil
 e (type pdf)
 <use ../results/figures/cumulative_and_difference/w_mean_top10.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/w_mean_to
-p10.pdf  used on input line 493.
+p10.pdf  used on input line 497.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
 
 
@@ -2091,7 +2091,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.5.5}) h
 as been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.497 
+l.501 
       ]
 <../results/figures/cumulative_and_difference/w_mean_top50.pdf, id=1250, 658.83
 861pt x 550.20718pt>
@@ -2099,7 +2099,7 @@ File: ../results/figures/cumulative_and_difference/w_mean_top50.pdf Graphic fil
 e (type pdf)
 <use ../results/figures/cumulative_and_difference/w_mean_top50.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/w_mean_to
-p50.pdf  used on input line 500.
+p50.pdf  used on input line 504.
 (pdftex.def)             Requested size: 354.40135pt x 295.97406pt.
 <../results/figures/cumulative_and_difference/w_mean_top100.pdf, id=1251, 659.0
 6755pt x 550.20718pt>
@@ -2107,7 +2107,7 @@ File: ../results/figures/cumulative_and_difference/w_mean_top100.pdf Graphic fi
 le (type pdf)
 <use ../results/figures/cumulative_and_difference/w_mean_top100.pdf>
 Package pdftex.def Info: ../results/figures/cumulative_and_difference/w_mean_to
-p100.pdf  used on input line 507.
+p100.pdf  used on input line 511.
 (pdftex.def)             Requested size: 354.40135pt x 295.86493pt.
 
 
@@ -2116,13 +2116,13 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.7})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.521 
+l.525 
       
 pdfTeX warning (ext4): destination with the same identifier (name{figure.5.8}) 
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.521 
+l.525 
        <../results/figures/cumulative_and_difference/w_mean_top10.pdf> <../resu
 lts/figures/cumulative_and_difference/w_mean_top50.pdf>]
 
@@ -2131,11 +2131,11 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.5.9})
 has been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.526 \newpage
+l.530 \newpage
                <../results/figures/cumulative_and_difference/w_mean_top100.pdf>
 ]
 LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 5
-30.
+34.
  (/usr/local/texlive/2025/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 ))
@@ -2640,6 +2640,9 @@ L3 programming layer <2020/03/25>
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `thesis.out' has not changed.
 (rerunfilecheck)             Checksum: 74E13E5D5D18C3F3F82DD6CF0EA6BC65;17153.
  ) 
@@ -2683,7 +2686,7 @@ pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/l
 ocal/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></u
 sr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb
 >
-Output written on thesis.pdf (83 pages, 5276124 bytes).
+Output written on thesis.pdf (83 pages, 5276450 bytes).
 PDF statistics:
  2629 PDF objects out of 2984 (max. 8388607)
  1462 compressed objects within 15 object streams
