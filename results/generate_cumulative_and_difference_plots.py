@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--type", choices=TYPES, required=True)
 kind = parser.parse_args().type
 file, pattern, title = TYPES[kind]
-measures = {m: v for m, v in MEASURES.items() if not (kind == "w_mean" and m == "soes")}
+measures = MEASURES
 runs = pd.read_csv(ROOT / "runs" / file, skipinitialspace=True, index_col=0)
 out = ROOT / "figures" / "cumulative_and_difference"
 out.mkdir(parents=True, exist_ok=True)
