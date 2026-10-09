@@ -67,12 +67,22 @@ g_t^{\text{OOS}} &\coloneqq \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t}) - \rho_
 
 The difference between the out-of-sample errors $\Delta\epsilon_t$ can be either positive or negative. For the variance, the in-sample risk of an optimized portfolio is known to understate its true risk, and the more
 weights are fitted relative to the sample size, the larger this understatement becomes \cite{ElKaroui2010}. Since the joint program fits all of its weights to the same in-sample objective, we expect it to
-adapt more closely to the noise in the estimation window than the sequential overlay, and hence $\Delta\epsilon_t$ to be typically positive. The restriction imposed
-by the sequential overlay could also reduce its estimation error rather than just constrain the optimizer. If $\Delta\epsilon_t$ exceeds $g_t^{\text{IS}}$, the overlay could in some cases realize lower risk than the joint program out of sample. We expect $\Delta\epsilon_t$ to be measure-dependent. Tail measures, in our case Expected Shortfall and second-order Expected Shortfall, are estimated from
+adapt more closely to the noise in the estimation window than the sequential overlay, and hence $\Delta\epsilon_t$ to be typically positive. If $\Delta\epsilon_t$ exceeds $g_t^{\text{IS}}$, the overlay could in some cases realize lower risk than the joint program out of sample. We also expect $\Delta\epsilon_t$ to be measure-dependent. Tail measures, in our case Expected Shortfall and second-order Expected Shortfall, are estimated from
 a smaller fraction of the sample, whereas the deviation measures, variance and mean absolute deviation use every observation, and semi-variance
  those below the mean. For a given sample size, we therefore expect  $\Delta\epsilon_t$ to be larger and more volatile for the tail measures. 
 
-We perform the following gap analysis to investigate the in and out of sample performance of the joint and sequential overlay programs with respect to the risk measure they are minimizing. The in-sample gap is guaranteed to be non-negative only when each program minimizes the risk measure it is scored on, so we initially consider the unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year estimation window, and under the same budget and leverage constraints. The resulting weights are then held fixed and scored twice, once on the estimation window itself and once on the following holding quarter, which gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. For variance and semi-variance we score their square roots, volatility and semi-deviation. The square root does not change the minimizers, and makes all five measures positively homogeneous, so that the gaps are comparable across measures. Both gaps are reported relative to the risk of the overlay optimizer,
+We perform the following gap analysis to investigate the in and out of sample performance of the joint and sequential 
+overlay programs with respect to the risk measure they are minimizing. The in-sample gap is guaranteed to 
+be non-negative only when each program minimizes the risk measure it is scored on, so we consider the 
+unregularized formulation from \Cref{chap:optimization-framework}. At each of the $T = 91$ quarterly rebalancing 
+dates the joint and the sequential overlay optimizers, for a given risk measure, are solved on the same ten-year 
+estimation window, and under the same budget and leverage constraints. The resulting weights are then held fixed 
+and scored twice, once on the estimation window itself and once on the following holding quarter, which 
+gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two programs. For variance and 
+semi-variance we score their square roots, volatility and semi-deviation. The square root does not change 
+the minimizers, and makes all five measures positively homogeneous, so that the gaps are comparable across 
+measures. Both gaps are reported relative to the risk of the overlay optimizer,
+\vspace{0.3em}
 \begin{equation*}
 \tilde g_t^{\text{IS}} \coloneqq \frac{g_t^{\text{IS}}}{\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t})}
 \qquad \text{and} \qquad
@@ -97,7 +107,20 @@ so they are to be interpreted as the risk reduction achieved by the joint optimi
   \end{minipage}
 \end{figure}
 
-We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for all risk measures across all universe sizes, and that it is largest for the two considered tail measures. The out-of-sample gap is smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being the volatility and semi-deviation measures at the smallest universe size. Out-of-sample we see a negative dependence on the size of the investable universe. At the top-$10$ universe the realized out-of-sample advantage of joint optimization is in the range between $1.78\%$ and $3.67\%$, with second-order Expected Shortfall having the smallest benefit and Semi-Deviation having the largest. At top-$50$, the advantage drops to zero for second-order Expected Shortfall, and remains around $1\%$ for the other measures, and at top-$100$ the advantage for Expected Shortfall drops slightly below zero while the remaining measures stay below $1\%$. The in-sample series separates the two groups of risk measures the same way as in \Cref{chap:backtest-analysis}, that is, whether they are deviation or tail measures. The in-sample advantage falls as the universe grows, from $2.45\%$ to $0.63\%$ for volatility, from $2.67\%$ to $1.26\%$ for mean absolute deviation and from $3.08\%$ to $1.37\%$ for semi-deviation, whereas for the two tail measures it remains larger and more stable, from $3.95\%$ to $3.49\%$ for Expected Shortfall and from $7.73\%$ to $5.81\%$ for second-order Expected Shortfall. For the deviation measures the in-sample and out-of-sample series fall together, whereas for the tail measures, the out-of-sample series falls, and the in-sample series remains high. We visualize the difference between the two series in \Cref{fig:delta-epsilon}. 
+We see in \Cref{fig:gap-measures} that the in-sample advantage of joint optimization is positive for 
+all risk measures across all universe sizes, and that it is largest for the two considered tail measures. The out-of-sample gap is 
+smaller than the in-sample gap for almost  all risk measures and universe sizes, the only exception being the volatility and 
+semi-deviation measures at the smallest universe size. Out-of-sample we see a negative dependence on the size of the investable 
+universe. At the top-$10$ universe the realized out-of-sample advantage of joint optimization is in the range between $1.78\%$ and $3.67\%$, with second-order Expected Shortfall having the smallest benefit and Semi-Deviation having the largest. At top-$50$, the 
+advantage drops to zero for second-order Expected Shortfall, and remains around $1\%$ for the other measures, and at top-$100$ the 
+advantage for Expected Shortfall drops slightly below zero while the remaining measures stay below $1\%$. The in-sample series separates 
+
+the two groups of risk measures the same way as in \Cref{chap:backtest-analysis}, that is, whether they are deviation or tail measures. 
+The in-sample advantage falls as the universe grows, from $2.45\%$ to $0.63\%$ for volatility, from $2.67\%$ to $1.26\%$ for mean 
+absolute deviation and from $3.08\%$ to $1.37\%$ for semi-deviation, whereas for the two tail measures it remains larger and more 
+stable, from $3.95\%$ to $3.49\%$ for Expected Shortfall and from $7.73\%$ to $5.81\%$ for second-order Expected Shortfall. For the 
+deviation measures the in-sample and out-of-sample series fall together, whereas for the tail measures, the out-of-sample series falls to zero, 
+and the in-sample series remains large and positive. We visualize the difference between the two series in \Cref{fig:delta-epsilon}. 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=1\textwidth]{../results/in_sample_vs_out_of_sample/delta_epsilon.pdf}
