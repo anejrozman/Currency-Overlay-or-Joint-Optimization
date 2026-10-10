@@ -22,7 +22,7 @@ rebuilt at the beginning of each year from the largest stocks by market capitali
 approach that mitigates survivorship bias). At the start of each year we rank stocks within
 each market and restrict the following year's investments to that set. To study how the
 universe size affects the optimization approaches considered, we form three cross-sections, comprising the
-top 10, top 50, and top 100 stocks per market. Because the constituents turn over each
+top 10, top 50, and top 100 stocks per economy. We refer to these as the small, medium and large universe. Because the constituents turn over each
 year, each universe spans more distinct stocks over the full sample than are held on any
 single date, 407 for the top 10, 1705 for the top 50, and 3189 for the top 100, respectively.
 
@@ -70,17 +70,17 @@ fully hedged equity returns and excess currency returns, by economy. For each ec
 asset figures are the cross-sectional average of the daily returns of its individual
 stocks. 
 
-We can see that as the investable universe becomes larger, the average returns tend to fall. In the top 10 universe every economy has a positive average return, ranging from
-$2.76\%$ (the United Kingdom) to $12.59\%$ (the United States). In the top 50 universe, the range
+We can see that as the investable universe becomes larger, the average returns tend to fall. In the small universe every economy has a positive average return, ranging from
+$2.76\%$ (the United Kingdom) to $12.59\%$ (the United States). In the medium universe, the range
 drops downward, from $-1.99\%$ (Singapore) to $7.99\%$ (the United States), and in the
-top 100 universe the range goes from $-4.84\%$ (Singapore) to $6.86\%$ (the United States), with many
+large universe the range goes from $-4.84\%$ (Singapore) to $6.86\%$ (the United States), with many
 economies now having negative average returns. The
 trend reflects the firm size, the largest stocks post the strongest returns, and the smaller
 firms added pull the average down.
 Volatilities exhibit the opposite pattern, rising with universe size, as smaller, more
 volatile stocks join the investable universe. Switzerland is the least volatile market in every case, 
 its volatility rises from $29.04\%$ to $33.65\%$, and the upper end rises 
-from $43.30\%$ (Norway) in the top 10 to $62.12\%$ (Singapore) in the top 100.
+from $43.30\%$ (Norway) in the small universe to $62.12\%$ (Singapore) in the large universe.
 
 Excess currency returns range between $-2.07\%$ for the Japanese yen and $2.48\%$ for the New
 Zealand dollar, and excess currency volatilities range from $0.56\%$ for the Hong Kong
@@ -378,7 +378,7 @@ Where the Sharpe ratio scales return by total volatility and the Sortino ratio b
 downside deviation, the expected shortfall ratio scales it by the tail loss
 itself.
 A strategy scores well only if it earns return efficiently relative to
-its realized tail risk, so the ratio rewards the trade-off the expected shortfall optimizers
+its realized tail risk, so the ratio rewards the tradeoff the expected shortfall optimizers
 are solving. Reported in annualized units alongside the Sharpe and Sortino ratios,
 the three can be read together to trace how the ranking of strategies shifts as the
 risk moves from total, to downside, to tail risk. It is computed from the

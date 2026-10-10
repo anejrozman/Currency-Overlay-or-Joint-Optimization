@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent
-MEASURES = {"mv": ("Vol", "tab:blue"), "mad": ("MAD", "tab:orange"), "smv": ("SD", "tab:green"),
+MEASURES = {"mv": ("Variance", "tab:blue"), "smv": ("Semi-Variance", "tab:green"), "mad": ("MAD", "tab:orange"),
             "es": ("ES", "tab:red"), "soes": ("SOES", "tab:purple")}
 TYPES = {
     "unregularized": ("top_runs.csv", "{}_{}", "Unregularized joint vs. overlay"),

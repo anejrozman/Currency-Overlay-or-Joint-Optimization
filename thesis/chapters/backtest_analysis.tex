@@ -2,22 +2,22 @@
 
 In this chapter, we analyze the out-of-sample performance of the joint and sequential overlay programs across the five 
 risk measures and three universe sizes introduced in \Cref{chap:optimization-framework,chap:data-and-implementation}. In \Cref{sec:baseline-backtests} we report the
-baseline backtests of the unregularized joint and overlay optimizers, together with the equally weighted benchmark.
+baseline backtests of the unregularized joint and overlay programs, together with the equally weighted benchmark.
 We show that the strategies trade excess return for lower volatility and drawdowns, that their
 risk-adjusted returns exceed those of the equally weighted portfolio in the medium and large universes but not consistently
-in the small universe, and that joint and overlay optimization approaches produce similar realized performance across
+in the small universe, and that joint and sequential optimization produce similar realized performance across
 measures and universes. In \Cref{sec:effects-of-regularization} we repeat the analysis for the regularized joint and
 overlay programs and compare them against the regularized asset-only benchmarks, the fully hedged and unhedged portfolios. 
 We show that regularization improves the Sharpe ratios, the most in the large universe, and that
 actively trading the currencies performs on par with full hedging. In \Cref{sec:effects-of-adding-a-mean-term} we consider the mean-risk formulation of the optimizers and show that adding a mean term
 substantially improves the risk-adjusted returns. We further show that the
-deviation measures benefit from the addition of a mean term more than the tail measures. Across the three considered backtests, the only metric where joint optimization consistently outperforms overlay optimization is volatility, where the joint program achieves lower realized volatility across all risk measures and universe sizes. This motivates the analysis of \Cref{chap:joint-vs-sequential}, where we focus on comparing the optimization approaches in terms of their risk reduction.
+deviation measures benefit from the addition of a mean term more than the tail measures. Across the three considered backtests, the only metric where joint optimization consistently outperforms sequential optimization is volatility, i.e. risk reduction, where the joint program achieves lower realized volatility across all risk measures and universe sizes. This motivates the analysis of \Cref{chap:joint-vs-sequential}, where we focus on comparing the optimization approaches in terms of their risk reduction.
  
 
 \section{Baseline Backtest Results} \label{sec:baseline-backtests}
 
 We first report the baseline backtests of the 
-unregularized Joint and sequential Overlay optimizers across the five 
+unregularized Joint and Overlay optimizers across the five 
 risk measures and three universe sizes considered in the thesis. 
 We compare them against the equally weighted portfolio which serves as the no-optimization benchmark.
 
@@ -39,7 +39,7 @@ between the two optimization approaches over time.
   \begin{tabular}{l*{11}{c}}
     \multicolumn{12}{c}{\textbf{Baseline Backtest Performance across Universe Sizes}} \\[2pt]
     \toprule
-    \multicolumn{12}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
                              &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
@@ -53,7 +53,7 @@ between the two optimization approaches over time.
     $\text{Turnover}^a$      & 0.30             & 0.87             & 0.82             & 0.99             & 0.97             & 1.10             & 1.06             & 1.30             & 1.27             & 1.38             & 1.47 \\
     $\text{Turnover}^c$      & 0.92             & 1.70             & 1.88             & 2.13             & 2.38             & 1.51             & 1.84             & 2.39             & 2.98             & 2.66             & 3.46 \\
     \midrule
-    \multicolumn{12}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investable Universe (top 50 stocks per economy)}} \\
     \midrule
                              &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
@@ -67,7 +67,7 @@ between the two optimization approaches over time.
     $\text{Turnover}^a$      & 0.27             & 1.05             & 1.05             & 1.25             & 1.26             & 1.66             & 1.68             & 1.78             & 1.79             & 2.13             & 2.23 \\
     $\text{Turnover}^c$      & 0.92             & 1.16             & 1.37             & 1.20             & 1.36             & 0.98             & 1.25             & 0.97             & 1.67             & 1.02             & 1.85 \\
     \midrule
-    \multicolumn{12}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investable Universe (top 100 stocks per economy)}} \\
     \midrule
                              &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
@@ -83,18 +83,18 @@ between the two optimization approaches over time.
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the baseline backtests in the small, medium and large investment universes}
+  \caption{Performance metrics of the baseline backtests in the small, medium and large investable universes}
   \label{tab:baseline}
    \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     Table \ref{tab:baseline} reports out-of-sample performance metrics for the unregularized optimizers in
-  the three investment universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
-  medium and Panel C the large investment universe. Each panel reports the unregularized sequential currency
+  the three investable universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
+  medium and Panel C the large investable universe. Each panel reports the unregularized sequential currency
   overlay (Overlay) and joint (Joint) optimizers, together with the equally weighted portfolio (EW). Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean
   absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
   out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
-  (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average asset and currency turnover,
+  (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average asset and currency turnover,
   respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
   formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
@@ -127,7 +127,9 @@ In the small universe, the Sharpe ratios of the optimizers range from $0.02$ to 
 equally weighted portfolio, and only the variance and mean absolute deviation optimizers improve on the benchmark. In
 the medium and large universes, every optimizer outperforms the equally weighted portfolio, with Sharpe ratios between
 $0.41$ and $0.56$ against $0.33$, and between $0.51$ and $0.76$ against $0.37$, respectively.
-This tells us that the risk reduction achieved by the optimizers outweighs the lower excess return once the universe is large enough. 
+In the small universe, the optimizers lose more excess return than they reduce
+risk, while in larger universes they can diversify across more low-risk stocks,
+and the reduction in volatility outweighs the lost return.
 Sortino ratios follow the same pattern, so accounting only
 for downside risk does not change the comparison. 
 
@@ -137,39 +139,39 @@ turnover, where Joint is higher than Overlay in every measure-universe combinati
 between $11\%$ and $82\%$.  Since returns are reported net of transaction costs, the comparisons above already incorporate these differences. The extra currency turnover does not reduce the risk-adjusted returns of Joint relative to Overlay, and the higher turnover of both optimizers does not change their advantage over the equally weighted portfolio.
 
 Finally, comparing the performance of the unregularized Joint and Overlay optimizers under the same risk measures, across all reported metrics, we see that they perform very similarly.
-The Joint optimizer does consistently achieve a lower volatility, but the differences shrink as we increase the universe size, from up to $0.45$ percentage points in the
-small universe, and up to $0.06$ in the large universe. This is in line with the
-Joint program being able to exploit the asset and currency dependence structure when the number of assets compared to the number of currencies is smaller. We study the risk reduction performance and mechanism in more detail in \Cref{chap:joint-vs-sequential}. The other metrics differ by small
+The Joint optimizer does consistently achieve a lower volatility, but the differences shrink as we increase the universe size, from up to a $7\%$ decrease in the
+small universe, to essentially no difference in the large universe. This is in line with the
+joint program being able to exploit the asset and currency dependence structure when the number of assets compared to the number of currencies is smaller. We study the risk reduction performance and mechanism in more detail in \Cref{chap:joint-vs-sequential}. The other metrics differ by small
 amounts, with excess returns differing by at most $0.5$ percentage points, maximum drawdowns by at most $1.96$
-percentage points and Sharpe ratios by at most $0.07$. However, the sign of the difference changes across risk measures within every universe, so one optimization approach does not consistently outperform the other. 
+percentage points and Sharpe ratios by at most $0.07$. However, the sign of these differences changes across risk measures within every universe, so one optimization approach does not consistently outperform the other. 
 
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/unregularized_top10.pdf}
-  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top10.pdf}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy).}
   \label{fig:baseline-top10}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/unregularized_top50.pdf}
-  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top50.pdf}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy).}
   \label{fig:baseline-top50}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/unregularized_top100.pdf}
-  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the currency overlay in the large investment universe (top 100 stocks per economy).}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top100.pdf}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy).}
   \label{fig:baseline-top100}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} show the out-of-sample performance of the
-  unregularized optimizers in the small, medium and large investment universes, respectively. In each figure,
+  unregularized optimizers in the small, medium and large investable universes, respectively. In each figure,
   the top panel shows the cumulative wealth of the joint optimizers and the equally weighted portfolio, and
-  the bottom panel shows the cumulative sum of the daily return differences between the joint and the currency
+  the bottom panel shows the cumulative sum of the daily return differences between the joint and the
   overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction costs. The
   corresponding performance metrics are reported in
   Panels A, B and C of \Cref{tab:baseline}, respectively.
@@ -185,7 +187,7 @@ after the COVID-19 market shock and ultimately attains the highest terminal weal
 volatility and with deeper drawdowns throughout the sample. In contrast, the Overlay and Joint optimizers follow more stable growth 
 paths, consistent with their lower realized volatility reported in \Cref{tab:baseline}.
 
-The bottom panels show the cumulative daily return difference between the Joint and Overlay optimizers for each risk measure, and confirm that the two optimization approaches track each other closely throughout the sample in terms of returns. The cumulative differences remain close to zero in every universe size and for every measure, with the exception of second-order Expected Shortfall in the small universe, where the Joint optimizer drifts persistently below the Overlay optimizer from the early $2010$s onward. 
+The bottom panels show the cumulative daily return difference between the Joint and Overlay optimizers for each risk measure, and confirm that the two optimization approaches track each other closely throughout the sample in terms of returns. The cumulative differences oscilate around zero in every universe size and for every measure, with the exception of second-order Expected Shortfall in the small universe, where the Joint optimizer drifts persistently below the Overlay optimizer from the early $2010$s onward. 
 
 Overall, we see a consistent pattern across all the considered risk measures. The Overlay and 
 Joint optimizers reduce volatility and drawdowns substantially relative to the equally weighted portfolio. The Sharpe comparison depends on the 
@@ -198,7 +200,7 @@ Overlay optimizers. We add $L_1$ and $L_2$ penalties on the asset weights and, s
 weights to the objective, following the regularization scheme of \Cref{chap:optimization-framework}. The penalty
 weights are selected at every rebalancing date by a grid search over the validation window described in
 \Cref{sec:backtest-configuration}. All other aspects of the backtests remain unchanged. We also compare the Joint and Overlay
-optimizers against the regularized Asset-Full (Full) and Assets-Zero (Zero) optimizers which serve as 
+optimizers against the regularized Assets-Full (Full) and Assets-Zero (Zero) optimizers which serve as 
 benchmarks for optimizing only the asset weights under the same risk measures, with the currency weights either fully hedged or set to zero, respectively.
 \Cref{tab:regularization-sharpe-change} reports the change in the Sharpe ratio between the unregularized and regularized optimizers,
 and \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} report 
@@ -232,9 +234,8 @@ performance metrics of the regularized optimizers and the three benchmarks.
   computed as the Sharpe ratio of each regularized optimizer in
   \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} minus that of its unregularized version in
   \Cref{tab:baseline}, for the Overlay and Joint optimizers in the small, medium and
-  large investment universes. Rows correspond to the
-  risk measure that is minimized, that is, variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES)
-  and second-order Expected Shortfall (SOES), and the last row reports the average change across the five risk measures.
+  large investable universes. Rows correspond to the
+  risk measure that is minimized, and the last row reports the average change across the five risk measures.
   \end{minipage}
 \end{table}
 
@@ -244,7 +245,7 @@ rises by $0.17$ on average, while the effect is modest in the small universe and
 penalties stabilize the weights by limiting the extreme positions that the unregularized programs fit to noise in the
 estimation window, which becomes more important when the number of assets increases relative to the length of the estimation
 window. The unregularized second-order Expected Shortfall optimizers are the least stable, since the measure is driven by
-the squared losses of the few most extreme observations in the estimation window. Accordingly, regularization helps them the most, raising their Sharpe ratios by $0.38$ in the large universe.
+the squared losses of the few most extreme observations in the estimation window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
 
 \begin{table}[H]
   \centering
@@ -260,7 +261,7 @@ the squared losses of the few most extreme observations in the estimation window
     \textbf{Metric}          &                  & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
     ER (\%)                  &                  & 1.29             & 1.24             & 1.05             & 0.84             & 1.60             & 1.64             & 1.07             & 1.31             & 0.98             & 0.03 \\
-    Vol (\%)                 &                  & 7.82             & 7.76             & 7.91             & 7.72             & 7.81             & 7.75             & 7.99             & 7.85             & 8.52             & 8.34 \\
+    Vol (\%)                 &                  & 7.82             & 7.76             & 7.91             & 7.72             & 7.81             & 7.75             & 7.99             & 7.85             & 8.52             & 8.64 \\
     MD (\%)                  &                  & 27.81            & 27.80            & 30.63            & 30.43            & 27.83            & 26.01            & 29.96            & 28.89            & 36.02            & 36.22 \\
     SR                       &                  & 0.16             & 0.16             & 0.13             & 0.11             & 0.20             & 0.21             & 0.13             & 0.17             & 0.11             & 0.00 \\
     SOR                      &                  & 0.22             & 0.22             & 0.18             & 0.15             & 0.28             & 0.29             & 0.18             & 0.23             & 0.16             & 0.00 \\
@@ -283,7 +284,7 @@ the squared losses of the few most extreme observations in the estimation window
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the regularized optimizers in the small investment universe (top 10 stocks per economy)}
+  \caption{Performance metrics of the regularized optimizers in the small investable universe (top 10 stocks per economy)}
   \label{tab:regularized-top10}
 \end{table}
 
@@ -324,7 +325,7 @@ the squared losses of the few most extreme observations in the estimation window
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the regularized optimizers in the medium investment universe (top 50 stocks per economy)}
+  \caption{Performance metrics of the regularized optimizers in the medium investable universe (top 50 stocks per economy)}
   \label{tab:regularized-top50}
 \end{table}
 
@@ -365,21 +366,21 @@ the squared losses of the few most extreme observations in the estimation window
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the regularized optimizers in the large investment universe (top 100 stocks per economy)}
+  \caption{Performance metrics of the regularized optimizers in the large investable universe (top 100 stocks per economy)}
   \label{tab:regularized-top100}
    \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} report out-of-sample performance metrics
   for the regularized optimizers in
-  the three investment universes, with portfolios rebalanced quarterly.
+  the three investable universes, with portfolios rebalanced quarterly.
   Panels A1, A2 and A3 report the regularized sequential
   currency overlay (Overlay) and joint (Joint) optimizers, and Panels B1, B2 and B3 the benchmarks, the
   equally weighted portfolio (EW) and the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero).
   Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean absolute
   deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
   out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
-  (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average asset and currency turnover,
+  (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average asset and currency turnover,
   respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
   formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
@@ -390,7 +391,7 @@ Comparing the performance of the Full optimizer with Overlay and Joint optimizer
 we see that fully
 hedging the currency exposure performs very similarly to actively trading the currencies. 
 Full solves the same asset-only
-problem as the first step of the Overlay, and the regularized Overlay and Joint optimizers achieve Sharpe ratios on par
+problem as the first step of the overlay program, and the regularized Overlay and Joint optimizers achieve Sharpe ratios on par
 with Full in every universe. A likely reason is that the objective contains no mean term, so the currency weights are
 chosen only to reduce risk and not to earn the excess currency returns. 
 Volatility in the small universe is where the Joint and Overlay outperform the Full optimizer, by up to $10\%$. Looking at 
@@ -402,36 +403,38 @@ On the other hand, the Zero optimizer keeps the full currency
 exposure and with it the excess currency returns that the
 risk-minimizing optimizers give up, and earns a higher excess return at a much higher volatility. In the small universe
 this gives Zero the higher Sharpe ratio for every risk measure, while in the medium and large universes the Overlay and
-Joint optimizers outperform it for every risk measure, by up to 70\%. This performance advantage of the risk-minimizing optimizers over Zero 
-shows the benefits of active currency management in larger international portfolios. 
+Joint optimizers outperform it for every risk measure, by up to 70\%. This performance advantage of the risk-minimizing optimizers over Zero shows the
+benefits of active currency management in larger universes, where equity risk is
+reduced further and currency risk makes up a larger share of the portfolio's
+total risk.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
-  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
+  \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy).}
   \label{fig:regularized-top10}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
-  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
+  \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy).}
   \label{fig:regularized-top50}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/regularized_top100.pdf}
-  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the currency overlay in the large investment universe (top 100 stocks per economy).}
+  \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top100.pdf}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy).}
   \label{fig:regularized-top100}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     \Cref{fig:regularized-top10,fig:regularized-top50,fig:regularized-top100} show the out-of-sample
-  performance of the regularized optimizers in the small, medium and large investment universes, respectively.
+  performance of the regularized optimizers in the small, medium and large investable universes, respectively.
   In each figure, the top panel shows the cumulative wealth of the joint optimizers and the equally weighted
   portfolio, and the bottom panel shows the cumulative sum of the daily return differences between the joint
-  and the currency overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction
+  and the overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction
   costs. The corresponding performance metrics are reported in
   \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100}.
   \end{minipage}
@@ -439,34 +442,32 @@ shows the benefits of active currency management in larger international portfol
 
 After regularization, the performance of the Joint and Overlay optimizers remains very similar. Their Sharpe ratios in
 \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} differ only marginally for every risk measure
-and universe size, with the sign of the difference changing across risk measures within each universe. Joint optimization again
-achieves a lower volatility in every measure-universe combination. The only exception being 
-second-order Expected Shortfall in the small universe, where Overlay beats Joint optimization on every metric besides volatility. The bottom panel of
+and universe size, with the sign of the difference changing across risk measures within each universe. The Joint optimizers again
+achieve a lower volatility in every measure-universe combination. The only exception being 
+second-order Expected Shortfall in the small universe, where Overlay beats Joint on every metric. The bottom panel of
 \Cref{fig:regularized-top10} shows that this happens almost entirely after the onset of the COVID-19 crisis in 2020, so
-it reflects this period rather than a persistent difference, while the bottom panels of
+it is more reflective of this period rather than a persistent difference. The bottom panels of
 \Cref{fig:regularized-top50,fig:regularized-top100} show that the cumulative return differences in the medium and large
 universes remain small for all risk measures throughout the sample. The main effect of regularization on the comparison is on currency
 turnover. Without regularization, the currency turnover of Joint exceeds that of Overlay by $11\%$ to $82\%$, while with
 regularization the two differ by at most $7\%$. The penalties on the currency weights thus shrink the larger currency
-positions of the Joint program to about the size of those of the Overlay, without changing the comparison of their
-risk-adjusted returns. 
+positions of the joint program to about the size of those of the overlay program. This does not have an effect on their
+risk-adjusted returns, which remain very similar, with no optimizer consistently outperforming the other. 
 
 The results so far share a common feature. All optimizers minimize a risk measure without any return term in the
 objective, and while this delivers substantially lower volatility and drawdowns than the equally weighted portfolio, it
 also gives up potential excess asset and currency returns. A natural extension is therefore to
 add a mean term to the objective, which lets the optimizers trade off expected return against risk. 
-A risk-return objective is also where joint optimization could be more beneficial, as the Joint program
-can account for the dependence between asset and currency returns when choosing positions that raise the expected
-return. The difficulty is that expected returns are estimated much less precisely than risk, so whether the mean term
-improves out-of-sample performance is an empirical question, which we address in
-\Cref{sec:effects-of-adding-a-mean-term}.
+A risk-return objective is also where joint optimization could be more beneficial, as the joint program
+can account for the dependence structure between asset and currency returns when choosing positions that raise the expected
+return.
 
 \section{Mean-Risk Optimization} \label{sec:effects-of-adding-a-mean-term}
 
-In this section, we add a mean term to the objective of the unregularized Joint and Overlay programs of
+In this section, we add a mean term to the objective of the unregularized joint and overlay programs of
 \Cref{sec:baseline-backtests}. Each program now
 minimizes the risk measure with an added expected portfolio return scaled by $1/\gamma$, where $\gamma$ is a risk aversion
-coefficient, as introduced in \Cref{sec:mean-risk-portfolio-optimization}. In the Overlay, the asset step includes the
+coefficient, as introduced in \Cref{sec:mean-risk-portfolio-optimization}. In the overlay program, the asset step includes the
 expected asset returns and the currency step the expected excess currency returns. The expected asset returns are averaged
 across the stocks of each economy and shrunk toward zero, while the expected excess currency returns are set to the
 negative forward premium, that is, the difference between the foreign and the US interest rate. The choice of $\gamma$ for each risk measure is described in
@@ -502,7 +503,7 @@ metrics.
     \Cref{tab:mean-sharpe-change} reports the change in the out-of-sample Sharpe ratio from adding a mean term to the
   objective, computed as the Sharpe ratio of each mean-risk optimizer in \Cref{tab:mean-risk} minus that of the
   unregularized version in \Cref{tab:baseline}, for the Overlay and Joint optimizers in the small,
-  medium and large investment universes. Rows correspond to the risk measure in the objective, that is, variance,
+  medium and large investable universes. Rows correspond to the risk measure in the objective, that is, variance,
   semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES), and the
   last two rows report the average change across the deviation measures (variance, semi-variance and MAD) and across the
   tail measures (ES and SOES).
@@ -511,14 +512,15 @@ metrics.
 
 Looking at \Cref{tab:mean-sharpe-change}, we see that adding a mean term to the objective raises the Sharpe ratios of the Overlay and Joint optimizers in 28 of the 30 combinations of risk
 measure and universe size. Unlike regularization, which was most beneficial in the large universe, the addition of a mean term
-improves the Sharpe ratios by a similar amount in all three universes. The improvement is, however, very uneven across
+improves the Sharpe ratios by a similar amount in all three universes. Minimizing risk alone ignores expected returns, and the mean term recovers part
+of the excess return the optimizers otherwise give up. Though we can see that the improvement is very uneven across
 risk measures. The Sharpe ratios of the deviation measures rise by $0.16$ to $0.24$ on average, while those of the tail
 measures rise by at most $0.10$.
 
 This split is in line with how the risk measures handle the mean of the portfolio return. Expected Shortfall and
 second-order Expected Shortfall are translation equivariant, so minimizing them already rewards portfolios with a higher mean. The two tail measures therefore
 carry an implicit mean term, which the explicit one only strengthens. The deviation measures are invariant to a shift in
-the portfolio return, so for them the addition of a mean term introduces new information. The average currency turnover is
+the portfolio return, so for them the addition of a mean term introduces new information in the optimization problem. The average currency turnover is
 consistent with this interpretation. In the medium and large universes, the mean term raises the currency turnover of
 the variance and semi-variance optimizers to two to three times its previous level, while for the tail-measure
 optimizers it remains stable around its previous level. We analyze the implicit risk-return tradeoff of the tail measures in more detail in
@@ -531,7 +533,7 @@ optimizers it remains stable around its previous level. We analyze the implicit 
   \begin{tabular}{l*{11}{c}}
     \multicolumn{12}{c}{\textbf{Mean-Risk Backtest Performance across Universe Sizes}} \\[2pt]
     \toprule
-    \multicolumn{12}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
                              &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
@@ -545,7 +547,7 @@ optimizers it remains stable around its previous level. We analyze the implicit 
     $\text{Turnover}^a$      & 0.30             & 0.94             & 0.92             & 1.17             & 1.22             & 1.13             & 1.13             & 1.30             & 1.28             & 1.39             & 1.48 \\
     $\text{Turnover}^c$      & 0.92             & 2.36             & 2.41             & 2.65             & 2.61             & 2.14             & 2.25             & 2.15             & 2.35             & 2.25             & 2.42 \\
     \midrule
-    \multicolumn{12}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investable Universe (top 50 stocks per economy)}} \\
     \midrule
                              &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
@@ -559,7 +561,7 @@ optimizers it remains stable around its previous level. We analyze the implicit 
     $\text{Turnover}^a$      & 0.27             & 1.17             & 1.21             & 1.43             & 1.52             & 1.64             & 1.69             & 1.78             & 1.80             & 2.13             & 2.25 \\
     $\text{Turnover}^c$      & 0.92             & 2.62             & 2.71             & 3.15             & 3.10             & 1.60             & 2.01             & 0.99             & 1.72             & 1.03             & 1.92 \\
     \midrule
-    \multicolumn{12}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investable Universe (top 100 stocks per economy)}} \\
     \midrule
                              &                  & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
     \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
@@ -575,19 +577,19 @@ optimizers it remains stable around its previous level. We analyze the implicit 
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the mean-risk optimizers in the small, medium and large investment universes}
+  \caption{Performance metrics of the mean-risk optimizers in the small, medium and large investable universes}
   \label{tab:mean-risk}
    \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     Table \ref{tab:mean-risk} reports out-of-sample performance metrics for the mean-risk optimizers in the
-  three investment universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
-  medium and Panel C the large investment universe. Each panel reports the unregularized sequential currency
+  three investable universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
+  medium and Panel C the large investable universe. Each panel reports the unregularized sequential currency
   overlay (Overlay) and joint (Joint) optimizers with an added mean term, together with the equally weighted
   portfolio (EW) as a benchmark. Columns are grouped by the risk measure, that is,
   variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected
   Shortfall (SOES). The realized out-of-sample performance metrics shown are the annualized excess return (ER),
-  volatility (Vol), maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), and average
+  volatility (Vol), maximum drawdown (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average
   asset and currency turnover, respectively. The sample period runs from June 1990 to June 2023, and the first
   out-of-sample portfolio is formed in June 2000. More details on the optimization approaches, backtest configuration, and performance
   metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
@@ -600,47 +602,51 @@ the tail measures. This comes at the cost of an increase in volatility, which ri
 variance and semi-variance optimizers, while for mean absolute deviation
 and the tail measures it changes by less than half a percentage point. Even with the increase, the volatility of the variance and
 semi-variance optimizers remains at between $50\%$ and $70\%$ of that of the equally weighted portfolio, and the
-maximum drawdowns of all mean-risk optimizers stay below $70\%$ of that of the equally weighted portfolio. As a
-result, every mean-risk optimizer outperforms the equally weighted portfolio on a risk-adjusted basis in the medium and
-large universes. In the small universe, the deviation measures reach Sharpe ratios of $0.34$ to $0.38$ against $0.13$,
-while the tail measures stay close to the benchmark. The Sortino ratios show the same pattern.
+maximum drawdowns of all mean-risk optimizers stay below $70\%$ of that of the equally weighted portfolio. The mean
+term thus raises returns without giving up the risk reduction that distinguishes the optimizers from the equally
+weighted portfolio. As a result, every mean-risk optimizer outperforms the equally weighted portfolio on a risk-adjusted
+basis in the medium and large universes. In the small universe, the deviation measures reach Sharpe ratios of $0.34$ to
+$0.38$ against $0.13$ for the equally weighted portfolio, while the tail measures perform similarly at $0.12$ to $0.16$. For the deviation measures, the
+underperformance of the pure risk-minimizing optimizers in the small universe is therefore not a failure of risk
+reduction, but a consequence of ignoring expected returns. The Sortino ratios show the same pattern, so a
+comparison focused on downside risk does not change the conclusion. 
 
-The comparison with the asset-only benchmarks of \Cref{sec:effects-of-regularization} changes.
-The deviation
-measures now achieve higher Sharpe ratios than Full in every case except semi-variance in the large universe. Under the same risk measure, their Sharpe ratios are $0.34$ to $0.38$ against $0.12$ to $0.20$ for Full in
-the small universe, $0.61$ to $0.74$ against $0.48$ to $0.49$ in the medium universe and 
-$0.67$ to $0.91$ against $0.57$ to $0.83$ in the large universe. The variance and semi-variance
-optimizers also earn a higher excess return than Zero in every universe, between $3.1\%$ and $6.4\%$ against $2.6\%$ to
-$4.9\%$ under the same risk measure, at a lower volatility of $5.7\%$ to $9.9\%$ against $8.9\%$ to $11.8\%$. Zero earns
-currency returns passively by leaving the entire currency exposure unhedged, whereas the mean-risk optimizers take
-currency exposure selectively and earn more at a lower risk.
+% The comparison with the asset-only benchmarks of \Cref{sec:effects-of-regularization} changes.
+% The deviation
+% measures now achieve higher Sharpe ratios than Full in every case except semi-variance in the large universe. Under the same risk measure, their Sharpe ratios are $0.34$ to $0.38$ against $0.12$ to $0.20$ for Full in
+% the small universe, $0.61$ to $0.74$ against $0.48$ to $0.49$ in the medium universe and 
+% $0.67$ to $0.91$ against $0.57$ to $0.83$ in the large universe. The variance and semi-variance
+% optimizers also earn a higher excess return than Zero in every universe, between $3.1\%$ and $6.4\%$ against $2.6\%$ to
+% $4.9\%$ under the same risk measure, at a lower volatility of $5.7\%$ to $9.9\%$ against $8.9\%$ to $11.8\%$. Zero earns
+% currency returns passively by leaving the entire currency exposure unhedged, whereas the mean-risk optimizers take
+% currency exposure selectively and earn more at a lower risk.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
-  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the small investment universe (top 10 stocks per economy).}
+  \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy).}
   \label{fig:mean-risk-top10}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
-  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the medium investment universe (top 50 stocks per economy).}
+  \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy).}
   \label{fig:mean-risk-top50}
 \end{figure}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.7\textwidth]{../results/figures/cumulative_and_difference/w_mean_top100.pdf}
-  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the currency overlay in the large investment universe (top 100 stocks per economy).}
+  \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top100.pdf}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy).}
   \label{fig:mean-risk-top100}
   \vspace{0.5em}
   \begin{minipage}{\textwidth}
   \raggedright\small
     \Cref{fig:mean-risk-top10,fig:mean-risk-top50,fig:mean-risk-top100} show the out-of-sample performance of
-  the mean-risk optimizers in the small, medium and large investment universes, respectively. In each figure,
+  the mean-risk optimizers in the small, medium and large investable universes, respectively. In each figure,
   the top panel shows the cumulative wealth of the joint optimizers and the equally weighted portfolio, and
-  the bottom panel shows the cumulative sum of the daily return differences between the joint and the currency
+  the bottom panel shows the cumulative sum of the daily return differences between the joint and the
   overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction costs. The
   corresponding performance metrics are reported in Panels A, B and C of \Cref{tab:mean-risk}, respectively.
   \end{minipage}
@@ -652,10 +658,16 @@ Overlay for every risk measure in the medium and large universes, by $0.03$ to $
 ratios confirm this, with Joint performing better, by $0.02$ to $0.25$. The bottom panels of
 \Cref{fig:mean-risk-top50,fig:mean-risk-top100} show that this advantage builds up gradually over the sample rather than in
 a single period, with the cumulative return difference reaching about $0.18$ for semi-variance in the large universe and
-$0.19$ for second-order Expected Shortfall in the medium universe by the end of the sample. At the same time, Joint optimization attains
+$0.19$ for second-order Expected Shortfall in the medium universe by the end of the sample. At the same time, Joint attains
 a lower volatility than Overlay for all risk measures, by up to $0.44$ percentage
 points. The lower volatility of the Joint optimizers is a persistent finding across all backtests in
-\Cref{sec:baseline-backtests,sec:effects-of-regularization}. Intuitively, the Joint program can choose assets and currencies that offset each other's risk, while the Overlay picks its assets before considering the currencies.
+\Cref{sec:baseline-backtests,sec:effects-of-regularization}. Intuitively, the joint program can choose assets 
+and currencies that offset each other's risk, while the overlay program picks its assets before considering the currencies.
+Without a mean term, this flexibility is used only to reduce risk, which lowers
+volatility but leaves returns largely unchanged. With a mean term, the joint
+program can also weigh the expected returns of assets and currencies against each
+other, keeping currency exposure where it is expected to pay and hedging it where
+it is not.
 
 
 \section{Conclusion} \label{sec:backtest-conclusion}
@@ -664,29 +676,43 @@ All optimizers considered in this chapter achieve a much lower volatility and sm
 portfolio. Without a mean term,
 the excess return of the Joint and Overlay optimizers is also lower. They minimize risk without any return term in the
 objective and have a lower exposure to the common movement of the equity markets, so they earn a smaller share of the
-equity risk premium. In the medium and large universes, the optimizers still have a higher Sharpe ratio than the equally
-weighted portfolio, but in the small universe they do not outperform it consistently. 
+equity risk premium. In the medium and large universes, the optimizers achieve a higher Sharpe ratio than the equally
+weighted portfolio, but in the small universe they do not outperform it consistently. With fewer stocks to choose from, the optimizers lose more excess return than they
+reduce volatility, while a larger universe offers more low-risk stocks, and the
+reduction in volatility outweighs the lost return.
 
 Regularization increases the Sharpe ratios, especially in the large universe. The penalties limit the extreme positions
 that the unregularized programs fit to noise in the estimation window, which matters more when the number of assets is
 large relative to the length of the window. The regularized Joint and Overlay optimizers perform on par with the Full
 optimizer, which keeps the currency exposure fully hedged. Without a mean term in the objective, actively trading the
 currencies therefore adds little compared to full hedging in terms of returns, likely because the currency weights
-are then chosen only to reduce risk and not to earn the excess currency returns.
+are then chosen only to reduce risk and not to earn the excess currency returns. Compared with the Zero optimizer, which keeps the full currency exposure, managing
+the currencies pays off in the medium and large universes, where equity risk is
+reduced further and currency risk makes up a larger share of the portfolio's total risk.
 
-Adding a mean term to the objective improves the performance of the deviation measures. Their Sharpe ratios
-increase considerably and are then higher than those of both the Full and the Zero optimizers in almost every case. The tail measures improve much less, since they already contain an implicit mean term.
+Adding a mean term to the objective raises the Sharpe ratios in almost every case and
+by a similar amount in all three universes. The gain comes from higher excess returns,
+while the volatility and drawdowns stay well below those of the equally weighted
+portfolio. The most significant improvement is for the deviation measures. Since they are
+invariant to a shift in the portfolio return, minimizing them ignores expected returns
+entirely, and the mean term adds information the optimizers did not use before.
+Expected Shortfall and second-order Expected Shortfall are translation equivariant and
+already reward a higher mean, so the explicit mean term changes them much less. 
 
 The Joint and Overlay optimizers perform very similarly when they only minimize risk. The Joint optimizer achieves a lower volatility and, without regularization, a higher currency
 turnover. With regularization, the currency turnover decreases to about the size of those of
 the Overlay. In both cases, neither approach achieves consistently higher risk-adjusted returns. This changes when a mean term is added. The
 Joint optimizer then has higher Sharpe and Sortino ratios than the Overlay for every risk measure in the medium and large
-universes, and this advantage is consistent over the sample.
+universes, and this advantage is consistent over the sample. Once expected returns enter the objective, the joint program can optimize the expected
+returns of assets and currencies against each other, which the overlay program cannot
+do since it fixes the asset weights first. This is the setting in which active
+currency management adds value, consistent with the result that it adds little when
+the currency weights are only optimized to reduce risk.
 
 The lower volatility of the Joint optimizer is the most consistent difference between the two approaches. We would
-expect this, since both programs minimize risk and the Joint program can always choose the same portfolio as the
-Overlay.
-Intuitively, the Joint program can choose assets and currencies that offset each other's risk, while the Overlay picks
+expect this, since both programs minimize risk and the joint program can always choose the same portfolio as the
+overlay program.
+Intuitively, the joint program can choose assets and currencies that offset each other's risk, while the overlay program picks
 its assets before considering the currencies, and this matters most in the small universe, where the number of assets is
 small relative to the number of currencies. In the next chapter, we therefore focus on comparing the optimizers in terms
 of reducing the risk measure they are optimizing for.
