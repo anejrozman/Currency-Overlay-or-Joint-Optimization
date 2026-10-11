@@ -243,9 +243,9 @@ We see in \Cref{tab:regularization-sharpe-change} that regularization improves t
 The improvement is the largest in the large universe, where the Sharpe ratio
 rises by $0.17$ on average, while the effect is modest in the small universe and mixed in the medium universe. The
 penalties stabilize the weights by limiting the extreme positions that the unregularized programs fit to noise in the
-estimation window, which becomes more important when the number of assets increases relative to the length of the estimation
+lookback window, which becomes more important when the number of assets increases relative to the length of the lookback
 window. The unregularized second-order Expected Shortfall optimizers are the least stable, since the measure is driven by
-the squared losses of the few most extreme observations in the estimation window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
+the squared losses of the few most extreme observations in the lookback window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
 
 \begin{table}[H]
   \centering
@@ -682,7 +682,7 @@ reduce volatility, while a larger universe offers more low-risk stocks, and the
 reduction in volatility outweighs the lost return.
 
 Regularization increases the Sharpe ratios, especially in the large universe. The penalties limit the extreme positions
-that the unregularized programs fit to noise in the estimation window, which matters more when the number of assets is
+that the unregularized programs fit to noise in the lookback window, which matters more when the number of assets is
 large relative to the length of the window. The regularized Joint and Overlay optimizers perform on par with the Full
 optimizer, which keeps the currency exposure fully hedged. Without a mean term in the objective, actively trading the
 currencies therefore adds little compared to full hedging in terms of returns, likely because the currency weights
