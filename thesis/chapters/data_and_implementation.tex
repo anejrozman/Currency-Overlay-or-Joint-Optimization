@@ -1,28 +1,36 @@
 \chapter{Data and Implementation}\label{chap:data-and-implementation}
 
-In this chapter, we describe the dataset used for the empirical evaluation of the portfolio optimization strategies and the implementation of the backtesting framework. 
-In the data section we detail the construction of the investable universe. We follow \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to analyze asset and excess currency returns and volatillities. We further expand the analysis to different investable universe sizes, and look at the correlation dependence of asset and currency returns. In the implementation section we describe the modular structure of the backtesting framework,
-the workflow of the backtest, numerical considerations in the implementation, and the metrics used to evaluate potrfolio performance.
+In this chapter, we describe the dataset and the backtest implementation used for the empirical evaluation of the
+portfolio optimization strategies in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. In \Cref{sec:data} we
+detail the construction of three investable universes of different sizes from the largest stocks of 14 global economies. We
+analyze the fully hedged asset returns and the excess currency returns, and show that as the universe size increases,
+the average asset returns tend to decrease and their volatilities rise. We further show that the correlations between the asset and
+excess currency returns are mostly positive, with the commodity and risk-sensitive currencies being the most positively
+correlated and the safe-haven currencies negatively correlated with most economies. This dependence structure stays stable across universe sizes. In \Cref{sec:backtest-implementation} we describe the implementation of the backtest. We first
+present in \Cref{sec:backtesting-framework} the modular structure of the backtesting framework. In \Cref{sec:backtest-configuration} we present the backtested strategies
+and their benchmarks, and specify the rebalancing frequency, the lookback window, the selection of the hyperparameters, and the
+modelling of transaction cost. Finally, in \Cref{sec:performance-evaluation-metrics} we define the performance metrics on which the
+strategies are evaluated in \Cref{chap:backtest-analysis}.
 
-\section{Data} 
+\section{Data}\label{sec:data}
 
 The empirical evaluation of all portfolio optimization strategies in this thesis relies on
 a dataset of international equities, foreign exchange spot rates, and forward
-exchange rates sourced from Refinitiv Datastream. The the one-month U.S.\ Treasury bill rate used in the return and
+exchange rates sourced from Refinitiv Datastream. The one-month U.S.\ Treasury bill rate used in the return and
 performance metric calculations is obtained from
 Kenneth R.\ French's online data library.\footnote{\url{https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html}}
 The datasets span from June 1990 to June 2023, covering several different market regimes, including
-the dot-com crash, the 2008 Global Financial Crisis, the European sovereign debt crisis, and the
+the dot-com crash, the global financial crisis, the European sovereign debt crisis, and the
 COVID-19 pandemic.
 
-We construct the investable universe from 14 global equity markets: Australia,
+We construct the investable universe from 14 economies: Australia,
 Canada, Denmark, Norway, Sweden, Hong Kong, Japan, New Zealand, Singapore, South
 Africa, Switzerland, the Eurozone, the United Kingdom, and the United States. The universe is
 rebuilt at the beginning of each year from the largest stocks by market capitalization at the time (a rolling-window
 approach that mitigates survivorship bias). At the start of each year we rank stocks within
-each market and restrict the following year's investments to that set. To study how the
-universe size affects the optimization approaches considered, we form three cross-sections, comprising the
-top 10, top 50, and top 100 stocks per economy. We refer to these as the small, medium and large universe. Because the constituents turn over each
+each economy and restrict the following year's investments to that set. To study how the
+universe size affects the optimization approaches considered, we form three cross-sections, comprising of the
+top 10, top 50, and top 100 stocks per economy. We refer to these as the small, medium and large universe. Because the constituents change each
 year, each universe spans more distinct stocks over the full sample than are held on any
 single date, 407 for the top 10, 1705 for the top 50, and 3189 for the top 100, respectively.
 
@@ -72,13 +80,13 @@ stocks.
 
 We can see that as the investable universe becomes larger, the average returns tend to fall. In the small universe every economy has a positive average return, ranging from
 $2.76\%$ (the United Kingdom) to $12.59\%$ (the United States). In the medium universe, the range
-drops downward, from $-1.99\%$ (Singapore) to $7.99\%$ (the United States), and in the
+drops from $-1.99\%$ (Singapore) to $7.99\%$ (the United States), and in the
 large universe the range goes from $-4.84\%$ (Singapore) to $6.86\%$ (the United States), with many
 economies now having negative average returns. The
 trend reflects the firm size, the largest stocks post the strongest returns, and the smaller
 firms added pull the average down.
 Volatilities exhibit the opposite pattern, rising with universe size, as smaller, more
-volatile stocks join the investable universe. Switzerland is the least volatile market in every case, 
+volatile stocks are added to the investable universe. Switzerland exhibits the lowest volatility in every case, 
 its volatility rises from $29.04\%$ to $33.65\%$, and the upper end rises 
 from $43.30\%$ (Norway) in the small universe to $62.12\%$ (Singapore) in the large universe.
 
@@ -95,45 +103,48 @@ Correlating each economy's series
 with each currency's excess return over the full sample gives a $14 \times 13$ correlation matrix. The
 US dollar is dropped from the currency axis, since its excess return is zero by
 construction. We repeat this for the three universe sizes.
-The resulting heatmaps are shown in \Cref{fig:asset-currency-corr-top-10}, \Cref{fig:asset-currency-corr-top-50}, and \Cref{fig:asset-currency-corr-top-100}.
+The resulting heatmaps are shown in \Cref{fig:asset-currency-corr-top-10,fig:asset-currency-corr-top-50,fig:asset-currency-corr-top-100}.
 
 Across all three universes the correlations range from $-0.2$ to
-$0.4$, and remain mostly positive. The pattern is intuitive and confirms well known empirical findings. The strongest positive correlations belong to commodity and risk-sensitive currencies such as the AUD, CAD, NZD and ZAR, whose equity markets and
+$0.4$, and remain mostly positive. The results are intuitive and agree with known empirical findings. The strongest positive correlations belong to commodity and risk-sensitive currencies such as the AUD, CAD, NZD and ZAR, whose equity markets and
 currencies rise together in good times and fall together in bad \citep{CHEN2003133, common_risk_factors_currency_markets, carry_trades_and_global_foreign_exchange_volatility}. The JPY and CHF are the only negatively correlated currencies with most other economies (ranging from $-0.2$ to $0.03$), in line with their role as safe havens that strengthen when equities fall \cite{safe_haven_currencies}. The EUR, DKK, and HKD are minimally correlated, reflecting the HKD's peg to the US dollar, and the DKK's peg to the EUR. This split between risky and safe-haven currencies is well
 documented \citep{global_currency_hedging, safe_haven_currencies}.
 
-This is the dependence structure the overlay optimization approach discards. It sets asset weights first, using only equity information, and adds the currency hedge afterwards, whereas the joint model can act on it
+This is the dependence structure the overlay program discards when it optimizes the asset weights. It sets the asset weights first, using only equity information, and adds the currency hedge afterwards, whereas the joint program can act on it
 directly. The structure barely changes across universe sizes, and this matters for the
-results that follow. A shift
-in the relative performance of the joint and overlay approaches in \Cref{chap:backtest-analysis} should therefore
-be attributed to estimation error rather than a change in the underlying dependence structure.
+results that follow. A shift in the relative performance of the joint and overlay programs across universe sizes in
+\Cref{chap:backtest-analysis,chap:joint-vs-sequential} is therefore not due to a change in the underlying
+dependence structure, and we analyze its causes in \Cref{chap:joint-vs-sequential}.
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\linewidth]{../results/figures/asset_currency_corr_top10.pdf}
-  \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the top 10 economies. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
+  \caption{Pearson correlation between the fully hedged returns of the equally weighted economy portfolios and the excess currency returns in the small universe (top 10 stocks per economy). The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
   \label{fig:asset-currency-corr-top-10}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\linewidth]{../results/figures/asset_currency_corr_top50.pdf}
-  \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the top 50 economies. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
+  \caption{Pearson correlation between the fully hedged returns of the equally weighted economy portfolios and the excess currency returns in the medium universe (top 50 stocks per economy). The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
   \label{fig:asset-currency-corr-top-50}
 \end{figure}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.8\linewidth]{../results/figures/asset_currency_corr_top100.pdf}
-  \caption{Pearson correlation between equally weighted economy fully hedged returns and excess currency returns, across the top 100 economies. The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
+  \caption{Pearson correlation between the fully hedged returns of the equally weighted economy portfolios and the excess currency returns in the large universe (top 100 stocks per economy). The US dollar is excluded from the currency axis, since it serves as the base currency and therefore its excess return is zero.}
   \label{fig:asset-currency-corr-top-100}
 \end{figure}
 
 
 \newpage
-\section{Backtesting Framework} \label{sec:backtesting-framework}
+\section{Backtest Implementation} \label{sec:backtest-implementation}
 
-In \Cref{chap:backtest-analysis} we evaluate a range of optimization strategies under different objectives (Mean-Variance,  Expected Shortfall, Mean Absolute Deviation), their treatment of
+\subsection{Backtesting Framework} \label{sec:backtesting-framework}
+
+In \Cref{chap:backtest-analysis} we evaluate a range of optimization strategies under different risk measures (variance, semi-variance, mean absolute deviation, Expected Shortfall and second-order
+Expected Shortfall), their treatment of
 currency exposure (overlay or joint), and the size of the investable
 universe. To keep these comparisons fair, the
 backtesting framework separates between the
@@ -168,7 +179,7 @@ interaction is summarized in \Cref{fig:backtest}.
   % --- Data Files (elevated, upper-left) ---
   \node[box, text width=3cm] (files) at (-0.65, 2.85) {
     \textbf{Data Files}\\[3pt]
-    $R^u$,\; $R^c$,\; $f_t$,\\
+    $R^u$,\; $R^c$,\; $f$,\\
     Universe Mask \\
   };
 
@@ -213,9 +224,10 @@ interaction is summarized in \Cref{fig:backtest}.
   \node[box, text width=3.5cm] (opt) at (11.3, 2.5) {
     \textbf{Optimizers}\\[3pt]
     \texttt{Equal Weight Optimizer}\\
-    \texttt{ES Optimizer}\\
-    \texttt{MV Optimizer}\\
-    \texttt{General Convex Optimizer}
+    \texttt{Full Optimizer}\\
+    \texttt{Zero Optimizer}\\
+    \texttt{Joint Optimizer}\\
+    \texttt{Overlay Optimizer}
   };
 
   \draw[arr] (opt.south) -- (base.north);
@@ -224,7 +236,7 @@ interaction is summarized in \Cref{fig:backtest}.
   \node[box, text width=2.8cm] (oos) at (5, -3.4) {
     \text{OOS Returns}\\[2pt]
     {\text{Performance metrics}}
-  };
+  }; 
 
   \draw[arr] (bt.south) -- (oos.north);
 
@@ -234,10 +246,10 @@ interaction is summarized in \Cref{fig:backtest}.
 \label{fig:backtest}
 \end{figure} 
 
-Data ingestion and alignment are implemetned in the \texttt{DataHandler}.
-It reads the raw inputs, the local unhedged asset returns $R^u$, the currency returns
-$R^c$, the forward premia $f_t$, and the universe mask that identifies which
-assets constitute the investable universe at each date, and aligns them into a
+Data ingestion and alignment are implemented in the \texttt{DataHandler}.
+It loads the input data, the local unhedged asset returns $R^u$, the currency returns
+$R^c$, the forward premia $f$, and the universe mask that identifies which
+assets constitute the investable universe at each date. It then aligns them into a
 \texttt{data\_bundle} which is passed to the backtester. The optimizers operate only on the
 bundled series, and the construction of returns from
 these inputs follows \Cref{sec:returns}.
@@ -245,19 +257,16 @@ these inputs follows \Cref{sec:returns}.
 All implemented optimizers inherit from an abstract base class, \texttt{BaseOptimizer}, that
 defines the three-method interface through which the backtester runs them. The
 \texttt{fit} method receives a training data bundle and estimates and stores the
-quantities the optimizer requires for its objective (e.g. covariance matrix for the mean-variance optimizer), so that estimation is
+quantities the optimizer requires for its objective (e.g. the covariance matrix for the variance optimizers), so that estimation is
 performed entirely within each optimizer.
 The \texttt{optimize} method solves the specific optimization problem. The \texttt{score} method takes a set of weights and a
 validation bundle and returns the validation performance used for hyperparameter
-selection. Concrete subclasses implement this interface for each strategy, an
-equal-weight optimizer that serves as the naive benchmark, the mean-variance and
-Expected Shortfall optimizers, and a general convex optimizer TODO: Update this when done implementing generalization.
-The estimators and solver internals invoked inside the methods \texttt{fit} and
-\texttt{optimize} are described in \Cref{sec:numerical-implementation}.
+selection. 
+More details on the estimators and solver internals invoked inside the methods \texttt{fit} and
+\texttt{optimize} can be found in Appendix \ref{sec:numerical-implementation}.
 
 The backtest itself is implemented in the \texttt{Backtester.run} method, which
-advances through the data sample on a set rebalancing frequency (daily, weekly, monthly, quarterly, or annual). The
-empirical analysis in \Cref{chap:backtest-analysis} and Appendix \ref{app:additional-results} uses monthly and quarterly rebalancing on the daily data. At each
+advances through the data sample on a set rebalancing frequency (daily, weekly, monthly, quarterly, or annual). At each
 rebalancing date, the optimizer is calibrated and deployed using a fixed rolling lookback window, partitioned into  an estimation window and a validation window. Hyperparameters are selected by a grid search over
 this partition. Each configuration is fitted on the estimation window
 via \texttt{fit}, used to produce weights via \texttt{optimize}, and evaluated on
@@ -265,153 +274,180 @@ the validation window via \texttt{score}, and the configuration with the
 best validation score is retrained on both the estimation and validation windows and finally used to 
 produce the portfolio weights for the next out-of-sample period. 
 These weights are held until the next rebalancing date, the window then rolls forward and the procedure
-repeats. Because we keep the estimation, validation, and total lookback window lengths
-fixed throughout the backtest (10 years split into 9 for estimation and 1 for validation) and across universe sizes, every strategy is evaluated on the same out-of-sample dataset.
+repeats.
 
 Each invocation of the backtester for a given optimizer produces a self-contained
-run directory. A new \texttt{run\_<n>} folder is created under
-\texttt{run/<optimizer\_name>/} and collects the full record of that run. The
+run directory. A new \texttt{run\_<n>} folder is created in
+\texttt{results/runs/<optimizer\_name>/} and collects the full record of that run: the
 out-of-sample return series \texttt{oos\_returns.csv}, the performance
 metrics \texttt{metrics.json}, a cumulative-return plot
-\texttt{cum\_returns\_plot.png}, and a configuration file \texttt{config.json}
+\texttt{cumulative\_returns\_plot.png}, the hyperparameters selected at each rebalancing date
+\texttt{selected\_params.csv}, the asset and currency weights \texttt{weights\_assets.csv} and
+\texttt{weights\_currencies.csv}, and a configuration file \texttt{config.json}
 recording the run specification. Storing the configuration alongside its outputs
 makes each result reproducible and attributable to the settings
 that generated it.
 
-% MAYBE INCLUDE
-
-% This design also anticipates the methodological extension of 
-% \Cref{chap:general}. Because the backtester treats the optimizer as an opaque
-% component behind the \texttt{fit}--\texttt{optimize}--\texttt{score} interface,
-% generalizing the objective to an arbitrary convex risk measure requires no
-% modification to the harness: the general convex optimizer already appears in the
-% same class hierarchy and is evaluated under exactly the protocol described here.
-% The orchestration is held constant not only across the baseline strategies but
-% also across the generalized objectives studied later, so that any difference in
-% performance is attributable to the objective itself rather than to the evaluation
-% procedure.
 
 
-\section{Backtest Configuration}
+\subsection{Backtest Configuration}
 \label{sec:backtest-configuration}
 
+We now specify the configuration under which the considered strategies in the thesis
+are backtested. We first list the backtested strategies, then describe the chosen backtest specification, and finally the execution
+of the currency positions and the transaction costs.
+ 
+
+We backtest the joint and the sequential currency overlay optimizers under the five risk measures
+considered in the thesis, variance, semi-variance, mean absolute deviation, Expected Shortfall and second-order Expected
+Shortfall, each in an unregularized, a regularized and a mean-risk formulation, as introduced in
+\Cref{chap:optimization-framework}. As benchmarks we use the equally weighted portfolio and two regularized
+asset-only optimizers, Full and Zero, under the same five risk measures. EW and Full are evaluated on fully hedged
+returns, and the joint and overlay optimizers on fully hedged returns plus the excess currency returns of their currency
+positions. Zero optimizes the same objective as Full, but is evaluated on unhedged returns, so it keeps the full currency
+exposure of its asset positions. The following portfolio strategies are considered:
+\begin{itemize}
+  \item \textbf{EW}: The fully hedged equally weighted portfolio.
+  \item \textbf{Full}: The fully hedged regularized asset portfolio with both $L_1$ and $L_2$ penalties.
+  \item \textbf{Zero}: The unhedged regularized asset portfolio with both $L_1$ and $L_2$ penalties.
+  \item \textbf{Overlay}: The unregularized sequential currency overlay portfolio.
+  \item \textbf{Regularized Overlay}: The overlay portfolio with both $L_1$ and $L_2$ penalties on the asset and currency
+  weights.
+  \item \textbf{Mean-risk Overlay}: The unregularized overlay portfolio with an added mean term.
+  \item \textbf{Joint}: The unregularized joint optimization portfolio.
+  \item \textbf{Regularized Joint}: The joint optimization portfolio with both $L_1$ and $L_2$ penalties on the asset and
+  currency weights.
+  \item \textbf{Mean-risk Joint}: The unregularized joint optimization portfolio with an added mean term.
+\end{itemize}
 
 
-\section{Performance Evaluation Metrics}
+Portfolios are rebalanced on the last
+trading day of each quarter. The first portfolio is formed
+on 30 June 2000, and the last on 30 December 2022, which gives $91$
+rebalancing dates. The lookback window covers the ten years
+before each rebalancing date, approximately $2{,}500$ daily observations. All strategies invest in the constituents of the current year's universe that have a
+complete return history over the lookback window.
+
+The penalty weights of the regularized optimizers are selected at every rebalancing date by a grid search, for which the
+lookback window is partitioned into a nine-year estimation window and a one-year validation window. Each configuration is
+fitted on the estimation window, and the resulting weights are scored by the risk measure they realize on the validation
+window. The
+configuration with the lowest validation risk is then re-fitted on both the estimation and validation windows, so that the final weights
+also use the most recent year of data. More details on the grid search and the hyperparameter range analysis are given in
+Appendix~\ref{app:additional-results}.
+
+The mean-risk optimizers also require expected asset and currency returns, which are estimated at each
+rebalancing date on the lookback window. Since individual stock means are hard to estimate accurately, we combine them by economy, as derived in \Cref{chap:optimization-framework}. That is, the means of the equally weighted 
+economy returns are shrunk toward zero with a
+James--Stein estimator, and every asset inherits the shrunk mean of its economy. The expected excess currency returns are
+not estimated from returns, but set to the negative forward premium at the end of the lookback window. 
+Due to computational complexity considerations, the risk aversion coefficient $\gamma$ is not selected on the
+validation window. Instead, we run each mean-risk optimizer over a grid of $\gamma$ values on the first lookback window between June 1990 and June 2000 and fix one value for each risk
+measure. More details on the risk aversion parameter selection can be found in Appendix~\ref{app:additional-results}.
+
+
+The currency positions of the hedged strategies are implemented with three-month forward contracts. Since each contract
+expires at the next rebalancing date, the full forward position is traded at every rebalancing date rather than only its
+change, which is why the currency turnover \eqref{eq:currency-turnover} in \Cref{sec:performance-evaluation-metrics} equals the notional of the
+forward positions. All returns are reported net of transaction costs. We assume constant half-spreads of $10$ basis points for equities and $1$ basis
+point for currencies, which gives transaction costs of
+$\tau^{asset} \approx 0.002$ and $\tau^{curr} \approx 0.0002$ per unit traded.  We derive the 
+transaction costs in detail in Appendix~\ref{app:transaction_costs}.
+
+\subsection{Performance Evaluation Metrics}
 \label{sec:performance-evaluation-metrics}
 
-All portfolio optimization strategies are evaluated on a common set of performance metrics computed from
-their out-of-sample return series. Because each optimizer minimizes a different
-objective, the strategies cannot be ranked solely by their in-sample objective values
-and are instead judged on the same realized metrics, each capturing a different view of the performance. All metrics are computed on USD out-of-sample returns net of the
-transaction costs (Derivation detailed in Appendix \ref{app:transaction_costs}). 
-Throughout this section, $R_{\mathcal P,t}$ denotes
+In \Cref{chap:backtest-analysis} we evaluate the performance of all considered portfolio optimization strategies on a common set of performance metrics computed from
+their out-of-sample return series, each capturing a different view of the portfolio's performance. How well the
+joint and overlay programs reduce the risk measure they minimize is analyzed separately in
+\Cref{chap:joint-vs-sequential}. Throughout this section, let $T$ be the number of trading days in the out-of-sample period, and let $R_{\mathcal P,t}$ denote
 the realized daily out-of-sample portfolio return, $\bar R_{\mathcal P}$ its
-sample mean, $\sigma$ its sample standard deviation, and $R_f$ the risk-free
-rate. Daily figures are annualized using the standard $252$ trading days per year assumption. The reported metrics are
-the expected shortfall at the $80\%$ and $95\%$ confidence levels, annualized volatility,
-maximum drawdown, the Sharpe ratio, the Sortino ratio, the expected shortfall
-ratio, and asset and currency turnover.
+sample mean, $\sigma_{\mathcal P}$ its annualized volatility, $\sigma_{\mathcal{P}, \text{down}}$ its annualized downside volatility, $R_{f, t}$ the
+daily risk-free
+rate and $\bar R_f$ the 
+average daily risk-free rate. Daily figures are annualized using the standard $252$ trading days per year assumption. The metrics we report are
+the annualized excess return, annualized volatility, maximum drawdown, the Sharpe ratio, the Sortino ratio, and average asset
+and currency turnover.
 
-Expected shortfall at confidence level $\beta$ measures the average loss in the
-worst $(1-\beta)$ tail of the return distribution. It is preferred to value at
-risk because it is coherent \cite{CoherentMeasuresOfRisk} and, rather than
-reporting only the loss threshold, averages the losses beyond it, so it reflects
-how severe the tail outcomes are and not merely how often they occur.\footnote{Formal
-definitions of value at risk and expected shortfall at confidence level $\beta$ are
-given in Appendix \ref{app:es_auxiliary_formulation}.} For the expected shortfall
-strategies, it is the quantity the optimizer minimizes,
-which makes it the most direct out-of-sample test of whether the expected shortfall
-strategy delivers on its objective. Because every strategy, including the
-mean--variance and naive benchmarks, is evaluated on the same measure, it also
-reveals whether explicitly targeting expected shortfall minimization produces lower
-realized tail risk than controlling variance alone. We evaluate it at
-$\beta = 0.80$ (the same confidence level used in the optimizer) and $\beta = 0.95$,
-which captures a more extreme region of the loss distribution. Reporting both levels
-separates a strategy's realized tail risk at the quantile it was optimized for from
-its tail risk at a deeper quantile it was not, showing whether (how much) the downside
-protection generalizes beyond the optimization level. 
+The annualized excess return is the compound annual growth rate of the portfolio in
+excess of that of the risk-free rate
+\begin{equation*}
+  \mathrm{ER_{\mathcal P}}
+  = \left( \prod_{t=1}^{T} \left(1 + R_{\mathcal P,t}\right) \right)^{252/T}
+  - \left( \prod_{t=1}^{T} \left(1 + R_{f,t}\right) \right)^{252/T}.
+\end{equation*}
+It is the annual return an investor holding the portfolio over the full sample would
+have earned on top of the risk-free rate. 
+Since the risk-minimizing optimizers do not target returns, inspecting the excess return shows
+how much return they give up in exchange for lower risk.
 
-Annualized volatility is the standard deviation of portfolio returns. It is the classical measure of risk in the portfolio optimization literature, but does have some limitations. It is symmetric, meaning it penalizes
-favorable and adverse deviations equally, which is the limitation that
-motivates the downside and tail-risk measures reported alongside it. For the
-mean--variance strategies it plays the role that expected shortfall plays for the
-expected shortfall strategies. It is the objective the mean--variance optimizers minimize, and so it is the most direct out-of-sample test of whether they deliver on their objective.
-Because a portfolio can
-achieve low volatility while still suffering severe cumulative losses over time, it is informative
-only when interpretedtogether with the maximum drawdown and other tail-risk measures.
+Annualized volatility is the standard deviation of portfolio returns
+\begin{equation*}
+  \sigma_{\mathcal P} = \sqrt{252} \, \sqrt{\frac{1}{T-1} \sum_{t=1}^{T}
+  \left(R_{\mathcal P,t} - \bar R_{\mathcal P}\right)^2}.
+\end{equation*}
+It is the most common measure of risk used to evaluate portfolio performance, and is also used in the 
+calculation of the Sharpe ratio to measure risk-adjusted performance.
+Because a portfolio can achieve low volatility while still suffering severe cumulative
+losses over time, it is most informative when interpreted together with the maximum
+drawdown.
 
 Maximum drawdown is the largest decline of the cumulative return
-path over the out-of-sample period. Unlike expected shortfall and volatility,
-which summarize the one-period return distribution, drawdown is a property of the
+path of the portfolio. Unlike volatility,
+which summarizes a one-period return distribution, drawdown is a property of the
 realized wealth path, capturing the cumulative and sequential experience of losses
 that an investor goes through.\ Such path-dependent losses matter
 in practice.\ For example, deep drawdowns can breach margin requirements. 
 Importantly, none of the optimizers considered in the thesis targets drawdown
-directly, so it serves as an out-of-sample robustness check on a metric the
-strategies were not built to control. Letting $V_t = \prod_{s \le t}(1 + R_{\mathcal P,s})$ denote
-the cumulative wealth of portfolio $\mathcal{P}$, with $V_0 = 1$, and $P_t = \max_{s \le t} V_s$ its running
+directly, so it serves as an out-of-sample robustness check. Let $V_{\mathcal{P},t} = \prod_{s \le t}(1 + R_{\mathcal P,s})$ denote
+the cumulative wealth of the portfolio, with $V_{\mathcal{P},0} = 1$, and $P_{\mathcal{P},t} = \max_{s \le t} V_{\mathcal{P},s}$ its running
 maximum, the maximum drawdown is defined as
 \begin{equation*}
-\mathrm{MD} = \max_{t} \frac{P_t - V_t}{P_t}.
+\mathrm{MD_{\mathcal P}} = \max_{t} \frac{P_{\mathcal P,t} - V_{\mathcal P,t}}{P_{\mathcal P,t}}.
 \end{equation*}
 
-The Sharpe ratio is the annualized ratio of the average excess portfolio return relative to its total
-volatility. It is the standard measure of return per unit of total risk. The Sharpe ratio is given by
+The Sharpe ratio is the annualized ratio of the average excess portfolio return
+relative to its total volatility. It is the standard measure of return per unit of
+total risk. The Sharpe ratio is given by
 \begin{equation*}
-\mathrm{SR} = \frac{\bar{R}_{\mathcal P} - R_f}{\sigma}\sqrt{252}.
+\mathrm{SR}_{\mathcal P} = 252\,
+\frac{\bar{R}_{\mathcal P} - \bar R_f}{\sigma_{\mathcal P}}.
 \end{equation*}
+Since the risk-minimizing optimizers run at a much lower volatility than the equally weighted
+portfolio, their returns alone cannot be compared fairly. The Sharpe ratio corrects
+for this, and a strategy with a higher Sharpe ratio earns a higher return
+at any level of risk an investor chooses. Like volatility, however, it penalizes
+favorable and adverse deviations equally.
 
-The Sortino ratio replaces volatility in the Sharpe ratio with downside volatility, so that a
-strategy is not penalized for upside dispersion. By measuring volatility only
-over adverse outcomes it addresses the main downside of the Sharpe
-ratio. Read against the Sharpe ratio, it indicates whether a strategy's risk-adjusted performance stems from downside protection or from
-lower overall variability. It is the annualized ratio of average excess return to
-the standard deviation of the negative returns $\sigma_{\text{down}}$, given by
+The Sortino ratio replaces volatility in the Sharpe ratio with downside volatility,
+so that a strategy is not penalized for upside dispersion. Read against the Sharpe
+ratio, it indicates whether a strategy's risk-adjusted performance stems from downside
+protection or from lower overall variability. The Sortino ratio is given by
 \begin{equation*}
-\mathrm{SOR} = \frac{\bar{R}_{\mathcal P} - R_f}{\sigma_{\text{down}}}\sqrt{252}.
+\mathrm{SOR}_{\mathcal P} = 252\,\frac{\bar R_{\mathcal P} - \bar R_f}{\sigma_{\mathcal P, \text{down}}},
 \end{equation*}
-
-The expected shortfall ratio is the tail-risk analogue of the Sharpe ratio,
-reporting average return per unit of downside risk \citep{RegularizedMultiCurrencyExpectedShortfallPortfolios}.
-Where the Sharpe ratio scales return by total volatility and the Sortino ratio by
-downside deviation, the expected shortfall ratio scales it by the tail loss
-itself.
-A strategy scores well only if it earns return efficiently relative to
-its realized tail risk, so the ratio rewards the tradeoff the expected shortfall optimizers
-are solving. Reported in annualized units alongside the Sharpe and Sortino ratios,
-the three can be read together to trace how the ranking of strategies shifts as the
-risk moves from total, to downside, to tail risk. It is computed from the
-annualized average return and the annualized expected shortfall
+where the annualized downside volatility
 \begin{equation*}
-\mathrm{ESR} = \frac{\bar{R}_{\mathcal P}}{\mathrm{ES}_{\beta}}.
+\sigma_{\mathcal P,\text{down}} = \sqrt{252}\,\sqrt{\frac{1}{T}\sum_{t=1}^{T}
+\min\left(R_{\mathcal P,t},\, 0\right)^2}
 \end{equation*}
+only considers negative returns. 
 
-We use the expected shortfall ratio at the $\beta = 0.80$ confidencelevel.
-
-Finally, turnover proxies the trading activity, and the implementation
-costs, of each strategy. Although the reported returns are already net of
-proportional transaction costs, turnover remains informative because it
-measures how much the portfolio must trade to maintain its positions, its capacity to scale, and its exposure to frictions such as slippage and market impact that our model does not capture. A strategy whose performance depends on heavy rebalancing can be hard to implement, so low and stable turnover is a desirable property. Turnover is reported separately for the asset and currency legs,
+Finally, turnover proxies the trading activity and the implementation
+costs of each strategy. Although the reported returns are already net of
+transaction costs, turnover remains informative because it
+measures how much the portfolio must trade to maintain its positions, its capacity to scale, and its exposure to frictions such as slippage and market impact that our analysis does not capture. A strategy whose performance depends on heavy rebalancing can be hard to implement, so low and stable turnover is a desirable property. Turnover is reported separately for the asset and currency legs,
 since the two are traded through different instruments with different cost levels.
 Asset turnover is the average rebalancing volume over the out-of-sample period
 \begin{equation*}
-\mathrm{Turnover}^{a} = \frac{1}{T}\sum_{t=1}^{T}\sum_{i=1}^{N}
-\bigl| x_{i,t} - x_{i,t}^{-} \bigr|,
+\mathrm{Turnover}^{a} = \frac{1}{D}\sum_{d=1}^{D}\sum_{i=1}^{N}
+\bigl| x_{i,d} - x_{i,d}^{-} \bigr|,
 \end{equation*}
-where $x_{i,t}^{-}$ is the asset weight just before rebalancing at $t$ and
-$x_{i,t}$ the weight set at the rebalance, and $T$ is the number of out-of-sample
-rebalancing dates. Currency turnover is the average absolute notional of the
+where $D$ is the number of out-of-sample rebalancing dates, $x_{i,d}^{-}$ the weight of
+asset $i$ just before the rebalance at date $d$, and $x_{i,d}$ the weight set at that
+rebalance. Currency turnover is the average absolute notional of the
 forward positions
-\begin{equation*}
-\mathrm{Turnover}^{c} = \frac{1}{T}\sum_{t=1}^{T}\sum_{c=1}^{M}
-\bigl| \upphi_{c,t} \bigr|.
-\end{equation*}
-
-\textcolor{red}{TODO: Add the metrics: Semi-variance, second order expected shortfall, mean absolute deviation. Split the metrics into the pure risk metrics we are optimizing for, and the risk adjusted return metrics and turnover metrics. Consider adding any other risk adjusted return metrics. }
-
-
-
-
-
-
+\begin{equation}
+\mathrm{Turnover}^{c} = \frac{1}{D}\sum_{d=1}^{D}\sum_{c=1}^{M}
+\bigl| \upphi_{c,d} \bigr|. \label{eq:currency-turnover} 
+\end{equation}
