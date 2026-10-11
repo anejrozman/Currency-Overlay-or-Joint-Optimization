@@ -1,0 +1,218 @@
+%% TEMPORARY root file: compiles only Chapters 5 and 6 (with the thesis title page) to send for review.
+%% The preamble is a copy of thesis.tex (10 October 2026). Delete this file and chapters_5_6.pdf when done.
+%% Build from thesis/: pdflatex chapters_5_6 && bibtex chapters_5_6 && pdflatex chapters_5_6 && pdflatex chapters_5_6
+
+%% (Master) Thesis template
+% Template version used: v1.4
+%
+% Largely adapted from Adrian Nievergelt's template for the ADPS
+% (lecture notes) project.
+
+
+%% We use the memoir class because it offers a many easy to use features.
+\documentclass[11pt,a4paper,oneside]{memoir}
+
+%% Packages
+%% ========
+
+%% LaTeX Font encoding and language
+\usepackage[T1]{fontenc} 
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+% Use Latin Modern (a standard, CM-like font family commonly used for
+% academic papers). Computer Modern math will be used (good default math
+% appearance for papers).
+\usepackage{lmodern}
+\usepackage{microtype}
+
+%% [REC] TikZ is used to draw figures
+\usepackage{tikz}
+% For positioning library (helps position nodes more easily), 
+% and arrows.meta for more arrow tips and styles
+\usetikzlibrary{
+  decorations.pathreplacing,
+  calc,
+  shapes,
+  arrows.meta,
+  positioning,
+  backgrounds,
+  fit,
+  matrix,
+  graphs,
+  graphs.standard, 
+  positioning, 
+  arrows.meta,
+  patterns,
+  shapes.geometric,
+  shapes.misc,
+  decorations.pathmorphing,
+  shadows,
+}
+
+
+
+%% The AMS-LaTeX extensions for mathematical typesetting.  Do not
+%% remove.  
+\usepackage{amsmath,amsfonts,mathrsfs}
+
+
+%% NTheorem is a reimplementation of the AMS Theorem package. This
+%% will allow us to typeset theorems like examples, proofs and
+%% similar.  Do not remove.
+%% NOTE: Must be loaded AFTER amsmath, or the \qed placement will
+%% break
+\usepackage[amsmath,thmmarks]{ntheorem}
+ 
+%% LaTeX' own graphics handling
+\usepackage{graphicx}
+
+% Search for graphics in the `logos/` subdirectory as well
+\graphicspath{{logos/}}
+
+%% We unfortunately need this for the Rules chapter.  Remove it
+%% afterwards; or at least NEVER use its underlining features.
+\usepackage{soul} 
+
+%% This allows you to add .pdf files. It is used to add the
+%% declaration of originality.
+\usepackage{pdfpages}
+
+%% Some more packages that you may want to use.  Have a look at the
+%% file, and consult the package docs for each.
+\input{thesis_settings/extrapackages.tex}
+
+%% Our layout configuration.  DO NOT CHANGE.
+\input{thesis_settings/layoutsetup.tex}
+
+%% Theorem environments.  You will have to adapt this for a German
+%% thesis.
+\input{thesis_settings/theoremsetup.tex}
+
+%% Helpful macros.
+\input{thesis_settings/macrosetup.tex}
+
+%% Make document internal hyperlinks wherever possible. (TOC, references)
+\usepackage[linkcolor=black,colorlinks=true,citecolor=black,filecolor=black]{hyperref}
+
+% Load cleveref after hyperref
+\usepackage{cleveref}
+
+\usepackage{upgreek}
+
+\usepackage{natbib}
+\usepackage{multirow}
+
+% We now name most things that are to be referred to.
+% You can add similar commands for your own defined environments
+% THEOREM
+\crefname{theorem}{theorem}{theorems}
+\Crefname{theorem}{Theorem}{Theorems}
+
+% LEMMA
+\crefname{lemma}{lemma}{lemmas} 
+\Crefname{lemma}{Lemma}{Lemmas}
+
+% COROLLARY
+\crefname{corollary}{corollary}{corollaries}
+\Crefname{corollary}{Corollary}{Corollaries}
+
+% PROPOSITION
+\crefname{proposition}{proposition}{propositions}
+\Crefname{proposition}{Proposition}{Propositions}
+
+% CLAIM
+\crefname{claim}{claim}{claims}
+\Crefname{claim}{Claim}{Claims}
+
+% DEFINITION
+\crefname{definition}{definition}{definitions}
+\Crefname{definition}{Definition}{Definitions}
+% EXAMPLE
+\crefname{example}{example}{examples}
+\Crefname{example}{Example}{Examples}
+%% The AMS-LaTeX extensions for mathematical typesetting.  Do not
+%% remove. We avoid loading amssymb directly because `newtxmath` will
+%% provide compatible symbol definitions; this prevents a \Bbbk clash.
+\usepackage{amsmath,amsfonts,mathrsfs}
+% REMARK
+\crefname{remark}{remark}{remarks} 
+\Crefname{remark}{Remark}{Remarks}
+
+% RULE - This one is special
+\crefname{Rule}{rule}{rules}
+\Crefname{Rule}{Rule}{Rules}
+
+ 
+%% [REC] This is for restating theorems.
+\usepackage{thmtools}
+\usepackage{thm-restate}      
+
+
+%% [REC] packages for pseudocode
+\usepackage{algorithm}        % A float wrapper for algorithms
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
+
+
+%% Document information
+\title{Multi-Currency Portfolio Optimization with General Risk
+Measures} 
+\author{Anej Rozman}
+\thesistype{Master Thesis} 
+\advisors{Supervisor: Prof.\ Patrick Cheridito \\ Co-Supervisor: Dr.\ Urban Ulrych} 
+\department{Department of Mathematics}   
+\date{} 
+
+%% Settings for theorem D.3 in appendix and chapter 6.2
+\usepackage{cleveref}
+
+\theoremstyle{nonumberplain}
+\theoremheaderfont{\bfseries}
+\theorembodyfont{\itshape}
+\theoremsymbol{}
+\newtheorem{demeaningthmDthree}{Theorem D.3}
+\theoremstyle{plain}
+\theoremsymbol{}
+
+%% Cross-references to parts of the thesis that are not included in this file.
+%% Copied from thesis.aux (full build of 10 October 2026), so they show the thesis numbering.
+\newlabel{app:demeaning}{{D}{59}{Coherent Risk Measures and Deviation Measures}{appendix.D}{}}
+\newlabel{app:demeaning@cref}{{[chapter][4][]D}{[1][59][]59}{}{}{}}
+\newlabel{chap:data-and-implementation}{{4}{7}{Data and Implementation}{chapter.4}{}}
+\newlabel{chap:data-and-implementation@cref}{{[chapter][4][]4}{[1][7][]7}{}{}{}}
+\newlabel{chap:optimization-framework}{{3}{3}{Optimization Framework}{chapter.3}{}}
+\newlabel{chap:optimization-framework@cref}{{[chapter][3][]3}{[1][3][]3}{}{}{}}
+\newlabel{sec:backtest-configuration}{{4.3}{12}{Backtest Configuration}{section.4.3}{}}
+\newlabel{sec:backtest-configuration@cref}{{[section][3][4]4.3}{[1][12][]12}{}{}{}}
+\newlabel{sec:mean-risk-portfolio-optimization}{{3.2}{6}{Mean--Risk Portfolio Optimization}{section.3.2}{}}
+\newlabel{sec:mean-risk-portfolio-optimization@cref}{{[section][2][3]3.2}{[1][5][]6}{}{}{}}
+\newlabel{thm:demeaning}{{D.{3}}{60}{Coherent Risk Measures and Deviation Measures}{theorem.D.3}{}}
+\newlabel{thm:demeaning@cref}{{[theorem][3][4]D.{3}}{[1][59][]60}{}{}{}}
+
+%% ======================================================= %%
+\begin{document}
+
+\frontmatter
+
+%% Title page (same as thesis.tex)
+\begin{titlingpage}
+  \calccentering{\unitlength}
+  \begin{adjustwidth*}{\unitlength-24pt}{-\unitlength-24pt}
+    \maketitle
+  \end{adjustwidth*}
+\end{titlingpage}
+
+\mainmatter
+
+%% Keep the thesis numbering, so the first chapter here is Chapter 5
+\setcounter{chapter}{4}
+\input{chapters/backtest_analysis.tex}
+\input{chapters/joint_versus_sequential_optimization.tex}
+
+\backmatter
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}
