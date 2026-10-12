@@ -4,11 +4,6 @@
 Carlo Acerbi and Dirk Tasche.
 \newblock On the coherence of expected shortfall, 2002.
 
-\bibitem{CoherentMeasuresOfRisk}
-Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, and David Heath.
-\newblock Coherent measures of risk.
-\newblock {\em Mathematical Finance}, 9(3):203--228, 1999.
-
 \bibitem{boyd2004convex}
 Stephen Boyd and Lieven Vandenberghe.
 \newblock {\em Convex Optimization}.
@@ -102,6 +97,12 @@ Hanno Lustig, Nikolai Roussanov, and Adrien Verdelhan.
 Harry Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
+
+\bibitem{McNeilFrey2000}
+Alexander~J. McNeil and Rudiger Frey.
+\newblock Estimation of tail-related risk measures for heteroscedastic
+  financial time series: an extreme value approach.
+\newblock {\em Journal of Empirical Finance}, 7(3-4):271--300, November 2000.
 
 \bibitem{carry_trades_and_global_foreign_exchange_volatility}
 LUKAS MENKHOFF, Lucio Sarno, MAIK SCHMELING, and Andreas Schrimpf.

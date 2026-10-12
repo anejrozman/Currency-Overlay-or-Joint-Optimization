@@ -1,9 +1,112 @@
 \chapter{Conclusion}\label{chap:conclusion}
 
+In this thesis, we studied how risk-based portfolio optimization performs for an investor who holds assets denominated
+in several currencies, and whether optimizing the asset and currency weights jointly improves on the standard
+sequential currency overlay, in which the asset weights are chosen first and the currency positions afterwards. We
+considered five risk measures, variance, semi-variance, mean absolute deviation, Expected Shortfall and second-order
+Expected Shortfall, and investable universes of three sizes, built from the largest stocks of 14 economies
+(\Cref{chap:data-and-implementation}). In \Cref{chap:backtest-analysis} we backtested the joint and overlay programs in
+an unregularized, a regularized and a mean-risk formulation against the equally weighted portfolio and two asset-only
+benchmarks, and in \Cref{chap:joint-vs-sequential} we compared how well the two programs minimize their target risk
+measure in and out of sample. We find that the optimizers achieve a much lower risk than the equally weighted portfolio
+in every universe and higher risk-adjusted returns in the medium and large universes, which a mean term extends to the
+small universe for the deviation measures. The benefit of joint over sequential optimization is limited to two
+settings, objectives with a mean term in the medium and large universes, and risk minimization in the small universe.
+
 \section{Findings}
+
+Out of sample, the risk-minimizing optimizers reduce volatility by $34\%$ to $64\%$ relative to the equally weighted
+portfolio, and its maximum drawdown by up to $30$ percentage points (\Cref{sec:baseline-backtests}). Without a return
+term in the objective and with a lower exposure to the common movement of the equity markets, they earn a smaller share
+of the equity risk premium and lower excess returns. On a risk-adjusted basis, they still outperform the equally
+weighted portfolio, with Sharpe ratios of $0.41$ to $0.56$ against $0.33$ in the medium universe and of $0.51$ to $0.76$
+against $0.37$ in the large universe, but not consistently in the small universe, where the equally weighted portfolio
+reaches $0.13$. This pattern is consistent with the low-volatility anomaly, the empirical finding that low-risk stocks
+earn higher risk-adjusted returns than high-risk stocks, and with the evidence that minimum-risk portfolios can
+outperform naive diversification out of sample. The optimizers tilt the portfolio toward low-risk stocks, and a larger
+universe offers more of them, while in the small universe they give up more return than they remove risk.
+
+Regularization raises the Sharpe ratios further, most in the large universe, where they increase by $0.17$ on average
+(\Cref{sec:effects-of-regularization}). The penalties limit the extreme positions that the unregularized programs fit to
+noise in the lookback window, in line with the estimation error of optimized portfolios growing with the number of
+assets relative to the length of the window. On the currency side, the regularized Joint and Overlay optimizers perform
+on par with the Full optimizer, which keeps the currency exposure fully hedged, so without a mean term, actively
+managing the currencies adds little over full hedging. The Zero optimizer, which leaves the currency exposure unhedged,
+outperforms them only in the small universe. In the medium and large universes, where currency risk makes up a larger
+share of the portfolio's total risk, managing the currency exposure pays off.
+
+Adding a mean term raises the Sharpe ratios in almost every case, by $0.16$ to $0.24$ on average for the deviation
+measures and by much less for the tail measures (\Cref{sec:effects-of-adding-a-mean-term}). The deviation measures are
+invariant to a shift in the portfolio return, so minimizing them ignores expected returns entirely, whereas Expected
+Shortfall and second-order Expected Shortfall already reward a higher mean. Since the expected excess currency returns
+are set to the interest rate differential, the mean term likely also tilts the currency positions toward
+higher-yielding currencies, so that they earn part of the carry premium that pure risk minimization gives up. With the
+mean term, the variance and semi-variance optimizers earn higher excess returns than the equally weighted portfolio in
+every universe, at $50\%$ to $70\%$ of its volatility.
+
+Comparing all backtests in
+\Cref{tab:baseline,tab:regularized-top10,tab:regularized-top50,tab:regularized-top100,tab:mean-risk}, the mean-variance
+Joint optimizer, that is, the mean-risk Joint optimizer with variance as the risk measure, performs best out of sample.
+Its Sharpe ratio is the highest in the medium universe, at $0.74$ against $0.33$ for the equally weighted portfolio, and
+in the large universe, at $0.91$ against $0.37$, where the regularized Joint optimizer under second-order Expected
+Shortfall reaches the same value. In the small universe, its Sharpe ratio of $0.37$ against $0.13$ is exceeded only by
+the mean-risk semi-variance optimizers at $0.38$. Its Sortino ratio confirms the ranking in the medium and large
+universes, although several of the risk-minimizing optimizers have smaller drawdowns. The mean-variance Joint optimizer
+combines two sources of improvement. Variance is a deviation measure, which gains the most from the mean term, and the
+joint program can weigh the expected returns of assets and currencies against each other, which the overlay program
+cannot since it fixes the asset weights first.
+
+For the main question of the thesis, the comparison between the two approaches depends on whether expected returns
+enter the objective. When the optimizers only minimize risk, the Joint and Overlay optimizers perform very similarly,
+with or without regularization, and the most consistent difference is the lower volatility of the Joint optimizers,
+although the difference shrinks as the universe grows. With a mean term, the Joint optimizers achieve higher Sharpe and
+Sortino ratios than the Overlay for every risk measure in the medium and large universes, by about $0.07$ in Sharpe
+ratio on average.
+
+Since the lower volatility is the most consistent difference between the two approaches, \Cref{chap:joint-vs-sequential}
+compares them on the risk measure they minimize. By construction, the joint program achieves an in-sample risk no higher
+than that of the overlay program, since the solution of the overlay program is feasible for the joint program. Out of
+sample, this advantage falls with universe size for all five risk measures. It is present only in the small universe,
+where the currency weights are a larger share of the decision variables, and drops to zero in the larger universes,
+where the asset step of the overlay program has enough weights to fit the objective on its own. Since the dependence
+between asset and currency returns barely changes across universe sizes (\Cref{sec:data}), this decline is driven by the
+number of assets relative to the number of currencies and not by a change in the dependence structure.
+
+For the deviation measures, most of the small in-sample advantage is realized out of sample, while the larger in-sample
+advantage of the tail measures is not. We trace it to two mechanisms that do not generalize, a tail-fitting mechanism,
+in which the joint program aligns the currency weights with the specific worst days of the lookback window, and an
+implicit risk-return tradeoff, through which the tail measures reward a high realized mean (\Cref{sec:mechanism-level}).
+These results agree with the finding of \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} that the benefit of
+joint optimization is concentrated in small universes, and qualify the finding of
+\cite{SparseAndStableInternationalPortfolioOptimization} that joint optimization outperforms the overlay, since in our
+backtests it does so in risk-adjusted terms only once a mean term enters the objective.
+
+Overall, optimizing the portfolio pays off relative to naive diversification in the medium and large universes, which
+offer more low-risk stocks to choose from, and more so with regularization and a mean term, which extends the advantage
+to the small universe for the deviation measures. Joint optimization of the asset and currency weights is worth its
+additional complexity in two situations, when the number of assets is small relative to the number of currencies, and
+when expected returns enter the objective in the medium and large universes. When the goal is only to minimize risk in
+larger universes, the sequential currency overlay performs just as well.
 
 \section{Limitations and Future Research}
 
+Our analysis covers one base currency, the US dollar, 14 economies, and one out-of-sample period from 2000 to 2023,
+so the results reflect the dependence between asset and currency returns for a US investor over this period. For
+an investor based in another currency, such as the Euro, the Swiss franc or the Japanese yen, the excess currency returns
+and their dependence with the asset returns differ, and repeating the analysis for other base currencies would show how
+much the results depend on this structure.
 
+The backtests are also based on simplified trading assumptions, namely constant transaction costs, no market impact, and are conducted with quarterly
+rebalancing, among others.
+Since the unregularized and mean-risk Joint optimizers have a much higher currency turnover than the Overlay in most cases, higher trading
+costs, more frequent rebalancing and market impact would likely reduce the advantage of the Joint optimizers
+over the Overlay. A more realistic analysis could include a dynamic transaction cost model and 
+multiple rebalancing frequencies, and test the sensitivity of the results to these assumptions.
 
+Two further extensions follow from the results. First, the tail measures are estimated from the empirical distribution
+of the lookback window, and are sensitive to estimation error. Estimators or formulations that
+stabilize the tail, such as the extreme value approach proposed in \cite{McNeilFrey2000}, could improve the out-of-sample performance.
+Second, the explanations given for the optimizers' performance, a lower market
+exposure, a tilt towards low-risk stocks and currency carry, could be further investigated by
+regressing their returns on market, low-volatility, carry and other factors.
 
