@@ -94,17 +94,17 @@ Thus, minimizing $\text{ES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is equiv
     \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+] \right).
 \end{equation}
 
-Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite{boyd2004convex}, thus $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator which preserves convexity and the sum of convex functions is convex.
+Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite[Section~3.2.2]{boyd2004convex}, thus $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator which preserves convexity and the sum of convex functions is convex.
 
 
 \subsection{Second-Order Expected Shortfall} \label{app:soes_auxiliary}
 
 Second-order Expected Shortfall belongs to the family of higher moment risk measures introduced by Krokhmal
 \cite{Krokhmal2007}. It is obtained from the auxiliary function $F_\beta$ by replacing the expectation of the excess
-loss $(L(\bm{x}_t) - \alpha)^+$ with its $L^2$ norm.\footnote{ We define the $L^2$ norm in the standard way as $\|Z\|_2 = (\mathbb{E}_t[Z^2])^{1/2}$ for a random variable
+loss $(L(\bm{x}_t) - \alpha)^+$ with its $L^2$ norm.\footnote{ We define the $L^2$ norm in the standard way as $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$ for a random variable
 $Z$.} This gives the auxiliary function
 \begin{equation*}
-    G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta} \big\| (L(\bm{x}_t) - \alpha)^+ \big\|_2,
+    G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta} \big\| (L(\bm{x}_t) - \alpha)^+ \big\|_{L^2},
 \end{equation*}
 and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
 \begin{equation} \label{eq:soes_def}
@@ -116,76 +116,57 @@ receive more weight than in Expected Shortfall. Second-order Expected Shortfall 
 Unlike Expected Shortfall, second-order Expected Shortfall is defined directly through the minimization over $\alpha$,
 so there is no equivalence to derive. Instead, we only have to verify that $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$.  
 
-We argued for the case of $F_\beta$ that the map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is convex. The $L^2$ norm is a convex function \cite{boyd2004convex}, and nondecreasing for non-negative random variables.  The composition of a convex nondecreasing function with a convex
-function is again convex \cite{boyd2004convex}. Hence $\big\| (L(\bm{x}_t) - \alpha)^+ \big\|_2 $ is jointly convex in $(\bm{x}_t, \alpha)$, and the sum of convex functions is convex. 
+We argued for the case of $F_\beta$ that the map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is convex. The $L^2$ norm is a convex function \cite[Section~3.1.5]{boyd2004convex}, and nondecreasing for non-negative random variables.  The composition of a convex nondecreasing function with a convex
+function is again convex \cite[Section~3.2.4]{boyd2004convex}. Hence $\big\| (L(\bm{x}_t) - \alpha)^+ \big\|_{L^2} $ is jointly convex in $(\bm{x}_t, \alpha)$, and the sum of convex functions is convex. 
 
 By definition \eqref{eq:soes_def}, minimizing $\text{SOES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is
 equivalent to minimizing $G_\beta(\bm{x}_t, \alpha)$ jointly with respect to $\bm{x}_t$ and $\alpha$
 \begin{equation} \label{eq:soes_joint_opt}
     \min_{\bm{x}_t} \text{SOES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta}
-    \big\| (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+ \big\|_2 \right).
+    \big\| (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+ \big\|_{L^2} \right).
 \end{equation}
 
 Since both $F_\beta$ and $G_\beta$ are jointly convex, any local minimum is global, ensuring that
 both optimization problems can be solved reliably with standard convex optimization methods.
 
-\section{Linear Program Representation of Portfolio Optimization} \label{app:linear-program-representation} % another possible title: Linear program representation of portfolio optimization
-
-The equivalence in \eqref{eq:joint_opt} reduces Expected Shortfall minimization to the
-minimization of the jointly convex auxiliary function $F_\beta(\bm{x}_t, \alpha)$
-\begin{equation*}
-    \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t)
-    = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta}
-    \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+] \right).
-\end{equation*}
-This formulation is not yet appropriate for portfolio optimization, as it only optimizes for downside risk, without
-taking into account the expected return of the portfolio. It also depends on the unknown
-expectation $\mathbb{E}_t[\cdot]$. We address this by incorporating the expected return into the optimization
-objective and replacing the expectation with its empirical estimator.
-
-Following \cite{goldberg2013minimizingshortfall} and \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we trade off expected return against %
-downside risk through a relative risk-aversion coefficient $\gamma > 0$
-\begin{equation} \label{eq:mean_es}
-    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ -\bm{\mu}_t^\top \bm{x}_t + \frac{\gamma}{2}
-    \text{ES}_\beta(\bm{x}_t) \right\}, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+\section{Representation for Portfolio Optimization} \label{app:linear-program-representation}
+ 
+Let $\rho_\beta \in \{\text{ES}_\beta, \text{SOES}_\beta\}$ denote either of the two risk measures. The portfolio
+optimization problem is
+\begin{equation} \label{eq:risk_min}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \rho_\beta(\bm{x}_t), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation}
-where $\bm{\mu}_t$ denotes the asset return mean estimator and the budget constraint
-$\bm{x}_t^\top \bm{1}_N = 1$ enforces full investment. Substituting the auxiliary
-representation \eqref{eq:joint_opt} into \eqref{eq:mean_es} gives
-\begin{equation*}
-    \bm{x}_t^*, \alpha^* = \argmin_{\bm{x}_t, \alpha} \left\{ -\bm{\mu}_t^\top \bm{x}_t
-    + \frac{\gamma}{2} \alpha
-    + \frac{\gamma}{2(1-\beta)} \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+] \right\}.
-\end{equation*}
+where the budget constraint enforces full investment. By \eqref{eq:joint_opt} and \eqref{eq:soes_joint_opt}, problem
+\eqref{eq:risk_min} is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ or $G_\beta(\bm{x}_t, \alpha)$ jointly
+with respect to $\bm{x}_t$ and $\alpha$, which we write as a linear program for Expected Shortfall in
+\Cref{app:lp_es} and as a second-order cone program for second-order Expected Shortfall in \Cref{app:socp_soes}.
 
-Let $\bm{y}_1, \dots, \bm{y}_q \in \mathbb{R}^N$ denote $q$ historical realizations of the joint
-return vector $\bm{R}_{t+1}$.\ We approximate the conditional expectation by the empirical
-average over this sample
+
+\subsection{Expected Shortfall} \label{app:lp_es}
+
+Let $\bm{y}_1, \dots, \bm{y}_q \in \mathbb{R}^N$ denote $q$ historical realizations of the asset return vector
+$\bm{R}_{t+1}$. We approximate the conditional expectation in $F_\beta$ by the empirical average over this sample
 \begin{equation*}
     \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+]
     \approx \frac{1}{q} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+,
 \end{equation*}
-so that the portfolio optimization problem becomes
+so that the portfolio optimization problem under Expected Shortfall becomes
 \begin{equation} \label{eq:empirical_es}
-    \bm{x}_t^*, \alpha^* = \argmin_{\bm{x}_t, \alpha} \left\{ -\bm{\mu}_t^\top \bm{x}_t
-    + \frac{\gamma}{2} \alpha
-    + \frac{\gamma}{2q(1-\beta)} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \right\},
+    \bm{x}_t^*, \alpha^* = \argmin_{\bm{x}_t, \alpha} \left\{ \alpha
+    + \frac{1}{q(1-\beta)} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \right\},
     \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
 \end{equation}
-
-The summand $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ is convex but non-linear. We linearize it by
-introducing, for each observation $k$, an auxiliary variable $u_k \ge 0$ subject to
+The summand $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ is convex but non-linear. We linearize it by introducing, for each
+observation $k$, an auxiliary variable $u_k \ge 0$ subject to
 \begin{equation} \label{eq:slack_constraint}
     u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha
     \qquad \Longleftrightarrow \qquad
     \bm{x}_t^\top \bm{y}_k + \alpha + u_k \ge 0.
 \end{equation}
-Since the objective in \eqref{eq:empirical_es} is strictly increasing in each $u_k$
-(its coefficient $\tfrac{\gamma}{2q(1-\beta)} > 0$) and minimized, every $u_k$ is driven
-to its lower bound at the optimum, so $u_k^* = (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$. The slack
-constraints therefore reproduce the term $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ while keeping all
-relations linear.
-
+Replacing each summand by $u_k$, the objective becomes $\alpha + \frac{1}{q(1-\beta)} \sum_{k=1}^q u_k$. It is
+strictly increasing in each $u_k$ and minimized, so every $u_k$ is driven to its lower bound at the optimum,
+$u_k^* = (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$. The slack constraints therefore reproduce the term
+$(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ while keeping all relations linear.
 
 By collecting the decision variables in the vector
 \begin{equation*}
@@ -194,7 +175,7 @@ By collecting the decision variables in the vector
 \end{equation*}
 and constants in the vector
 \begin{equation*}
-    \bm{c} = \begin{bmatrix} -\bm{\mu}_t^\top, &  \dfrac{\gamma}{2}, & \dfrac{\gamma}{2q(1-\beta)} \bm{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
+    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, &  1, & \dfrac{1}{q(1-\beta)} \bm{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
 \end{equation*}
 the portfolio optimization problem \eqref{eq:empirical_es} can be written as a linear program
 \begin{equation} \label{eq:base_lp}
@@ -213,14 +194,76 @@ the portfolio optimization problem \eqref{eq:empirical_es} can be written as a l
 \end{equation}
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+1)}$ encodes the budget constraint, while
 $\bm{A} \in \mathbb{R}^{q \times (N+q+1)}$ and $\bm{b} \in \mathbb{R}^{q}$ encode the
-$q$ inequality constraints arising from the linearization \eqref{eq:slack_constraint}. The matrix $\bm{R}^{\text{data}} \in \mathbb{R}^{q \times N}$ is comprised of
-sampled return vectors $\bm{y}_k^\top$ row by row, $\bm{0}_q$ is the $q$-dimensional zero vector,
-and $\bm{I}_q$ the $q$-dimensional identity matrix.
+$q$ inequality constraints arising from the linearization \eqref{eq:slack_constraint}. The matrix
+$\bm{R}^{\text{data}} \in \mathbb{R}^{q \times N}$ is comprised of the sampled return vectors $\bm{y}_k^\top$ row by
+row, $\bm{0}_q$ is the $q$-dimensional zero vector, and $\bm{I}_q$ the $q$-dimensional identity matrix.
 
 Problem \eqref{eq:base_lp} has a linear objective subject to one linear equality and $q$
 linear inequalities, and is thus a linear program solvable with standard methods. This
 formulation serves as the base unregularized portfolio optimization problem under Expected Shortfall.
-Regularization terms and additional constraints are added in \Cref{app:regularization} of the appendix.
+
+\subsection{Second-Order Expected Shortfall} \label{app:socp_soes}
+
+Using the same historical realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref{app:lp_es}, we approximate the $L^2$ norm in $G_\beta$ by its
+empirical average over the sample
+\begin{equation*}
+    \big\| (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+ \big\|_{L^2}
+    \approx \left( \frac{1}{q} \sum_{k=1}^q \big( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \big)^2 \right)^{1/2},
+\end{equation*}
+so that the portfolio optimization problem under second-order Expected Shortfall becomes
+\begin{equation} \label{eq:empirical_soes}
+\begin{gathered}
+    \bm{x}_t^*, \alpha^* = \argmin_{\bm{x}_t, \alpha} \left\{ \alpha
+    + \frac{1}{1-\beta} \left( \frac{1}{q} \sum_{k=1}^q \big( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \big)^2 \right)^{1/2}
+    \right\}, \\[4pt]
+    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
+\end{gathered}
+\end{equation}
+As in \Cref{app:lp_es}, we replace each term $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ by $u_k$ subject to
+\eqref{eq:slack_constraint}. The empirical norm then becomes
+$\big( \frac{1}{q} \sum_{k=1}^q u_k^2 \big)^{1/2} = \frac{1}{\sqrt{q}} \|\bm{u}\|_2$, and the objective becomes
+$\alpha + \frac{1}{(1-\beta)\sqrt{q}} \|\bm{u}\|_2$. The Euclidean norm is strictly increasing in
+every positive $u_k$, so, as for Expected Shortfall, every $u_k$ is driven to its lower bound at the optimum,
+$u_k^* = (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$.
+
+The objective is still not linear, so we introduce one more auxiliary variable $s$ subject to the constraint
+$\|\bm{u}\|_2 \le s$ and minimize $\alpha + \frac{1}{(1-\beta)\sqrt{q}} s$ instead. Since $\frac{1}{(1-\beta)\sqrt{q}} > 0$, $s^* = \|\bm{u}^*\|_2$ at the optimum, and the objective is linear in the decision variables. The constraint
+$\|\bm{u}\|_2 \le s$ requires the vector $(\bm{u}, s) \in \mathbb{R}^{q+1}$ to lie in the second-order cone, the set of
+vectors whose last entry is at least the Euclidean norm of the remaining entries \cite[Section~2.2.3]{boyd2004convex}.
+This set is a cone, since it contains every non-negative multiple of its elements, and it is convex, so the constraint
+keeps the optimization problem convex. An optimization problem with a linear objective, linear constraints and
+second-order cone constraints is a second-order cone program \cite[Section~4.4.2]{boyd2004convex}.
+
+By collecting the decision variables in the vector
+\begin{equation*}
+    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top, & \alpha, & \bm{u}^\top, & s \end{bmatrix}^\top \in \mathbb{R}^{(N+q+2)},
+\end{equation*}
+and constants in the vector
+\begin{equation*}
+    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, &  1, & \bm{0}_q^\top, & \dfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top \in \mathbb{R}^{(N+q+2)},
+\end{equation*}
+the portfolio optimization problem \eqref{eq:empirical_soes} can be written as a second-order cone program
+\begin{equation} \label{eq:base_socp}
+\begin{aligned}
+    & \ \ \tilde{\bm{x}}_t^* = \argmin_{\tilde{\bm{x}}_t} \quad
+     \bm{c}^\top \tilde{\bm{x}}_t \\[4pt]
+    \text{s.t.} \quad
+    & \bm{D} \tilde{\bm{x}}_t =
+    \begin{bmatrix} \bm{1}_N^\top & \bm{0}_{q+2}^\top \end{bmatrix}
+    \tilde{\bm{x}}_t = E = 1, \\[2pt]
+    & \bm{A} \tilde{\bm{x}}_t =
+    \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_q \end{bmatrix}
+    \tilde{\bm{x}}_t \le \bm{b} = \bm{0}_q, \\[2pt]
+    & \|\bm{u}\|_2 \le s, \\[2pt]
+    & \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+2)}$ and $\bm{A} \in \mathbb{R}^{q \times (N+q+2)}$ are the constraint
+matrices of \eqref{eq:base_lp} with a zero column added for the variable $s$. Problem \eqref{eq:base_socp} has a linear objective
+subject to one linear equality, $q$ linear inequalities and one second-order cone constraint, and is thus a
+second-order cone program. This formulation serves as the base unregularized portfolio optimization problem under
+second-order Expected Shortfall.
+
 \section{Regularization} \label{app:regularization}
 
 The base problem \eqref{eq:base_lp} is known to be numerically unstable in
