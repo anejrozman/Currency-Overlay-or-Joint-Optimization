@@ -19,66 +19,70 @@ Finally, in \Cref{app:joint-optimization} we derive the joint quadratic program 
 in which asset and currency weights are optimized simultaneously
 through a single Expected Shortfall term that captures the combined return distribution.
 
-\section{Derivation of the Auxiliary Expected Shortfall Formulation} \label{app:es_auxiliary_formulation}
+\section{Auxiliary Formulations of Expected Shortfall and Second-Order Expected Shortfall} \label{app:es_auxiliary_formulation}
 
-We derive the equivalence between the direct minimization of Expected Shortfall and the auxiliary formulation proposed by Rockafellar and Uryasev \cite{RockafellarUryasev2000} that allows for formulating the portfolio optimization as a linear program.
+We derive the equivalence between the direct minimization of Expected Shortfall and the auxiliary formulation proposed
+by Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and introduce second-order Expected Shortfall, which Krokhmal
+\cite{Krokhmal2007} defines directly through an auxiliary formulation of the same type. The two formulations
+allow for writing the portfolio optimization as a linear program for Expected Shortfall and as a second-order cone
+program for second-order Expected Shortfall.
 
-We assume that the loss distribution is continuous, meaning the loss cumulative distribution function has no jumps and the probability density function $f(l)$ exists. Under these assumptions, Value-at-Risk (VaR) is uniquely defined \cite{QuantitativeRiskManagement2016}.
+\subsection{Expected Shortfall} \label{app:es_auxiliary}
 
-Define the loss random variable at time $t+1$, given portfolio weights $\bm{x}_t$, as $L(\bm{x}_t) = -\bm{x}_t^T \bm{R}_{t+1}$. Let $f(l)$ denote the probability density function of the loss $L(\bm{x}_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
+We assume that the loss distribution is continuous and has a strictly increasing cumulative distribution function,
+meaning the cumulative distribution function has neither jumps nor flat sections, and additionally that its probability density
+function exists. Under these assumptions, the Value-at-Risk (VaR) defined below is the unique point at which the
+cumulative distribution function equals the confidence level \cite{QuantitativeRiskManagement2016}. The assumptions
+simplify the derivation but are not needed for the result. Rockafellar and Uryasev \cite{RockafellarUryasev2002} show
+that the equivalence derived below holds for general loss distributions, including the empirical distribution used in
+\Cref{app:linear-program-representation}, when Expected Shortfall is defined as the average of the quantiles of the loss
+distribution over all levels above the confidence level \cite{acerbi2002coherenceexpectedshortfall}.
+
+Define the loss random variable at time $t+1$, given portfolio weights $\bm{x}_t\in\mathbb{R}^N$, as $L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$, where $\bm{R}_{t+1}\in\mathbb{R}^N$ is the asset return vector. Let $f(l)$ denote the probability density function of the loss $L(\bm{x}_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
 \begin{equation*}
     \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha : \mathbb{P}(L(\bm{x}_t) \le \alpha) \ge \beta \}.
 \end{equation*}
 
 The Expected Shortfall at confidence level $\beta$ is defined as the conditional expectation of losses exceeding $\text{VaR}_\beta$
 \begin{equation*}
-    \text{ES}_\beta(\bm{x}_t) = \mathbb{E}[L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t)] = \frac{1}{1-\beta} \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty l f(l) \, dl.
+    \text{ES}_\beta(\bm{x}_t) = \mathbb{E}_t[L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t)] = \frac{1}{1-\beta} \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty l f(l) \, dl.
 \end{equation*}
 
 We now consider the auxiliary function $F_\beta$ defined as
-\begin{equation*}
-    F_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(L(\bm{x}_t) - \alpha)^+].
-\end{equation*}
-
-
-We can rewrite the expectation term using the integral form
-\begin{equation*}
-    \mathbb{E}_t[(L(\bm{x}_t) - \alpha)^+] = \int_{-\infty}^\infty (l - \alpha)^+ f(l) \, dl = \int_{\alpha}^\infty (l - \alpha) f(l) \, dl.
-\end{equation*}
-
-Before minimizing $F_\beta(\bm{x}_t, \alpha)$ with respect to $\alpha$, we verify convexity. Using Leibniz's rule, the first and second derivative of $F_\beta$ with respect to $\alpha$ is
+\begin{align}
+    F_\beta(\bm{x}_t, \alpha) &= \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(L(\bm{x}_t) - \alpha)^+] \nonumber \\ 
+    &= \alpha + \frac{1}{1-\beta} \int_\alpha^\infty (l - \alpha) f(l) \, dl. \label{eq:aux-function-es}
+\end{align}
+ 
+Before minimizing \eqref{eq:aux-function-es} with respect to $\alpha$, we verify convexity. Using Leibniz's rule, the first and second derivatives of $F_\beta$ with respect to $\alpha$ are
 \begin{align*}
     \frac{\partial F_\beta}{\partial \alpha}
         &= 1 + \frac{1}{1-\beta} \frac{\partial}{\partial \alpha} \int_\alpha^\infty (l - \alpha) f(l) \, dl \\
     &= 1 + \frac{1}{1-\beta} \left[ -f(\alpha) \cdot 0 + \int_\alpha^\infty (-1) f(l) \, dl \right] \\
-    &= 1 - \frac{1}{1-\beta} \int_{\alpha}^\infty f(l) \, dl \\
+    &= 1 - \frac{1}{1-\beta} \int_{\alpha}^\infty f(l) \, dl, \\
     \frac{\partial^2 F_\beta}{\partial \alpha^2} &= \frac{1}{1-\beta} f(\alpha).
 \end{align*}
-Since the probability density function $f(\alpha) \ge 0$ and $\beta < 1$, the second derivative is non-negative, $\frac{\partial^2 F_\beta}{\partial \alpha^2} \ge 0$. Thus, $F_\beta(\bm{x}_t, \alpha)$ is convex in $\alpha$, ensuring that the first-order condition is necessary and sufficient for a global minimum.
+Since the probability density function $f(\alpha) \ge 0$ and $\beta < 1$, the second derivative is non-negative. Thus, \eqref{eq:aux-function-es}  is convex in $\alpha$, ensuring that the first-order condition is a necessary and sufficient condition for a global minimum.
 
-Differentiation of $F_\beta(\bm{x}_t, \alpha)$ with respect to $\alpha$ gives us the first-order condition for optimality
-\begin{align*}
-    \frac{\partial F_\beta}{\partial \alpha}
-    &= 1 - \frac{1}{1-\beta} \int_\alpha^\infty f(l) \, dl \\
-    &= 1 - \frac{1}{1-\beta} \mathbb{P}(L(\bm{x}_t) \ge \alpha).
-\end{align*}
 
-Setting the derivative to zero to find the optimal $\alpha^*$
+Setting the derivative to zero gives the optimal $\alpha^*$
 \begin{align*}
+    \frac{\partial F_\beta}{\partial \alpha} &= 0 \\
+    1 - \frac{1}{1-\beta} \int_{\alpha^*}^\infty f(l) \, dl &= 0 \\
     1 - \frac{1}{1-\beta} \mathbb{P}(L(\bm{x}_t) \ge \alpha^*) &= 0 \\
     \mathbb{P}(L(\bm{x}_t) \ge \alpha^*) &= 1 - \beta \\
     \mathbb{P}(L(\bm{x}_t) \le \alpha^*) &= \beta.
 \end{align*}
 
-This implies that the optimal $\alpha^*$ that minimizes the auxiliary function for a fixed $\bm{x}_t$ is exactly the Value-at-Risk at level $\beta$, so $\alpha^* = \text{VaR}_\beta(\bm{x}_t)$.
+We see that the optimal $\alpha^*$ that minimizes the auxiliary function for a fixed $\bm{x}_t$ is exactly the Value-at-Risk at level $\beta$.
 
-Substituting $\alpha^* = \text{VaR}_\beta(\bm{x}_t)$ back into $F_\beta(\bm{x}_t, \alpha)$ we obtain
+Substituting $\alpha^* = \text{VaR}_\beta(\bm{x}_t)$ back into \eqref{eq:aux-function-es} we obtain
 \begin{align*}
     F_\beta(\bm{x}_t, \text{VaR}_\beta(\bm{x}_t)) &= \text{VaR}_\beta(\bm{x}_t) + \frac{1}{1-\beta} \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty (l - \text{VaR}_\beta(\bm{x}_t)) f(l) \, dl \\
     &= \text{VaR}_\beta(\bm{x}_t) + \frac{1}{1-\beta} \left( \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty l f(l) \, dl - \text{VaR}_\beta(\bm{x}_t) \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty f(l) \, dl \right).
 \end{align*}
 
-Recognizing that $\int_{\text{VaR}_\beta(\bm{x}_t)}^\infty f(l) \, dl = \mathbb{P}(L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t)) = 1-\beta$, we have
+Recognizing that $\int_{\text{VaR}_\beta(\bm{x}_t)}^\infty f(l) \, dl = 1-\beta$, we have
 \begin{align*}
     F_\beta(\bm{x}_t, \text{VaR}_\beta(\bm{x}_t)) &= \text{VaR}_\beta(\bm{x}_t) + \frac{1}{1-\beta} \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty l f(l) \, dl - \frac{1}{1-\beta} \text{VaR}_\beta(\bm{x}_t) (1-\beta) \\
     &= \text{VaR}_\beta(\bm{x}_t) + \text{ES}_\beta(\bm{x}_t) - \text{VaR}_\beta(\bm{x}_t) \\
@@ -87,13 +91,43 @@ Recognizing that $\int_{\text{VaR}_\beta(\bm{x}_t)}^\infty f(l) \, dl = \mathbb{
 
 Thus, minimizing $\text{ES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ jointly with respect to $\bm{x}_t$ and $\alpha$
 \begin{equation} \label{eq:joint_opt}
-    \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(-\bm{x}_t^T \bm{R}_{t+1} - \alpha)^+] \right).
+    \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+] \right).
 \end{equation}
 
-Finally, we observe that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The term $\alpha$ is linear (hence convex). The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine. The outer function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite{boyd2004convex}. Thus $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Taking the expectation preserves convexity.
+Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite{boyd2004convex}, thus $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator which preserves convexity and the sum of convex functions is convex.
 
 
-Since the objective function is convex, any local minimum is global, ensuring the optimization problem can be solved reliably with standard convex optimization methods.
+\subsection{Second-Order Expected Shortfall} \label{app:soes_auxiliary}
+
+Second-order Expected Shortfall belongs to the family of higher moment risk measures introduced by Krokhmal
+\cite{Krokhmal2007}. It is obtained from the auxiliary function $F_\beta$ by replacing the expectation of the excess
+loss $(L(\bm{x}_t) - \alpha)^+$ with its $L^2$ norm.\footnote{ We define the $L^2$ norm in the standard way as $\|Z\|_2 = (\mathbb{E}_t[Z^2])^{1/2}$ for a random variable
+$Z$.} This gives the auxiliary function
+\begin{equation*}
+    G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta} \big\| (L(\bm{x}_t) - \alpha)^+ \big\|_2,
+\end{equation*}
+and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
+\begin{equation} \label{eq:soes_def}
+    \text{SOES}_\beta(\bm{x}_t) = \min_{\alpha} G_\beta(\bm{x}_t, \alpha).
+\end{equation}
+The $L^2$ norm squares the excess losses, so large losses 
+receive more weight than in Expected Shortfall. Second-order Expected Shortfall is a coherent risk measure, which we prove in Proposition~\ref{prop:soes-coherent}.
+
+Unlike Expected Shortfall, second-order Expected Shortfall is defined directly through the minimization over $\alpha$,
+so there is no equivalence to derive. Instead, we only have to verify that $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$.  
+
+We argued for the case of $F_\beta$ that the map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is convex. The $L^2$ norm is a convex function \cite{boyd2004convex}, and nondecreasing for non-negative random variables.  The composition of a convex nondecreasing function with a convex
+function is again convex \cite{boyd2004convex}. Hence $\big\| (L(\bm{x}_t) - \alpha)^+ \big\|_2 $ is jointly convex in $(\bm{x}_t, \alpha)$, and the sum of convex functions is convex. 
+
+By definition \eqref{eq:soes_def}, minimizing $\text{SOES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is
+equivalent to minimizing $G_\beta(\bm{x}_t, \alpha)$ jointly with respect to $\bm{x}_t$ and $\alpha$
+\begin{equation} \label{eq:soes_joint_opt}
+    \min_{\bm{x}_t} \text{SOES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta}
+    \big\| (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+ \big\|_2 \right).
+\end{equation}
+
+Since both $F_\beta$ and $G_\beta$ are jointly convex, any local minimum is global, ensuring that
+both optimization problems can be solved reliably with standard convex optimization methods.
 
 \section{Linear Program Representation of Portfolio Optimization} \label{app:linear-program-representation} % another possible title: Linear program representation of portfolio optimization
 
