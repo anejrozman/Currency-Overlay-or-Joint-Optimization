@@ -140,6 +140,9 @@ where the budget constraint enforces full investment. By \eqref{eq:joint_opt} an
 \eqref{eq:risk_min} is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ or $G_\beta(\bm{x}_t, \alpha)$ jointly
 with respect to $\bm{x}_t$ and $\alpha$, which we write as a linear program for Expected Shortfall in
 \Cref{app:lp_es} and as a second-order cone program for second-order Expected Shortfall in \Cref{app:socp_soes}.
+Each program in this appendix defines its own decision vector, cost vector and penalty and constraint matrices, so
+the same symbols denote different objects in different programs, and we refer to a specific program by its equation
+number.
 
 
 \subsection{Expected Shortfall} \label{app:lp_es}
@@ -266,17 +269,16 @@ second-order Expected Shortfall.
 
 \section{Regularization} \label{app:regularization}
 
-The base problem \eqref{eq:base_lp} is known to be numerically unstable in
-high-dimensional settings, producing extreme and concentrated weights \citep{ciliberti2007feasibility, kondor2007noise}. We stabilize it
-with three regularization techniques. An $L_1$-norm penalty that promotes sparsity, an $L_2$-norm penalty
-that promotes shrinkage, and a leverage constraint that bounds gross exposure. Each is
-appended to \eqref{eq:base_lp} while preserving its linear or quadratic structure. The
-$L_1$ penalty and the leverage constraint share a common variable decomposition, which
-we introduce first.
+The base problems \eqref{eq:base_lp} and \eqref{eq:base_socp} are known to be numerically unstable in
+high-dimensional settings, producing extreme and concentrated weights \citep{ciliberti2007feasibility, kondor2007noise}.
+We stabilize them with three regularization techniques, an $L^1$-norm penalty that promotes sparsity, an $L^2$-norm
+penalty that promotes shrinkage, and an asset leverage constraint that bounds gross exposure. Each is appended to the base
+problems while keeping them convex. The regularized programs are assembled in \Cref{app:reg_qp} for Expected
+Shortfall and in \Cref{app:reg_socp} for second-order Expected Shortfall.
 
-\subsection{$L_1$ Regularization} \label{app:l1}
+\subsection{$L^1$ Regularization} \label{app:l1}
 
-The $L_1$ penalty $\lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \sum_{i=1}^N |x_{i,t}|$, with
+The $L^1$ penalty $\lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \sum_{i=1}^N |x_{i,t}|$, with
 $\lambda_1 \ge 0$, is non-linear through the absolute value. Following \cite{roncalli2013introduction},
 we linearize it by splitting each weight into its positive and negative parts via the
 auxiliary variables $\Delta_{i,t}^+ \ge 0$ and $\Delta_{i,t}^- \ge 0$
@@ -285,70 +287,71 @@ auxiliary variables $\Delta_{i,t}^+ \ge 0$ and $\Delta_{i,t}^- \ge 0$
     \qquad
     |x_{i,t}| = \Delta_{i,t}^+ + \Delta_{i,t}^-.
 \end{equation}
-The second identity holds at the optimum. Minimizing the $L_1$ penalty drives the parts to
-their smallest feasible values, so at most one of $\Delta_{i,t}^+$, $\Delta_{i,t}^-$ is
+The second identity holds at the optimum. Minimizing the $L^1$ penalty drives the $\Delta_{i,t}^+$ and $\Delta_{i,t}^-$ to
+their smallest feasible values, so at most one is
 non-zero, giving $\Delta_{i,t}^+ = \max(x_{i,t}, 0)$ and
-$\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. The $L_1$ penalty is then linear in the auxiliary
-variables
+$\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. Writing the positive and negative parts as
+vectors
+$\bm{\Delta}_t^+ = [\Delta_{1,t}^+, \dots, \Delta_{N,t}^+]^\top$ and
+$\bm{\Delta}_t^- = [\Delta_{1,t}^-, \dots, \Delta_{N,t}^-]^\top$, the $L^1$ penalty is linear in the auxiliary
+variables and written as
 \begin{equation*}
     \lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-).
 \end{equation*}
+We append $\bm{\Delta}_t^-$ and $\bm{\Delta}_t^+$ to the decision vector, with the penalty coefficient $\lambda_1$ on
+each of their entries in the cost vector. The decomposition \eqref{eq:l1_decomp} is enforced as $N$ additional linear
+equality constraints, $\bm{x}_t + \bm{\Delta}_t^- - \bm{\Delta}_t^+ = \bm{0}_N$, alongside the original budget
+constraint.
 
-We extend the decision vector to carry the two parts
+\subsection{$L^2$ Regularization} \label{app:l2}
+
+The $L^2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2 = \lambda_2 \bm{x}_t^\top \bm{x}_t$, with
+$\lambda_2 \ge 0$, is quadratic in the weights and is written as a quadratic form
+\begin{equation*}
+    \lambda_2 \|\bm{x}_t\|_2^2 = \bm{x}_t^\top \bm{Q}\, \bm{x}_t,
+    \qquad \bm{Q} = \lambda_2 \bm{I}_N.
+\end{equation*}
+Embedding this in the decision vector $\tilde{\bm{x}}_t$, the penalty becomes
+$\tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t$, where $\tilde{\bm{Q}}$ places the
+block $\lambda_2 \bm{I}_N$ on the asset weights and zeros for the rest of the variables. Adding this term to the linear
+objective of the base problems makes the objective quadratic, and since $\tilde{\bm{Q}}$ is positive semi-definite, it
+remains convex.
+
+\subsection{Leverage Constraint} \label{app:leverage}
+
+The leverage constraint $\|\bm{x}_t\|_1 \le \ell^a$, with $\ell^a \ge 1$, bounds the portfolio's
+gross exposure and guarantees a bounded feasible region even when $\lambda_1 = 0$. Reusing
+the decomposition \eqref{eq:l1_decomp}, it is expressed as a single linear inequality
+\begin{equation} \label{eq:leverage_constraint}
+    \|\bm{x}_t\|_1 = \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-) \le \ell^a.
+\end{equation}
+The choice $\ell^a = 1$ rules out leverage entirely and is equivalent to a hard $L^1$
+constraint.
+
+\subsection{Expected Shortfall} \label{app:reg_qp}
+
+Adding all three regularization terms to the base problem \eqref{eq:base_lp} extends the decision vector to
 \begin{equation*}
     \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \alpha,& \bm{u}^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top \end{bmatrix}^\top
     \in \mathbb{R}^{3N+q+1},
 \end{equation*}
-and append the penalty coefficients to the cost vector
+with the cost vector
 \begin{equation*}
-    \tilde{\bm{c}} = \begin{bmatrix} -\bm{\mu}_t^\top,& \tfrac{\gamma}{2},& \tfrac{\gamma}{2q(1-\beta)} \bm{1}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top.
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& 1,& \tfrac{1}{q(1-\beta)} \bm{1}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top
 \end{equation*}
-The decomposition \eqref{eq:l1_decomp} is enforced as $N$ additional linear equality
-constraints, $\bm{x}_t + \bm{\Delta}_t^- - \bm{\Delta}_t^+ = \bm{0}_N$, alongside the original budget
-constraint. All relations remain linear, so the optimization problem is still a linear program after the addition of the $L_1$ penalty.
-
-\subsection{$L_2$ Regularization} \label{app:l2}
-
-The $L_2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2 = \lambda_2 \bm{x}_t^\top \bm{x}_t$, with
-$\lambda_2 \ge 0$, is quadratic in the weights and is written as a quadratic form
-\begin{equation*}
-    \lambda_2 \|\bm{x}_t\|_2^2 = \tfrac{1}{2}\, \bm{x}_t^\top \bm{Q}\, \bm{x}_t,
-    \qquad \bm{Q} = 2 \lambda_2 \bm{I}_N.
-\end{equation*}
-Embedding this in the augmented vector $\tilde{\bm{x}}_t$, the penalty becomes
-$\tfrac{1}{2}\, \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t$ with $\tilde{\bm{Q}}$ placing the
-block $2\lambda_2 \bm{I}_N$ on the asset weights and zeros on the auxiliary variables
+and the penalty matrix
 \begin{equation*}
     \tilde{\bm{Q}} =
     \begin{bmatrix}
-        2 \lambda_2 \bm{I}_N & \bm{0}_{N \times (2N+q+1)} \\
+        \lambda_2 \bm{I}_N & \bm{0}_{N \times (2N+q+1)} \\
         \bm{0}_{(2N+q+1) \times N} & \bm{0}_{(2N+q+1) \times (2N+q+1)}
     \end{bmatrix}.
 \end{equation*}
-Adding this term turns the $L_1-$augmented linear objective of the problem \eqref{eq:base_lp} into a quadratic objective
-$\tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tfrac{1}{2}\, \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t$.
-Since $\tilde{\bm{Q}}$ is positive semi-definite, the objective remains convex, and the optimization problem becomes a
-quadratic program with linear constraints.
-
-\subsection{Leverage Constraint} \label{app:leverage}
-
-The leverage constraint $\|\bm{x}_t\|_1 \le \ell$, with $\ell \ge 1$, bounds the portfolio's
-gross exposure and guarantees a bounded feasible region even when $\lambda_1 = 0$. Reusing
-the decomposition \eqref{eq:l1_decomp}, it is expressed as a single linear inequality
-\begin{equation} \label{eq:leverage_constraint}
-    \|\bm{x}_t\|_1 = \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-) \le \ell.
-\end{equation}
-The choice $\ell = 1$ rules out leverage entirely and is equivalent to a hard $L_1$
-constraint. As a linear inequality, it preserves the quadratic program structure.
-
-\subsection{Quadratic Program Representation of the Regularized Portfolio Optimization} \label{app:reg_qp}
-
-Adding all three regularization terms to the base problem \eqref{eq:base_lp}, makes the portfolio optimization problem under Expected Shortfall
-a quadratic program with linear constraints
+The portfolio optimization problem under Expected Shortfall then becomes a quadratic program with linear constraints
 \begin{equation} \label{eq:reg_qp}
 \begin{aligned}
     \tilde{\bm{x}}_t^* &= \argmin_{\tilde{\bm{x}}_t} \quad
-    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tfrac{1}{2}\, \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
+    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t +  \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
     \text{s.t.} \quad
      \tilde{\bm{D}} \tilde{\bm{x}}_t &=
     \begin{bmatrix} \bm{1}_N^\top & \bm{0}_{q+1}^\top & \bm{0}_N^\top & \bm{0}_N^\top \\
@@ -357,15 +360,57 @@ a quadratic program with linear constraints
      \tilde{\bm{A}} \tilde{\bm{x}}_t &=
     \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} \\
     \bm{0}_N^\top & 0 & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top \end{bmatrix} \tilde{\bm{x}}_t
-    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell \end{bmatrix}, \\[6pt]
+    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
      \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 The first row of $\tilde{\bm{D}}$ enforces the budget constraint and the remaining $N$ rows
 enforce the weight decomposition \eqref{eq:l1_decomp}. The first $q$ rows of $\tilde{\bm{A}}$
-encode the inequality constraints from the linearization \eqref{eq:slack_constraint}, and are extended with zeros for the new
+encode the inequality constraints from the linearization \eqref{eq:slack_constraint}, extended with zeros for the new
 variables, and the final row of $\tilde{\bm{A}}$ imposes the leverage constraint \eqref{eq:leverage_constraint}.
+
+\subsection{Second-Order Expected Shortfall} \label{app:reg_socp}
+
+Adding the same three regularization terms to the base problem \eqref{eq:base_socp} extends the decision vector to
+\begin{equation*}
+    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \alpha,& \bm{u}^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top,& s \end{bmatrix}^\top
+    \in \mathbb{R}^{3N+q+2},
+\end{equation*}
+with the cost vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& 1,& \bm{0}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top,& \tfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \lambda_2 \bm{I}_N & \bm{0}_{N \times (2N+q+2)} \\
+        \bm{0}_{(2N+q+2) \times N} & \bm{0}_{(2N+q+2) \times (2N+q+2)}
+    \end{bmatrix}.
+\end{equation*}
+The portfolio optimization problem under second-order Expected Shortfall then becomes a second-order cone program
+with a convex quadratic objective
+\begin{equation} \label{eq:reg_socp}
+\begin{aligned}
+    \tilde{\bm{x}}_t^* &= \argmin_{\tilde{\bm{x}}_t} \quad
+    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
+    \text{s.t.} \quad
+     \tilde{\bm{D}} \tilde{\bm{x}}_t &=
+    \begin{bmatrix} \bm{1}_N^\top & \bm{0}_{q+1}^\top & \bm{0}_N^\top & \bm{0}_N^\top & 0 \\
+    \bm{I}_N & \bm{0}_{N \times (q+1)} & \bm{I}_N & -\bm{I}_N & \bm{0}_N \end{bmatrix} \tilde{\bm{x}}_t
+    = \tilde{\bm{E}} = \begin{bmatrix} 1 \\ \bm{0}_N \end{bmatrix}, \\[6pt]
+     \tilde{\bm{A}} \tilde{\bm{x}}_t &=
+    \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} & \bm{0}_q \\
+    \bm{0}_N^\top & 0 & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top & 0 \end{bmatrix} \tilde{\bm{x}}_t
+    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+     \|\bm{u}\|_2 &\le s, \\[2pt]
+     \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+    \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+Here $\tilde{\bm{D}}$ and $\tilde{\bm{A}}$ are the constraint matrices of \eqref{eq:reg_qp} with a zero column added
+for the variable $s$, and the cone constraint is the one of \eqref{eq:base_socp}.
 
 \section{Separate (Currency Overlay) Optimization} \label{app:separate-optimization}
 In the separate (currency overlay) portfolio optimization approach, the asset and currency allocations are
