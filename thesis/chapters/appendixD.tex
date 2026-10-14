@@ -1,6 +1,6 @@
 \chapter{Coherent Risk Measures and Deviation Measures} \label{app:demeaning}
 
-In this appendix, we define the notion of a deviation measure and a coherent risk measure, and prove that a strictly expectation bounded coherent risk measure can be transformed into a deviation measure by a simple de-meaning operation. This result is used in \Cref{sec:mechanism-level} to de-mean expected shortfall and second-order expected shortfall risk measures and transform them into deviation measures. Throughout this appendix, let $X \in L^2(\Omega)$ denote a square-integrable
+In this appendix, we define the notion of a deviation measure and a coherent risk measure, and prove that a strictly expectation bounded coherent risk measure can be transformed into a deviation measure by a simple de-meaning operation. This result is used in \Cref{sec:mechanism-level} to de-mean Expected Shortfall and second-order Expected Shortfall risk measures and transform them into deviation measures. Throughout this appendix, let $X \in L^2(\Omega)$ denote a square-integrable
 random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$.
 
 \begin{definition}[Deviation measure]\label{def:deviation}
@@ -18,7 +18,8 @@ $X, X' \in L^2(\Omega)$, every constant $C$ and every $\lambda > 0$,
 The property \emph{(D1)} is the main one that distinguishes deviation measures from coherent risk measures. It is a form of translation invariance. 
 
 \begin{definition}[Coherent and strictly expectation bounded risk measure]\label{def:coherent}
-A functional $\mathcal{R} : L^2(\Omega) \to (-\infty, \infty]$ is a \emph{coherent risk measure} if
+A functional $\mathcal{R} : L^2(\Omega) \to (-\infty, \infty]$ is a \emph{coherent risk measure} if for all
+$X, X' \in L^2(\Omega)$ and every constant $C$,
 \begin{align*}
 &\text{(R1)} && \mathcal{R}(X + C) = \mathcal{R}(X) - C, \\
 &\text{(R2)} && \mathcal{R}(0) = 0 \quad \text{and} \quad \mathcal{R}(\lambda X) = \lambda \mathcal{R}(X) \text{ for } \lambda > 0, \\
@@ -27,11 +28,11 @@ A functional $\mathcal{R} : L^2(\Omega) \to (-\infty, \infty]$ is a \emph{cohere
 \end{align*}
 and it is \emph{strictly expectation bounded} if in addition
 \begin{align*}
-&\text{(R5)} && \mathcal{R}(X) > \mathbb{E}[-X] \quad \text{for every nonconstant }X,\quad and \quad \mathcal{R}(X) = \mathbb{E}[-X] \text{ for constant } X.
+&\text{(R5)} && \mathcal{R}(X) > \mathbb{E}[-X] \quad \text{for every nonconstant }X,\quad \text{and} \quad \mathcal{R}(X) = \mathbb{E}[-X] \text{ for constant } X.
 \end{align*}
 \end{definition}
 
-As mentioned above, properties \emph{(R1)} and \emph{(D1)} are incompatible, so no non-degenerate functional can be a risk measure and a deviation
+Properties \emph{(R1)} and \emph{(D1)} are incompatible, so no non-degenerate functional can be a risk measure and a deviation
 measure at once. The de-meaning transformation is what moves between the two classes. We state and prove only the operation for transforming a coherent and strictly expectation bounded  risk measure into a deviation measure. This is one direction of the more general result of Theorem 2 in \cite{RockafellarUryasevZabarankin2006}.
 
 \begin{theorem}\label{thm:demeaning}
@@ -64,96 +65,98 @@ $\mathcal{D}(X) = \mathcal{R}(\bar X) > \mathbb{E}[-\bar X] = 0$.
 \end{proof}
 
 The proof uses the properties \emph{(R2)}, \emph{(R3)} and \emph{(R5)} only. Monotonicity \emph{(R4)} is never used, which is the reason the
-original Theorem in \cite{RockafellarUryasevZabarankin2006} is stated more genetally for strictly expectation bounded risk
+original Theorem in \cite{RockafellarUryasevZabarankin2006} is stated more generally for strictly expectation bounded risk
 measures rather than coherent risk measures.
 
-We now show that both expected shortfall and second-order expected shortfall are strictly expectation bounded coherent risk measures, and we can therefore apply    
+We now show that both Expected Shortfall and second-order Expected Shortfall are strictly expectation bounded coherent risk measures, and we can therefore apply    
 \Cref{thm:demeaning} to transform them into deviation measures. Write $z^{+} = \max\{z, 0\}$ and $z^{-} = \max\{-z, 0\}$, fix a confidence level
-$\alpha \in (0,1)$ and set $\kappa \coloneqq (1-\alpha)^{-1} > 1$. 
-In the Rockafellar--Uryasev form \cite{RockafellarUryasev2002} the expected shortfall is
+$\beta \in (0,1)$ and set $\kappa \coloneqq (1-\beta)^{-1} > 1$. 
+In the Rockafellar--Uryasev form \cite{RockafellarUryasev2002} the Expected Shortfall is
 \begin{equation}
-\mathrm{ES}_\alpha(X) = \min_{\eta \in \mathbb{R}} \varphi(X, \eta),
+\mathrm{ES}_\beta(X) = \min_{\alpha \in \mathbb{R}} F_\beta(X, \alpha),
 \label{eq:es-ru-form} 
 \end{equation}
-and its second-order analogue, obtained by replacing the expectation in $\varphi$ with the
+and its second-order analogue, obtained by replacing the expectation in $F_\beta$ with the
 $L^2$ norm \cite{Krokhmal2007}, is
 \begin{equation}
-\mathrm{SOES}_\alpha(X) = \min_{\eta \in \mathbb{R}} \psi(X, \eta),
+\mathrm{SOES}_\beta(X) = \min_{\alpha \in \mathbb{R}} G_\beta(X, \alpha),
 \label{eq:soes-ru-form}
 \end{equation}
 where
 \begin{equation*}
-\varphi(X, \eta) = \eta + \kappa\, \mathbb{E}\big[(-X-\eta)^{+}\big],
+F_\beta(X, \alpha) = \alpha + \kappa\, \mathbb{E}\big[(-X-\alpha)^{+}\big],
 \qquad
-\psi(X, \eta) = \eta + \kappa\, \big\| (-X-\eta)^{+} \big\|_2 .
+G_\beta(X, \alpha) = \alpha + \kappa\, \big\| (-X-\alpha)^{+} \big\|_{L^2}
 \end{equation*}
-Both $\varphi(X, \cdot)$ and $\psi(X, \cdot)$ are convex, and both diverge as $|\eta| \to \infty$, so
-the minima in \eqref{eq:es-ru-form} and \eqref{eq:soes-ru-form} are attained. Appendix \ref{app:es_auxiliary_formulation} provides additional details on the Rockafellar--Uryasev formulation. It is well known that $\mathrm{ES}_\alpha$ is a coherent risk measure, see, for example Proposition 3.1 and Corollary 4.3 in \cite{acerbi2002coherenceexpectedshortfall}. We focus on showing it is strictly expectation bounded. 
+are the auxiliary functions of \Cref{app:es_auxiliary_formulation}. Both $F_\beta(X, \cdot)$ and $G_\beta(X, \cdot)$ are convex, and both diverge as $|\alpha| \to \infty$, so
+the minima in \eqref{eq:es-ru-form} and \eqref{eq:soes-ru-form} are attained. It is well known that $\mathrm{ES}_\beta$ is a coherent risk measure, see, for example, Proposition 3.1 and Corollary 4.3 in \cite{acerbi2002coherenceexpectedshortfall}. We show it is strictly expectation bounded. 
 
 \begin{proposition}[Expected Shortfall]\label{prop:es-seb}
-$\mathrm{ES}_\alpha$ is strictly expectation bounded.
+$\mathrm{ES}_\beta$ is strictly expectation bounded.
 \end{proposition}
 
 \begin{proof}
-Fix $\eta$, write $\mu = \mathbb{E}[X]$ and put $Y = -X - \eta$, so that
-$\mathbb{E}[Y] = -\mu - \eta$ and hence $\eta + \mu = -\mathbb{E}[Y]$. Using
+Fix $\alpha$, write $\mu = \mathbb{E}[X]$ and put $Y = -X - \alpha$, so that
+$\mathbb{E}[Y] = -\mu - \alpha$ and hence $\alpha + \mu = -\mathbb{E}[Y]$. Using
 $\mathbb{E}[Y] = \mathbb{E}[Y^{+}] - \mathbb{E}[Y^{-}]$ we write
 \begin{align*}
-\varphi(X, \eta) - \mathbb{E}[-X]
-&= \eta + \mu + \kappa\, \mathbb{E}[Y^{+}] \\
+F_\beta(X, \alpha) - \mathbb{E}[-X]
+&= \alpha + \mu + \kappa\, \mathbb{E}[Y^{+}] \\
 &= -\mathbb{E}[Y] + \kappa\, \mathbb{E}[Y^{+}]\\
 &= \mathbb{E}[Y^{-}] + (\kappa - 1)\,\mathbb{E}[Y^{+}] .
 \end{align*}
 Both terms on the right are non-negative, the second because $\kappa > 1$, so
-$\varphi(X, \eta) \geq \mathbb{E}[-X]$ for every $\eta$, with equality if and only if
-$Y = 0$ almost surely, that is $X \equiv -\eta$. If $X$ is nonconstant the inequality is
-therefore strict at every $\eta$, and since the
-minimum is attained, $\mathrm{ES}_\alpha(X) > \mathbb{E}[-X]$. If $X \equiv C$, then $\eta = -C$ attains equality,
-so $\mathrm{ES}_\alpha(X) = \mathbb{E}[-X]$.
+$F_\beta(X, \alpha) \geq \mathbb{E}[-X]$ for every $\alpha$, with equality if and only if
+$Y = 0$ almost surely, that is $X \equiv -\alpha$. If $X$ is nonconstant the inequality is
+therefore strict at every $\alpha$, and since the
+minimum is attained, $\mathrm{ES}_\beta(X) > \mathbb{E}[-X]$. If $X \equiv C$, then $\alpha = -C$ attains equality,
+so $\mathrm{ES}_\beta(X) = \mathbb{E}[-X]$.
 \end{proof}
 
 \begin{proposition}[Second-order Expected Shortfall]\label{prop:soes-coherent}
-$\mathrm{SOES}_\alpha$ is a coherent, strictly expectation bounded risk measure.
+$\mathrm{SOES}_\beta$ is a coherent, strictly expectation bounded risk measure.
 \end{proposition}
 
 \begin{proof}
-\emph{(R1):} Substituting $\eta' = \eta + C$ gives $-X - C - \eta = -X - \eta'$ and
-$\psi(X + C, \eta) = \eta' - C + \kappa \|(-X-\eta')^{+}\|_2 = \psi(X, \eta') - C$. As $\eta$ ranges over
-$\mathbb{R}$ so does $\eta'$, so minimizing both sides gives
-$\mathrm{SOES}_\alpha(X + C) = \mathrm{SOES}_\alpha(X) - C$.
+\emph{(R1):} Substituting $\alpha' = \alpha + C$ gives $-X - C - \alpha = -X - \alpha'$ and
+$G_\beta(X + C, \alpha) = \alpha' - C + \kappa \|(-X-\alpha')^{+}\|_{L^2} = G_\beta(X, \alpha') - C$. As $\alpha$ ranges over
+$\mathbb{R}$ so does $\alpha'$, so minimizing both sides gives
+$\mathrm{SOES}_\beta(X + C) = \mathrm{SOES}_\beta(X) - C$.
 
-\emph{(R2):} For $X = 0$ we have $\psi(0, \eta) = \eta + \kappa\, \eta^{-}$, which equals $\eta \geq 0$ for
-$\eta \geq 0$ and $(1-\kappa)\eta > 0$ for $\eta < 0$. The minimum is $0$, attained at $\eta = 0$. For
-$\lambda > 0$, substituting $\eta = \lambda \eta'$ and using positive homogeneity of $z \mapsto z^{+}$
+\emph{(R2):} For $X = 0$ we have $G_\beta(0, \alpha) = \alpha + \kappa\, \alpha^{-}$, which equals $\alpha \geq 0$ for
+$\alpha \geq 0$ and $(1-\kappa)\alpha > 0$ for $\alpha < 0$. The minimum is $0$, attained at $\alpha = 0$. For
+$\lambda > 0$, substituting $\alpha = \lambda \alpha'$ and using positive homogeneity of $z \mapsto z^{+}$
 and of the norm,
 \begin{equation*}
-\psi(\lambda X, \lambda \eta')
-= \lambda \eta' + \kappa \big\| \lambda (-X - \eta')^{+} \big\|_2
-= \lambda\left[\eta' + \kappa \big\| (-X-\eta')^{+} \big\|_2\right]
-= \lambda\, \psi(X, \eta') ,
+G_\beta(\lambda X, \lambda \alpha')
+= \lambda \alpha' + \kappa \big\| \lambda (-X - \alpha')^{+} \big\|_{L^2}
+= \lambda\left[\alpha' + \kappa \big\| (-X-\alpha')^{+} \big\|_{L^2}\right]
+= \lambda\, G_\beta(X, \alpha') ,
 \end{equation*}
-and minimizing over $\eta'$ gives $\mathrm{SOES}_\alpha(\lambda X) = \lambda\, \mathrm{SOES}_\alpha(X)$.
+and minimizing over $\alpha'$ gives $\mathrm{SOES}_\beta(\lambda X) = \lambda\, \mathrm{SOES}_\beta(X)$.
 
-\emph{(R3):} Let $\eta$ and $\eta'$ attain the minima for $X$ and $X'$. Since
-$(a + b)^{+} \leq a^{+} + b^{+}$ pointwise, and since $\|\cdot\|_2$ is monotone on non-negative random
+\emph{(R3):} Let $\alpha$ and $\alpha'$ attain the minima for $X$ and $X'$. Since
+$(a + b)^{+} \leq a^{+} + b^{+}$ pointwise, and since $\|\cdot\|_{L^2}$ is monotone on non-negative random
 variables and satisfies the triangle inequality,
 \begin{equation*}
-\big\| \big(-(X + X') - (\eta + \eta')\big)^{+} \big\|_2
-\leq \big\| (-X-\eta)^{+} + (-X'-\eta')^{+} \big\|_2
-\leq \big\| (-X-\eta)^{+} \big\|_2 + \big\| (-X'-\eta')^{+} \big\|_2 .
+\begin{aligned}
+\big\| \big(-(X + X') - (\alpha + \alpha')\big)^{+} \big\|_{L^2}
+&\leq \big\| (-X-\alpha)^{+} + (-X'-\alpha')^{+} \big\|_{L^2} \\
+&\leq \big\| (-X-\alpha)^{+} \big\|_{L^2} + \big\| (-X'-\alpha')^{+} \big\|_{L^2} .
+\end{aligned}
 \end{equation*}
-Adding $\eta + \eta'$ and multiplying the norms by $\kappa$,
-$\mathrm{SOES}_\alpha(X + X') \leq \psi(X + X', \eta + \eta') \leq \psi(X, \eta) + \psi(X', \eta')
-= \mathrm{SOES}_\alpha(X) + \mathrm{SOES}_\alpha(X')$.
+Adding $\alpha + \alpha'$ and multiplying the norms by $\kappa$,
+$\mathrm{SOES}_\beta(X + X') \leq G_\beta(X + X', \alpha + \alpha') \leq G_\beta(X, \alpha) + G_\beta(X', \alpha')
+= \mathrm{SOES}_\beta(X) + \mathrm{SOES}_\beta(X')$.
 
-\emph{(R4):} If $X \geq X'$ then $-X - \eta \leq -X' - \eta$, so $(-X-\eta)^{+} \leq (-X'-\eta)^{+}$
-pointwise and therefore $\psi(X, \eta) \leq \psi(X', \eta)$ for every $\eta$. Taking the minimum gives
-$\mathrm{SOES}_\alpha(X) \leq \mathrm{SOES}_\alpha(X')$.
+\emph{(R4):} If $X \geq X'$ then $-X - \alpha \leq -X' - \alpha$, so $(-X-\alpha)^{+} \leq (-X'-\alpha)^{+}$
+pointwise and therefore $G_\beta(X, \alpha) \leq G_\beta(X', \alpha)$ for every $\alpha$. Taking the minimum gives
+$\mathrm{SOES}_\beta(X) \leq \mathrm{SOES}_\beta(X')$.
 
-\emph{(R5):} On a probability space $\|Z\|_2 \geq \|Z\|_1$, so for $Z = (-X-\eta)^{+} \geq 0$ we have
-$\|(-X-\eta)^{+}\|_2 \geq \mathbb{E}[(-X-\eta)^{+}]$ and hence $\psi(X, \eta) \geq \varphi(X, \eta)$ for
-every $\eta$. Minimizing over $\eta$ gives $\mathrm{SOES}_\alpha(X) \geq \mathrm{ES}_\alpha(X)$, and
-Proposition \ref{prop:es-seb} then gives $\mathrm{SOES}_\alpha(X) > \mathbb{E}[-X]$ for nonconstant $X$, with
+\emph{(R5):} On a probability space $\|Z\|_{L^2} \geq \|Z\|_{L^1}$, so for $Z = (-X-\alpha)^{+} \geq 0$ we have
+$\|(-X-\alpha)^{+}\|_{L^2} \geq \mathbb{E}[(-X-\alpha)^{+}]$ and hence $G_\beta(X, \alpha) \geq F_\beta(X, \alpha)$ for
+every $\alpha$. Minimizing over $\alpha$ gives $\mathrm{SOES}_\beta(X) \geq \mathrm{ES}_\beta(X)$, and
+Proposition \ref{prop:es-seb} then gives $\mathrm{SOES}_\beta(X) > \mathbb{E}[-X]$ for nonconstant $X$, with
 equality for constant $X$ by \emph{(R1)} and \emph{(R2)}.
 \end{proof}
 
