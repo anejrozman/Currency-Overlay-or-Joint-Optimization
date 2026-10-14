@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  14 OCT 2026 12:57
+This is pdfTeX, Version 3.141592653-2.6-1.40.27 (TeX Live 2025) (preloaded format=pdflatex 2025.12.3)  14 OCT 2026 15:10
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1943,7 +1943,18 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 
 [58]
 
+LaTeX Warning: Reference `app:sep_currency' on page 1 undefined on input line 322.
+
+
+LaTeX Warning: Reference `app:sep_currency' on page 1 undefined on input line 346.
+
+
+
 [59]
+
+LaTeX Warning: Reference `app:sep_currency' on page 1 undefined on input line 389.
+
+
 Overfull \hbox (11.35751pt too wide) detected at line 423
 \OML/lmm/b/it/10.95 q[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 L \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;  \OML/lmm/b/it/10.95 S[] \OT1/lmr/m/n/10.95 = [] \OML/lmm/m/it/10.95 ;
  []
@@ -2022,12 +2033,12 @@ Package natbib Warning: Citation `getsomething' on page 71 undefined on input li
 [71
 
 ]
-<../results/figures/boundary_plots/es_top10_dinf.pdf, id=2292, 642.23833pt x 447.70543pt>
+<../results/figures/boundary_plots/es_top10_dinf.pdf, id=2297, 642.23833pt x 447.70543pt>
 File: ../results/figures/boundary_plots/es_top10_dinf.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/es_top10_dinf.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_dinf.pdf  used on input line 69.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
-<../results/figures/boundary_plots/es_top10_gross.pdf, id=2295, 643.23625pt x 447.70543pt>
+<../results/figures/boundary_plots/es_top10_gross.pdf, id=2300, 643.23625pt x 447.70543pt>
 File: ../results/figures/boundary_plots/es_top10_gross.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/es_top10_gross.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/es_top10_gross.pdf  used on input line 81.
@@ -2052,17 +2063,17 @@ pdfTeX warning (ext4): destination with the same identifier (name{table.G.1}) ha
                                                   \__shipout_drop_firstpage_...
 l.137 \newpage
                <../results/figures/boundary_plots/es_top10_gross.pdf>]
-<../results/figures/boundary_plots/mv_top10_dinf.pdf, id=2346, 642.23833pt x 447.70543pt>
+<../results/figures/boundary_plots/mv_top10_dinf.pdf, id=2351, 642.23833pt x 447.70543pt>
 File: ../results/figures/boundary_plots/mv_top10_dinf.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/mv_top10_dinf.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/mv_top10_dinf.pdf  used on input line 142.
 (pdftex.def)             Requested size: 443.0pt x 308.82143pt.
-<../results/figures/boundary_plots/mv_top10_gross.pdf, id=2349, 643.23625pt x 447.70543pt>
+<../results/figures/boundary_plots/mv_top10_gross.pdf, id=2354, 643.23625pt x 447.70543pt>
 File: ../results/figures/boundary_plots/mv_top10_gross.pdf Graphic file (type pdf)
 <use ../results/figures/boundary_plots/mv_top10_gross.pdf>
 Package pdftex.def Info: ../results/figures/boundary_plots/mv_top10_gross.pdf  used on input line 154.
 (pdftex.def)             Requested size: 443.0pt x 308.34323pt.
-<../results/figures/sparsity_analysis/normal/es_assets.pdf, id=2357, 787.65733pt x 286.65495pt>
+<../results/figures/sparsity_analysis/normal/es_assets.pdf, id=2362, 787.65733pt x 286.65495pt>
 File: ../results/figures/sparsity_analysis/normal/es_assets.pdf Graphic file (type pdf)
 <use ../results/figures/sparsity_analysis/normal/es_assets.pdf>
 Package pdftex.def Info: ../results/figures/sparsity_analysis/normal/es_assets.pdf  used on input line 204.
@@ -2092,7 +2103,7 @@ pdfTeX warning (ext4): destination with the same identifier (name{figure.G.5}) h
                                                   \__shipout_drop_firstpage_...
 l.211 R
        egularization stabilizes the weight vector conditional on the penalty... <../results/figures/boundary_plots/mv_top10_gross.pdf> <../results/figures/sparsity_analysis/normal/es_assets.pdf>]
-<../results/figures/sparsity_analysis/normal/mv_assets.pdf, id=2424, 787.65733pt x 286.65495pt>
+<../results/figures/sparsity_analysis/normal/mv_assets.pdf, id=2429, 787.65733pt x 286.65495pt>
 File: ../results/figures/sparsity_analysis/normal/mv_assets.pdf Graphic file (type pdf)
 <use ../results/figures/sparsity_analysis/normal/mv_assets.pdf>
 Package pdftex.def Info: ../results/figures/sparsity_analysis/normal/mv_assets.pdf  used on input line 224.
@@ -2149,12 +2160,12 @@ l.220 \backmatter
 
 
 ])
-<declaration-originality.pdf, id=2480, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=2485, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf>
 Package pdftex.def Info: declaration-originality.pdf  used on input line 225.
 (pdftex.def)             Requested size: 597.551pt x 845.07512pt.
-<declaration-originality.pdf, id=2482, page=1, 597.55246pt x 845.07718pt>
+<declaration-originality.pdf, id=2487, page=1, 597.55246pt x 845.07718pt>
 File: declaration-originality.pdf Graphic file (type pdf)
 <use declaration-originality.pdf, page 1>
 Package pdftex.def Info: declaration-originality.pdf , page1 used on input line 225.
@@ -2203,21 +2214,21 @@ L3 programming layer <2020/03/25>
 LaTeX Warning: There were undefined references.
 
 Package rerunfilecheck Info: File `thesis.out' has not changed.
-(rerunfilecheck)             Checksum: 90C12C7869F8CBDD2D0368C530BF3223;18068.
+(rerunfilecheck)             Checksum: FFCC2B7109C21BE95160C61A3828BCAC;18229.
  ) 
 Here is how much of TeX's memory you used:
  41432 strings out of 473190
- 803732 string characters out of 5715800
- 1520792 words of memory out of 5000000
- 62997 multiletter control sequences out of 15000+600000
- 764245 words of font info for 422 fonts, out of 8000000 for 9000
+ 803739 string characters out of 5715800
+ 1520924 words of memory out of 5000000
+ 62998 multiletter control sequences out of 15000+600000
+ 764153 words of font info for 421 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  102i,19n,125p,1440b,1307s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurb10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/euler/eurm10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbx8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmbxi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmex10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmi9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmmib10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr12.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr5.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmr9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmri10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmss9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmssbx10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmsy9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtk10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt8.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/lm/lmtt9.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msam10.pfb></usr/local/texlive/2025/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on thesis.pdf (88 pages, 5332897 bytes).
+Output written on thesis.pdf (88 pages, 5334219 bytes).
 PDF statistics:
- 2769 PDF objects out of 2984 (max. 8388607)
- 1594 compressed objects within 16 object streams
- 319 named destinations out of 1000 (max. 500000)
+ 2774 PDF objects out of 2984 (max. 8388607)
+ 1599 compressed objects within 16 object streams
+ 320 named destinations out of 1000 (max. 500000)
  114089 words of extra memory for PDF output out of 128383 (max. 10000000)
 

@@ -131,10 +131,10 @@ both optimization problems can be solved reliably with standard convex optimizat
 
 \section{Representation for Portfolio Optimization} \label{app:linear-program-representation}
  
-Let $\rho_\beta \in \{\text{ES}_\beta, \text{SOES}_\beta\}$ denote either of the two risk measures. The portfolio
-optimization problem is
+Let $\rho_\beta \in \{\text{ES}_\beta, \text{SOES}_\beta\}$ denote either of the two risk measures, written as a
+function of the portfolio return. The portfolio optimization problem is
 \begin{equation} \label{eq:risk_min}
-    \bm{x}_t^* = \argmin_{\bm{x}_t} \rho_\beta(\bm{x}_t), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \rho_\beta\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation}
 where the budget constraint enforces full investment. By \eqref{eq:joint_opt} and \eqref{eq:soes_joint_opt}, problem
 \eqref{eq:risk_min} is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ or $G_\beta(\bm{x}_t, \alpha)$ jointly
@@ -410,111 +410,81 @@ with a convex quadratic objective
 Here $\tilde{\bm{D}}$ and $\tilde{\bm{A}}$ are the constraint matrices of \eqref{eq:reg_qp} with a zero column added
 for the variable $s$, and the cone constraint is the one of \eqref{eq:base_socp}.
 
-\section{Separate (Currency Overlay) Optimization} \label{app:separate-optimization}
-In the separate (currency overlay) portfolio optimization approach, the asset and currency allocations are
-optimized in two sequential steps. First, the asset weights $\bm{x}_t \in \mathbb{R}^N$ are
-optimized on the fully hedged returns, then, conditional on the optimal $\bm{x}_t^*$, the
-currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized.
-Let
-\begin{align*}
-\bm{\mu}^{fh} &= \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N, \\
-\bm{\mu}^c &= \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M,
-\end{align*}
-denote the expected fully hedged asset return and the expected
-excess currency return respectively. The two otimization steps are then given by
+\section{Sequential Optimization} \label{app:separate-optimization}
+So far, we have formulated the portfolio optimization problem over the asset weights only. An international portfolio,
+however, holds assets and currency forward positions, so constructing it
+also requires selecting currency exposures. In the sequential portfolio optimization approach, the asset weigths and currency exposures are optimized in two steps. First, the
+asset weights $\bm{x}_t \in \mathbb{R}^N$ are optimized on the fully hedged returns, then, conditional on the optimal
+$\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The two optimization steps are given
+by
 \begin{equation} \label{eq:sep_asset_obj}
 \begin{gathered}
-    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ -\bm{x}_t^\top \bm{\mu}^{fh}
-    + \tfrac{\gamma}{2} \text{ES}_\beta\left(\bm{x}_t^\top \bm{R}^{fh}_{t+1}\right)
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\biggl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \biggr)
     + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \right\} \\[4pt]
-    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell,
+    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell^a,
 \end{gathered}
 \end{equation}
 \begin{equation} \label{eq:sep_curr_obj}
-\begin{split}
-    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \Big\{\, &
-    {-}\bm{\psi}_t^\top \bm{\mu}^c
-    + \tfrac{\gamma}{2}\, \text{ES}_\beta\!\left( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1}
-    + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \right) \\
-    & + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \,\Big\}.
-\end{split}
+    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \left\{
+    \rho_\beta\biggl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \biggr)
+    + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}.
 \end{equation}
 The regularization parameters are kept separate across assets ($\lambda_1^a, \lambda_2^a$)
 and currencies ($\lambda_1^c, \lambda_2^c$).
 
-\subsection{Asset Optimization} \label{app:sep_asset}
+The fully hedged return vector $\bm{R}^{fh}_{t+1}$ (defined in \Cref{sec:matrix-representation}) takes the place of the asset return vector $\bm{R}_{t+1}$ of
+Sections~\ref{app:es_auxiliary_formulation}--\ref{app:regularization}, so the asset step \eqref{eq:sep_asset_obj} is
+identical to the regularized programs \eqref{eq:reg_qp} for Expected Shortfall and
+\eqref{eq:reg_socp} for second-order Expected Shortfall, and is obtained from them by
+substituting the matrix of historically sampled fully hedged returns $\bm{R}^{fh}\in \mathbb{R}^{q \times N}$ for
+$\bm{R}^{\text{data}}$ and the asset-specific penalties $\lambda_1^a, \lambda_2^a$ for $\lambda_1, \lambda_2$.
 
-The asset optimization step \eqref{eq:sep_asset_obj} is identical to the regularized
-single-currency program \eqref{eq:reg_qp}. It carries a budget constraint, $L_1$
-and $L_2$ penalty terms, and a leverage constraint.
-It is therefore obtained directly from \eqref{eq:reg_qp} by substituting the matrix of historically sampled fully hedged
-returns $\bm{R}^{fh}\in \mathbb{R}^{q \times N}$ for $\bm{R}^{\text{data}}$, the mean $\bm{\mu}^{fh}$ for $\bm{\mu}_t$, and the
-asset-specific penalties $\lambda_1^a, \lambda_2^a$. With the augmented vector
+In the currency step \eqref{eq:sep_curr_obj}, the asset weights $\bm{x}_t^*$ are fixed and the currency exposures
+$\bm{\psi}_t$ are optimized. The currency exposure $\psi_{c,t}$ is the net exposure of the portfolio to the foreign currency $c$ as defined in
+\Cref{sec:matrix-representation}, and each unit of net exposure earns the excess currency return
+$e_{c,t+1} - f_{c,t}$. Using the same auxiliary
+representation for the risk measures and the empirical approximation as in \Cref{app:linear-program-representation}, we introduce $\alpha_\psi$ and auxiliary variables $u_{k,\psi} \ge 0$, and the slack constraint
+\eqref{eq:slack_constraint} becomes
 \begin{equation*}
-    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \alpha_x,& \bm{u}_x^\top,&
-    (\bm{\Delta}_{x,t}^-)^\top,& (\bm{\Delta}_{x,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3N+q+1},
-\end{equation*}
-the cost vector and penalty matrix are
-\begin{equation*}
-    \tilde{\bm{c}} =
-    \begin{bmatrix}
-        -(\bm{\mu}^{fh})^\top, & \tfrac{\gamma}{2}, &
-        \tfrac{\gamma}{2q(1-\beta)} \bm{1}_q^\top, &
-        \lambda_1^a \bm{1}_N^\top, & \lambda_1^a \bm{1}_N^\top
-    \end{bmatrix}^\top,
-\end{equation*}
-
-\begin{equation*}
-    \tilde{\bm{Q}} =
-    \begin{bmatrix}
-        2 \lambda_2^a \bm{I}_N & \bm{0}_{N \times (2N+q+1)} \\
-        \bm{0}_{(2N+q+1) \times N} & \bm{0}_{(2N+q+1) \times (2N+q+1)}
-    \end{bmatrix},
-\end{equation*}
-and the equality, inequality, and sign constraints are exactly those of
-\eqref{eq:reg_qp} with $\bm{R}^{fh}$ in place of $\bm{R}^{\text{data}}$. The step yields the optimal
-asset weights $\bm{x}_t^*$, which are then fixed in the currency overlay optimization.
-
-\subsection{Currency Overlay Optimization} \label{app:sep_currency}
-
-Conditional on $\bm{x}_t^*$, the currency step \eqref{eq:sep_curr_obj} minimizes the Expected
-Shortfall of the combined return $\bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t)$
-over the currency exposures $\bm{\psi}_t$. Applying the same auxiliary representation and the empirical approximation as in
-\Cref{app:linear-program-representation}, we introduce the auxiliary variable
-$\alpha_\psi$ and slack variables $u_{k,\psi} \ge 0$. Since $\bm{x}_t^*$ is now fixed, the
-slack constraint becomes
-\begin{equation*}
-    u_{k,\psi} \ge -\bm{\psi}_t^\top (\bm{e}_k - \bm{f}_t) - \bm{x}_t^{*\top} \bm{R}^{fh}_k - \alpha_\psi
+    u_{k,\psi} \ge -\bm{\psi}_t^\top (\bm{e}_k - \bm{f}_k) - \bm{x}_t^{*\top} \bm{R}^{fh}_k - \alpha_\psi
     \quad \Longleftrightarrow \quad
-    -\bm{\psi}_t^\top (\bm{e}_k - \bm{f}_t) - \alpha_\psi - u_{k,\psi} \le \bm{x}_t^{*\top} \bm{R}^{fh}_k,
+    -\bm{\psi}_t^\top (\bm{e}_k - \bm{f}_k) - \alpha_\psi - u_{k,\psi} \le \bm{x}_t^{*\top} \bm{R}^{fh}_k,
 \end{equation*}
-where $\bm{R}^{fh}_k$ is the $k$-th sampled fully hedged return vector and $\bm{e}_k$ the
-$k$-th sampled currency return vector. The fixed asset-portfolio
-returns therefore appear on the right-hand side. We stack the sampled excess currency returns
-$(\bm{e}_k - \bm{f}_t)^\top$ row by row into $\bm{R}^c \in \mathbb{R}^{q \times M}$, and collect the
-fixed asset-portfolio returns in $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. We linearize the currency $L_1$ penalty with
-the decomposition $\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in
-\Cref{app:l1}, and form the augmented vector
+where $\bm{R}^{fh}_k$ is the $k$-th sampled fully hedged return vector, and $\bm{e}_k$ and $\bm{f}_k$ are the $k$-th
+sampled currency return and forward premium vectors. We stack the sampled excess currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix
+$\bm{R}^c \in \mathbb{R}^{q \times M}$, and collect the fixed asset-portfolio returns in
+$\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$.
+
+The currency step has no budget constraint, since the currency overlay is a zero-investment portfolio whose domestic
+exposure $\psi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$ is inferred residually, and no leverage constraint is imposed on the
+currency exposures. We linearize the currency $L^1$ penalty with the decomposition
+$\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1}, and write the currency $L^2$ penalty as
+a quadratic form with the block $\lambda_2^c \bm{I}_M$ as in \Cref{app:l2}.
+
+\subsection{Currency Overlay under Expected Shortfall} \label{app:sep_curr_es}
+
+For Expected Shortfall, the decision vector of the currency step is
 \begin{equation*}
     \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \alpha_\psi,& \bm{u}_\psi^\top,&
     (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3M+q+1},
 \end{equation*}
-The cost vector and penalty matrix are
+with the cost vector
 \begin{equation*}
-    \tilde{\bm{c}} = \begin{bmatrix} -(\bm{\mu}^c)^\top,& \tfrac{\gamma}{2},& \tfrac{\gamma}{2q(1-\beta)} \bm{1}_q^\top,& \lambda_1^c \bm{1}_M^\top,& \lambda_1^c \bm{1}_M^\top \end{bmatrix}^\top,
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_M^\top,& 1,& \tfrac{1}{q(1-\beta)} \bm{1}_q^\top,& \lambda_1^c \bm{1}_M^\top,& \lambda_1^c \bm{1}_M^\top \end{bmatrix}^\top
 \end{equation*}
+and the penalty matrix
 \begin{equation*}
     \tilde{\bm{Q}} =
     \begin{bmatrix}
-        2 \lambda_2^c \bm{I}_M & \bm{0}_{M \times (2M+q+1)} \\
+        \lambda_2^c \bm{I}_M & \bm{0}_{M \times (2M+q+1)} \\
         \bm{0}_{(2M+q+1) \times M} & \bm{0}_{(2M+q+1) \times (2M+q+1)}
     \end{bmatrix}.
 \end{equation*}
-The currency overlay optimization is then the quadratic program
+The currency overlay optimization under Expected Shortfall then becomes a quadratic program with linear constraints
 \begin{equation} \label{eq:sep_curr_qp}
 \begin{aligned}
-    \bm{\psi}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
-     \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tfrac{1}{2}\, \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
+    \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
+     \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
     \text{s.t.} \quad
     \tilde{\bm{D}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} \bm{I}_M & \bm{0}_{M \times (q+1)} & \bm{I}_M & -\bm{I}_M \end{bmatrix} \tilde{\bm{\psi}}_t
@@ -522,21 +492,54 @@ The currency overlay optimization is then the quadratic program
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
     \tilde{\bm{\psi}}_t \le \bm{b} = \bm{R}^{fh}_P, \\[4pt]
-    \alpha_\psi &\ge 0, \quad u_{k,\psi} \ge 0, \quad
-    \Delta_{\psi,c,t}^- \ge 0, \quad \Delta_{\psi,c,t}^+ \ge 0
+    \alpha_\psi \ge 0, & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
+The $M$ rows of $\tilde{\bm{D}}$ enforce the weight decomposition \eqref{eq:l1_decomp} for the currency exposures,
+and the $q$ rows of $\tilde{\bm{A}}$ encode the slack constraints of the currency step, with the fixed
+asset-portfolio returns $\bm{R}^{fh}_P$ on the right-hand side.
 
-The currency optimization differs from the asset optimization \eqref{eq:sep_asset_obj} in the following ways.
-First, there is no budget constraint, the currency portfolio is a
-zero-investment portfolio, so the domestic exposure $\psi_{0,t}$ is inferred residually and
-the equality block $\tilde{\bm{D}}$ enforces only the weight decomposition, with right-hand
-side $\tilde{\bm{E}} = \bm{0}_M$ rather than $[1, \bm{0}_M^\top]^\top$. Second, the fixed asset leg
-shifts the inequality right-hand side from $\bm{0}_q$ to $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^*$. Third, no
-leverage constraint is imposed on the currency exposures through matrix $\tilde{\bm{A}}$. The $L_1$ and $L_2$ regularizing terms are
-as before, through the last two blocks of $\tilde{\bm{c}}$ and the main block of
-$\tilde{\bm{Q}}$, so the currency overlay remains a convex quadratic program.
+\subsection{Currency Overlay under Second-Order Expected Shortfall} \label{app:sep_curr_soes}
+
+For second-order Expected Shortfall, we introduce, as in \Cref{app:socp_soes}, one more auxiliary variable $s_\psi$
+subject to the cone constraint $\|\bm{u}_\psi\|_2 \le s_\psi$, which extends the decision vector to
+\begin{equation*}
+    \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \alpha_\psi,& \bm{u}_\psi^\top,&
+    (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top,& s_\psi \end{bmatrix}^\top \in \mathbb{R}^{3M+q+2},
+\end{equation*}
+with the cost vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_M^\top,& 1,& \bm{0}_q^\top,& \lambda_1^c \bm{1}_M^\top,& \lambda_1^c \bm{1}_M^\top,& \tfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \lambda_2^c \bm{I}_M & \bm{0}_{M \times (2M+q+2)} \\
+        \bm{0}_{(2M+q+2) \times M} & \bm{0}_{(2M+q+2) \times (2M+q+2)}
+    \end{bmatrix}.
+\end{equation*}
+The currency overlay optimization under second-order Expected Shortfall then becomes a second-order cone program with
+a convex quadratic objective
+\begin{equation} \label{eq:sep_curr_socp}
+\begin{aligned}
+    \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
+     \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
+    \text{s.t.} \quad
+    \tilde{\bm{D}} \tilde{\bm{\psi}}_t &=
+    \begin{bmatrix} \bm{I}_M & \bm{0}_{M \times (q+1)} & \bm{I}_M & -\bm{I}_M & \bm{0}_M \end{bmatrix} \tilde{\bm{\psi}}_t
+    = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
+    \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
+    \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} & \bm{0}_q \end{bmatrix}
+    \tilde{\bm{\psi}}_t \le \bm{b} = \bm{R}^{fh}_P, \\[4pt]
+    \|\bm{u}_\psi\|_2 &\le s_\psi, \\[2pt]
+    \alpha_\psi \ge 0, & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
+    \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+Here $\tilde{\bm{D}}$ and $\tilde{\bm{A}}$ are the constraint matrices of \eqref{eq:sep_curr_qp} with a zero column
+added for the variable $s_\psi$.
 
 \section{Joint Optimization} \label{app:joint-optimization}
 

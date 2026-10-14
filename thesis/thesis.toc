@@ -50,9 +50,9 @@
 \contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{50}{subsection.A.3.3}%
 \contentsline {subsection}{\numberline {A.3.4}Expected Shortfall}{50}{subsection.A.3.4}%
 \contentsline {subsection}{\numberline {A.3.5}Second-Order Expected Shortfall}{51}{subsection.A.3.5}%
-\contentsline {section}{\numberline {A.4}Separate (Currency Overlay) Optimization}{51}{section.A.4}%
-\contentsline {subsection}{\numberline {A.4.1}Asset Optimization}{52}{subsection.A.4.1}%
-\contentsline {subsection}{\numberline {A.4.2}Currency Overlay Optimization}{52}{subsection.A.4.2}%
+\contentsline {section}{\numberline {A.4}Sequential Optimization}{51}{section.A.4}%
+\contentsline {subsection}{\numberline {A.4.1}Currency Overlay under Expected Shortfall}{52}{subsection.A.4.1}%
+\contentsline {subsection}{\numberline {A.4.2}Currency Overlay under Second-Order Expected Shortfall}{53}{subsection.A.4.2}%
 \contentsline {section}{\numberline {A.5}Joint Optimization}{53}{section.A.5}%
 \contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Variance and Semi-Variance}{55}{appendix.B}%
 \contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{55}{section.B.1}%
