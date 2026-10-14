@@ -24,7 +24,7 @@ through a single Expected Shortfall term that captures the combined return distr
 We derive the equivalence between the direct minimization of Expected Shortfall and the auxiliary formulation proposed
 by Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and introduce second-order Expected Shortfall, which Krokhmal
 \cite{Krokhmal2007} defines directly through an auxiliary formulation of the same type. The two formulations
-allow for writing the portfolio optimization as a linear program for Expected Shortfall and as a second-order cone
+allow for writing the portfolio optimization problem as a linear program for Expected Shortfall and as a second-order cone
 program for second-order Expected Shortfall.
 
 \subsection{Expected Shortfall} \label{app:es_auxiliary}
@@ -141,8 +141,8 @@ where the budget constraint enforces full investment. By \eqref{eq:joint_opt} an
 with respect to $\bm{x}_t$ and $\alpha$, which we write as a linear program for Expected Shortfall in
 \Cref{app:lp_es} and as a second-order cone program for second-order Expected Shortfall in \Cref{app:socp_soes}.
 Each program in this appendix defines its own decision vector, cost vector and penalty and constraint matrices, so
-the same symbols denote different objects in different programs, and we refer to a specific program by its equation
-number.
+the same symbols denote slightly different objects in different programs, and we refer to a specific program by its equation
+number. 
 
 
 \subsection{Expected Shortfall} \label{app:lp_es}
@@ -273,8 +273,7 @@ The base problems \eqref{eq:base_lp} and \eqref{eq:base_socp} are known to be nu
 high-dimensional settings, producing extreme and concentrated weights \citep{ciliberti2007feasibility, kondor2007noise}.
 We stabilize them with three regularization techniques, an $L^1$-norm penalty that promotes sparsity, an $L^2$-norm
 penalty that promotes shrinkage, and an asset leverage constraint that bounds gross exposure. Each is appended to the base
-problems while keeping them convex. The regularized programs are assembled in \Cref{app:reg_qp} for Expected
-Shortfall and in \Cref{app:reg_socp} for second-order Expected Shortfall.
+problems while keeping them convex. 
 
 \subsection{$L^1$ Regularization} \label{app:l1}
 
@@ -293,8 +292,7 @@ non-zero, giving $\Delta_{i,t}^+ = \max(x_{i,t}, 0)$ and
 $\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. Writing the positive and negative parts as
 vectors
 $\bm{\Delta}_t^+ = [\Delta_{1,t}^+, \dots, \Delta_{N,t}^+]^\top$ and
-$\bm{\Delta}_t^- = [\Delta_{1,t}^-, \dots, \Delta_{N,t}^-]^\top$, the $L^1$ penalty is linear in the auxiliary
-variables and written as
+$\bm{\Delta}_t^- = [\Delta_{1,t}^-, \dots, \Delta_{N,t}^-]^\top$, the $L^1$ penalty is written as
 \begin{equation*}
     \lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-).
 \end{equation*}
