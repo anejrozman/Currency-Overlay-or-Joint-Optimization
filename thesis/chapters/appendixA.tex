@@ -1,23 +1,16 @@
 \chapter{Optimization Derivation: Expected Shortfall and Second-Order Expected Shortfall} \label{app:es_derivation}
 
-In this appendix, we derive the optimization problems used in the main text,
-building up from the Expected Shortfall objective to the implementable
-quadratic programs solved in the empirical analysis.
-In \Cref{app:es_auxiliary_formulation} we follow \cite{RockafellarUryasev2000} to derive the equivalence between direct
-minimization of Expected Shortfall and an auxiliary formulation suitable for linear programming.
-Following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, in \Cref{app:linear-program-representation}
-we embed this equivalence in a mean-ES objective,
-by replacing the conditional expectation with its empirical counterpart, and linearizing the
-terms to assemble the base unregularized portfolio optimization problem as a linear
-program. 
-In \Cref{app:regularization} we introduce three regularization techniques, an $L_1$
-penalty, an $L_2$ penalty, and a leverage constraint, giving us the
-base regularized quadratic program for portfolio optimization.
-In \Cref{app:separate-optimization} we extend the framework to the multi-currency setting
-under the separate (currency overlay) approach, deriving the asset and the currency quadratic programs.
-Finally, in \Cref{app:joint-optimization} we derive the joint quadratic program formulation,
-in which asset and currency weights are optimized simultaneously
-through a single Expected Shortfall term that captures the combined return distribution.
+In this appendix, we derive theportfolio optimization problems used in the main text, building up from the definitions of
+Expected Shortfall and second-order Expected Shortfall to the programs solved in the empirical analysis.
+In \Cref{app:es_auxiliary_formulation} we follow \cite{RockafellarUryasev2000} to derive the auxiliary formulation of
+Expected Shortfall and introduce second-order Expected Shortfall, which Krokhmal \cite{Krokhmal2007} defines through an
+auxiliary formulation of the same type. In \Cref{app:linear-program-representation} we approximate both auxiliary
+functions on historical returns and write the risk minimization problem as a linear program for Expected Shortfall
+and as a second-order cone program for second-order Expected Shortfall. In \Cref{app:regularization} we regularize the programs by adding an $L^1$
+penalty, an $L^2$ penalty and a leverage constraint. Following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we
+then extend the programs to the multi-currency setting, for sequential optimization in \Cref{app:separate-optimization}
+and for joint optimization in \Cref{app:joint-optimization}. Finally, in \Cref{app:mean-risk} we add the expected
+portfolio return to the objectives of the sequential and joint problems.
 
 \section{Auxiliary Formulations of Expected Shortfall and Second-Order Expected Shortfall} \label{app:es_auxiliary_formulation}
 
@@ -40,7 +33,7 @@ distribution over all levels above the confidence level \cite{acerbi2002coherenc
 
 Define the loss random variable at time $t+1$, given portfolio weights $\bm{x}_t\in\mathbb{R}^N$, as $L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$, where $\bm{R}_{t+1}\in\mathbb{R}^N$ is the asset return vector. Let $f(l)$ denote the probability density function of the loss $L(\bm{x}_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
 \begin{equation*}
-    \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha : \mathbb{P}(L(\bm{x}_t) \le \alpha) \ge \beta \}.
+    \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha : \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
 \end{equation*}
 
 The Expected Shortfall at confidence level $\beta$ is defined as the conditional expectation of losses exceeding $\text{VaR}_\beta$
@@ -69,9 +62,9 @@ Setting the derivative to zero gives the optimal $\alpha^*$
 \begin{align*}
     \frac{\partial F_\beta}{\partial \alpha} &= 0 \\
     1 - \frac{1}{1-\beta} \int_{\alpha^*}^\infty f(l) \, dl &= 0 \\
-    1 - \frac{1}{1-\beta} \mathbb{P}(L(\bm{x}_t) \ge \alpha^*) &= 0 \\
-    \mathbb{P}(L(\bm{x}_t) \ge \alpha^*) &= 1 - \beta \\
-    \mathbb{P}(L(\bm{x}_t) \le \alpha^*) &= \beta.
+    1 - \frac{1}{1-\beta} \mathbb{P}_t(L(\bm{x}_t) \ge \alpha^*) &= 0 \\
+    \mathbb{P}_t(L(\bm{x}_t) \ge \alpha^*) &= 1 - \beta \\
+    \mathbb{P}_t(L(\bm{x}_t) \le \alpha^*) &= \beta.
 \end{align*}
 
 We see that the optimal $\alpha^*$ that minimizes the auxiliary function for a fixed $\bm{x}_t$ is exactly the Value-at-Risk at level $\beta$.
@@ -140,7 +133,7 @@ where the budget constraint enforces full investment. By \eqref{eq:joint_opt} an
 \eqref{eq:risk_min} is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ or $G_\beta(\bm{x}_t, \alpha)$ jointly
 with respect to $\bm{x}_t$ and $\alpha$, which we write as a linear program for Expected Shortfall in
 \Cref{app:lp_es} and as a second-order cone program for second-order Expected Shortfall in \Cref{app:socp_soes}.
-Each program in this appendix defines its own decision vector, cost vector and penalty and constraint matrices, so
+Each program in this appendix defines its own decision vector, vector of constants and penalty and constraint matrices, so
 the same symbols denote slightly different objects in different programs, and we refer to a specific program by its equation
 number. 
 
@@ -174,11 +167,11 @@ $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ while keeping all relations linear.
 By collecting the decision variables in the vector
 \begin{equation*}
     \tilde{\bm{x}}_t = \begin{bmatrix} x_{1,t}, \dots, x_{N,t}, &  \alpha, & u_1, \dots, u_q \end{bmatrix}^\top
-    = \begin{bmatrix} \bm{x}_t^\top, & \alpha, & \bm{u}^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
+    = \begin{bmatrix} \bm{x}_t^\top, & \alpha, & \bm{u}^\top \end{bmatrix}^\top \in \mathbb{R}^{N+q+1},
 \end{equation*}
 and constants in the vector
 \begin{equation*}
-    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, &  1, & \dfrac{1}{q(1-\beta)} \bm{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{(N+q+1)},
+    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, &  1, & \dfrac{1}{q(1-\beta)} \bm{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{N+q+1},
 \end{equation*}
 the portfolio optimization problem \eqref{eq:empirical_es} can be written as a linear program
 \begin{equation} \label{eq:base_lp}
@@ -239,11 +232,11 @@ second-order cone constraints is a second-order cone program \cite[Section~4.4.2
 
 By collecting the decision variables in the vector
 \begin{equation*}
-    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top, & \alpha, & \bm{u}^\top, & s \end{bmatrix}^\top \in \mathbb{R}^{(N+q+2)},
+    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top, & \alpha, & \bm{u}^\top, & s \end{bmatrix}^\top \in \mathbb{R}^{N+q+2},
 \end{equation*}
 and constants in the vector
 \begin{equation*}
-    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, &  1, & \bm{0}_q^\top, & \dfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top \in \mathbb{R}^{(N+q+2)},
+    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, &  1, & \bm{0}_q^\top, & \dfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top \in \mathbb{R}^{N+q+2},
 \end{equation*}
 the portfolio optimization problem \eqref{eq:empirical_soes} can be written as a second-order cone program
 \begin{equation} \label{eq:base_socp}
@@ -297,7 +290,7 @@ $\bm{\Delta}_t^- = [\Delta_{1,t}^-, \dots, \Delta_{N,t}^-]^\top$, the $L^1$ pena
     \lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-).
 \end{equation*}
 We append $\bm{\Delta}_t^-$ and $\bm{\Delta}_t^+$ to the decision vector, with the penalty coefficient $\lambda_1$ on
-each of their entries in the cost vector. The decomposition \eqref{eq:l1_decomp} is enforced as $N$ additional linear
+each of their entries in the vector of constants. The decomposition \eqref{eq:l1_decomp} is enforced as $N$ additional linear
 equality constraints, $\bm{x}_t + \bm{\Delta}_t^- - \bm{\Delta}_t^+ = \bm{0}_N$, alongside the original budget
 constraint.
 
@@ -333,7 +326,7 @@ Adding all three regularization terms to the base problem \eqref{eq:base_lp} ext
     \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \alpha,& \bm{u}^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top \end{bmatrix}^\top
     \in \mathbb{R}^{3N+q+1},
 \end{equation*}
-with the cost vector
+with the constants in the vector
 \begin{equation*}
     \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& 1,& \tfrac{1}{q(1-\beta)} \bm{1}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top
 \end{equation*}
@@ -358,7 +351,7 @@ The portfolio optimization problem under Expected Shortfall then becomes a quadr
      \tilde{\bm{A}} \tilde{\bm{x}}_t &=
     \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} \\
     \bm{0}_N^\top & 0 & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top \end{bmatrix} \tilde{\bm{x}}_t
-    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
      \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
 \end{aligned}
@@ -375,7 +368,7 @@ Adding the same three regularization terms to the base problem \eqref{eq:base_so
     \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \alpha,& \bm{u}^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top,& s \end{bmatrix}^\top
     \in \mathbb{R}^{3N+q+2},
 \end{equation*}
-with the cost vector
+with the constants in the vector
 \begin{equation*}
     \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& 1,& \bm{0}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top,& \tfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top
 \end{equation*}
@@ -401,7 +394,7 @@ with a convex quadratic objective
      \tilde{\bm{A}} \tilde{\bm{x}}_t &=
     \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} & \bm{0}_q \\
     \bm{0}_N^\top & 0 & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top & 0 \end{bmatrix} \tilde{\bm{x}}_t
-    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
      \|\bm{u}\|_2 &\le s, \\[2pt]
      \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
@@ -468,7 +461,7 @@ For Expected Shortfall, the decision vector of the currency step is
     \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \alpha_\psi,& \bm{u}_\psi^\top,&
     (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3M+q+1},
 \end{equation*}
-with the cost vector
+with the constants in the vector
 \begin{equation*}
     \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_M^\top,& 1,& \tfrac{1}{q(1-\beta)} \bm{1}_q^\top,& \lambda_1^c \bm{1}_M^\top,& \lambda_1^c \bm{1}_M^\top \end{bmatrix}^\top
 \end{equation*}
@@ -491,7 +484,7 @@ The currency overlay optimization under Expected Shortfall then becomes a quadra
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
-    \tilde{\bm{\psi}}_t \le \bm{b} = \bm{R}^{fh}_P, \\[4pt]
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_P, \\[4pt]
     \alpha_\psi \ge 0, & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}
@@ -508,7 +501,7 @@ subject to the cone constraint $\|\bm{u}_\psi\|_2 \le s_\psi$, which extends the
     \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \alpha_\psi,& \bm{u}_\psi^\top,&
     (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top,& s_\psi \end{bmatrix}^\top \in \mathbb{R}^{3M+q+2},
 \end{equation*}
-with the cost vector
+with the constants in the vector
 \begin{equation*}
     \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_M^\top,& 1,& \bm{0}_q^\top,& \lambda_1^c \bm{1}_M^\top,& \lambda_1^c \bm{1}_M^\top,& \tfrac{1}{(1-\beta)\sqrt{q}} \end{bmatrix}^\top
 \end{equation*}
@@ -532,7 +525,7 @@ a convex quadratic objective
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} & \bm{0}_q \end{bmatrix}
-    \tilde{\bm{\psi}}_t \le \bm{b} = \bm{R}^{fh}_P, \\[4pt]
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_P, \\[4pt]
     \|\bm{u}_\psi\|_2 &\le s_\psi, \\[2pt]
     \alpha_\psi \ge 0, & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
@@ -615,7 +608,7 @@ For Expected Shortfall, the decision vector is
     (\bm{\Delta}_{x,t}^+)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \,\end{bmatrix}^\top
     \in \mathbb{R}^{3N+3M+q+1},
 \end{equation*}
-with the cost vector
+with the constants in the vector
 \begin{equation*}
     \tilde{\bm{c}} = \begin{bmatrix}\, \bm{0}_{N+M}^\top,& 1,&
     \tfrac{1}{q(1-\beta)} \bm{1}_q^\top,&
@@ -645,7 +638,7 @@ constraints
     \tilde{\bm{A}} \tilde{\bm{\theta}}_t &=
     \begin{bmatrix} -\bm{R}^{\text{all}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times (N+M)} & \bm{0}_{q \times (N+M)} \\
     \bm{0}_{N+M}^\top & 0 & \bm{0}_q^\top & \bm{q}_{N,M}^\top & \bm{q}_{N,M}^\top \end{bmatrix} \tilde{\bm{\theta}}_t
-    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
     & \quad \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
     & \quad \Delta_{x,i,t}^\pm \ge 0,\quad \Delta_{\psi,c,t}^\pm \ge 0
     \quad \text{for } i = 1, \dots, N,\ c = 1, \dots, M.
@@ -668,7 +661,7 @@ subject to the cone constraint $\|\bm{u}\|_2 \le s$, which extends the decision 
     (\bm{\Delta}_{x,t}^+)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top,& s \,\end{bmatrix}^\top
     \in \mathbb{R}^{3N+3M+q+2},
 \end{equation*}
-with the cost vector
+with the constants in the vector
 \begin{equation*}
     \tilde{\bm{c}} = \begin{bmatrix}\, \bm{0}_{N+M}^\top,& 1,& \bm{0}_q^\top,&
     \lambda_1^a \bm{1}_N^\top,& \lambda_1^c \bm{1}_M^\top,&
@@ -697,7 +690,7 @@ program with a convex quadratic objective
     \tilde{\bm{A}} \tilde{\bm{\theta}}_t &=
     \begin{bmatrix} -\bm{R}^{\text{all}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times (N+M)} & \bm{0}_{q \times (N+M)} & \bm{0}_q \\
     \bm{0}_{N+M}^\top & 0 & \bm{0}_q^\top & \bm{q}_{N,M}^\top & \bm{q}_{N,M}^\top & 0 \end{bmatrix} \tilde{\bm{\theta}}_t
-    \le \bm{b} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
     \|\bm{u}\|_2 &\le s, \\[2pt]
     & \quad \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
     & \quad \Delta_{x,i,t}^\pm \ge 0,\quad \Delta_{\psi,c,t}^\pm \ge 0
@@ -710,17 +703,17 @@ added for the variable $s$.
 \section{Mean-Risk Optimization} \label{app:mean-risk}
 
 The programs of Sections~\ref{app:linear-program-representation}--\ref{app:joint-optimization} minimize the risk
-measure only. A mean-risk program subtracts the expected portfolio return from the risk measure, scaled by $1/\gamma$, with the risk
-aversion coefficient $\gamma > 0$. For problem \eqref{eq:risk_min}, this gives
+measure only. A mean-risk program subtracts the expected portfolio return, scaled by $1/\gamma$, from the risk measure, where
+$\gamma > 0$ is the risk aversion coefficient. For problem \eqref{eq:risk_min}, this gives
 \begin{equation} \label{eq:mean_es}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
     - \frac{1}{\gamma}\, \bm{\mu}_t^\top \bm{x}_t \right\}, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation}
 where $\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}]$ is the expected asset return.
 
-Let $\bm{\mu}^{fh} = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N$ and
-$\bm{\mu}^c = \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M$ denote the expected fully hedged asset returns and
-the expected excess currency returns, and $\bm{\mu}^{\text{all}} = [(\bm{\mu}^{fh})^\top, (\bm{\mu}^c)^\top]^\top
+Let $\bm{\mu}^{fh}_t = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N$ and
+$\bm{\mu}^c_t = \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M$ denote the expected fully hedged asset returns and
+the expected excess currency returns, and $\bm{\mu}^{\text{all}}_t = [(\bm{\mu}^{fh}_t)^\top, (\bm{\mu}^c_t)^\top]^\top
 \in \mathbb{R}^{N+M}$. The asset means are estimated from the equally weighted return of each
 economy, whose mean is shrunk toward zero with a James--Stein estimator,
 and the currency means are set to the negative forward premium $-\bm{f}_t$. Both estimators are defined and further discussed in
@@ -730,7 +723,7 @@ In the sequential approach, the asset step and the currency step become
 \begin{equation} \label{eq:mean_sep_asset}
 \begin{gathered}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\biggl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \biggr)
-    - \frac{1}{\gamma}\, (\bm{\mu}^{fh})^\top \bm{x}_t
+    - \frac{1}{\gamma}\, (\bm{\mu}^{fh}_t)^\top \bm{x}_t
     + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \right\} \\[4pt]
     \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell^a,
 \end{gathered}
@@ -740,7 +733,7 @@ In the sequential approach, the asset step and the currency step become
     \begin{aligned}
     \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \biggl\{ &
     \rho_\beta\biggl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \biggr)
-    - \frac{1}{\gamma}\, (\bm{\mu}^c)^\top \bm{\psi}_t \\
+    - \frac{1}{\gamma}\, (\bm{\mu}^c_t)^\top \bm{\psi}_t \\
     & + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \biggr\}
     \end{aligned} \\[4pt]
     \text{s.t. } \|\bm{\psi}_t\|_1 \le \ell^c.
@@ -751,7 +744,7 @@ approach, problem \eqref{eq:joint_obj} becomes
 \begin{equation} \label{eq:mean_joint}
 \begin{gathered}
     \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \left\{ \rho_\beta\biggl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \biggr)
-    - \frac{1}{\gamma}\, (\bm{\mu}^{\text{all}})^\top \bm{\theta}_t
+    - \frac{1}{\gamma}\, (\bm{\mu}^{\text{all}}_t)^\top \bm{\theta}_t
     + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \right\} \\[4pt]
     \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L}^a \bm{\theta}_t\|_1 \le \ell^a, \quad
     \|\bm{L}^c \bm{\theta}_t\|_1 \le \ell^c,
