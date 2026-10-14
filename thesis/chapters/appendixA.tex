@@ -707,3 +707,61 @@ program with a convex quadratic objective
 Here $\tilde{\bm{D}}$ and $\tilde{\bm{A}}$ are the constraint matrices of \eqref{eq:joint_qp} with a zero column
 added for the variable $s$.
 
+\section{Mean-Risk Optimization} \label{app:mean-risk}
+
+The programs of Sections~\ref{app:linear-program-representation}--\ref{app:joint-optimization} minimize the risk
+measure only. A mean-risk program subtracts the expected portfolio return from the risk measure, scaled by $1/\gamma$, with the risk
+aversion coefficient $\gamma > 0$. For problem \eqref{eq:risk_min}, this gives
+\begin{equation} \label{eq:mean_es}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    - \frac{1}{\gamma}\, \bm{\mu}_t^\top \bm{x}_t \right\}, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+\end{equation}
+where $\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}]$ is the expected asset return.
+
+Let $\bm{\mu}^{fh} = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N$ and
+$\bm{\mu}^c = \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M$ denote the expected fully hedged asset returns and
+the expected excess currency returns, and $\bm{\mu}^{\text{all}} = [(\bm{\mu}^{fh})^\top, (\bm{\mu}^c)^\top]^\top
+\in \mathbb{R}^{N+M}$. The asset means are estimated from the equally weighted return of each
+economy, whose mean is shrunk toward zero with a James--Stein estimator,
+and the currency means are set to the negative forward premium $-\bm{f}_t$. Both estimators are defined and further discussed in
+\Cref{chap:optimization-framework}.
+
+In the sequential approach, the asset step and the currency step become
+\begin{equation} \label{eq:mean_sep_asset}
+\begin{gathered}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\biggl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \biggr)
+    - \frac{1}{\gamma}\, (\bm{\mu}^{fh})^\top \bm{x}_t
+    + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \right\} \\[4pt]
+    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell^a,
+\end{gathered}
+\end{equation}
+\begin{equation} \label{eq:mean_sep_curr}
+\begin{gathered}
+    \begin{aligned}
+    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \biggl\{ &
+    \rho_\beta\biggl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \biggr)
+    - \frac{1}{\gamma}\, (\bm{\mu}^c)^\top \bm{\psi}_t \\
+    & + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \biggr\}
+    \end{aligned} \\[4pt]
+    \text{s.t. } \|\bm{\psi}_t\|_1 \le \ell^c.
+\end{gathered}
+\end{equation}
+In the joint
+approach, problem \eqref{eq:joint_obj} becomes
+\begin{equation} \label{eq:mean_joint}
+\begin{gathered}
+    \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \left\{ \rho_\beta\biggl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \biggr)
+    - \frac{1}{\gamma}\, (\bm{\mu}^{\text{all}})^\top \bm{\theta}_t
+    + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \right\} \\[4pt]
+    \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L}^a \bm{\theta}_t\|_1 \le \ell^a, \quad
+    \|\bm{L}^c \bm{\theta}_t\|_1 \le \ell^c,
+\end{gathered}
+\end{equation}
+where
+\begin{equation*}
+    \bm{L}^c = \begin{bmatrix} \bm{0}_{N \times N} & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \bm{I}_M \end{bmatrix}
+\end{equation*}
+applies the leverage constraint to the currency exposures only. We add the currency leverage constraint to both the
+currency step and the joint program, since without it, the mean term can push the currency exposures
+toward arbitrarily large positions.
+
