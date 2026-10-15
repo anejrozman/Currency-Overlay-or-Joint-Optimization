@@ -442,7 +442,6 @@
 \newlabel{eq:mv_mean_joint@cref}{{[equation][20][2]B.20}{[1][65][]65}{}{}{}}
 \citation{KonnoYamazaki1991}
 \citation{boyd2004convex}
-\citation{Speranza1993,OgryczakRuszczynski1999}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
 \@writefile{toc}{\contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{66}{appendix.C}\protected@file@percent }
@@ -455,9 +454,10 @@
 \newlabel{eq:mad_def@cref}{{[equation][1][3]C.1}{[1][66][]66}{}{}{}}
 \newlabel{eq:mad_risk_min}{{C.2}{66}{Definition and Representation for Portfolio Optimization}{equation.C.2}{}}
 \newlabel{eq:mad_risk_min@cref}{{[equation][2][3]C.2}{[1][66][]66}{}{}{}}
-\newlabel{eq:empirical_mad}{{C.3}{66}{Definition and Representation for Portfolio Optimization}{equation.C.3}{}}
-\newlabel{eq:empirical_mad@cref}{{[equation][3][3]C.3}{[1][66][]66}{}{}{}}
+\citation{Speranza1993,OgryczakRuszczynski1999}
 \citation{kondor2007noise}
+\newlabel{eq:empirical_mad}{{C.3}{67}{Definition and Representation for Portfolio Optimization}{equation.C.3}{}}
+\newlabel{eq:empirical_mad@cref}{{[equation][3][3]C.3}{[1][66][]67}{}{}{}}
 \newlabel{eq:mad_identity}{{C.4}{67}{Definition and Representation for Portfolio Optimization}{equation.C.4}{}}
 \newlabel{eq:mad_identity@cref}{{[equation][4][3]C.4}{[1][67][]67}{}{}{}}
 \newlabel{eq:mad_slack}{{C.5}{67}{Definition and Representation for Portfolio Optimization}{equation.C.5}{}}
@@ -481,140 +481,152 @@
 \newlabel{eq:mad_sep_curr_qp}{{C.11}{69}{Sequential Optimization}{equation.C.11}{}}
 \newlabel{eq:mad_sep_curr_qp@cref}{{[equation][11][3]C.11}{[1][69][]69}{}{}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {C.4}Joint Optimization}{69}{section.C.4}\protected@file@percent }
-\newlabel{sec:mad-joint}{{C.4}{69}{Joint Optimization}{section.C.4}{}}
-\newlabel{sec:mad-joint@cref}{{[section][4][3]C.4}{[1][69][]69}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {C.5}Adding the Mean Term}{69}{section.C.5}\protected@file@percent }
-\newlabel{sec:mad-mean}{{C.5}{69}{Adding the Mean Term}{section.C.5}{}}
-\newlabel{sec:mad-mean@cref}{{[section][5][3]C.5}{[1][69][]69}{}{}{}}
+\newlabel{app:mad_joint}{{C.4}{69}{Joint Optimization}{section.C.4}{}}
+\newlabel{app:mad_joint@cref}{{[section][4][3]C.4}{[1][69][]69}{}{}{}}
+\newlabel{eq:mad_joint_obj}{{C.12}{70}{Joint Optimization}{equation.C.12}{}}
+\newlabel{eq:mad_joint_obj@cref}{{[equation][12][3]C.12}{[1][69][]70}{}{}{}}
+\newlabel{eq:mad_joint_qp}{{C.13}{71}{Joint Optimization}{equation.C.13}{}}
+\newlabel{eq:mad_joint_qp@cref}{{[equation][13][3]C.13}{[1][70][]71}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {C.5}Mean-Risk Optimization}{71}{section.C.5}\protected@file@percent }
+\newlabel{app:mad_mean_risk}{{C.5}{71}{Mean-Risk Optimization}{section.C.5}{}}
+\newlabel{app:mad_mean_risk@cref}{{[section][5][3]C.5}{[1][71][]71}{}{}{}}
+\newlabel{eq:mad_mean_obj}{{C.14}{71}{Mean-Risk Optimization}{equation.C.14}{}}
+\newlabel{eq:mad_mean_obj@cref}{{[equation][14][3]C.14}{[1][71][]71}{}{}{}}
+\newlabel{eq:mad_mean_sep_asset}{{C.15}{71}{Mean-Risk Optimization}{equation.C.15}{}}
+\newlabel{eq:mad_mean_sep_asset@cref}{{[equation][15][3]C.15}{[1][71][]71}{}{}{}}
+\newlabel{eq:mad_mean_sep_curr}{{C.16}{71}{Mean-Risk Optimization}{equation.C.16}{}}
+\newlabel{eq:mad_mean_sep_curr@cref}{{[equation][16][3]C.16}{[1][71][]71}{}{}{}}
+\newlabel{eq:mad_mean_joint}{{C.17}{71}{Mean-Risk Optimization}{equation.C.17}{}}
+\newlabel{eq:mad_mean_joint@cref}{{[equation][17][3]C.17}{[1][71][]71}{}{}{}}
 \citation{RockafellarUryasevZabarankin2006}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
-\@writefile{toc}{\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{70}{appendix.D}\protected@file@percent }
-\newlabel{app:demeaning}{{D}{70}{Coherent Risk Measures and Deviation Measures}{appendix.D}{}}
-\newlabel{app:demeaning@cref}{{[chapter][4][]D}{[1][70][]70}{}{}{}}
-\@writefile{thm}{\contentsline {definition}{{Definition}{D.{1}}{Deviation measure}}{70}{theorem.D.1}\protected@file@percent }
-\newlabel{def:deviation}{{D.{1}}{70}{Coherent Risk Measures and Deviation Measures}{theorem.D.1}{}}
-\newlabel{def:deviation@cref}{{[theorem][1][4]D.{1}}{[1][70][]70}{}{}{}}
-\@writefile{thm}{\contentsline {definition}{{Definition}{D.{2}}{Coherent and strictly expectation bounded risk measure}}{70}{theorem.D.2}\protected@file@percent }
-\newlabel{def:coherent}{{D.{2}}{70}{Coherent Risk Measures and Deviation Measures}{theorem.D.2}{}}
-\newlabel{def:coherent@cref}{{[theorem][2][4]D.{2}}{[1][70][]70}{}{}{}}
+\@writefile{toc}{\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{73}{appendix.D}\protected@file@percent }
+\newlabel{app:demeaning}{{D}{73}{Coherent Risk Measures and Deviation Measures}{appendix.D}{}}
+\newlabel{app:demeaning@cref}{{[chapter][4][]D}{[1][73][]73}{}{}{}}
+\@writefile{thm}{\contentsline {definition}{{Definition}{D.{1}}{Deviation measure}}{73}{theorem.D.1}\protected@file@percent }
+\newlabel{def:deviation}{{D.{1}}{73}{Coherent Risk Measures and Deviation Measures}{theorem.D.1}{}}
+\newlabel{def:deviation@cref}{{[theorem][1][4]D.{1}}{[1][73][]73}{}{}{}}
+\@writefile{thm}{\contentsline {definition}{{Definition}{D.{2}}{Coherent and strictly expectation bounded risk measure}}{73}{theorem.D.2}\protected@file@percent }
+\newlabel{def:coherent}{{D.{2}}{73}{Coherent Risk Measures and Deviation Measures}{theorem.D.2}{}}
+\newlabel{def:coherent@cref}{{[theorem][2][4]D.{2}}{[1][73][]73}{}{}{}}
 \citation{RockafellarUryasevZabarankin2006}
 \citation{RockafellarUryasev2002}
 \citation{Krokhmal2007}
 \citation{acerbi2002coherenceexpectedshortfall}
-\@writefile{thm}{\contentsline {theorem}{{Theorem}{D.{3}}{}}{71}{theorem.D.3}\protected@file@percent }
-\newlabel{thm:demeaning}{{D.{3}}{71}{Coherent Risk Measures and Deviation Measures}{theorem.D.3}{}}
-\newlabel{thm:demeaning@cref}{{[theorem][3][4]D.{3}}{[1][70][]71}{}{}{}}
-\newlabel{eq:demeaning}{{D.1}{71}{Coherent Risk Measures and Deviation Measures}{equation.D.1}{}}
-\newlabel{eq:demeaning@cref}{{[equation][1][4]D.1}{[1][70][]71}{}{}{}}
-\@writefile{thm}{\contentsline {proof}{{Proof}{1}{}}{71}{proof.1}\protected@file@percent }
-\newlabel{eq:es-ru-form}{{D.2}{71}{Coherent Risk Measures and Deviation Measures}{equation.D.2}{}}
-\newlabel{eq:es-ru-form@cref}{{[equation][2][4]D.2}{[1][71][]71}{}{}{}}
-\newlabel{eq:soes-ru-form}{{D.3}{71}{Coherent Risk Measures and Deviation Measures}{equation.D.3}{}}
-\newlabel{eq:soes-ru-form@cref}{{[equation][3][4]D.3}{[1][71][]71}{}{}{}}
-\@writefile{thm}{\contentsline {proposition}{{Proposition}{D.{4}}{Expected Shortfall}}{71}{theorem.D.4}\protected@file@percent }
-\newlabel{prop:es-seb}{{D.{4}}{71}{Coherent Risk Measures and Deviation Measures}{theorem.D.4}{}}
-\newlabel{prop:es-seb@cref}{{[theorem][4][4]D.{4}}{[1][71][]71}{}{}{}}
-\@writefile{thm}{\contentsline {proof}{{Proof}{2}{}}{71}{proof.2}\protected@file@percent }
-\@writefile{thm}{\contentsline {proposition}{{Proposition}{D.{5}}{Second-order Expected Shortfall}}{72}{theorem.D.5}\protected@file@percent }
-\newlabel{prop:soes-coherent}{{D.{5}}{72}{Coherent Risk Measures and Deviation Measures}{theorem.D.5}{}}
-\newlabel{prop:soes-coherent@cref}{{[theorem][5][4]D.{5}}{[1][71][]72}{}{}{}}
-\@writefile{thm}{\contentsline {proof}{{Proof}{3}{}}{72}{proof.3}\protected@file@percent }
+\@writefile{thm}{\contentsline {theorem}{{Theorem}{D.{3}}{}}{74}{theorem.D.3}\protected@file@percent }
+\newlabel{thm:demeaning}{{D.{3}}{74}{Coherent Risk Measures and Deviation Measures}{theorem.D.3}{}}
+\newlabel{thm:demeaning@cref}{{[theorem][3][4]D.{3}}{[1][73][]74}{}{}{}}
+\newlabel{eq:demeaning}{{D.1}{74}{Coherent Risk Measures and Deviation Measures}{equation.D.1}{}}
+\newlabel{eq:demeaning@cref}{{[equation][1][4]D.1}{[1][73][]74}{}{}{}}
+\@writefile{thm}{\contentsline {proof}{{Proof}{1}{}}{74}{proof.1}\protected@file@percent }
+\newlabel{eq:es-ru-form}{{D.2}{74}{Coherent Risk Measures and Deviation Measures}{equation.D.2}{}}
+\newlabel{eq:es-ru-form@cref}{{[equation][2][4]D.2}{[1][74][]74}{}{}{}}
+\newlabel{eq:soes-ru-form}{{D.3}{74}{Coherent Risk Measures and Deviation Measures}{equation.D.3}{}}
+\newlabel{eq:soes-ru-form@cref}{{[equation][3][4]D.3}{[1][74][]74}{}{}{}}
+\@writefile{thm}{\contentsline {proposition}{{Proposition}{D.{4}}{Expected Shortfall}}{74}{theorem.D.4}\protected@file@percent }
+\newlabel{prop:es-seb}{{D.{4}}{74}{Coherent Risk Measures and Deviation Measures}{theorem.D.4}{}}
+\newlabel{prop:es-seb@cref}{{[theorem][4][4]D.{4}}{[1][74][]74}{}{}{}}
+\@writefile{thm}{\contentsline {proof}{{Proof}{2}{}}{74}{proof.2}\protected@file@percent }
+\@writefile{thm}{\contentsline {proposition}{{Proposition}{D.{5}}{Second-order Expected Shortfall}}{75}{theorem.D.5}\protected@file@percent }
+\newlabel{prop:soes-coherent}{{D.{5}}{75}{Coherent Risk Measures and Deviation Measures}{theorem.D.5}{}}
+\newlabel{prop:soes-coherent@cref}{{[theorem][5][4]D.{5}}{[1][74][]75}{}{}{}}
+\@writefile{thm}{\contentsline {proof}{{Proof}{3}{}}{75}{proof.3}\protected@file@percent }
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
-\@writefile{toc}{\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{73}{appendix.E}\protected@file@percent }
-\newlabel{app:optimization-implementation}{{E}{73}{Numerical Implementation of the Optimization Problems}{appendix.E}{}}
-\newlabel{app:optimization-implementation@cref}{{[chapter][5][]E}{[1][73][]73}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {E.1}The CVXPY Library}{73}{section.E.1}\protected@file@percent }
-\newlabel{sec:cvxpy}{{E.1}{73}{The CVXPY Library}{section.E.1}{}}
-\newlabel{sec:cvxpy@cref}{{[section][1][5]E.1}{[1][73][]73}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {E.2}Numerical Implementation}{73}{section.E.2}\protected@file@percent }
-\newlabel{sec:numerical-implementation}{{E.2}{73}{Numerical Implementation}{section.E.2}{}}
-\newlabel{sec:numerical-implementation@cref}{{[section][2][5]E.2}{[1][73][]73}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{74}{section.E.3}\protected@file@percent }
-\newlabel{sec:computational-complexity}{{E.3}{74}{Computational Complexity and Performance}{section.E.3}{}}
-\newlabel{sec:computational-complexity@cref}{{[section][3][5]E.3}{[1][74][]74}{}{}{}}
+\@writefile{toc}{\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{76}{appendix.E}\protected@file@percent }
+\newlabel{app:optimization-implementation}{{E}{76}{Numerical Implementation of the Optimization Problems}{appendix.E}{}}
+\newlabel{app:optimization-implementation@cref}{{[chapter][5][]E}{[1][76][]76}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {E.1}The CVXPY Library}{76}{section.E.1}\protected@file@percent }
+\newlabel{sec:cvxpy}{{E.1}{76}{The CVXPY Library}{section.E.1}{}}
+\newlabel{sec:cvxpy@cref}{{[section][1][5]E.1}{[1][76][]76}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {E.2}Numerical Implementation}{76}{section.E.2}\protected@file@percent }
+\newlabel{sec:numerical-implementation}{{E.2}{76}{Numerical Implementation}{section.E.2}{}}
+\newlabel{sec:numerical-implementation@cref}{{[section][2][5]E.2}{[1][76][]76}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{77}{section.E.3}\protected@file@percent }
+\newlabel{sec:computational-complexity}{{E.3}{77}{Computational Complexity and Performance}{section.E.3}{}}
+\newlabel{sec:computational-complexity@cref}{{[section][3][5]E.3}{[1][77][]77}{}{}{}}
 \citation{SparseAndStableInternationalPortfolioOptimization,RegularizedMultiCurrencyExpectedShortfallPortfolios,Li2015}
 \citation{SparseAndStableInternationalPortfolioOptimization}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
-\@writefile{toc}{\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{75}{appendix.F}\protected@file@percent }
-\newlabel{app:transaction_costs}{{F}{75}{Transaction Costs}{appendix.F}{}}
-\newlabel{app:transaction_costs@cref}{{[chapter][6][]F}{[1][75][]75}{}{}{}}
-\newlabel{eq:hedged-portfolio-return-net}{{F.1}{75}{Transaction Costs}{equation.F.1}{}}
-\newlabel{eq:hedged-portfolio-return-net@cref}{{[equation][1][6]F.1}{[1][75][]75}{}{}{}}
+\@writefile{toc}{\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{78}{appendix.F}\protected@file@percent }
+\newlabel{app:transaction_costs}{{F}{78}{Transaction Costs}{appendix.F}{}}
+\newlabel{app:transaction_costs@cref}{{[chapter][6][]F}{[1][78][]78}{}{}{}}
+\newlabel{eq:hedged-portfolio-return-net}{{F.1}{78}{Transaction Costs}{equation.F.1}{}}
+\newlabel{eq:hedged-portfolio-return-net@cref}{{[equation][1][6]F.1}{[1][78][]78}{}{}{}}
 \citation{Jones2002,NeelyWellerUlrich2009,MenkhoffSarnoSchmelingSchrimpf2012,FrazziniIsraelMoskowitz2018}
 \citation{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 \citation{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 \citation{getsomething}
 \@writefile{lof}{\addvspace {10pt}}
 \@writefile{lot}{\addvspace {10pt}}
-\@writefile{toc}{\contentsline {appendix}{\chapternumberline {G}Additional Results}{77}{appendix.G}\protected@file@percent }
-\newlabel{app:additional-results}{{G}{77}{Additional Results}{appendix.G}{}}
-\newlabel{app:additional-results@cref}{{[chapter][7][]G}{[1][77][]77}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{77}{section.G.1}\protected@file@percent }
-\newlabel{app:hyperparameter-sensitivity}{{G.1}{77}{Hyperparameter Sensitivity Analysis}{section.G.1}{}}
-\newlabel{app:hyperparameter-sensitivity@cref}{{[section][1][7]G.1}{[1][77][]77}{}{}{}}
-\newlabel{eq:marginal-effect}{{G.1}{77}{Hyperparameter Sensitivity Analysis}{section.G.1}{}}
-\newlabel{eq:marginal-effect@cref}{{[section][1][7]G.1}{[1][77][]77}{}{}{}}
-\newlabel{app:hyperparameter-sensitivity-es}{{G.1}{78}{Expected Shortfall Hyperparameter Sensitivity Analysis}{section*.5}{}}
-\newlabel{app:hyperparameter-sensitivity-es@cref}{{[section][1][7]G.1}{[1][78][]78}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {G.1}{\ignorespaces Marginal effect of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref  {tab:hypergrid-es}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{78}{figure.G.1}\protected@file@percent }
-\newlabel{fig:hyperparameter-sensitivity-es-marginal}{{G.1}{78}{Marginal effect of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref {tab:hypergrid-es}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.1}{}}
-\newlabel{fig:hyperparameter-sensitivity-es-marginal@cref}{{[figure][1][7]G.1}{[1][78][]78}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {G.2}{\ignorespaces Portfolio exposure as a function of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref  {tab:hypergrid-es}. The upper panels report $\|\bm  {x}_t\|_1$ and the lower panels $\|\bm  {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{79}{figure.G.2}\protected@file@percent }
-\newlabel{fig:hyperparameter-sensitivity-es}{{G.2}{79}{Portfolio exposure as a function of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref {tab:hypergrid-es}. The upper panels report $\|\bm {x}_t\|_1$ and the lower panels $\|\bm {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.2}{}}
-\newlabel{fig:hyperparameter-sensitivity-es@cref}{{[figure][2][7]G.2}{[1][78][]79}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {G.1}{\ignorespaces Hyperparameter ranges for the regularized Expected Shortfall optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref  {app:hyperparameter-sensitivity-es}.}}{79}{table.G.1}\protected@file@percent }
-\newlabel{tab:hypergrid-es}{{G.1}{79}{Hyperparameter ranges for the regularized Expected Shortfall optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref {app:hyperparameter-sensitivity-es}}{table.G.1}{}}
-\newlabel{tab:hypergrid-es@cref}{{[table][1][7]G.1}{[1][79][]79}{}{}{}}
-\newlabel{app:hyperparameter-sensitivity-mv}{{G.1}{80}{Mean-Variance Hyperparameter Sensitivity Analysis}{section*.6}{}}
-\newlabel{app:hyperparameter-sensitivity-mv@cref}{{[section][1][7]G.1}{[1][80][]80}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {G.3}{\ignorespaces Marginal effect of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref  {tab:hypergrid-mv}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{80}{figure.G.3}\protected@file@percent }
-\newlabel{fig:hyperparameter-sensitivity-mv-marginal}{{G.3}{80}{Marginal effect of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref {tab:hypergrid-mv}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.3}{}}
-\newlabel{fig:hyperparameter-sensitivity-mv-marginal@cref}{{[figure][3][7]G.3}{[1][80][]80}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {G.2}{\ignorespaces Hyperparameter ranges for the regularized mean-variance optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref  {app:hyperparameter-sensitivity-mv}.}}{80}{table.G.2}\protected@file@percent }
-\newlabel{tab:hypergrid-mv}{{G.2}{80}{Hyperparameter ranges for the regularized mean-variance optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref {app:hyperparameter-sensitivity-mv}}{table.G.2}{}}
-\newlabel{tab:hypergrid-mv@cref}{{[table][2][7]G.2}{[1][80][]80}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {G.4}{\ignorespaces Portfolio exposure as a function of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref  {tab:hypergrid-mv}. The upper panels report $\|\bm  {x}_t\|_1$ and the lower panels $\|\bm  {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{81}{figure.G.4}\protected@file@percent }
-\newlabel{fig:hyperparameter-sensitivity-mv}{{G.4}{81}{Portfolio exposure as a function of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref {tab:hypergrid-mv}. The upper panels report $\|\bm {x}_t\|_1$ and the lower panels $\|\bm {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.4}{}}
-\newlabel{fig:hyperparameter-sensitivity-mv@cref}{{[figure][4][7]G.4}{[1][80][]81}{}{}{}}
-\newlabel{app:mean-absolute-deviation}{{G.1}{81}{Mean Absolute Deviation Hyperparameter Sensitivity Analysis}{section*.7}{}}
-\newlabel{app:mean-absolute-deviation@cref}{{[section][1][7]G.1}{[1][80][]81}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{81}{section.G.2}\protected@file@percent }
-\newlabel{app:portfolio-sparsity}{{G.2}{81}{Portfolio Sparsity Analysis}{section.G.2}{}}
-\newlabel{app:portfolio-sparsity@cref}{{[section][2][7]G.2}{[1][80][]81}{}{}{}}
-\newlabel{app:sparsity-es}{{G.2}{81}{Sparsity of the Regularized Expected Shortfall Optimizers}{section*.8}{}}
-\newlabel{app:sparsity-es@cref}{{[section][2][7]G.2}{[1][80][]81}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {G.5}{\ignorespaces Sparsity of the regularized Expected Shortfall currency overlay and joint optimizers.}}{81}{figure.G.5}\protected@file@percent }
-\newlabel{fig:sparsity-es}{{G.5}{81}{Sparsity of the regularized Expected Shortfall currency overlay and joint optimizers}{figure.G.5}{}}
-\newlabel{fig:sparsity-es@cref}{{[figure][5][7]G.5}{[1][80][]81}{}{}{}}
+\@writefile{toc}{\contentsline {appendix}{\chapternumberline {G}Additional Results}{80}{appendix.G}\protected@file@percent }
+\newlabel{app:additional-results}{{G}{80}{Additional Results}{appendix.G}{}}
+\newlabel{app:additional-results@cref}{{[chapter][7][]G}{[1][80][]80}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{80}{section.G.1}\protected@file@percent }
+\newlabel{app:hyperparameter-sensitivity}{{G.1}{80}{Hyperparameter Sensitivity Analysis}{section.G.1}{}}
+\newlabel{app:hyperparameter-sensitivity@cref}{{[section][1][7]G.1}{[1][80][]80}{}{}{}}
+\newlabel{eq:marginal-effect}{{G.1}{80}{Hyperparameter Sensitivity Analysis}{section.G.1}{}}
+\newlabel{eq:marginal-effect@cref}{{[section][1][7]G.1}{[1][80][]80}{}{}{}}
+\newlabel{app:hyperparameter-sensitivity-es}{{G.1}{81}{Expected Shortfall Hyperparameter Sensitivity Analysis}{section*.5}{}}
+\newlabel{app:hyperparameter-sensitivity-es@cref}{{[section][1][7]G.1}{[1][81][]81}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {G.1}{\ignorespaces Marginal effect of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref  {tab:hypergrid-es}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{81}{figure.G.1}\protected@file@percent }
+\newlabel{fig:hyperparameter-sensitivity-es-marginal}{{G.1}{81}{Marginal effect of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref {tab:hypergrid-es}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.1}{}}
+\newlabel{fig:hyperparameter-sensitivity-es-marginal@cref}{{[figure][1][7]G.1}{[1][81][]81}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {G.2}{\ignorespaces Portfolio exposure as a function of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref  {tab:hypergrid-es}. The upper panels report $\|\bm  {x}_t\|_1$ and the lower panels $\|\bm  {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{82}{figure.G.2}\protected@file@percent }
+\newlabel{fig:hyperparameter-sensitivity-es}{{G.2}{82}{Portfolio exposure as a function of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref {tab:hypergrid-es}. The upper panels report $\|\bm {x}_t\|_1$ and the lower panels $\|\bm {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.2}{}}
+\newlabel{fig:hyperparameter-sensitivity-es@cref}{{[figure][2][7]G.2}{[1][81][]82}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {G.1}{\ignorespaces Hyperparameter ranges for the regularized Expected Shortfall optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref  {app:hyperparameter-sensitivity-es}.}}{82}{table.G.1}\protected@file@percent }
+\newlabel{tab:hypergrid-es}{{G.1}{82}{Hyperparameter ranges for the regularized Expected Shortfall optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref {app:hyperparameter-sensitivity-es}}{table.G.1}{}}
+\newlabel{tab:hypergrid-es@cref}{{[table][1][7]G.1}{[1][82][]82}{}{}{}}
+\newlabel{app:hyperparameter-sensitivity-mv}{{G.1}{83}{Mean-Variance Hyperparameter Sensitivity Analysis}{section*.6}{}}
+\newlabel{app:hyperparameter-sensitivity-mv@cref}{{[section][1][7]G.1}{[1][83][]83}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {G.3}{\ignorespaces Marginal effect of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref  {tab:hypergrid-mv}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{83}{figure.G.3}\protected@file@percent }
+\newlabel{fig:hyperparameter-sensitivity-mv-marginal}{{G.3}{83}{Marginal effect of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the hyperparameter grid reported in \Cref {tab:hypergrid-mv}. The upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.3}{}}
+\newlabel{fig:hyperparameter-sensitivity-mv-marginal@cref}{{[figure][3][7]G.3}{[1][83][]83}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {G.2}{\ignorespaces Hyperparameter ranges for the regularized mean-variance optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref  {app:hyperparameter-sensitivity-mv}.}}{83}{table.G.2}\protected@file@percent }
+\newlabel{tab:hypergrid-mv}{{G.2}{83}{Hyperparameter ranges for the regularized mean-variance optimizers. Each penalty is searched over a log-spaced grid spanning the reported range, where the lower endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref {app:hyperparameter-sensitivity-mv}}{table.G.2}{}}
+\newlabel{tab:hypergrid-mv@cref}{{[table][2][7]G.2}{[1][83][]83}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {G.4}{\ignorespaces Portfolio exposure as a function of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref  {tab:hypergrid-mv}. The upper panels report $\|\bm  {x}_t\|_1$ and the lower panels $\|\bm  {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe.}}{84}{figure.G.4}\protected@file@percent }
+\newlabel{fig:hyperparameter-sensitivity-mv}{{G.4}{84}{Portfolio exposure as a function of each regularization penalty, for the regularized mean-variance currency overlay and joint optimizers. The dashed line marks the upper bound of the validation grid reported in \Cref {tab:hypergrid-mv}. The upper panels report $\|\bm {x}_t\|_1$ and the lower panels $\|\bm {\psi }_t\|_1$. Estimates are averaged over five bootstrap replicates of the first estimation window on the small investment universe}{figure.G.4}{}}
+\newlabel{fig:hyperparameter-sensitivity-mv@cref}{{[figure][4][7]G.4}{[1][83][]84}{}{}{}}
+\newlabel{app:mean-absolute-deviation}{{G.1}{84}{Mean Absolute Deviation Hyperparameter Sensitivity Analysis}{section*.7}{}}
+\newlabel{app:mean-absolute-deviation@cref}{{[section][1][7]G.1}{[1][83][]84}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{84}{section.G.2}\protected@file@percent }
+\newlabel{app:portfolio-sparsity}{{G.2}{84}{Portfolio Sparsity Analysis}{section.G.2}{}}
+\newlabel{app:portfolio-sparsity@cref}{{[section][2][7]G.2}{[1][83][]84}{}{}{}}
+\newlabel{app:sparsity-es}{{G.2}{84}{Sparsity of the Regularized Expected Shortfall Optimizers}{section*.8}{}}
+\newlabel{app:sparsity-es@cref}{{[section][2][7]G.2}{[1][83][]84}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {G.5}{\ignorespaces Sparsity of the regularized Expected Shortfall currency overlay and joint optimizers.}}{84}{figure.G.5}\protected@file@percent }
+\newlabel{fig:sparsity-es}{{G.5}{84}{Sparsity of the regularized Expected Shortfall currency overlay and joint optimizers}{figure.G.5}{}}
+\newlabel{fig:sparsity-es@cref}{{[figure][5][7]G.5}{[1][83][]84}{}{}{}}
 \citation{DeMiguel et al. 2009}
-\newlabel{app:sparsity-mv}{{G.2}{82}{Sparsity of the Regularized Mean-Variance Optimizers}{section*.9}{}}
-\newlabel{app:sparsity-mv@cref}{{[section][2][7]G.2}{[1][82][]82}{}{}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {G.6}{\ignorespaces Sparsity of the regularized Mean-Variance currency overlay and joint optimizers.}}{82}{figure.G.6}\protected@file@percent }
-\newlabel{fig:sparsity-mv}{{G.6}{82}{Sparsity of the regularized Mean-Variance currency overlay and joint optimizers}{figure.G.6}{}}
-\newlabel{fig:sparsity-mv@cref}{{[figure][6][7]G.6}{[1][82][]82}{}{}{}}
-\newlabel{app:sparsity-mad}{{G.2}{82}{Sparsity of the Regularized Mean Absolute Deviation Optimizers}{section*.10}{}}
-\newlabel{app:sparsity-mad@cref}{{[section][2][7]G.2}{[1][82][]82}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{82}{section.G.3}\protected@file@percent }
-\newlabel{app:instability-mv}{{G.3}{82}{Risk Aversion Instability under Mean Variance Optimization}{section.G.3}{}}
-\newlabel{app:instability-mv@cref}{{[section][3][7]G.3}{[1][82][]82}{}{}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{82}{section.G.4}\protected@file@percent }
-\newlabel{app:additional-backtest-results}{{G.4}{82}{Additional Backtest Performance Results}{section.G.4}{}}
-\newlabel{app:additional-backtest-results@cref}{{[section][4][7]G.4}{[1][82][]82}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {G.3}{\ignorespaces Performance metrics for the regularized mean-variance currency overlay and joint optimizers under finite risk aversion on the top 10 universe.}}{83}{table.G.3}\protected@file@percent }
-\newlabel{tab:instability-mv}{{G.3}{83}{Performance metrics for the regularized mean-variance currency overlay and joint optimizers under finite risk aversion on the top 10 universe}{table.G.3}{}}
-\newlabel{tab:instability-mv@cref}{{[table][3][7]G.3}{[1][82][]83}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {G.4}{\ignorespaces Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}}{83}{table.G.4}\protected@file@percent }
-\newlabel{tab:es-universe-sizes}{{G.4}{83}{Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}{table.G.4}{}}
-\newlabel{tab:es-universe-sizes@cref}{{[table][4][7]G.4}{[1][82][]83}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {G.5}{\ignorespaces Performance metrics for mean-variance optimization approaches on increasing universe sizes}}{84}{table.G.5}\protected@file@percent }
-\newlabel{tab:mv-universe-sizes}{{G.5}{84}{Performance metrics for mean-variance optimization approaches on increasing universe sizes}{table.G.5}{}}
-\newlabel{tab:mv-universe-sizes@cref}{{[table][5][7]G.5}{[1][82][]84}{}{}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {G.6}{\ignorespaces Performance metrics for mean absolute deviation optimization approaches on increasing universe sizes}}{85}{table.G.6}\protected@file@percent }
-\newlabel{tab:mad-universe-sizes}{{G.6}{85}{Performance metrics for mean absolute deviation optimization approaches on increasing universe sizes}{table.G.6}{}}
-\newlabel{tab:mad-universe-sizes@cref}{{[table][6][7]G.6}{[1][82][]85}{}{}{}}
+\newlabel{app:sparsity-mv}{{G.2}{85}{Sparsity of the Regularized Mean-Variance Optimizers}{section*.9}{}}
+\newlabel{app:sparsity-mv@cref}{{[section][2][7]G.2}{[1][85][]85}{}{}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {G.6}{\ignorespaces Sparsity of the regularized Mean-Variance currency overlay and joint optimizers.}}{85}{figure.G.6}\protected@file@percent }
+\newlabel{fig:sparsity-mv}{{G.6}{85}{Sparsity of the regularized Mean-Variance currency overlay and joint optimizers}{figure.G.6}{}}
+\newlabel{fig:sparsity-mv@cref}{{[figure][6][7]G.6}{[1][85][]85}{}{}{}}
+\newlabel{app:sparsity-mad}{{G.2}{85}{Sparsity of the Regularized Mean Absolute Deviation Optimizers}{section*.10}{}}
+\newlabel{app:sparsity-mad@cref}{{[section][2][7]G.2}{[1][85][]85}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{85}{section.G.3}\protected@file@percent }
+\newlabel{app:instability-mv}{{G.3}{85}{Risk Aversion Instability under Mean Variance Optimization}{section.G.3}{}}
+\newlabel{app:instability-mv@cref}{{[section][3][7]G.3}{[1][85][]85}{}{}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{85}{section.G.4}\protected@file@percent }
+\newlabel{app:additional-backtest-results}{{G.4}{85}{Additional Backtest Performance Results}{section.G.4}{}}
+\newlabel{app:additional-backtest-results@cref}{{[section][4][7]G.4}{[1][85][]85}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {G.3}{\ignorespaces Performance metrics for the regularized mean-variance currency overlay and joint optimizers under finite risk aversion on the top 10 universe.}}{86}{table.G.3}\protected@file@percent }
+\newlabel{tab:instability-mv}{{G.3}{86}{Performance metrics for the regularized mean-variance currency overlay and joint optimizers under finite risk aversion on the top 10 universe}{table.G.3}{}}
+\newlabel{tab:instability-mv@cref}{{[table][3][7]G.3}{[1][85][]86}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {G.4}{\ignorespaces Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}}{86}{table.G.4}\protected@file@percent }
+\newlabel{tab:es-universe-sizes}{{G.4}{86}{Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}{table.G.4}{}}
+\newlabel{tab:es-universe-sizes@cref}{{[table][4][7]G.4}{[1][85][]86}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {G.5}{\ignorespaces Performance metrics for mean-variance optimization approaches on increasing universe sizes}}{87}{table.G.5}\protected@file@percent }
+\newlabel{tab:mv-universe-sizes}{{G.5}{87}{Performance metrics for mean-variance optimization approaches on increasing universe sizes}{table.G.5}{}}
+\newlabel{tab:mv-universe-sizes@cref}{{[table][5][7]G.5}{[1][85][]87}{}{}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {G.6}{\ignorespaces Performance metrics for mean absolute deviation optimization approaches on increasing universe sizes}}{88}{table.G.6}\protected@file@percent }
+\newlabel{tab:mad-universe-sizes}{{G.6}{88}{Performance metrics for mean absolute deviation optimization approaches on increasing universe sizes}{table.G.6}{}}
+\newlabel{tab:mad-universe-sizes@cref}{{[table][6][7]G.6}{[1][85][]88}{}{}{}}
 \bibstyle{plain}
 \bibdata{refs}
 \bibcite{acerbi2002coherenceexpectedshortfall}{{1}{}{{}}{{}}}
@@ -633,7 +645,7 @@
 \bibcite{common_risk_factors_currency_markets}{{14}{}{{}}{{}}}
 \bibcite{Markowitz1952}{{15}{}{{}}{{}}}
 \bibcite{Markowitz1993}{{16}{}{{}}{{}}}
-\@writefile{toc}{\contentsline {chapter}{Bibliography}{86}{appendix*.11}\protected@file@percent }
+\@writefile{toc}{\contentsline {chapter}{Bibliography}{89}{appendix*.11}\protected@file@percent }
 \bibcite{McNeilFrey2000}{{17}{}{{}}{{}}}
 \bibcite{QuantitativeRiskManagement2016}{{18}{}{{}}{{}}}
 \bibcite{carry_trades_and_global_foreign_exchange_volatility}{{19}{}{{}}{{}}}
@@ -650,6 +662,6 @@
 \bibcite{RegularizedMultiCurrencyExpectedShortfallPortfolios}{{30}{}{{}}{{}}}
 \bibcite{SparseAndStableInternationalPortfolioOptimization}{{31}{}{{}}{{}}}
 \providecommand\NAT@force@numbers{}\NAT@force@numbers
-\memsetcounter{lastsheet}{94}
-\memsetcounter{lastpage}{88}
-\gdef \@abspage@last{94}
+\memsetcounter{lastsheet}{97}
+\memsetcounter{lastpage}{91}
+\gdef \@abspage@last{97}

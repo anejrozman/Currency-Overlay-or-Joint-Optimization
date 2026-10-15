@@ -77,16 +77,16 @@
 \contentsline {section}{\numberline {C.2}Regularization}{67}{section.C.2}%
 \contentsline {section}{\numberline {C.3}Sequential Optimization}{68}{section.C.3}%
 \contentsline {section}{\numberline {C.4}Joint Optimization}{69}{section.C.4}%
-\contentsline {section}{\numberline {C.5}Adding the Mean Term}{69}{section.C.5}%
-\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{70}{appendix.D}%
-\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{73}{appendix.E}%
-\contentsline {section}{\numberline {E.1}The CVXPY Library}{73}{section.E.1}%
-\contentsline {section}{\numberline {E.2}Numerical Implementation}{73}{section.E.2}%
-\contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{74}{section.E.3}%
-\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{75}{appendix.F}%
-\contentsline {appendix}{\chapternumberline {G}Additional Results}{77}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{77}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{81}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{82}{section.G.3}%
-\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{82}{section.G.4}%
-\contentsline {chapter}{Bibliography}{86}{appendix*.11}%
+\contentsline {section}{\numberline {C.5}Mean-Risk Optimization}{71}{section.C.5}%
+\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{73}{appendix.D}%
+\contentsline {appendix}{\chapternumberline {E}Numerical Implementation of the Optimization Problems}{76}{appendix.E}%
+\contentsline {section}{\numberline {E.1}The CVXPY Library}{76}{section.E.1}%
+\contentsline {section}{\numberline {E.2}Numerical Implementation}{76}{section.E.2}%
+\contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{77}{section.E.3}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{78}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{80}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{80}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{84}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{85}{section.G.3}%
+\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{85}{section.G.4}%
+\contentsline {chapter}{Bibliography}{89}{appendix*.11}%

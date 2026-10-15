@@ -1,12 +1,12 @@
 \chapter{Optimization Derivation: Mean Absolute Deviation} \label{app:mad_derivation}
 
-In this appendix, we derive the optimization problems used in the main text for portfolio
-optimization under the mean absolute deviation (MAD) risk measure.
-We begin by defining the MAD risk risk measure and formulate the base portoflio 
-optimization problem. We then introduce regularization techniques and extend the 
-formulation to the multi-currency setting, considering sequential overlay optimization 
-and joint optimization approaches. Finally, we discuss the implementation of 
-the optimization problems in Python using the CVXPY library. 
+In this appendix, we derive the portfolio optimization problems used in the main text, building up from the definition
+of the mean absolute deviation to the programs solved in the empirical analysis. In \Cref{app:mad_representation} we
+define the mean absolute deviation, show that it is convex in the portfolio weights and write the portfolio
+optimization problem as a linear program. In \Cref{app:mad_regularization} we regularize the program by adding an
+$L^1$ penalty, an $L^2$ penalty and a leverage constraint. We then extend the program to the multi-currency setting,
+for sequential optimization in \Cref{app:mad_separate} and for joint optimization in \Cref{app:mad_joint}. Finally, in
+\Cref{app:mad_mean_risk} we add the expected portfolio return to the objectives of the sequential and joint problems.
 
 \section{Definition and Representation for Portfolio Optimization} \label{app:mad_representation}
 
@@ -242,9 +242,156 @@ constraints
 The $M$ rows of $\tilde{\bm{D}}$ enforce the weight decomposition \eqref{eq:mad_l1_decomp} for the currency exposures,
 and the $q$ rows of $\tilde{\bm{A}}$ encode the slack constraints of the currency step.
 
-\section{Joint Optimization} \label{sec:mad-joint}
+\section{Joint Optimization} \label{app:mad_joint}
 
-\section{Adding the Mean Term} \label{sec:mad-mean}
+In the joint portfolio optimization approach, the asset weights and currency exposures are optimized simultaneously
+rather than sequentially. As for the other risk measures in Sections~\ref{app:joint-optimization}
+and~\ref{app:mv_joint}, we stack the weights into the combined decision vector
+$\bm{\theta}_t = [\bm{x}_t^\top, \bm{\psi}_t^\top]^\top \in \mathbb{R}^{N+M}$ and the corresponding returns into the
+combined return vector
+$\bm{R}^{\text{all}}_{t+1} = [\bm{R}^{fh\top}_{t+1},\, (\bm{e}_{t+1} - \bm{f}_t)^\top]^\top \in \mathbb{R}^{N+M}$,
+so that $\bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} = \bm{x}_t^\top \bm{R}^{fh}_{t+1}
++ \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t)$ is the hedged portfolio return of \Cref{app:mad_separate}.
+The joint optimization problem is
+\begin{equation} \label{eq:mad_joint_obj}
+\begin{gathered}
+    \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \left\{ \text{MAD}_t\biggl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \biggr)
+    + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \right\} \\[4pt]
+    \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L}^a \bm{\theta}_t\|_1 \le \ell^a,
+\end{gathered}
+\end{equation}
+with
+\begin{equation*}
+    \bm{q}_{N,M} = \begin{bmatrix} \bm{1}_N \\ \bm{0}_M \end{bmatrix}, \quad
+    \bm{L}^a = \begin{bmatrix} \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \bm{0}_{M \times M} \end{bmatrix},
+\end{equation*}
+\begin{equation*}
+    \bm{S}_1 = \begin{bmatrix} \lambda_1^a \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \lambda_1^c \bm{I}_M \end{bmatrix}, \quad
+    \bm{S}_2 = \begin{bmatrix} \sqrt{\lambda_2^a}\, \bm{I}_N & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \sqrt{\lambda_2^c}\, \bm{I}_M \end{bmatrix}.
+\end{equation*}
+The vector $\bm{q}_{N,M}$ and the matrix $\bm{L}^a$ apply the budget and leverage constraints to the asset weights
+only, and $\bm{S}_1$ and $\bm{S}_2$ encode the asset and currency penalties. We decompose
+$\bm{\theta}_t = \bm{\Delta}_t^+ - \bm{\Delta}_t^-$ as in \eqref{eq:mad_l1_decomp}, with
+$\bm{\Delta}_t^\pm = [(\bm{\Delta}_{x,t}^\pm)^\top, (\bm{\Delta}_{\psi,t}^\pm)^\top]^\top \ge \bm{0}_{N+M}$, which
+linearizes $\|\bm{S}_1 \bm{\theta}_t\|_1$ and the leverage constraint
+$\|\bm{L}^a \bm{\theta}_t\|_1 = \bm{q}_{N,M}^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-) \le \ell^a$, and write the $L^2$
+penalty as the quadratic form $\bm{\theta}_t^\top \bm{S}_2^2\, \bm{\theta}_t$.
+
+For the empirical approximation, let $\bm{R}^{\text{all}} = [\, \bm{R}^{fh}\ \ \bm{R}^c \,] \in
+\mathbb{R}^{q \times (N+M)}$ denote the matrix of jointly sampled asset and currency returns, with $\bm{R}^{fh}$ and
+$\bm{R}^c$ of \Cref{app:mad_separate}. Since the sample mean is linear in the returns, the demeaned joint returns are
+$\mathring{\bm{R}}^{\text{all}} \bm{\theta}_t$, as for semi-variance in \Cref{app:mv_svar_joint}, where
+$\mathring{\bm{R}}^{\text{all}}$ is the demeaned matrix of the jointly sampled returns. These demeaned returns sum to
+zero, so the identity \eqref{eq:mad_identity} applies, and introducing the auxiliary variables $\bm{u} \ge \bm{0}_q$,
+the slack constraint \eqref{eq:mad_slack} becomes
+\begin{equation*}
+    \bm{u} \ge -\mathring{\bm{R}}^{\text{all}} \bm{\theta}_t
+    \qquad \Longleftrightarrow \qquad
+    \mathring{\bm{R}}^{\text{all}} \bm{\theta}_t + \bm{u} \ge \bm{0}_q,
+\end{equation*}
+with the objective $\frac{2}{q} \bm{1}_q^\top \bm{u}$.
+
+The decision vector is
+\begin{equation*}
+    \tilde{\bm{\theta}}_t = \begin{bmatrix}\, \bm{x}_t^\top,& \bm{\psi}_t^\top,& \bm{u}^\top,&
+    (\bm{\Delta}_{x,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^-)^\top,&
+    (\bm{\Delta}_{x,t}^+)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \,\end{bmatrix}^\top
+    \in \mathbb{R}^{3N+3M+q},
+\end{equation*}
+with the constants in the vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix}\, \bm{0}_{N+M}^\top,& \tfrac{2}{q} \bm{1}_q^\top,&
+    \lambda_1^a \bm{1}_N^\top,& \lambda_1^c \bm{1}_M^\top,&
+    \lambda_1^a \bm{1}_N^\top,& \lambda_1^c \bm{1}_M^\top \,\end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \lambda_2^a \bm{I}_N & \bm{0}_{N \times M} & \bm{0}_{N\times(2N + 2M + q)} \\
+        \bm{0}_{M \times N} & \lambda_2^c \bm{I}_M & \bm{0}_{M\times(2N + 2M + q)} \\
+        \bm{0}_{(2N+2M+q) \times N} & \bm{0}_{(2N+2M+q) \times M} & \bm{0}_{(2N+2M+q) \times (2N+2M+q)}
+    \end{bmatrix}.
+\end{equation*}
+The joint portfolio optimization problem under mean absolute deviation then becomes a quadratic program with linear
+constraints
+\begin{equation} \label{eq:mad_joint_qp}
+\begin{aligned}
+    \tilde{\bm{\theta}}_t^* &= \argmin_{\tilde{\bm{\theta}}_t} \quad
+    \tilde{\bm{c}}^\top \tilde{\bm{\theta}}_t + \tilde{\bm{\theta}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\theta}}_t, \\[2pt]
+    \text{s.t.} \quad
+    \tilde{\bm{D}} \tilde{\bm{\theta}}_t &=
+    \begin{bmatrix} \bm{q}_{N,M}^\top & \bm{0}_q^\top & \bm{0}_{N+M}^\top & \bm{0}_{N+M}^\top \\
+    \bm{I}_{N+M} & \bm{0}_{(N+M) \times q} & \bm{I}_{N+M} & -\bm{I}_{N+M} \end{bmatrix} \tilde{\bm{\theta}}_t
+    = \tilde{\bm{E}} = \begin{bmatrix} 1 \\ \bm{0}_{N+M} \end{bmatrix}, \\[6pt]
+    \tilde{\bm{A}} \tilde{\bm{\theta}}_t &=
+    \begin{bmatrix} -\mathring{\bm{R}}^{\text{all}} & -\bm{I}_q & \bm{0}_{q \times (N+M)} & \bm{0}_{q \times (N+M)} \\
+    \bm{0}_{N+M}^\top & \bm{0}_q^\top & \bm{q}_{N,M}^\top & \bm{q}_{N,M}^\top \end{bmatrix} \tilde{\bm{\theta}}_t
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+    & \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
+    & \quad \Delta_{x,i,t}^\pm \ge 0,\quad \Delta_{\psi,c,t}^\pm \ge 0
+    \quad \text{for } i = 1, \dots, N,\ c = 1, \dots, M.
+\end{aligned}
+\end{equation}
+In $\tilde{\bm{D}}$, the first row enforces the asset budget constraint and the remaining $N+M$ rows the weight
+decomposition \eqref{eq:mad_l1_decomp} for all components of $\bm{\theta}_t$. In $\tilde{\bm{A}}$, the first $q$ rows
+encode the slack constraints, and the final row imposes the asset-only leverage constraint \eqref{eq:mad_l1_decomp}.
+
+\section{Mean-Risk Optimization} \label{app:mad_mean_risk}
+
+The programs of Sections~\ref{app:mad_representation}--\ref{app:mad_joint} minimize the risk measure only. As for the
+other risk measures in Sections~\ref{app:mean-risk} and~\ref{app:mv_mean_risk}, a mean-risk program subtracts the
+expected portfolio return, scaled by $1/\gamma$, from the risk measure, where $\gamma > 0$ is the risk aversion
+coefficient. For problem \eqref{eq:mad_risk_min}, this gives
+\begin{equation} \label{eq:mad_mean_obj}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \text{MAD}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    - \frac{1}{\gamma}\, \bm{\mu}_t^\top \bm{x}_t \right\}, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
+\end{equation}
+
+Let $\bm{\mu}^{fh}_t = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N$ and
+$\bm{\mu}^c_t = \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M$ denote the expected fully hedged asset returns and
+the expected excess currency returns, and $\bm{\mu}^{\text{all}}_t = [(\bm{\mu}^{fh}_t)^\top, (\bm{\mu}^c_t)^\top]^\top
+\in \mathbb{R}^{N+M}$. The asset means are estimated from the equally weighted return of each economy, whose mean is
+shrunk toward zero with a James--Stein estimator, and the currency means are set to the negative forward premium
+$-\bm{f}_t$. Both estimators are defined and further discussed in \Cref{chap:optimization-framework}.
+
+In the sequential approach, the asset step and the currency step become
+\begin{equation} \label{eq:mad_mean_sep_asset}
+\begin{gathered}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \text{MAD}_t\biggl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \biggr)
+    - \frac{1}{\gamma}\, (\bm{\mu}^{fh}_t)^\top \bm{x}_t
+    + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \right\} \\[4pt]
+    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell^a,
+\end{gathered}
+\end{equation}
+\begin{equation} \label{eq:mad_mean_sep_curr}
+\begin{gathered}
+    \begin{aligned}
+    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \biggl\{ &
+    \text{MAD}_t\biggl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \biggr)
+    - \frac{1}{\gamma}\, (\bm{\mu}^c_t)^\top \bm{\psi}_t \\
+    & + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \biggr\}
+    \end{aligned} \\[4pt]
+    \text{s.t. } \|\bm{\psi}_t\|_1 \le \ell^c.
+\end{gathered}
+\end{equation}
+In the joint approach, problem \eqref{eq:mad_joint_obj} becomes
+\begin{equation} \label{eq:mad_mean_joint}
+\begin{gathered}
+    \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \left\{ \text{MAD}_t\biggl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \biggr)
+    - \frac{1}{\gamma}\, (\bm{\mu}^{\text{all}}_t)^\top \bm{\theta}_t
+    + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \right\} \\[4pt]
+    \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L}^a \bm{\theta}_t\|_1 \le \ell^a, \quad
+    \|\bm{L}^c \bm{\theta}_t\|_1 \le \ell^c,
+\end{gathered}
+\end{equation}
+where
+\begin{equation*}
+    \bm{L}^c = \begin{bmatrix} \bm{0}_{N \times N} & \bm{0}_{N \times M} \\ \bm{0}_{M \times N} & \bm{I}_M \end{bmatrix}
+\end{equation*}
+applies the leverage constraint to the currency exposures only. We add the currency leverage constraint to both the
+currency step and the joint program, since without it, the mean term can push the currency exposures toward very large
+positions.
 
 
 
