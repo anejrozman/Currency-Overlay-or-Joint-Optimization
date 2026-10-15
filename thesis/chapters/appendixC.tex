@@ -1,4 +1,4 @@
-\chapter{Optimization Derivation: Mean Absolute Deviation} \label{app:mad}
+\chapter{Optimization Derivation: Mean Absolute Deviation} \label{app:mad_derivation}
 
 In this appendix, we derive the optimization problems used in the main text for portfolio
 optimization under the mean absolute deviation (MAD) risk measure.
@@ -8,19 +8,94 @@ formulation to the multi-currency setting, considering sequential overlay optimi
 and joint optimization approaches. Finally, we discuss the implementation of 
 the optimization problems in Python using the CVXPY library. 
 
-\section{Linear Program Represenation of the Mean Absolute Deviation Portfolio Optimization Problem}\label{sec:mad-lp}
+\section{Definition and Representation for Portfolio Optimization} \label{app:mad_representation}
+
+We define the mean absolute deviation of the portfolio return, which Konno and Yamazaki \cite{KonnoYamazaki1991}
+propose as an alternative to variance for portfolio optimization. Unlike variance, mean absolute deviation requires no
+estimate of the covariance matrix and can be implemented efficiently as a linear program instead of a quadratic program. 
+
+Let $\bm{x}_t \in \mathbb{R}^N$ denote the portfolio weights, $\bm{R}_{t+1} \in \mathbb{R}^N$ the asset return vector
+and $\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}] \in \mathbb{R}^N$ the expected asset return. The mean absolute deviation
+of the portfolio return is
+\begin{equation} \label{eq:mad_def}
+    \text{MAD}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    = \mathbb{E}_t\bigl[ \lvert \bm{x}_t^\top \bm{\mu}_t - \bm{x}_t^\top \bm{R}_{t+1} \rvert \bigr].
+\end{equation}
+The inner map $\bm{x}_t \mapsto \bm{x}_t^\top (\bm{\mu}_t - \bm{R}_{t+1})$ is linear and the function
+$z \mapsto \lvert z \rvert$ is convex. The composition of a convex function with an affine map is convex
+\cite[Section~3.2.2]{boyd2004convex}. Expectation is a linear operator which preserves convexity, so the mean absolute
+deviation is convex in $\bm{x}_t$. Hence any local minimum is global, ensuring that the portfolio optimization problem
+under mean absolute deviation can be solved reliably with standard convex optimization methods.
+
+The portfolio optimization problem is
+\begin{equation} \label{eq:mad_risk_min}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \text{MAD}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr),
+    \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+\end{equation}
+where the budget constraint enforces full investment. Let $\bm{y}_1, \dots, \bm{y}_q \in \mathbb{R}^N$ denote $q$
+historical realizations of the asset return vector $\bm{R}_{t+1}$. As for semi-variance in \Cref{app:mv_svar_qp}, we
+approximate the expected asset return $\bm{\mu}_t$ by the sample mean
+$\bar{\bm{y}} = \frac{1}{q} \sum_{k=1}^q \bm{y}_k$ and the conditional expectation in \eqref{eq:mad_def} by the
+empirical average over this sample, so that the portfolio optimization problem under mean absolute deviation becomes
+\begin{equation} \label{eq:empirical_mad}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \frac{1}{q} \sum_{k=1}^q
+    \lvert \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k \rvert,
+    \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
+\end{equation}
+Each summand is convex but non-linear. Since the deviations $\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k$ sum
+to zero over the sample, the sum of their positive parts equals the sum of their negative parts, and the absolute value
+of each deviation is the sum of its two parts. The empirical mean absolute deviation is therefore twice the average
+shortfall of the portfolio return below its sample mean \cite{Speranza1993, OgryczakRuszczynski1999}
+\begin{equation} \label{eq:mad_identity}
+    \frac{1}{q} \sum_{k=1}^q \lvert \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k \rvert
+    = \frac{2}{q} \sum_{k=1}^q (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+.
+\end{equation}
+We linearize the right-hand side by introducing, for each observation $k$, an auxiliary variable $u_k \ge 0$ subject
+to
+\begin{equation} \label{eq:mad_slack}
+    u_k \ge \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k
+    \qquad \Longleftrightarrow \qquad
+    \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) + u_k \ge 0.
+\end{equation}
+The objective becomes
+$\frac{2}{q} \sum_{k=1}^q u_k = \frac{2}{q} \bm{1}_q^\top \bm{u}$. It is strictly increasing in each $u_k$ and
+minimized, so every $u_k$ is driven to its lower bound at the optimum,
+$u_k^* = (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+$. The portfolio optimization problem therefore has the
+constraints of the semi-variance program \eqref{eq:svar_base_qp}, with the auxiliary variables entering the objective
+linearly.
+
+By writing the decision variables in the vector
+$\tilde{\bm{x}}_t = [\bm{x}_t^\top, \bm{u}^\top]^\top \in \mathbb{R}^{N+q}$ and the constants in the vector
+\begin{equation*}
+    \bm{c} = \begin{bmatrix} \bm{0}_N^\top, & \dfrac{2}{q} \bm{1}_q^\top \end{bmatrix}^\top \in \mathbb{R}^{N+q},
+\end{equation*}
+the portfolio optimization problem \eqref{eq:empirical_mad} can be written as a linear program
+\begin{equation} \label{eq:mad_base_lp}
+\begin{aligned}
+    & \ \ \tilde{\bm{x}}_t^* = \argmin_{\tilde{\bm{x}}_t} \quad
+     \bm{c}^\top \tilde{\bm{x}}_t \\[4pt]
+    \text{s.t.} \quad
+    & \bm{D} \tilde{\bm{x}}_t =
+    \begin{bmatrix} \bm{1}_N^\top & \bm{0}_q^\top \end{bmatrix}
+    \tilde{\bm{x}}_t = E = 1, \\[2pt]
+    & \bm{A} \tilde{\bm{x}}_t =
+    \begin{bmatrix} -\mathring{\bm{R}}^{\text{data}} & -\bm{I}_q \end{bmatrix}
+    \tilde{\bm{x}}_t \le \bm{b} = \bm{0}_q, \\[2pt]
+    & u_k \ge 0 \quad \text{for } k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+Here $\bm{D} \in \mathbb{R}^{1 \times (N+q)}$ encodes the budget constraint, while
+$\bm{A} \in \mathbb{R}^{q \times (N+q)}$ and $\bm{b} \in \mathbb{R}^q$ encode the $q$ inequality constraints
+\eqref{eq:mad_slack}. The matrix
+$\mathring{\bm{R}}^{\text{data}} = \bm{R}^{\text{data}} - \bm{1}_q \bar{\bm{y}}^\top \in \mathbb{R}^{q \times N}$ is the
+demeaned sample matrix introduced in \Cref{app:mv_svar_qp}, where $\bm{R}^{\text{data}}$ is comprised of the sampled
+return vectors $\bm{y}_k^\top$ row by row, so that the $k$-th row of $\mathring{\bm{R}}^{\text{data}}$ is
+$(\bm{y}_k - \bar{\bm{y}})^\top$. This formulation serves as the base unregularized portfolio optimization problem under
+mean absolute deviation.
 
 \section{Regularization}\label{sec:mad-reg}
 
-\subsection{$L_1, L_2$ Regularization and Leverage Constraint} \label{sec:mad-l1l2}
-
-\subsection{Quadratic Program Representaion of the Regularized Portfolio Optimization Problem} \label{sec:mad-qp}
-
-\section{Sequential Overlay Optimization} \label{sec:mad-sequential}
-
-\subsection{Asset Optimizaiton} \label{sec:mad-asset}
-
-\subsection{Currency Overlay Optimization} \label{sec:mad-currency}
+\section{Sequential Optimization} \label{sec:mad-sequential}
 
 \section{Joint Optimization} \label{sec:mad-joint}
 

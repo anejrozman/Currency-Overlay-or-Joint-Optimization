@@ -55,6 +55,12 @@ Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
 \newblock Noise sensitivity of portfolio selection under various risk measures.
 \newblock {\em Journal of Banking \& Finance}, 31(5):1545--1573, 2007.
 
+\bibitem{KonnoYamazaki1991}
+Hiroshi Konno and Hiroaki Yamazaki.
+\newblock Mean-absolute deviation portfolio optimization model and its
+  applications to {Tokyo} stock market.
+\newblock {\em Management Science}, 37(5):519--531, 1991.
+
 \bibitem{Krokhmal2007}
 Pavlo~A. Krokhmal.
 \newblock Higher moment coherent risk measures.
@@ -115,6 +121,12 @@ Christopher~J. Neely, Paul~A. Weller, and Joshua~M. Ulrich.
 \newblock {\em Journal of Financial and Quantitative Analysis}, 44(2):467--488,
   2009.
 
+\bibitem{OgryczakRuszczynski1999}
+W{\l}odzimierz Ogryczak and Andrzej Ruszczy{\'n}ski.
+\newblock From stochastic dominance to mean-risk models: Semideviations as risk
+  measures.
+\newblock {\em European Journal of Operational Research}, 116(1):33--50, 1999.
+
 \bibitem{safe_haven_currencies}
 Angelo Ranaldo and Paul Söderlind.
 \newblock Safe haven currencies.
@@ -140,6 +152,11 @@ Thierry Roncalli.
 \newblock {\em Introduction to Risk Parity and Budgeting}.
 \newblock Chapman \& Hall/CRC Financial Mathematics Series. Chapman \&
   Hall/CRC, Boca Raton, FL, 2013.
+
+\bibitem{Speranza1993}
+Maria~Grazia Speranza.
+\newblock Linear programming models for portfolio optimization.
+\newblock {\em Finance}, 14:107--123, 1993.
 
 \bibitem{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 Patrick~Lucescu Urban~Ulrych.
