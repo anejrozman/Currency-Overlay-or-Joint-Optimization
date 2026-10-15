@@ -1,13 +1,11 @@
 \chapter{Optimization Derivation: Expected Shortfall and Second-Order Expected Shortfall} \label{app:es_derivation}
 
-In this appendix, we derive theportfolio optimization problems used in the main text, building up from the definitions of
+In this appendix, we derive the portfolio optimization problems used in the main text, building up from the definitions of
 Expected Shortfall and second-order Expected Shortfall to the programs solved in the empirical analysis.
-In \Cref{app:es_auxiliary_formulation} we follow \cite{RockafellarUryasev2000} to derive the auxiliary formulation of
-Expected Shortfall and introduce second-order Expected Shortfall, which Krokhmal \cite{Krokhmal2007} defines through an
-auxiliary formulation of the same type. In \Cref{app:linear-program-representation} we approximate both auxiliary
-functions on historical returns and write the risk minimization problem as a linear program for Expected Shortfall
+In \Cref{app:es_auxiliary_formulation} we derive the auxiliary formulation of
+Expected Shortfall and introduce second-order Expected Shortfall. In \Cref{app:linear-program-representation} we write the portfolio optimization problem as a linear program for Expected Shortfall
 and as a second-order cone program for second-order Expected Shortfall. In \Cref{app:regularization} we regularize the programs by adding an $L^1$
-penalty, an $L^2$ penalty and a leverage constraint. Following \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we
+penalty, an $L^2$ penalty and a leverage constraint. We
 then extend the programs to the multi-currency setting, for sequential optimization in \Cref{app:separate-optimization}
 and for joint optimization in \Cref{app:joint-optimization}. Finally, in \Cref{app:mean-risk} we add the expected
 portfolio return to the objectives of the sequential and joint problems.
@@ -18,12 +16,11 @@ We derive the equivalence between the direct minimization of Expected Shortfall 
 by Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and introduce second-order Expected Shortfall, which Krokhmal
 \cite{Krokhmal2007} defines directly through an auxiliary formulation of the same type. The two formulations
 allow for writing the portfolio optimization problem as a linear program for Expected Shortfall and as a second-order cone
-program for second-order Expected Shortfall.
+program for second-order Expected Shortfall in \Cref{app:linear-program-representation}.
 
 \subsection{Expected Shortfall} \label{app:es_auxiliary}
 
-We assume that the loss distribution is continuous and has a strictly increasing cumulative distribution function,
-meaning the cumulative distribution function has neither jumps nor flat sections, and additionally that its probability density
+We assume that the loss distribution is continuous and has a strictly increasing cumulative distribution function and additionally that its probability density
 function exists. Under these assumptions, the Value-at-Risk (VaR) defined below is the unique point at which the
 cumulative distribution function equals the confidence level \cite{QuantitativeRiskManagement2016}. The assumptions
 simplify the derivation but are not needed for the result. Rockafellar and Uryasev \cite{RockafellarUryasev2002} show
@@ -31,6 +28,7 @@ that the equivalence derived below holds for general loss distributions, includi
 \Cref{app:linear-program-representation}, when Expected Shortfall is defined as the average of the quantiles of the loss
 distribution over all levels above the confidence level \cite{acerbi2002coherenceexpectedshortfall}.
 
+\newpage
 Define the loss random variable at time $t+1$, given portfolio weights $\bm{x}_t\in\mathbb{R}^N$, as $L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$, where $\bm{R}_{t+1}\in\mathbb{R}^N$ is the asset return vector. Let $f(l)$ denote the probability density function of the loss $L(\bm{x}_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
 \begin{equation*}
     \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha : \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
@@ -119,23 +117,22 @@ equivalent to minimizing $G_\beta(\bm{x}_t, \alpha)$ jointly with respect to $\b
     \big\| (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+ \big\|_{L^2} \right).
 \end{equation}
 
-Since both $F_\beta$ and $G_\beta$ are jointly convex, any local minimum is global, ensuring that
+Since both $F_\beta$ and $G_\beta$ are convex, any local minimum is global, ensuring that
 both optimization problems can be solved reliably with standard convex optimization methods.
 
 \section{Representation for Portfolio Optimization} \label{app:linear-program-representation}
  
-Let $\rho_\beta \in \{\text{ES}_\beta, \text{SOES}_\beta\}$ denote either of the two risk measures, written as a
-function of the portfolio return. The portfolio optimization problem is
+Let $\rho_\beta$ denote either of the two risk measures, written as a
+function of the portfolio return $\bm{x}_t^\top \bm{R}_{t+1}$. The portfolio optimization problem is
 \begin{equation} \label{eq:risk_min}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \rho_\beta\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation}
 where the budget constraint enforces full investment. By \eqref{eq:joint_opt} and \eqref{eq:soes_joint_opt}, problem
 \eqref{eq:risk_min} is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ or $G_\beta(\bm{x}_t, \alpha)$ jointly
-with respect to $\bm{x}_t$ and $\alpha$, which we write as a linear program for Expected Shortfall in
-\Cref{app:lp_es} and as a second-order cone program for second-order Expected Shortfall in \Cref{app:socp_soes}.
+with respect to $\bm{x}_t$ and $\alpha$.
 Each program in this appendix defines its own decision vector, vector of constants and penalty and constraint matrices, so
 the same symbols denote slightly different objects in different programs, and we refer to a specific program by its equation
-number. 
+number when discussing them. 
 
 
 \subsection{Expected Shortfall} \label{app:lp_es}
@@ -161,8 +158,7 @@ observation $k$, an auxiliary variable $u_k \ge 0$ subject to
 \end{equation}
 Replacing each summand by $u_k$, the objective becomes $\alpha + \frac{1}{q(1-\beta)} \sum_{k=1}^q u_k$. It is
 strictly increasing in each $u_k$ and minimized, so every $u_k$ is driven to its lower bound at the optimum,
-$u_k^* = (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$. The slack constraints therefore reproduce the term
-$(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ while keeping all relations linear.
+$u_k^* = (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$. 
 
 By collecting the decision variables in the vector
 \begin{equation*}
@@ -255,9 +251,7 @@ the portfolio optimization problem \eqref{eq:empirical_soes} can be written as a
 \end{aligned}
 \end{equation}
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+2)}$ and $\bm{A} \in \mathbb{R}^{q \times (N+q+2)}$ are the constraint
-matrices of \eqref{eq:base_lp} with a zero column added for the variable $s$. Problem \eqref{eq:base_socp} has a linear objective
-subject to one linear equality, $q$ linear inequalities and one second-order cone constraint, and is thus a
-second-order cone program. This formulation serves as the base unregularized portfolio optimization problem under
+matrices of \eqref{eq:base_lp} with a zero column added for the variable $s$. This formulation serves as the base unregularized portfolio optimization problem under
 second-order Expected Shortfall.
 
 \section{Regularization} \label{app:regularization}
@@ -401,13 +395,13 @@ with a convex quadratic objective
 \end{aligned}
 \end{equation}
 Here $\tilde{\bm{D}}$ and $\tilde{\bm{A}}$ are the constraint matrices of \eqref{eq:reg_qp} with a zero column added
-for the variable $s$, and the cone constraint is the one of \eqref{eq:base_socp}.
+for the variable $s$, and the cone constraint is the same as in \eqref{eq:base_socp}.
 
 \section{Sequential Optimization} \label{app:separate-optimization}
 So far, we have formulated the portfolio optimization problem over the asset weights only. An international portfolio,
-however, holds assets and currency forward positions, so constructing it
+however, holds assets and currency positions as well, so constructing it
 also requires selecting currency exposures. In the sequential portfolio optimization approach, the asset weights and currency exposures are optimized in two steps. First, the
-asset weights $\bm{x}_t \in \mathbb{R}^N$ are optimized on the fully hedged returns, then, conditional on the optimal
+asset weights $\bm{x}_t$ are optimized on the fully hedged returns, then, conditional on the optimal
 $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The two optimization steps are given
 by
 \begin{equation} \label{eq:sep_asset_obj}
@@ -566,7 +560,7 @@ $\bm{\theta}_t^\top \bm{q}_{N,M} = \bm{x}_t^\top \bm{1}_N = 1$, leaving the curr
 zero-investment overlay. The matrix $\bm{L}^a$ applies the leverage constraint
 to the asset weights only, giving $\|\bm{L}^a\bm{\theta}_t\|_1 = \|\bm{x}_t\|_1$. The diagonal regularization
 matrices $\bm{S}_1$ and $\bm{S}_2$ allow the asset and currency penalties to differ within a
-single objective,
+single objective
 \begin{equation*}
     \|\bm{S}_1 \bm{\theta}_t\|_1 = \lambda_1^a \|\bm{x}_t\|_1 + \lambda_1^c \|\bm{\psi}_t\|_1,
     \qquad

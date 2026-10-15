@@ -46,16 +46,16 @@
 \contentsline {subsection}{\numberline {A.2.2}Second-Order Expected Shortfall}{48}{subsection.A.2.2}%
 \contentsline {section}{\numberline {A.3}Regularization}{49}{section.A.3}%
 \contentsline {subsection}{\numberline {A.3.1}$L^1$ Regularization}{49}{subsection.A.3.1}%
-\contentsline {subsection}{\numberline {A.3.2}$L^2$ Regularization}{50}{subsection.A.3.2}%
+\contentsline {subsection}{\numberline {A.3.2}$L^2$ Regularization}{49}{subsection.A.3.2}%
 \contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{50}{subsection.A.3.3}%
 \contentsline {subsection}{\numberline {A.3.4}Expected Shortfall}{50}{subsection.A.3.4}%
-\contentsline {subsection}{\numberline {A.3.5}Second-Order Expected Shortfall}{51}{subsection.A.3.5}%
+\contentsline {subsection}{\numberline {A.3.5}Second-Order Expected Shortfall}{50}{subsection.A.3.5}%
 \contentsline {section}{\numberline {A.4}Sequential Optimization}{51}{section.A.4}%
 \contentsline {subsection}{\numberline {A.4.1}Currency Overlay under Expected Shortfall}{52}{subsection.A.4.1}%
-\contentsline {subsection}{\numberline {A.4.2}Currency Overlay under Second-Order Expected Shortfall}{53}{subsection.A.4.2}%
+\contentsline {subsection}{\numberline {A.4.2}Currency Overlay under Second-Order Expected Shortfall}{52}{subsection.A.4.2}%
 \contentsline {section}{\numberline {A.5}Joint Optimization}{53}{section.A.5}%
 \contentsline {subsection}{\numberline {A.5.1}Joint Optimization under Expected Shortfall}{54}{subsection.A.5.1}%
-\contentsline {subsection}{\numberline {A.5.2}Joint Optimization under Second-Order Expected Shortfall}{55}{subsection.A.5.2}%
+\contentsline {subsection}{\numberline {A.5.2}Joint Optimization under Second-Order Expected Shortfall}{54}{subsection.A.5.2}%
 \contentsline {section}{\numberline {A.6}Mean-Risk Optimization}{55}{section.A.6}%
 \contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Variance and Semi-Variance}{57}{appendix.B}%
 \contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{57}{section.B.1}%
