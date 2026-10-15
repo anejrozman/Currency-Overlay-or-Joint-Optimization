@@ -60,13 +60,13 @@ where the budget constraint enforces full investment. Each program in this appen
 vector of constants and penalty and constraint matrices, so the same symbols denote slightly different objects in
 different programs, and we refer to a specific program by its equation number when discussing them.
 
-\subsection{Variance} \label{app:mv_var_qp}
+\subsection{Variance} \label{app:mv_var_qp} 
 
 By \eqref{eq:variance_def}, the objective of problem \eqref{eq:mv_risk_min} under variance is the quadratic form
 $\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$. In the programs, $\bm{\Sigma}_t$ is the Ledoit--Wolf estimator of the covariance
 matrix defined in \Cref{chap:optimization-framework}, which is positive semi-definite, so the convexity shown in
 \Cref{app:mv_definitions} is preserved. With the decision vector $\bm{x}_t \in \mathbb{R}^N$ and the penalty matrix
-$\bm{Q} = \bm{\Sigma}_t \in \mathbb{R}^{N \times N}$, the portfolio optimization problem \eqref{eq:mv_risk_min} under
+$\bm{Q} = \bm{\Sigma}_t \in \mathbb{R}^{N \times N}$, the portfolio optimization problem under
 variance can be written as a quadratic program
 \begin{equation} \label{eq:var_base_qp}
 \begin{aligned}
@@ -76,9 +76,7 @@ variance can be written as a quadratic program
     & \bm{D} \bm{x}_t = \bm{1}_N^\top \bm{x}_t = E = 1.
 \end{aligned}
 \end{equation}
-Here $\bm{D} = \bm{1}_N^\top \in \mathbb{R}^{1 \times N}$ encodes the budget constraint. Problem \eqref{eq:var_base_qp}
-has a convex quadratic objective subject to one linear equality, and is thus a quadratic program solvable with standard
-methods. This formulation serves as the base unregularized portfolio optimization problem under variance.
+Here $\bm{D} = \bm{1}_N^\top \in \mathbb{R}^{1 \times N}$ encodes the budget constraint. This formulation serves as the base unregularized portfolio optimization problem under variance.
 
 \subsection{Semi-Variance} \label{app:mv_svar_qp}
 
@@ -95,15 +93,15 @@ so that the portfolio optimization problem under semi-variance becomes
     \bm{x}_t^* = \argmin_{\bm{x}_t} \frac{1}{q} \sum_{k=1}^q \bigl( (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+ \bigr)^2,
     \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
 \end{equation}
-Because of the positive part, each summand is only piecewise quadratic in $\bm{x}_t$. As for Expected Shortfall in
-\Cref{app:lp_es}, we remove the positive part by introducing, for each observation $k$, an auxiliary variable
+Each summand is only piecewise quadratic in $\bm{x}_t$. Following \cite{Markowitz1993}, and as for Expected Shortfall in \Cref{app:lp_es},
+we modify it by introducing, for each observation $k$, an auxiliary variable
 $u_k \ge 0$ subject to
 \begin{equation} \label{eq:svar_slack}
-    u_k \ge \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k
+    u_k \ge \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k 
     \qquad \Longleftrightarrow \qquad
     \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) + u_k \ge 0.
 \end{equation}
-Replacing each positive part by $u_k$, the objective becomes $\frac{1}{q} \sum_{k=1}^q u_k^2 = \frac{1}{q}
+The objective becomes $\frac{1}{q} \sum_{k=1}^q u_k^2 = \frac{1}{q}
 \|\bm{u}\|_2^2$. It is strictly increasing in each $u_k \ge 0$ and minimized, so every $u_k$ is driven to its lower
 bound at the optimum, $u_k^* = (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+$.
 
@@ -127,334 +125,277 @@ the portfolio optimization problem \eqref{eq:empirical_svar} can be written as a
     \begin{bmatrix} \bm{1}_N^\top & \bm{0}_q^\top \end{bmatrix}
     \tilde{\bm{x}}_t = E = 1, \\[2pt]
     & \bm{A} \tilde{\bm{x}}_t =
-    \begin{bmatrix} -\check{\bm{R}}^{\text{data}} & -\bm{I}_q \end{bmatrix}
+    \begin{bmatrix} -\mathring{\bm{R}}^{\text{data}} & -\bm{I}_q \end{bmatrix}
     \tilde{\bm{x}}_t \le \bm{b} = \bm{0}_q, \\[2pt]
     & u_k \ge 0 \quad \text{for } k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q)}$ encodes the budget constraint, while $\bm{A} \in \mathbb{R}^{q \times (N+q)}$
 and $\bm{b} \in \mathbb{R}^q$ encode the $q$ inequality constraints \eqref{eq:svar_slack}. The matrix
-$\check{\bm{R}}^{\text{data}} = \bm{R}^{\text{data}} - \bm{1}_q \bar{\bm{y}}^\top \in \mathbb{R}^{q \times N}$ is the
+$\mathring{\bm{R}}^{\text{data}} = \bm{R}^{\text{data}} - \bm{1}_q \bar{\bm{y}}^\top \in \mathbb{R}^{q \times N}$ is the
 demeaned sample matrix, where $\bm{R}^{\text{data}}$ is comprised of the sampled return vectors $\bm{y}_k^\top$ row by
-row as in \Cref{app:lp_es}, so that the $k$-th row of $\check{\bm{R}}^{\text{data}}$ is $(\bm{y}_k - \bar{\bm{y}})^\top$.
-
-Problem \eqref{eq:svar_base_qp} has a convex quadratic objective subject to one linear equality and $q$ linear
-inequalities, and is thus a quadratic program solvable with standard methods. This formulation serves as the base
+row as in \Cref{app:lp_es}, so that the $k$-th row of $\mathring{\bm{R}}^{\text{data}}$ is $(\bm{y}_k - \bar{\bm{y}})^\top$.
+This formulation serves as the base
 unregularized portfolio optimization problem under semi-variance.
 
 
 \section{Regularization} \label{app:mv_regularization}
 
-The base problem \eqref{eq:mv_base_qp} is well-documented to suffer from instability. 
-The weights are sensitive to estimation
-error in $\bm{\mu}_t$ and $\bm{\Sigma}_t$ and tend to take extreme, concentrated values,
-so that portfolios formed from the raw sample moments perform poorly out of sample
-\citep{Michaud1989, SparseAndStableInternationalPortfolioOptimization}. We stabilize the problem with two complementary approaches. 
-First, we regularize the weights directly through an $L_1$-norm
-penalty that promotes sparsity, an $L_2$-norm penalty that promotes shrinkage, and a
-leverage constraint that bounds gross exposure. These are the same three techniques
-appended to the Expected Shortfall optimizationprogram in \Cref{app:regularization}. 
-Second, we shrink the input estimators $\bm{\mu}_t$ and
-$\bm{\Sigma}_t$ themselves toward more stable targets. Both preserve the convex
-quadratic structure of \eqref{eq:mv_base_qp}.
+The base problems \eqref{eq:var_base_qp} and \eqref{eq:svar_base_qp} are known to be unstable in high-dimensional
+settings, where the programs are prone to producing extreme and concentrated weights \citep{Michaud1989, kondor2007noise}. As for
+Expected Shortfall, we stabilize them with the $L^1$ penalty, the $L^2$ penalty and the asset leverage constraint of
+Sections~\ref{app:l1}--\ref{app:leverage}, using the decomposition \eqref{eq:l1_decomp} of the weights into positive
+and negative parts and the leverage constraint \eqref{eq:leverage_constraint}.
 
-\subsection{$L_1$, $L_2$ Regularization and Leverage Constraint} \label{app:mv_l1_l2_lev_reg}
+\subsection{Variance} \label{app:mv_var_reg}
 
-The $L_1$ penalty $\lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \sum_{i=1}^N |x_{i,t}|$, with
-$\lambda_1 \ge 0$, is linearized just like in Appendix \ref{app:l1}. Each weight is split into
-its positive and negative parts through the auxiliary variables $\Delta_{i,t}^+ \ge 0$
-and $\Delta_{i,t}^- \ge 0$, giving
-\begin{equation*}
-    \lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-).
-\end{equation*}
-The leverage constraint
-$\|\bm{x}_t\|_1 \le \ell$, with $\ell \ge 1$, reuses the same decomposition and is the
-single linear inequality
-\begin{equation*}
-    \|\bm{x}_t\|_1 = \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-) \le \ell.
-\end{equation*}
-As before, the choice $\ell = 1$ rules out leverage
-entirely and is equivalent to a hard $L_1$ constraint.
-
-The $L_2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2 = \lambda_2 \bm{x}_t^\top \bm{x}_t$, with
-$\lambda_2 \ge 0$, is the quadratic form $\tfrac{1}{2} \bm{x}_t^\top (2\lambda_2 \bm{I}_N) \bm{x}_t$,
-as in Appendix \ref{app:l2}. Here the mean-variance and Expected Shortfall cases differ. In the
-Expected Shortfall program, the $L_2$ term is what turns
-the linear program \eqref{eq:base_lp} into a quadratic program. The mean-variance
-objective \eqref{eq:mv_objective} is already quadratic through the variance term, so the
-$L_2$ penalty does not change the program class. Instead, it adds to the existing
-quadratic form and combines with the covariance into the single term
-\begin{equation*}
-    \tfrac{\gamma}{2}\, \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t + \lambda_2 \bm{x}_t^\top \bm{x}_t
-    = \tfrac{1}{2}\, \bm{x}_t^\top \left( \gamma \bm{\Sigma}_t + 2\lambda_2 \bm{I}_N \right) \bm{x}_t.
-\end{equation*}
-Because $\gamma \bm{\Sigma}_t$ is positive semi-definite and $2\lambda_2 \bm{I}_N$ is
-positive definite for $\lambda_2 > 0$, the combined matrix is positive definite, so the
-penalized objective is strictly convex and admits a unique minimizer even when the
-covariance estimator $\bm{\Sigma}_t$ is singular, which occurs when the number of assets
-exceeds the number of observations. The combined term also makes the stabilizing role
-of the penalty explicit, since $\gamma \bm{\Sigma}_t + 2\lambda_2 \bm{I}_N = \gamma(\bm{\Sigma}_t + \tfrac{2\lambda_2}{\gamma} \bm{I}_N)$
-shrinks the covariance toward a scaled identity. The $L_2$ penalty can therefore be interpreted
-as a covariance shrinkage toward the identity \cite{Li2015}, complementing the
-estimator shrinkage introduced in \Cref{app:estimators}.
-
-\subsection{Estimators} \label{app:estimators}
-
-The program \eqref{eq:mv_base_qp} depends on the unknown mean $\bm{\mu}_t$ and
-covariance $\bm{\Sigma}_t$. Replacing them by the sample mean $\bar{\bm{\mu}}_t$ and
-the sample covariance $\bm{S}_t$ is the approach, which is known to produce
-unstable and poorly diversified portfolios, as the optimization amplifies estimation
-error in these inputs \citep{Michaud1989, LedoitWolf2003}. We instead replace each
-input by a shrinkage estimator, $\bm{\mu}_t = \bm{\mu}_t^{BS}$ and
-$\bm{\Sigma}_t = \bm{\Sigma}_t^{LW}$, following \cite{SparseAndStableInternationalPortfolioOptimization}.
-
-For estimating the mean, we use the Bayes--Stein estimator introduced in \cite{Jorion1986BayesStein}, which
-shrinks the sample mean towards a fixed shrinkage target. The shrinkage target is the return
-of the minimum-variance portfolio
-\begin{equation*}
-    \mu_0 = \frac{\bm{1}_N^\top \bm{S}_t^{-1} \bar{\bm{\mu}}_t}{\bm{1}_N^\top \bm{S}_t^{-1} \bm{1}_N},
-\end{equation*}
-and the Bayes--Stein estimator is the convex combination
-\begin{equation*}
-    \bm{\mu}_t^{BS} = (1 - \hat{\omega})\, \bar{\bm{\mu}}_t + \hat{\omega}\, \mu_0\, \bm{1}_N,
-    \qquad
-    \hat{\omega} = \frac{N+2}{(N+2) + q\,(\bar{\bm{\mu}}_t - \mu_0 \bm{1}_N)^\top \bm{S}_t^{-1} (\bar{\bm{\mu}}_t - \mu_0 \bm{1}_N)},
-\end{equation*}
-where $q$ is the number of observations in the estimation window, $N$ the number of
-assets, and $\hat{\omega} \in [0,1]$ the shrinkage intensity. The intensity increases
-toward one as the sample size gets smaller, or as the variance of the sample means around
-$\mu_0$ decreases. This pulls the estimator toward the shrinkage target when the data is least
-informative. The derivation of the estimator is given in \cite{Jorion1986BayesStein}.
-
-For estimating the covariance matrix, we use the Ledoit--Wolf linear shrinkage estimator introduced in \cite{LedoitWolf2004},
-which shrinks the sample covariance toward a shrinkage target. The Ledoit--Wolf estimator is the convex combination
-\begin{equation*}
-    \bm{\Sigma}_t^{LW} = \hat{v}\, \bm{F}_t + (1 - \hat{v})\, \bm{S}_t,
-\end{equation*}
-with shrinkage intensity $\hat{v} \in [0,1]$. The shrinkage target $\bm{F}_t$ is the
-constant-correlation matrix, which retains the sample variances and replaces every
-pairwise correlation by the average sample correlation
-\begin{equation*}
-    F_{ii,t} = S_{ii,t}, \qquad
-    F_{ij,t} = \bar{\rho}_t \sqrt{S_{ii,t}\, S_{jj,t}}\ \ (i \neq j), \qquad
-    \bar{\rho}_t = \frac{2}{N(N-1)} \sum_{i < j} \frac{S_{ij,t}}{\sqrt{S_{ii,t}\, S_{jj,t}}}.
-\end{equation*}
-The intensity $\hat{v}$ is chosen to minimize the expected Frobenius distance between
-$\bm{\Sigma}_t^{LW}$ and the true covariance matrix, its closed form is derived in
-\cite{LedoitWolf2004}. Both $\bm{F}_t$ and $\bm{S}_t$ are positive semi-definite, so
-$\bm{\Sigma}_t^{LW}$ is positive semi-definite and the convexity established in
-\Cref{app:mv_qp_representation} is preserved under estimation.
-
-The estimators above are stated for a single asset block. In the multi-currency setting,
-the asset and currency means and covariances, and in the separate approach the
-covariance of the augmented currency-overlay problem, are constructed analogously, we
-defer their specification to \Cref{app:mv_separate} and \Cref{app:mv_joint}. % Delete this later
-
-\subsection{Quadratic Program Representation of the Regularized Portfolio Optimization} \label{app:mv_reg_qp}
-
-Adding the three weight-level regularizers to the base problem \eqref{eq:mv_objective}
-gives the regularized mean-variance problem
-\begin{align}
-    \bm{x}_t^* = \argmin_{\bm{x}_t} & \left\{ -\bm{\mu}_t^{BS\top} \bm{x}_t
-    + \tfrac{\gamma}{2}\, \bm{x}_t^\top \bm{\Sigma}^{LW}_t \bm{x}_t
-    + \lambda_1 \|\bm{x}_t\|_1 + \lambda_2 \|\bm{x}_t\|_2^2 \right\},\label{eq:mv_reg_objective} \\
-     & \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell, \nonumber
-\end{align}
-Following the $L_1$ decomposition, we extend the
-decision vector to carry the positive and negative parts of the weights
+Adding the three regularization terms to the base problem \eqref{eq:var_base_qp} extends the decision vector to
 \begin{equation*}
     \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top \end{bmatrix}^\top
     \in \mathbb{R}^{3N},
 \end{equation*}
-and define the cost vector and the penalty matrix
+with the constants in the vector
 \begin{equation*}
-    \tilde{\bm{c}} = \begin{bmatrix} -\bm{\mu}_t^{BS\top},& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top,
-    \qquad
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
     \tilde{\bm{Q}} =
     \begin{bmatrix}
-        \gamma \bm{\Sigma}^{LW}_t + 2\lambda_2 \bm{I}_N & \bm{0}_{N \times 2N} \\
+        \bm{\Sigma}_t + \lambda_2 \bm{I}_N & \bm{0}_{N \times 2N} \\
         \bm{0}_{2N \times N} & \bm{0}_{2N \times 2N}
     \end{bmatrix}.
 \end{equation*}
-The regularized mean-variance portfolio optimization problem is then the quadratic program
-\begin{equation} \label{eq:mv_reg_qp}
+Since $\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t + \lambda_2 \bm{x}_t^\top \bm{x}_t
+= \bm{x}_t^\top (\bm{\Sigma}_t + \lambda_2 \bm{I}_N) \bm{x}_t$, the $L^2$ penalty shrinks the covariance estimate toward
+a scaled identity matrix \cite{Li2015}. The portfolio optimization problem under variance then becomes a quadratic program
+with linear constraints
+\begin{equation} \label{eq:var_reg_qp}
 \begin{aligned}
     \tilde{\bm{x}}_t^* &= \argmin_{\tilde{\bm{x}}_t} \quad
-    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tfrac{1}{2}\, \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
+    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
     \text{s.t.} \quad
-    \tilde{\bm{D}} \tilde{\bm{x}}_t &=
+     \tilde{\bm{D}} \tilde{\bm{x}}_t &=
     \begin{bmatrix} \bm{1}_N^\top & \bm{0}_N^\top & \bm{0}_N^\top \\
     \bm{I}_N & \bm{I}_N & -\bm{I}_N \end{bmatrix} \tilde{\bm{x}}_t
     = \tilde{\bm{E}} = \begin{bmatrix} 1 \\ \bm{0}_N \end{bmatrix}, \\[6pt]
-    \tilde{\bm{A}} \tilde{\bm{x}}_t &=
+     \tilde{\bm{A}} \tilde{\bm{x}}_t &=
     \begin{bmatrix} \bm{0}_N^\top & \bm{1}_N^\top & \bm{1}_N^\top \end{bmatrix} \tilde{\bm{x}}_t
-    \le b = \ell, \\[4pt]
-    \Delta_{i,t}^- &\ge 0, \quad \Delta_{i,t}^+ \ge 0
+    \le \tilde{b} = \ell^a, \\[6pt]
+     \Delta_{i,t}^- \ge 0, & \quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N.
 \end{aligned}
 \end{equation}
-The first row of $\tilde{\bm{D}}$ enforces the budget constraint and the remaining $N$
-rows enforce the weight decomposition \eqref{eq:l1_decomp}. The single row of
-$\tilde{\bm{A}}$ imposes the leverage constraint \eqref{eq:leverage_constraint}, giving
-$\bm{1}_N^\top(\bm{\Delta}_t^+ + \bm{\Delta}_t^-) = \|\bm{x}_t\|_1 \le \ell$.
+The first row of $\tilde{\bm{D}}$ enforces the budget constraint and the remaining $N$ rows enforce the weight
+decomposition \eqref{eq:l1_decomp}, while the single row of $\tilde{\bm{A}}$ imposes the leverage constraint
+\eqref{eq:leverage_constraint}.
 
-Compared with the regularized Expected Shortfall program \eqref{eq:reg_qp}, the
-mean-variance program is smaller. Its decision vector has dimension $3N$ rather
-than $3N + q + 1$.
-This formulation serves as the regularized base problem under the mean-variance
-criterion. The asset and currency extensions under the separate and joint approaches are
-derived in \Cref{app:mv_separate} and \Cref{app:mv_joint}.
+\subsection{Semi-Variance} \label{app:mv_svar_reg}
 
-\section{Separate (Currency Overlay) Optimization} \label{app:mv_separate}
+Adding the same three regularization terms to the base problem \eqref{eq:svar_base_qp} extends the decision vector to
+\begin{equation*}
+    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \bm{u}^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top \end{bmatrix}^\top
+    \in \mathbb{R}^{3N+q},
+\end{equation*}
+with the constants in the vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& \bm{0}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \lambda_2 \bm{I}_N & \bm{0}_{N \times q} & \bm{0}_{N \times 2N} \\
+        \bm{0}_{q \times N} & \tfrac{1}{q} \bm{I}_q & \bm{0}_{q \times 2N} \\
+        \bm{0}_{2N \times N} & \bm{0}_{2N \times q} & \bm{0}_{2N \times 2N}
+    \end{bmatrix}.
+\end{equation*}
+The sample semi-variance in \eqref{eq:empirical_svar} equals $\bm{x}_t^\top \bm{\Sigma}^-(\bm{x}_t)\, \bm{x}_t$, where
+\begin{equation*}
+    \bm{\Sigma}^-(\bm{x}_t) = \frac{1}{q} \sum_{k \,:\, \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) < 0}
+    (\bm{y}_k - \bar{\bm{y}})(\bm{y}_k - \bar{\bm{y}})^\top
+\end{equation*}
+is the sample semicovariance matrix of the observations below the portfolio mean, so the semi-variance and the $L^2$
+penalty together equal $\bm{x}_t^\top (\bm{\Sigma}^-(\bm{x}_t) + \lambda_2 \bm{I}_N) \bm{x}_t$. The penalty shrinks this
+semicovariance matrix toward a scaled identity matrix in the same way as it does for the variance. 
+The portfolio optimization problem under semi-variance
+then becomes a quadratic program with linear constraints
+\begin{equation} \label{eq:svar_reg_qp}
+\begin{aligned}
+    \tilde{\bm{x}}_t^* &= \argmin_{\tilde{\bm{x}}_t} \quad
+    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
+    \text{s.t.} \quad
+     \tilde{\bm{D}} \tilde{\bm{x}}_t &=
+    \begin{bmatrix} \bm{1}_N^\top & \bm{0}_q^\top & \bm{0}_N^\top & \bm{0}_N^\top \\
+    \bm{I}_N & \bm{0}_{N \times q} & \bm{I}_N & -\bm{I}_N \end{bmatrix} \tilde{\bm{x}}_t
+    = \tilde{\bm{E}} = \begin{bmatrix} 1 \\ \bm{0}_N \end{bmatrix}, \\[6pt]
+     \tilde{\bm{A}} \tilde{\bm{x}}_t &=
+    \begin{bmatrix} -\mathring{\bm{R}}^{\text{data}} & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} \\
+    \bm{0}_N^\top & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top \end{bmatrix} \tilde{\bm{x}}_t
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+     u_k \ge 0, & \quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+    \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+The first row of $\tilde{\bm{D}}$ enforces the budget constraint and the remaining $N$ rows enforce the weight
+decomposition \eqref{eq:l1_decomp}. The first $q$ rows of $\tilde{\bm{A}}$ encode the inequality constraints
+\eqref{eq:svar_slack}, extended with zeros for the new variables, and the final row of $\tilde{\bm{A}}$ imposes the
+leverage constraint \eqref{eq:leverage_constraint}.
 
-In the separate (currency overlay) portfolio optimization approach, the asset and
-currency allocations are optimized in two sequential steps. First, the asset weights
-$\bm{x}_t \in \mathbb{R}^N$ are optimized on the fully hedged returns, then, conditional
-on the optimal $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are
-optimized. Let
-\begin{align*}
-    \bm{\mu}^{fh} &= \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N, &
-    \bm{\Sigma}^a &= \mathrm{Var}_t(\bm{R}^{fh}_{t+1}) \in \mathbb{R}^{N \times N}, \\
-    \bm{\mu}^c &= \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M, &
-    \bm{\Sigma}^c &= \mathrm{Var}_t(\bm{e}_{t+1} - \bm{f}_t) \in \mathbb{R}^{M \times M},
-\end{align*}
-denote the expected fully hedged asset return and excess currency return together with
-their covariance matrices, and let
-$\bm{\Sigma}^{ac} = \mathrm{Cov}_t(\bm{R}^{fh}_{t+1},\, \bm{e}_{t+1} - \bm{f}_t) \in \mathbb{R}^{N \times M}$
-denote the cross-covariance between fully hedged asset returns and excess currency
-returns. Each moment is the corresponding shrinkage estimator of \Cref{app:estimators}.
-The two optimization steps are then given by
+\section{Sequential Optimization} \label{app:mv_separate}
+
+As we have considered for Expected Shortfall in \Cref{app:separate-optimization}, constructing an international portfolio also requires
+selecting currency exposures. In the sequential portfolio optimization approach, the asset weights and currency
+exposures are optimized in two steps. First, the asset weights $\bm{x}_t$ are optimized on the fully hedged returns,
+then, conditional on the optimal $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The
+two optimization steps are given by
 \begin{equation} \label{eq:mv_sep_asset_obj}
 \begin{gathered}
-    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ -\bm{x}_t^\top \bm{\mu}^{fh}
-    + \tfrac{\gamma}{2}\, \bm{x}_t^\top \bm{\Sigma}^a \bm{x}_t
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho\biggl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \biggr)
     + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \right\} \\[4pt]
-    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell,
+    \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell^a,
 \end{gathered}
 \end{equation}
-\begin{align}
-    \bm{\psi}_t^* \mid \bm{x}_t^* = & \argmin_{ \bm{\psi}_t} \left\{
-     -\bm{\psi}_t^\top \bm{\mu}^c
-    + \tfrac{\gamma}{2}\, \mathrm{Var}_t\!\left( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1}
-    + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \right) \right. \label{eq:mv_sep_curr_obj} \\
-    & \qquad \qquad \qquad \left. + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}. \notag
-\end{align}
+\begin{equation} \label{eq:mv_sep_curr_obj}
+    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \left\{
+    \rho\biggl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \biggr)
+    + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}.
+\end{equation}
 The regularization parameters are kept separate across assets ($\lambda_1^a, \lambda_2^a$)
 and currencies ($\lambda_1^c, \lambda_2^c$).
 
-\subsection{Asset Optimization} \label{app:mv_sep_asset}
-
-The asset optimization step \eqref{eq:mv_sep_asset_obj} is identical to the regularized
-single-currency program \eqref{eq:mv_reg_qp}. It carries a budget constraint, $L_1$ and
-$L_2$ penalty terms, and a leverage constraint. It is therefore obtained directly from
-\eqref{eq:mv_reg_qp} by substituting the fully hedged asset moments $\bm{\mu}^{fh}$ for
-$\bm{\mu}_t$ and $\bm{\Sigma}^a$ for $\bm{\Sigma}_t$, together with the asset-specific
-penalties $\lambda_1^a, \lambda_2^a$. With the augmented vector
+The fully hedged return vector $\bm{R}^{fh}_{t+1}$, defined in \Cref{sec:matrix-representation}, replaces
+the asset return vector $\bm{R}_{t+1}$ of Sections~\ref{app:mv_definitions}--\ref{app:mv_regularization}, with
+expected value $\bm{\mu}^{fh}_t = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}^N$ and conditional covariance matrix
 \begin{equation*}
-    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,&
-    (\bm{\Delta}_{x,t}^-)^\top,& (\bm{\Delta}_{x,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3N},
+    \bm{\Sigma}^a_t = \mathbb{E}_t\bigl[ (\bm{R}^{fh}_{t+1} - \bm{\mu}^{fh}_t)(\bm{R}^{fh}_{t+1} - \bm{\mu}^{fh}_t)^\top \bigr]
+    \in \mathbb{R}^{N \times N},
 \end{equation*}
-the cost vector and penalty matrix are
+which in the programs is the Ledoit--Wolf estimator of \Cref{chap:optimization-framework}. The asset step
+\eqref{eq:mv_sep_asset_obj} is therefore identical to the regularized programs \eqref{eq:var_reg_qp} for variance and
+\eqref{eq:svar_reg_qp} for semi-variance, and is obtained from them by substituting $\bm{\Sigma}^a_t$ for
+$\bm{\Sigma}_t$ in \eqref{eq:var_reg_qp}, and the demeaned matrix $\mathring{\bm{R}}^{fh}$ of the historically sampled fully hedged returns
+$\bm{R}^{fh} \in \mathbb{R}^{q \times N}$ for $\mathring{\bm{R}}^{\text{data}}$ in \eqref{eq:svar_reg_qp}.
+
+In the currency step \eqref{eq:mv_sep_curr_obj}, the asset weights $\bm{x}_t^*$ are fixed and the currency exposures
+$\bm{\psi}_t$ are optimized. The currency exposure $\psi_{c,t}$ is the net
+exposure of the portfolio to the foreign currency $c$ as defined in \Cref{sec:matrix-representation}, and each unit of
+net exposure earns the excess currency return $e_{c,t+1} - f_{c,t}$. The currency step has no budget constraint, since
+the currency overlay is a zero-investment portfolio whose domestic exposure $\psi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$ is
+inferred residually, and no leverage constraint is imposed on the currency exposures. We linearize the currency $L^1$
+penalty with the decomposition $\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1}, and write
+the currency $L^2$ penalty as a quadratic form as in \Cref{app:l2}.
+
+\subsection{Currency Overlay under Variance} \label{app:mv_var_sep_curr}
+
+Let $\bm{\mu}^c_t = \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \mathbb{R}^M$ denote the expected excess currency
+return, and
 \begin{equation*}
-    \tilde{\bm{c}} =
-    \begin{bmatrix}
-        -(\bm{\mu}^{fh})^\top, & \lambda_1^a \bm{1}_N^\top, & \lambda_1^a \bm{1}_N^\top
-    \end{bmatrix}^\top,
-    \qquad
+\begin{aligned}
+    \bm{\Sigma}^c_t &= \mathbb{E}_t\bigl[ (\bm{e}_{t+1} - \bm{f}_t - \bm{\mu}^c_t)
+    (\bm{e}_{t+1} - \bm{f}_t - \bm{\mu}^c_t)^\top \bigr] \in \mathbb{R}^{M \times M}, \\
+    \bm{\Sigma}^{ac}_t &= \mathbb{E}_t\bigl[ (\bm{R}^{fh}_{t+1} - \bm{\mu}^{fh}_t)
+    (\bm{e}_{t+1} - \bm{f}_t - \bm{\mu}^c_t)^\top \bigr] \in \mathbb{R}^{N \times M}
+\end{aligned}
+\end{equation*}
+the conditional covariance matrix of the excess currency returns and their conditional cross-covariance matrix with
+the fully hedged returns. In the programs, $\bm{\Sigma}^c_t$ is the Ledoit--Wolf estimator and $\bm{\Sigma}^{ac}_t$ the
+sample cross-covariance matrix of \Cref{chap:optimization-framework}. The variance of the hedged portfolio return
+decomposes as
+\begin{equation*}
+    \text{Var}_t\bigl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \bigr)
+    = \bm{x}_t^{*\top} \bm{\Sigma}^a_t \bm{x}_t^*
+    + 2\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac}_t \bm{\psi}_t
+    + \bm{\psi}_t^\top \bm{\Sigma}^c_t \bm{\psi}_t,
+\end{equation*}
+where the first term does not depend on $\bm{\psi}_t$ and is subsequently dropped from the currency step. The decision vector of
+the currency step is
+\begin{equation*}
+    \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top
+    \end{bmatrix}^\top \in \mathbb{R}^{3M},
+\end{equation*}
+with the constants in the vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix} 2\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac}_t,& \lambda_1^c \bm{1}_M^\top,&
+    \lambda_1^c \bm{1}_M^\top \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
     \tilde{\bm{Q}} =
     \begin{bmatrix}
-        \gamma \bm{\Sigma}^a + 2 \lambda_2^a \bm{I}_N & \bm{0}_{N \times 2N} \\
-        \bm{0}_{2N \times N} & \bm{0}_{2N \times 2N}
-    \end{bmatrix},
-\end{equation*}
-and the equality, inequality, and sign constraints are exactly those of
-\eqref{eq:mv_reg_qp} with $\bm{\Sigma}^a$ and $\bm{\mu}^{fh}$ in place of $\bm{\Sigma}_t$
-and $\bm{\mu}_t$. The step yields the optimal asset weights $\bm{x}_t^*$, which are then
-fixed in the currency overlay optimization.
-
-\subsection{Currency Overlay Optimization} \label{app:mv_sep_currency}
-
-Conditional on $\bm{x}_t^*$, the currency step \eqref{eq:mv_sep_curr_obj} optimizes the
-mean-variance objective of the combined hedged return
-$\bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t)$ over the
-currency exposures $\bm{\psi}_t$. Unlike the Expected Shortfall in the currency overlay
-of \Cref{app:sep_currency}, the variance decomposes in closed form
-\begin{equation*}
-    \mathrm{Var}_t\!\left( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1}
-    + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \right)
-    = \bm{x}_t^{*\top} \bm{\Sigma}^a \bm{x}_t^*
-    + 2\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t
-    + \bm{\psi}_t^\top \bm{\Sigma}^c \bm{\psi}_t.
-\end{equation*}
-The term $\bm{x}_t^{*\top} \bm{\Sigma}^a \bm{x}_t^*$ does not depend on $\bm{\psi}_t$ and
-is therefore dropped from the minimization. Substituting the remaining terms into
-\eqref{eq:mv_sep_curr_obj}, the currency overlay objective becomes
-\begin{equation} \label{eq:mv_curr_expanded}
-    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \left\{
-    -\bm{\psi}_t^\top \bm{\mu}^c
-    + \tfrac{\gamma}{2}\, \bm{\psi}_t^\top \bm{\Sigma}^c \bm{\psi}_t
-    + \gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t
-    + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \right\}.
-\end{equation}
-The fixed asset weights are present through the linear cross-covariance term
-$\gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t$. Collecting the two linear terms shows that the coupling is
-equivalent to shifting the currency mean,
-$-\bm{\psi}_t^\top \bm{\mu}^c + \gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac} \bm{\psi}_t
-= -\bm{\psi}_t^\top (\bm{\mu}^c - \gamma\, (\bm{\Sigma}^{ac})^\top \bm{x}_t^*)$.
-The fixed asset portfolio therefore lowers the effective expected currency return by
-$\gamma\, (\bm{\Sigma}^{ac})^\top \bm{x}_t^*$. This effect is similar to the one in \Cref{app:sep_currency}, 
-where the fixed asset weights shift the
-right-hand side of the slack constraints to $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^*$.
-
-We linearize the currency $L_1$ penalty with the decomposition
-$\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1}, and form
-the augmented vector
-\begin{equation*}
-    \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,&
-    (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3M}.
-\end{equation*}
-The cost vector and penalty matrix are
-\begin{equation*}
-    \tilde{\bm{c}} = \begin{bmatrix}
-        -(\bm{\mu}^c)^\top + \gamma\, \bm{x}_t^{*\top} \bm{\Sigma}^{ac},&
-        \lambda_1^c \bm{1}_M^\top,& \lambda_1^c \bm{1}_M^\top
-    \end{bmatrix}^\top,
-    \qquad
-    \tilde{\bm{Q}} =
-    \begin{bmatrix}
-        \gamma \bm{\Sigma}^c + 2 \lambda_2^c \bm{I}_M & \bm{0}_{M \times 2M} \\
+        \bm{\Sigma}^c_t + \lambda_2^c \bm{I}_M & \bm{0}_{M \times 2M} \\
         \bm{0}_{2M \times M} & \bm{0}_{2M \times 2M}
     \end{bmatrix}.
 \end{equation*}
-The currency overlay optimization is then the quadratic program
-\begin{equation} \label{eq:mv_sep_curr_qp}
+The currency overlay optimization under variance then becomes a quadratic program with linear constraints
+\begin{equation} \label{eq:var_sep_curr_qp}
 \begin{aligned}
     \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
-    \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tfrac{1}{2}\, \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
+     \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
     \text{s.t.} \quad
     \tilde{\bm{D}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} \bm{I}_M & \bm{I}_M & -\bm{I}_M \end{bmatrix} \tilde{\bm{\psi}}_t
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
-    \Delta_{\psi,c,t}^- &\ge 0, \quad \Delta_{\psi,c,t}^+ \ge 0
+    \Delta_{\psi,c,t}^- \ge 0, & \quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M.
 \end{aligned}
 \end{equation}
-The currency optimization differs from the asset optimization \eqref{eq:mv_sep_asset_obj}
-in the same ways as in the Expected Shortfall case. First, there is no budget constraint,
-as the currency portfolio is a zero-investment portfolio, so the domestic exposure
-$\psi_{0,t}$ is inferred residually and the equality block $\tilde{\bm{D}}$ enforces only
-the weight decomposition. Second, no
-leverage constraint is imposed on the currency exposures. The biggest
-difference relative to \Cref{app:sep_currency} is that the fixed asset weights enter the
-mean-variance currency step through the linear cross-covariance term in $\tilde{\bm{c}}$,
-rather than through a shifted inequality constraint. 
+The $M$ rows of $\tilde{\bm{D}}$ enforce the weight decomposition \eqref{eq:l1_decomp} for the currency exposures, and
+the fixed asset weights are present through the linear term $2\, (\bm{\Sigma}^{ac}_t)^\top \bm{x}_t^*$ in $\tilde{\bm{c}}$.
 
-As noted by \cite{SparseAndStableInternationalPortfolioOptimization}, the cross-covariance could alternatively be shrunk
-by augmenting the currency overlay problem with the fixed asset portfolio as an
-additional dimension. We use the direct formulation over $\bm{\psi}_t$, which keeps
-the currency step as both the asset program \eqref{eq:mv_reg_qp} and the
-Expected Shortfall currency overlay \eqref{eq:sep_curr_qp}.
+\subsection{Currency Overlay under Semi-Variance} \label{app:mv_svar_sep_curr}
 
+For semi-variance, we use the empirical approximation of \Cref{app:mv_svar_qp} for the hedged portfolio return. As
+in \Cref{app:separate-optimization}, let $\bm{R}^{fh}_k$ denote the $k$-th sampled fully hedged return vector, and
+$\bm{e}_k$ and $\bm{f}_k$ the $k$-th sampled currency return and forward premium vectors. We stack the sampled excess
+currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix $\bm{R}^c \in \mathbb{R}^{q \times M}$, and
+collect the fixed asset-portfolio returns in $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the
+sample mean of the hedged portfolio returns $\bm{R}^{fh}_P + \bm{R}^c \bm{\psi}_t$ is linear in $\bm{\psi}_t$, their
+demeaned formulation is simply $\mathring{\bm{R}}^{fh}_P + \mathring{\bm{R}}^c \bm{\psi}_t$, where
+$\mathring{\bm{R}}^{fh}_P = \mathring{\bm{R}}^{fh} \bm{x}_t^*$. Introducing the auxiliary variables
+$\bm{u}_\psi \ge \bm{0}_q$, the slack constraint \eqref{eq:svar_slack} becomes
+\begin{equation*}
+    \bm{u}_\psi \ge -\mathring{\bm{R}}^c \bm{\psi}_t - \mathring{\bm{R}}^{fh}_P
+    \qquad \Longleftrightarrow \qquad
+    -\mathring{\bm{R}}^c \bm{\psi}_t - \bm{u}_\psi \le \mathring{\bm{R}}^{fh}_P.
+\end{equation*}
+The decision vector of the currency step is
+\begin{equation*}
+    \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \bm{u}_\psi^\top,& (\bm{\Delta}_{\psi,t}^-)^\top,&
+    (\bm{\Delta}_{\psi,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3M+q},
+\end{equation*}
+with the constants in the vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_M^\top,& \bm{0}_q^\top,& \lambda_1^c \bm{1}_M^\top,&
+    \lambda_1^c \bm{1}_M^\top \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \lambda_2^c \bm{I}_M & \bm{0}_{M \times q} & \bm{0}_{M \times 2M} \\
+        \bm{0}_{q \times M} & \tfrac{1}{q} \bm{I}_q & \bm{0}_{q \times 2M} \\
+        \bm{0}_{2M \times M} & \bm{0}_{2M \times q} & \bm{0}_{2M \times 2M}
+    \end{bmatrix}.
+\end{equation*}
+The currency overlay optimization under semi-variance then becomes a quadratic program with linear constraints
+\begin{equation} \label{eq:svar_sep_curr_qp}
+\begin{aligned}
+    \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
+     \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
+    \text{s.t.} \quad
+    \tilde{\bm{D}} \tilde{\bm{\psi}}_t &=
+    \begin{bmatrix} \bm{I}_M & \bm{0}_{M \times q} & \bm{I}_M & -\bm{I}_M \end{bmatrix} \tilde{\bm{\psi}}_t
+    = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
+    \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
+    \begin{bmatrix} -\mathring{\bm{R}}^c & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \mathring{\bm{R}}^{fh}_P, \\[4pt]
+    u_{k,\psi} \ge 0, & \quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
+    \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+The $M$ rows of $\tilde{\bm{D}}$ enforce the weight decomposition \eqref{eq:l1_decomp} for the currency exposures,
+and the $q$ rows of $\tilde{\bm{A}}$ encode the slack constraints of the currency step.
 \section{Joint Optimization} \label{app:mv_joint}
 
 In the joint portfolio optimization approach, asset and currency weights are optimized
