@@ -50,12 +50,6 @@ Charles~M. Jones.
 \newblock 2002.
 \newblock Working paper, Columbia University.
 
-\bibitem{Jorion1986BayesStein}
-Philippe Jorion.
-\newblock Bayes-stein estimation for portfolio analysis.
-\newblock {\em The Journal of Financial and Quantitative Analysis},
-  21(3):279--292, 1986.
-
 \bibitem{kondor2007noise}
 Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
 \newblock Noise sensitivity of portfolio selection under various risk measures.
@@ -65,18 +59,6 @@ Imre Kondor, Szil{\'a}rd Pafka, and G{\'a}bor Nagy.
 Pavlo~A. Krokhmal.
 \newblock Higher moment coherent risk measures.
 \newblock {\em Quantitative Finance}, 7(4):373--387, 2007.
-
-\bibitem{LedoitWolf2003}
-Olivier Ledoit and Michael Wolf.
-\newblock Honey, i shrunk the sample covariance matrix.
-\newblock Economics Working Papers 691, Department of Economics and Business,
-  Universitat Pompeu Fabra, Jun 2003.
-
-\bibitem{LedoitWolf2004}
-Olivier Ledoit and Michael Wolf.
-\newblock A well-conditioned estimator for large-dimensional covariance
-  matrices.
-\newblock {\em Journal of Multivariate Analysis}, 88(2):365--411, 2004.
 
 \bibitem{Li2015}
 Jiahan Li.
