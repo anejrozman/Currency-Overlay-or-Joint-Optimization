@@ -93,7 +93,63 @@ return vectors $\bm{y}_k^\top$ row by row, so that the $k$-th row of $\mathring{
 $(\bm{y}_k - \bar{\bm{y}})^\top$. This formulation serves as the base unregularized portfolio optimization problem under
 mean absolute deviation.
 
-\section{Regularization}\label{sec:mad-reg}
+\section{Regularization} \label{app:mad_regularization}
+
+The base problem \eqref{eq:mad_base_lp} is known to be unstable in high-dimensional settings, where the portfolio weights
+can fluctuate strongly from sample to sample \cite{kondor2007noise}. As for the other risk measures in \Cref{app:es_derivation,app:mv_derivation}, we stabilize it with
+the three regularization techniques of Sections~\ref{app:l1}--\ref{app:leverage}, an $L^1$ penalty
+$\lambda_1 \|\bm{x}_t\|_1$, an $L^2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2$ and an asset leverage constraint
+$\|\bm{x}_t\|_1 \le \ell^a$, with $\lambda_1, \lambda_2 \ge 0$ and $\ell^a \ge 1$. Splitting the weights into their
+positive and negative parts gives
+\begin{equation} \label{eq:mad_l1_decomp}
+    \bm{x}_t = \bm{\Delta}_t^+ - \bm{\Delta}_t^-, \qquad
+    \|\bm{x}_t\|_1 = \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-) \le \ell^a, \qquad
+    \bm{\Delta}_t^+, \bm{\Delta}_t^- \ge \bm{0}_N,
+\end{equation}
+where the identity for $\|\bm{x}_t\|_1$ holds at the optimum, so that the $L^1$ penalty becomes
+$\lambda_1 \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-)$ and the $L^2$ penalty is the quadratic form
+$\bm{x}_t^\top (\lambda_2 \bm{I}_N) \bm{x}_t$.
+
+Adding the three regularization terms to the base problem \eqref{eq:mad_base_lp} extends the decision vector to
+\begin{equation*}
+    \tilde{\bm{x}}_t = \begin{bmatrix} \bm{x}_t^\top,& \bm{u}^\top,& (\bm{\Delta}_t^-)^\top,& (\bm{\Delta}_t^+)^\top \end{bmatrix}^\top
+    \in \mathbb{R}^{3N+q},
+\end{equation*}
+with the constants in the vector
+\begin{equation*}
+    \tilde{\bm{c}} = \begin{bmatrix} \bm{0}_N^\top,& \tfrac{2}{q} \bm{1}_q^\top,& \lambda_1 \bm{1}_N^\top,& \lambda_1 \bm{1}_N^\top \end{bmatrix}^\top
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \tilde{\bm{Q}} =
+    \begin{bmatrix}
+        \lambda_2 \bm{I}_N & \bm{0}_{N \times (2N+q)} \\
+        \bm{0}_{(2N+q) \times N} & \bm{0}_{(2N+q) \times (2N+q)}
+    \end{bmatrix}.
+\end{equation*}
+The portfolio optimization problem under mean absolute deviation then becomes a quadratic program with linear
+constraints
+\begin{equation} \label{eq:mad_reg_qp}
+\begin{aligned}
+    \tilde{\bm{x}}_t^* &= \argmin_{\tilde{\bm{x}}_t} \quad
+    \tilde{\bm{c}}^\top \tilde{\bm{x}}_t + \tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t, \\[2pt]
+    \text{s.t.} \quad
+     \tilde{\bm{D}} \tilde{\bm{x}}_t &=
+    \begin{bmatrix} \bm{1}_N^\top & \bm{0}_q^\top & \bm{0}_N^\top & \bm{0}_N^\top \\
+    \bm{I}_N & \bm{0}_{N \times q} & \bm{I}_N & -\bm{I}_N \end{bmatrix} \tilde{\bm{x}}_t
+    = \tilde{\bm{E}} = \begin{bmatrix} 1 \\ \bm{0}_N \end{bmatrix}, \\[6pt]
+     \tilde{\bm{A}} \tilde{\bm{x}}_t &=
+    \begin{bmatrix} -\mathring{\bm{R}}^{\text{data}} & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} \\
+    \bm{0}_N^\top & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top \end{bmatrix} \tilde{\bm{x}}_t
+    \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
+     u_k \ge 0, & \quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+    \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+The first row of $\tilde{\bm{D}}$ enforces the budget constraint and the remaining $N$ rows enforce the weight
+decomposition \eqref{eq:mad_l1_decomp}. The first $q$ rows of $\tilde{\bm{A}}$ encode the inequality constraints
+\eqref{eq:mad_slack}, extended with zeros for the new variables, and the final row of $\tilde{\bm{A}}$ imposes the
+leverage constraint \eqref{eq:mad_l1_decomp}.
 
 \section{Sequential Optimization} \label{sec:mad-sequential}
 
