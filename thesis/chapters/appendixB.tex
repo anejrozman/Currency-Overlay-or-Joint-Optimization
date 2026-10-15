@@ -11,77 +11,136 @@ present the quadratic program representation of the mean-variance portfolio opti
 
 
 
-\section{Quadratic Program Representation of the Mean-Variance Portfolio Optimization} \label{app:mv_qp_representation}
+\section{Definitions and Convexity} \label{app:mv_definitions}
 
-The mean-variance portfolio optimization of \cite{Markowitz1952} trades off the expected
-portfolio return against its return variance. The portfolio return
-$\bm{x}_t^\top \bm{R}_{t+1}$ is linear in the asset weights, so its variance is the
-quadratic form $\mathrm{Var}(\bm{x}_t^\top \bm{R}_{t+1}) = \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$,
-where $\bm{R}_{t+1} \in \mathbb{R}^N$ is the asset return vector and $\bm{\Sigma}_t$
-its covariance matrix. Following the international mean-variance formulation of
-\cite{SparseAndStableInternationalPortfolioOptimization}, we write the portfolio optimization
-problem as a minimization that trades off
-expected return against variance through a relative risk-aversion coefficient
-$\gamma > 0$
-\begin{equation} \label{eq:mv_objective}
-    \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ -\bm{\mu}_t^\top \bm{x}_t
-    + \frac{\gamma}{2} \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t \right\},
-    \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+We define the variance of the portfolio return, which Markowitz \cite{Markowitz1952} uses as the measure of portfolio
+risk, and the semi-variance, which Markowitz et al.~\cite{Markowitz1993} consider as a downside alternative to the
+variance, and show that both are convex in the portfolio weights. The two definitions allow for writing the portfolio
+optimization problem as a quadratic program for both risk measures in \Cref{app:mv_representation}.
+
+Let $\bm{x}_t \in \mathbb{R}^N$ denote the portfolio weights, $\bm{R}_{t+1} \in \mathbb{R}^N$ the asset return vector
+and $\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}] \in \mathbb{R}^N$ the expected asset return. The variance of the
+portfolio return is
+\begin{equation} \label{eq:variance_def}
+    \text{Var}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    = \mathbb{E}_t\bigl[ (\bm{x}_t^\top \bm{\mu}_t - \bm{x}_t^\top \bm{R}_{t+1})^2 \bigr]
+    = \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t,
 \end{equation}
-where $\bm{\mu}_t$ denotes the asset return mean estimator, $\bm{\Sigma}_t$ the asset
-return covariance estimator, and the budget constraint $\bm{x}_t^\top \bm{1}_N = 1$
-enforces full investment.
+where $\bm{\Sigma}_t = \mathbb{E}_t\bigl[ (\bm{R}_{t+1} - \bm{\mu}_t)(\bm{R}_{t+1} - \bm{\mu}_t)^\top \bigr]
+\in \mathbb{R}^{N \times N}$ is the conditional covariance matrix of the asset returns. Since the variance \eqref{eq:variance_def} is non-negative for every $\bm{x}_t$, the matrix
+$\bm{\Sigma}_t$ is positive semi-definite, and the quadratic form is convex in $\bm{x}_t$
+\cite[Section~3.1.4]{boyd2004convex}. 
 
-In contrast to the Expected Shortfall objective \eqref{eq:mean_es}, which depends on
-the unknown conditional expectation $\mathbb{E}_t[\cdot]$ and requires the auxiliary
-representation of \Cref{app:es_auxiliary_formulation} together with a sample
-approximation to obtain a tractable form, the variance term in \eqref{eq:mv_objective}
-is already expressed in closed quadratic form. Problem \eqref{eq:mv_objective} is
-therefore already formulated as a quadratic program.
+The variance penalizes returns above the expected return as much as returns below it, although an investor is typically
+concerned with underperformance rather than outperformance \cite{Markowitz1993}. This motivates us to consider the semi-variance of the portfolio return
+as a downside risk measure. The semi-variance is defined as
+\begin{equation} \label{eq:svar_def}
+    \text{SVar}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    = \mathbb{E}_t\Bigl[ \bigl( (\bm{x}_t^\top \bm{\mu}_t - \bm{x}_t^\top \bm{R}_{t+1})^+ \bigr)^2 \Bigr].
+\end{equation}
 
-The objective in \eqref{eq:mv_objective} is convex. The first term
-$-\bm{\mu}_t^\top \bm{x}_t$ is linear, hence convex, and the quadratic term
-$\tfrac{\gamma}{2} \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$ has Hessian
-$\gamma \bm{\Sigma}_t$. Since a covariance matrix is positive semi-definite and
-$\gamma > 0$, this Hessian is positive semi-definite, so the quadratic term, and with
-it the full objective, is convex \cite{boyd2004convex}. Any local minimum is therefore
-global, ensuring the problem can be solved reliably with standard convex optimization
-methods.
+The inner map $\bm{x}_t \mapsto \bm{x}_t^\top (\bm{\mu}_t - \bm{R}_{t+1})$ is linear and the function
+$z \mapsto (z^+)^2$ is convex. The composition of a convex function with
+an affine map is convex \cite[Section~3.2.2]{boyd2004convex}. Expectation is a
+linear operator which preserves convexity, so the semi-variance is convex in $\bm{x}_t$.
 
-The mean and covariance terms are unknown and replaced by their sample
-estimators $\bm{\mu}_t$ and $\bm{\Sigma}_t$. Because the variance term is expressed in closed form, 
-this step introduces no auxiliary variables and leaves
-the decision vector at dimension $N$, independent of the number of historical
-observations $q$ used to estimate it. This is different from the empirical approximation of the Expected
-Shortfall objective in \Cref{app:linear-program-representation}, where the conditional
-expectation is replaced by an average over $q$ historical return samples and $q$ slack
-variables $u_k$ enlarge the problem to dimension $N + q + 1$. The sample covariance
-estimator we use is positive semi-definite, so the convexity established above is preserved
-under estimation. The choice of estimators is discussed in \Cref{app:estimators}.
+Since both the variance and the semi-variance are convex, any local minimum is global, ensuring that the portfolio
+optimization problems under both risk measures can be solved reliably with standard convex optimization methods.
 
-Collecting the asset weights in the decision vector $\bm{x}_t \in \mathbb{R}^N$ and
-defining the cost vector and the penalty matrix
-\begin{equation*}
-    \bm{c} = -\bm{\mu}_t \in \mathbb{R}^N, \qquad
-    \bm{Q} = \gamma \bm{\Sigma}_t \in \mathbb{R}^{N \times N},
-\end{equation*}
-the mean-variance problem \eqref{eq:mv_objective} is written as the quadratic program
-\begin{equation} \label{eq:mv_base_qp}
+
+
+\section{Representation for Portfolio Optimization} \label{app:mv_representation}
+
+Let $\rho$ denote either of the two risk measures, written as a function of the portfolio return
+$\bm{x}_t^\top \bm{R}_{t+1}$. The portfolio optimization problem is
+\begin{equation} \label{eq:mv_risk_min}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \rho\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+\end{equation}
+where the budget constraint enforces full investment. Each program in this appendix defines its own decision vector,
+vector of constants and penalty and constraint matrices, so the same symbols denote slightly different objects in
+different programs, and we refer to a specific program by its equation number when discussing them.
+
+\subsection{Variance} \label{app:mv_var_qp}
+
+By \eqref{eq:variance_def}, the objective of problem \eqref{eq:mv_risk_min} under variance is the quadratic form
+$\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$. In the programs, $\bm{\Sigma}_t$ is the Ledoit--Wolf estimator of the covariance
+matrix defined in \Cref{chap:optimization-framework}, which is positive semi-definite, so the convexity shown in
+\Cref{app:mv_definitions} is preserved. With the decision vector $\bm{x}_t \in \mathbb{R}^N$ and the penalty matrix
+$\bm{Q} = \bm{\Sigma}_t \in \mathbb{R}^{N \times N}$, the portfolio optimization problem \eqref{eq:mv_risk_min} under
+variance can be written as a quadratic program
+\begin{equation} \label{eq:var_base_qp}
 \begin{aligned}
-    \bm{x}_t^* &= \argmin_{\bm{x}_t} \quad
-    \bm{c}^\top \bm{x}_t + \tfrac{1}{2}\, \bm{x}_t^\top \bm{Q}\, \bm{x}_t, \\[2pt]
-    \text{s.t.} \quad \bm{D} \bm{x}_t &= \bm{1}_N^\top \bm{x}_t = E = 1.
+    & \ \ \bm{x}_t^* = \argmin_{\bm{x}_t} \quad
+     \bm{x}_t^\top \bm{Q}\, \bm{x}_t \\[4pt]
+    \text{s.t.} \quad
+    & \bm{D} \bm{x}_t = \bm{1}_N^\top \bm{x}_t = E = 1.
 \end{aligned}
 \end{equation}
-Here $\bm{D} = \bm{1}_N^\top \in \mathbb{R}^{1 \times N}$ encodes the budget constraint
-with right-hand side $E = 1$.
+Here $\bm{D} = \bm{1}_N^\top \in \mathbb{R}^{1 \times N}$ encodes the budget constraint. Problem \eqref{eq:var_base_qp}
+has a convex quadratic objective subject to one linear equality, and is thus a quadratic program solvable with standard
+methods. This formulation serves as the base unregularized portfolio optimization problem under variance.
 
-Problem \eqref{eq:mv_base_qp} has a convex quadratic objective subject to a single
-linear equality constraint, and is thus a quadratic program solvable with standard
-methods.
-This formulation serves as the base unregularized portfolio optimization problem under
-the mean-variance criterion. Regularization terms and additional constraints are added
-in \Cref{app:mv_regularization}.
+\subsection{Semi-Variance} \label{app:mv_svar_qp}
+
+Let $\bm{y}_1, \dots, \bm{y}_q \in \mathbb{R}^N$ denote $q$ historical realizations of the asset return vector
+$\bm{R}_{t+1}$, as in \Cref{app:lp_es}. We approximate the expected asset return $\bm{\mu}_t$ by the sample mean
+$\bar{\bm{y}} = \frac{1}{q} \sum_{k=1}^q \bm{y}_k$ and the conditional expectation in \eqref{eq:svar_def} by the
+empirical average over this sample
+\begin{equation*}
+    \text{SVar}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    \approx \frac{1}{q} \sum_{k=1}^q \bigl( (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+ \bigr)^2,
+\end{equation*}
+so that the portfolio optimization problem under semi-variance becomes
+\begin{equation} \label{eq:empirical_svar}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \frac{1}{q} \sum_{k=1}^q \bigl( (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+ \bigr)^2,
+    \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
+\end{equation}
+Because of the positive part, each summand is only piecewise quadratic in $\bm{x}_t$. As for Expected Shortfall in
+\Cref{app:lp_es}, we remove the positive part by introducing, for each observation $k$, an auxiliary variable
+$u_k \ge 0$ subject to
+\begin{equation} \label{eq:svar_slack}
+    u_k \ge \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k
+    \qquad \Longleftrightarrow \qquad
+    \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) + u_k \ge 0.
+\end{equation}
+Replacing each positive part by $u_k$, the objective becomes $\frac{1}{q} \sum_{k=1}^q u_k^2 = \frac{1}{q}
+\|\bm{u}\|_2^2$. It is strictly increasing in each $u_k \ge 0$ and minimized, so every $u_k$ is driven to its lower
+bound at the optimum, $u_k^* = (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+$.
+
+By collecting the decision variables in the vector
+\begin{equation*}
+    \tilde{\bm{x}}_t = \begin{bmatrix} x_{1,t}, \dots, x_{N,t}, & u_1, \dots, u_q \end{bmatrix}^\top
+    = \begin{bmatrix} \bm{x}_t^\top, & \bm{u}^\top \end{bmatrix}^\top \in \mathbb{R}^{N+q},
+\end{equation*}
+and the penalty matrix
+\begin{equation*}
+    \bm{Q} = \begin{bmatrix} \bm{0}_{N \times N} & \bm{0}_{N \times q} \\ \bm{0}_{q \times N} & \tfrac{1}{q} \bm{I}_q \end{bmatrix}
+    \in \mathbb{R}^{(N+q) \times (N+q)},
+\end{equation*}
+the portfolio optimization problem \eqref{eq:empirical_svar} can be written as a quadratic program
+\begin{equation} \label{eq:svar_base_qp}
+\begin{aligned}
+    & \ \ \tilde{\bm{x}}_t^* = \argmin_{\tilde{\bm{x}}_t} \quad
+     \tilde{\bm{x}}_t^\top \bm{Q}\, \tilde{\bm{x}}_t \\[4pt]
+    \text{s.t.} \quad
+    & \bm{D} \tilde{\bm{x}}_t =
+    \begin{bmatrix} \bm{1}_N^\top & \bm{0}_q^\top \end{bmatrix}
+    \tilde{\bm{x}}_t = E = 1, \\[2pt]
+    & \bm{A} \tilde{\bm{x}}_t =
+    \begin{bmatrix} -\check{\bm{R}}^{\text{data}} & -\bm{I}_q \end{bmatrix}
+    \tilde{\bm{x}}_t \le \bm{b} = \bm{0}_q, \\[2pt]
+    & u_k \ge 0 \quad \text{for } k = 1, \dots, q.
+\end{aligned}
+\end{equation}
+Here $\bm{D} \in \mathbb{R}^{1 \times (N+q)}$ encodes the budget constraint, while $\bm{A} \in \mathbb{R}^{q \times (N+q)}$
+and $\bm{b} \in \mathbb{R}^q$ encode the $q$ inequality constraints \eqref{eq:svar_slack}. The matrix
+$\check{\bm{R}}^{\text{data}} = \bm{R}^{\text{data}} - \bm{1}_q \bar{\bm{y}}^\top \in \mathbb{R}^{q \times N}$ is the
+demeaned sample matrix, where $\bm{R}^{\text{data}}$ is comprised of the sampled return vectors $\bm{y}_k^\top$ row by
+row as in \Cref{app:lp_es}, so that the $k$-th row of $\check{\bm{R}}^{\text{data}}$ is $(\bm{y}_k - \bar{\bm{y}})^\top$.
+
+Problem \eqref{eq:svar_base_qp} has a convex quadratic objective subject to one linear equality and $q$ linear
+inequalities, and is thus a quadratic program solvable with standard methods. This formulation serves as the base
+unregularized portfolio optimization problem under semi-variance.
 
 
 \section{Regularization} \label{app:mv_regularization}

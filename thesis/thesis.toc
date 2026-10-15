@@ -58,15 +58,16 @@
 \contentsline {subsection}{\numberline {A.5.2}Joint Optimization under Second-Order Expected Shortfall}{54}{subsection.A.5.2}%
 \contentsline {section}{\numberline {A.6}Mean-Risk Optimization}{55}{section.A.6}%
 \contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Variance and Semi-Variance}{57}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{57}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Regularization}{58}{section.B.2}%
-\contentsline {subsection}{\numberline {B.2.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{58}{subsection.B.2.1}%
-\contentsline {subsection}{\numberline {B.2.2}Estimators}{59}{subsection.B.2.2}%
-\contentsline {subsection}{\numberline {B.2.3}Quadratic Program Representation of the Regularized Portfolio Optimization}{60}{subsection.B.2.3}%
-\contentsline {section}{\numberline {B.3}Separate (Currency Overlay) Optimization}{60}{section.B.3}%
-\contentsline {subsection}{\numberline {B.3.1}Asset Optimization}{61}{subsection.B.3.1}%
-\contentsline {subsection}{\numberline {B.3.2}Currency Overlay Optimization}{61}{subsection.B.3.2}%
-\contentsline {section}{\numberline {B.4}Joint Optimization}{62}{section.B.4}%
+\contentsline {section}{\numberline {B.1}Definitions and Convexity}{57}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Quadratic Program Representation of the Mean-Variance Portfolio Optimization}{58}{section.B.2}%
+\contentsline {section}{\numberline {B.3}Regularization}{59}{section.B.3}%
+\contentsline {subsection}{\numberline {B.3.1}$L_1$, $L_2$ Regularization and Leverage Constraint}{59}{subsection.B.3.1}%
+\contentsline {subsection}{\numberline {B.3.2}Estimators}{59}{subsection.B.3.2}%
+\contentsline {subsection}{\numberline {B.3.3}Quadratic Program Representation of the Regularized Portfolio Optimization}{60}{subsection.B.3.3}%
+\contentsline {section}{\numberline {B.4}Separate (Currency Overlay) Optimization}{61}{section.B.4}%
+\contentsline {subsection}{\numberline {B.4.1}Asset Optimization}{62}{subsection.B.4.1}%
+\contentsline {subsection}{\numberline {B.4.2}Currency Overlay Optimization}{62}{subsection.B.4.2}%
+\contentsline {section}{\numberline {B.5}Joint Optimization}{63}{section.B.5}%
 \contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{65}{appendix.C}%
 \contentsline {section}{\numberline {C.1}Linear Program Represenation of the Mean Absolute Deviation Portfolio Optimization Problem}{65}{section.C.1}%
 \contentsline {section}{\numberline {C.2}Regularization}{65}{section.C.2}%

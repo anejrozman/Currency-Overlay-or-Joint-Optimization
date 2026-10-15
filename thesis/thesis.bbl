@@ -38,10 +38,6 @@ Andrea Frazzini, Ronen Israel, and Tobias~J. Moskowitz.
 \newblock 2018.
 \newblock Working paper, AQR Capital Management / Yale University.
 
-\bibitem{goldberg2013minimizingshortfall}
-Lisa~R. Goldberg, Michael~Y. Hayes, and Ola Mahmoud.
-\newblock Minimizing shortfall, 2013.
-
 \bibitem{HastieTibshiraniFriedman2009}
 Trevor Hastie, Robert Tibshirani, and Jerome Friedman.
 \newblock {\em The Elements of Statistical Learning: Data Mining, Inference,
@@ -98,11 +94,22 @@ Harry Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
 
+\bibitem{Markowitz1993}
+Harry Markowitz, Peter Todd, Ganlin Xu, and Yuji Yamane.
+\newblock Computation of mean-semivariance efficient sets by the {Critical Line
+  Algorithm}.
+\newblock {\em Annals of Operations Research}, 45(1):307--317, 1993.
+
 \bibitem{McNeilFrey2000}
 Alexander~J. McNeil and Rudiger Frey.
 \newblock Estimation of tail-related risk measures for heteroscedastic
   financial time series: an extreme value approach.
 \newblock {\em Journal of Empirical Finance}, 7(3-4):271--300, November 2000.
+
+\bibitem{QuantitativeRiskManagement2016}
+Alexander~J. McNeil, R{\"u}diger Frey, and Paul Embrechts.
+\newblock {\em Quantitative Risk Management: Concepts, Techniques and Tools}.
+\newblock Princeton University Press, Princeton, NJ, revised edition, 2015.
 
 \bibitem{carry_trades_and_global_foreign_exchange_volatility}
 LUKAS MENKHOFF, Lucio Sarno, MAIK SCHMELING, and Andreas Schrimpf.
@@ -126,14 +133,6 @@ Christopher~J. Neely, Paul~A. Weller, and Joshua~M. Ulrich.
 \newblock {\em Journal of Financial and Quantitative Analysis}, 44(2):467--488,
   2009.
 
-\bibitem{QuantitativeRiskManagement2016}
-Johanna~G. NeÅ¡LehovÃ¡.
-\newblock Quantitative risk management: Concepts, techniques and tools , by
-  alexander j. mcneil , rÃ¼diger frey and paul embrechts . revised edition.
-  published by princeton university press , 2015 . total number of pages: 720.
-  isbn: 978-0-691-16627-8 (hardback).
-\newblock {\em Journal of Time Series Analysis}, 37(3):431--432, May 2016.
-
 \bibitem{safe_haven_currencies}
 Angelo Ranaldo and Paul Söderlind.
 \newblock Safe haven currencies.
@@ -144,15 +143,15 @@ R.~Tyrrell Rockafellar, Stan Uryasev, and Michael Zabarankin.
 \newblock Generalized deviations in risk analysis.
 \newblock {\em Finance and Stochastics}, 10(1):51--74, 2006.
 
+\bibitem{RockafellarUryasev2000}
+R.~Tyrrell Rockafellar and Stanislav Uryasev.
+\newblock Optimization of conditional value-at-risk.
+\newblock {\em Journal of Risk}, 2(3):21--41, 2000.
+
 \bibitem{RockafellarUryasev2002}
 R.~Tyrrell Rockafellar and Stanislav Uryasev.
 \newblock Conditional value-at-risk for general loss distributions.
 \newblock {\em Journal of Banking \& Finance}, 26(7):1443--1471, 2002.
-
-\bibitem{RockafellarUryasev2000}
-R.~Tyrrell Rockafellar and Stanislav Uryasev.
-\newblock Optimization of conditional value-at-risk.
-\newblock {\em Journal of Risk}, None(None):None, None None.
 
 \bibitem{roncalli2013introduction}
 Thierry Roncalli.
