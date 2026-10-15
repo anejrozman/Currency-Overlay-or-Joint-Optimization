@@ -69,6 +69,8 @@
 \contentsline {subsection}{\numberline {B.4.1}Currency Overlay under Variance}{61}{subsection.B.4.1}%
 \contentsline {subsection}{\numberline {B.4.2}Currency Overlay under Semi-Variance}{62}{subsection.B.4.2}%
 \contentsline {section}{\numberline {B.5}Joint Optimization}{63}{section.B.5}%
+\contentsline {subsection}{\numberline {B.5.1}Joint Optimization under Variance}{63}{subsection.B.5.1}%
+\contentsline {subsection}{\numberline {B.5.2}Joint Optimization under Semi-Variance}{64}{subsection.B.5.2}%
 \contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{65}{appendix.C}%
 \contentsline {section}{\numberline {C.1}Linear Program Represenation of the Mean Absolute Deviation Portfolio Optimization Problem}{65}{section.C.1}%
 \contentsline {section}{\numberline {C.2}Regularization}{65}{section.C.2}%
