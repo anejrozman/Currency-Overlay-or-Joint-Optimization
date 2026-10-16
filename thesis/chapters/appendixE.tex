@@ -106,28 +106,97 @@ steps generate for it.
 
 \section{Numerical Implementation} \label{sec:numerical-implementation}
 
-The optimization problems derived in \Cref{chap:optimization-framework} are
-not assembled in their explicit matrix form in code. Each problem is instead
-expressed directly in the high-level modeling syntax of \texttt{CVXPY},
-converted automatically into the standard form, and finally passed to the solver. For example,
-the $L_1$ penalty is written with \texttt{CVXPY}'s \texttt{norm1} atom, so the
-positive-negative variable split used in the derivation is internal to the solver and never appears explicitly in the code. The resulting problem
-class depends only on the regularization. The Expected Shortfall
-optimizer is a linear program when it is left unregularized, since both the
-Rockafellar--Uryasev objective and its constraints are linear, whereas the
-$L_2$ ridge penalty introduces a quadratic term that turns every regularized
-Expected Shortfall problem into a quadratic program. The mean--variance problems
-are quadratic programs by construction, through the variance term in their
-objective.
+The programs derived in Appendices~\ref{app:es_derivation}--\ref{app:mad_derivation} are  written in CVXPY close to their mathematical formulations, and the
+standard form passed to the solver is generated as described in \Cref{sec:cvxpy}. We showcase this for the
+regularized joint optimization problem for Expected Shortfall \eqref{eq:joint_qp}. In the code, this program is written
+as
+\begin{equation} \label{eq:joint_es_cvxpy}
+\begin{aligned}
+    \bm{x}_t^*, \bm{\psi}_t^*, \alpha^*, \bm{u}^* = \argmin_{\bm{x}_t, \bm{\psi}_t, \alpha, \bm{u}} \quad
+    & \alpha + \frac{1}{q(1-\beta)} \bm{1}_q^\top \bm{u}
+    + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_1^c \|\bm{\psi}_t\|_1 \\
+    & + \lambda_2^a \|\bm{x}_t\|_2^2 + \lambda_2^c \|\bm{\psi}_t\|_2^2, \\[2pt]
+    \text{s.t.} \quad
+    & \bm{u} \ge -\bm{R}^{fh} \bm{x}_t - \bm{R}^c \bm{\psi}_t - \alpha \bm{1}_q, \quad \bm{u} \ge \bm{0}_q, \\
+    & \bm{x}_t^\top \bm{1}_N = 1, \quad \|\bm{x}_t\|_1 \le \ell^a.
+\end{aligned}
+\end{equation}
+As in \eqref{eq:joint_qp}, the Expected Shortfall is linearized with the auxiliary
+variables $\bm{u}$ of \eqref{eq:slack_constraint}, but the penalties and the leverage constraint are kept as norms
+instead of split as in \eqref{eq:l1_decomp}.
 
-All programs are solved with Gurobi, a state-of-the-art solver for linear and
-quadratic programs, accessed through \texttt{CVXPY}.\footnote{Gurobi is a commercial solver and requires a license to use, a free fallback solver is available in the project codebase.} The solver is configured to use the
-barrier (interior point) method with tight convergence and accuracy tolerances,
-so that the large number of problems solved across rebalancing dates, universes,
-and hyperparameter configurations return reproducible results. The
-exact configuration is
+\begin{lstlisting}[style=python, float=htbp, caption={Regularized joint Expected Shortfall program implementation in CVXPY.}, label={lst:joint-es}]
+import cvxpy as cp
 
-\begin{lstlisting}[language=Python]
+# Data and configuration.
+beta, ell_a = 0.8, 2.0
+q, N = R_fh.shape
+M = R_c.shape[1]
+
+# Variables.
+x = cp.Variable(N)
+psi = cp.Variable(M)
+alpha = cp.Variable()
+u = cp.Variable(q)
+
+# Penalties as parameters.
+lambda1_a, lambda2_a = cp.Parameter(nonneg=True), cp.Parameter(nonneg=True)
+lambda1_c, lambda2_c = cp.Parameter(nonneg=True), cp.Parameter(nonneg=True)
+
+# Objective and constraints.
+es = alpha + cp.sum(u) / (q * (1 - beta))
+penalty = (lambda1_a * cp.norm(x, 1) + lambda1_c * cp.norm(psi, 1)
+           + lambda2_a * cp.sum_squares(x) + lambda2_c * cp.sum_squares(psi))
+constraints = [
+    u >= -R_fh @ x - R_c @ psi - alpha,
+    u >= 0,
+    cp.sum(x) == 1,
+    cp.norm(x, 1) <= ell_a,
+]
+problem = cp.Problem(cp.Minimize(es + penalty), constraints)
+
+# One setting of the hyperparameter grid is selected.
+lambda1_a.value, lambda2_a.value = 5e-4, 0.03
+lambda1_c.value, lambda2_c.value = 5e-5, 5e-5
+
+# Solve.
+problem.solve(solver=cp.GUROBI)
+x_opt, psi_opt = x.value, psi.value
+\end{lstlisting}
+
+Lines 5 and 6 of \Cref{lst:joint-es} read the dimensions $q$, $N$ and $M$ from the return matrices $\bm{R}^{fh}$ and
+$\bm{R}^c$, and lines 9--12 declare the variables $\bm{x}_t$, $\bm{\psi}_t$, $\alpha$ and $\bm{u}$. Lines 15 and 16 declare
+the four penalties as parameters, whose values are set only after the problem is built. Line 19 is the Expected Shortfall term of
+\eqref{eq:joint_es_cvxpy}, lines 20 and 21 are the $L^1$ and $L^2$ penalties, and lines 22--27 are the constraints, namely
+the linearization of the Expected Shortfall in line 23, the non-negativity of $\bm{u}$ in line 24, the budget constraint in
+line 25 and the leverage constraint in line 26. Line 28 combines the objective and the constraints into a problem. Lines
+31 and 32 assign the penalties of one point of the hyperparameter grid. Finally, line 35 solves the problem with Gurobi, 
+configured as in \Cref{lst:gurobi-config}, and line 36 reads out the solution. 
+
+None of the matrices of \eqref{eq:joint_qp} are written in the code. When \texttt{problem.solve} is called, CVXPY carries
+out the steps of \Cref{fig:cvxpy-chain}. The norms in lines 20 and 26 are replaced by the split of the weights into positive
+and negative parts \eqref{eq:l1_decomp}, the variables are combined into one vector, which corresponds to the decision
+vector $\tilde{\bm{\theta}}_t$ of \eqref{eq:joint_qp}, and the coefficients of the objective and the constraints are
+combined into the vector of constants, the penalty matrix, and the constraint matrices, which take the form 
+of $\tilde{\bm{c}}$, $\tilde{\bm{Q}}$, $\tilde{\bm{D}}$, $\tilde{\bm{E}}$, $\tilde{\bm{A}}$ and
+$\tilde{\bm{b}}$ in \eqref{eq:joint_qp}. 
+
+In the backtest, this program is solved at every rebalancing date for all 256 points of the hyperparameter grid (further details on hyperparameter 
+selection can be found in 
+Appendix~\ref{app:additional-results}). Since the grid points differ only in the penalties,
+the problem of \Cref{lst:joint-es} does not have to be rebuilt for
+each grid point. To speed up the runtime, we keep the problem of each window cached and, for every further grid
+point, only assign the new penalties before calling \texttt{solve}. As a result, CVXPY compiles the problem only once
+per window.
+The cache holds two problems at a time, one for the estimation window, used by all grid points, and one for the
+estimation and validation windows together, used for the final refit.
+
+All programs are solved with Gurobi, a state-of-the-art solver for linear, quadratic and second-order cone programs. 
+The solver is configured to use the barrier method with tight convergence and
+accuracy tolerances. The exact configuration is given in \Cref{lst:gurobi-config}.
+
+\needspace{15\baselineskip}
+\begin{lstlisting}[style=python, caption={Configuration of Gurobi for all programs.}, label={lst:gurobi-config}]
 problem.solve(
     solver=cp.GUROBI,
     verbose=False,
@@ -143,9 +212,7 @@ problem.solve(
 )
 \end{lstlisting}
 
-The barrier method (\texttt{Method=2}) is paired with a barrier convergence
-tolerance of $10^{-8}$ and feasibility and optimality tolerances of $10^{-9}$,
-the remaining flags specify the presolve, scaling, and threading behavior, which were optimized for the problem sizes considered in the thesis.
+The configuration was kindly provided by Dr.\ Patrick Lucescu, who calibrated it on the same dataset as used in this thesis. 
 
 \section{Computational Complexity and Performance}\label{sec:computational-complexity}
 
