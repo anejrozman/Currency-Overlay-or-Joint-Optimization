@@ -1,11 +1,12 @@
 \chapter{Numerical Implementation and Analysis of the Optimization Problems} \label{app:optimization-implementation}
 
-In this appendix, we provide details on the numerical implementation of the optimization problems 
-discussed in the thesis. We describe the algorithms used, 
-the software libraries employed, and any specific considerations taken into account to 
-ensure efficient and accurate solutions. Additionally, we discuss the 
-computational complexity of the optimization problems and provide insights 
-into the performance of the implemented algorithms across different scenarios.
+In this appendix, we describe how the programs derived in Appendices~\ref{app:es_derivation}--\ref{app:mad_derivation}
+are implemented and solved numerically. In \Cref{sec:cvxpy} we
+introduce the CVXPY library. In
+\Cref{sec:numerical-implementation} we show the implementation in CVXPY for the example of the regularized joint program
+for Expected Shortfall and give the configuration
+of the Gurobi solver. Finally, in \Cref{sec:computational-complexity} we discuss how the size of the programs grows
+with the investable universe and analyze their running time.
 
 \section{The CVXPY Library}\label{sec:cvxpy}
 
@@ -216,4 +217,57 @@ The configuration was kindly provided by Dr.\ Patrick Lucescu, who calibrated it
 
 \section{Computational Complexity and Performance}\label{sec:computational-complexity}
 
+The size of the programs derived in Appendices~\ref{app:es_derivation}--\ref{app:mad_derivation} grows with the
+investable universe in two ways. In the regularized programs, every asset weight and currency exposure is split 
+into positive and negative parts, so the number of variables always grows linearly with the number of assets and
+currencies. For all risk measures except variance, every observation of the lookback window adds one more auxiliary
+variable and one constraint to the program. The second-order Expected Shortfall programs additionally 
+have a second-order cone constraint, which makes them harder to solve than the linear or quadratic programs of the other measures.
+The joint programs are the largest, since they optimize all asset weights and currency exposures at once, whereas
+sequential optimization splits the problem into an asset program and a small currency program. 
+Regularization hardly changes the size of a program, but it multiplies the number of programs solved
+at every rebalancing date, since the regularized programs are solved for every point of the hyperparameter grid.
 
+The backtests were run on the Euler cluster of ETH Zürich, each as one job with four CPU cores and Gurobi using three
+threads, as described in \Cref{lst:gurobi-config}. The backtester implementation of \Cref{sec:backtesting-framework} logs a timestamp at the start of every rebalancing date. 
+For each program, we average these step
+times over all logged backtests. 
+
+\Cref{fig:runtime-small,fig:runtime-medium,fig:runtime-large} show the step times at each rebalancing date for the
+small, medium and large universe. The times grow with the size of the universe, from about a minute per rebalancing
+date for the regularized joint Expected Shortfall program in the small universe to about half an hour in the large
+universe, and within each universe they rise over the backtest period as the number of assets in the investable
+universe grows. The regularized programs are considerably slower than the unregularized ones, 
+and the regularized joint programs are the slowest of all programs. Across the risk measures, the second-order
+Expected Shortfall programs are computationally the most expensive, followed by the Expected Shortfall programs. The variance programs
+are the cheapest in the small and medium universes, but their cost grows faster because the size of the covariance matrix grows quadratically with the number of assets. In the large universe they are solved as fast as the Expected Shortfall programs,
+but slower than the semi-variance and MAD programs.
+
+Without regularization, the joint and the overlay programs are similar in terms of computational cost. With regularization, the joint programs
+are slower than the overlay programs, about twice as slow in the small universe and up to 14 times slower in the large
+universe.
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../results/figures/runtime/top10.pdf}
+  \caption{Time per rebalancing date of the backtests in the small universe (top-10), by risk measure and program, on a
+  logarithmic scale, averaged over all logged backtests of each program. Times
+  below the logging resolution of one second are drawn at one second.}
+  \label{fig:runtime-small}
+\end{figure}
+ 
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../results/figures/runtime/top50.pdf}
+  \caption{Time per rebalancing date of the backtests in the medium universe (top-50), by risk measure and program, on a
+  logarithmic scale, averaged over all logged backtests of each program.}
+  \label{fig:runtime-medium}
+\end{figure}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=0.95\textwidth]{../results/figures/runtime/top100.pdf}
+  \caption{Time per rebalancing date of the backtests in the large universe (top-100), by risk measure and program, on a
+  logarithmic scale, averaged over all logged backtests of each program.}
+  \label{fig:runtime-large}
+\end{figure}

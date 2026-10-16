@@ -1,0 +1,76 @@
+universe,measure,program,strategy,logs,median_s,max_s
+10,mv,Assets-Full,reg_mv_asset_full,1,1.0,2.0
+10,mv,Overlay,mv_curr_overlay,1,0.0,1.0
+10,mv,Regularized Overlay,reg_mv_curr_overlay,1,12.0,13.0
+10,mv,Joint,mv_joint,1,1.0,1.0
+10,mv,Regularized Joint,reg_mv_joint,1,23.0,24.0
+10,smv,Assets-Full,reg_smv_asset_full,1,8.0,9.0
+10,smv,Overlay,smv_curr_overlay,2,1.0,1.5
+10,smv,Regularized Overlay,reg_smv_curr_overlay,1,32.0,39.0
+10,smv,Joint,smv_joint,1,1.0,1.0
+10,smv,Regularized Joint,reg_smv_joint,1,82.0,88.0
+10,mad,Assets-Full,reg_mad_asset_full,1,5.0,6.0
+10,mad,Overlay,mad_curr_overlay,1,1.0,1.0
+10,mad,Regularized Overlay,reg_mad_curr_overlay,1,29.0,32.0
+10,mad,Joint,mad_joint,1,1.0,1.0
+10,mad,Regularized Joint,reg_mad_joint,1,72.0,83.0
+10,es,Assets-Full,reg_es_asset_full,1,3.0,4.0
+10,es,Overlay,es_curr_overlay,3,1.0,1.6666666666666667
+10,es,Regularized Overlay,reg_es_curr_overlay,3,32.333333333333336,34.333333333333336
+10,es,Joint,es_joint,4,1.0,1.5
+10,es,Regularized Joint,reg_es_joint,4,70.0,78.25
+10,soes,Assets-Full,reg_soes_asset_full,1,25.0,27.0
+10,soes,Overlay,soes_curr_overlay,3,3.0,4.333333333333333
+10,soes,Regularized Overlay,reg_soes_curr_overlay,2,162.0,176.5
+10,soes,Joint,soes_joint,3,3.0,4.0
+10,soes,Regularized Joint,reg_soes_joint,2,336.0,385.5
+50,mv,Assets-Full,reg_mv_asset_full,2,18.0,20.5
+50,mv,Overlay,mv_curr_overlay,2,4.0,5.0
+50,mv,Regularized Overlay,reg_mv_curr_overlay,2,68.0,82.0
+50,mv,Joint,mv_joint,2,4.5,6.0
+50,mv,Regularized Joint,reg_mv_joint,2,365.5,483.5
+50,smv,Assets-Full,reg_smv_asset_full,1,36.0,39.0
+50,smv,Overlay,smv_curr_overlay,2,5.0,6.5
+50,smv,Regularized Overlay,reg_smv_curr_overlay,1,61.0,68.0
+50,smv,Joint,smv_joint,1,7.0,10.0
+50,smv,Regularized Joint,reg_smv_joint,1,590.0,693.0
+50,mad,Assets-Full,reg_mad_asset_full,1,40.0,47.0
+50,mad,Overlay,mad_curr_overlay,1,10.0,14.0
+50,mad,Regularized Overlay,reg_mad_curr_overlay,1,51.0,54.0
+50,mad,Joint,mad_joint,1,7.0,9.0
+50,mad,Regularized Joint,reg_mad_joint,1,430.0,466.0
+50,es,Assets-Full,reg_es_asset_full,3,43.333333333333336,63.333333333333336
+50,es,Overlay,es_curr_overlay,4,6.5,7.5
+50,es,Regularized Overlay,reg_es_curr_overlay,4,178.75,216.75
+50,es,Joint,es_joint,5,7.6,8.8
+50,es,Regularized Joint,reg_es_joint,4,1004.5,1312.5
+50,soes,Assets-Full,reg_soes_asset_full,1,255.0,314.0
+50,soes,Overlay,soes_curr_overlay,3,31.333333333333332,40.333333333333336
+50,soes,Regularized Overlay,reg_soes_curr_overlay,2,487.5,581.5
+50,soes,Joint,soes_joint,3,32.666666666666664,46.666666666666664
+50,soes,Regularized Joint,reg_soes_joint,2,3108.5,3967.5
+100,mv,Assets-Full,reg_mv_asset_full,2,106.5,144.0
+100,mv,Overlay,mv_curr_overlay,2,14.0,20.0
+100,mv,Regularized Overlay,reg_mv_curr_overlay,2,405.5,551.0
+100,mv,Joint,mv_joint,2,21.5,29.5
+100,mv,Regularized Joint,reg_mv_joint,2,1743.0,2561.0
+100,smv,Assets-Full,reg_smv_asset_full,1,82.0,100.0
+100,smv,Overlay,smv_curr_overlay,2,10.5,12.0
+100,smv,Regularized Overlay,reg_smv_curr_overlay,1,99.0,113.0
+100,smv,Joint,smv_joint,1,12.0,14.0
+100,smv,Regularized Joint,reg_smv_joint,1,1379.0,1696.0
+100,mad,Assets-Full,reg_mad_asset_full,1,86.0,103.0
+100,mad,Overlay,mad_curr_overlay,1,16.0,19.0
+100,mad,Regularized Overlay,reg_mad_curr_overlay,1,87.0,102.0
+100,mad,Joint,mad_joint,1,19.0,24.0
+100,mad,Regularized Joint,reg_mad_joint,1,1144.0,1448.0
+100,es,Assets-Full,reg_es_asset_full,3,117.33333333333333,143.33333333333334
+100,es,Overlay,es_curr_overlay,5,19.2,22.2
+100,es,Regularized Overlay,reg_es_curr_overlay,4,394.5,458.0
+100,es,Joint,es_joint,5,22.6,25.8
+100,es,Regularized Joint,reg_es_joint,3,1839.6666666666667,2390.6666666666665
+100,soes,Assets-Full,reg_soes_asset_full,1,394.0,456.0
+100,soes,Overlay,soes_curr_overlay,2,44.5,56.0
+100,soes,Regularized Overlay,reg_soes_curr_overlay,2,1427.0,1851.0
+100,soes,Joint,soes_joint,3,71.33333333333333,114.33333333333333
+100,soes,Regularized Joint,reg_soes_joint,2,6117.5,9149.5
