@@ -1,0 +1,19 @@
+Starting es_curr_overlay_u50 at Fri Sep  4 07:52:49 PM CEST 2026 on eu-a2p-334
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ES Currency Overlay (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4165
+  ES_95 (daily, %)                       0.7926
+  Volatility (ann., %)                   5.4419
+  MAD (ann., %)                          3.5696
+  Max Drawdown (%)                      39.0938
+  Sharpe Ratio                           0.5004
+  Sortino Ratio                          0.6862
+  ESR                                    0.4118
+  Avg Asset Turnover (per rebal.)        0.8766
+  Avg Currency Turnover (per rebal.)     0.9677
+────────────────────────────────────────────────
+
+Finished es_curr_overlay_u50 at Fri Sep  4 08:02:28 PM CEST 2026 with exit code 0

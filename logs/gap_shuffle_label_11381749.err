@@ -1,0 +1,41 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-08-21 10:18:59  INFO      Shuffle draw 1/20
+2026-08-21 10:18:59  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-08-21 10:22:50  INFO      Shuffle draw 2/20
+2026-08-21 10:26:32  INFO      Shuffle draw 3/20
+2026-08-21 10:30:15  INFO      Shuffle draw 4/20
+2026-08-21 10:34:00  INFO      Shuffle draw 5/20
+2026-08-21 10:37:48  INFO      Shuffle draw 6/20
+2026-08-21 10:41:38  INFO      Shuffle draw 7/20
+2026-08-21 10:45:26  INFO      Shuffle draw 8/20
+2026-08-21 10:49:11  INFO      Shuffle draw 9/20
+2026-08-21 10:53:02  INFO      Shuffle draw 10/20
+2026-08-21 10:56:48  INFO      Shuffle draw 11/20
+2026-08-21 11:00:31  INFO      Shuffle draw 12/20
+2026-08-21 11:04:19  INFO      Shuffle draw 13/20
+2026-08-21 11:07:58  INFO      Shuffle draw 14/20
+2026-08-21 11:11:43  INFO      Shuffle draw 15/20
+2026-08-21 11:15:20  INFO      Shuffle draw 16/20
+2026-08-21 11:19:03  INFO      Shuffle draw 17/20
+2026-08-21 11:22:44  INFO      Shuffle draw 18/20
+2026-08-21 11:26:21  INFO      Shuffle draw 19/20
+2026-08-21 11:30:04  INFO      Shuffle draw 20/20
+2026-08-21 11:33:33  INFO      Wrote 5460 rows to results/in_sample_vs_out_of_sample_label/gaps.csv
+Traceback (most recent call last):
+  File "/cluster/home/arozman/master_thesis/code/scripts/in_sample_vs_out_of_sample.py", line 482, in <module>
+    main()
+  File "/cluster/home/arozman/master_thesis/code/scripts/in_sample_vs_out_of_sample.py", line 467, in main
+    overfit = overfitting_table(grid)
+              ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/scripts/in_sample_vs_out_of_sample.py", line 352, in overfitting_table
+    return pd.DataFrame(rows).sort_values(["measure", "universe"]).reset_index(drop=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 8351, in sort_values
+    keys_data = list(keys)  # type: ignore[arg-type]
+                ^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/core/frame.py", line 8340, in <genexpr>
+    keys = (self._get_label_or_level_values(x, axis=axis) for x in by)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/core/generic.py", line 1776, in _get_label_or_level_values
+    raise KeyError(key)
+KeyError: 'measure'

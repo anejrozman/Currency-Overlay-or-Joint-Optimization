@@ -1,0 +1,4 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-05 13:12:59  INFO      Grid unregularized top-100 es
+2026-09-05 13:13:18  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-09-05 13:41:20  INFO      Wrote 91 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample_demeaned/gaps_unregularized_es_top100.csv

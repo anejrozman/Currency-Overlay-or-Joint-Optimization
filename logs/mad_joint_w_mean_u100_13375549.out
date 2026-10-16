@@ -1,0 +1,19 @@
+Starting mad_joint_w_mean_u100 at Tue Sep  8 02:31:02 PM CEST 2026 on eu-a2p-158
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Mean-MAD Joint (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.3731
+  ES_95 (daily, %)                       0.7418
+  Volatility (ann., %)                   4.9946
+  MAD (ann., %)                          3.1147
+  Max Drawdown (%)                      34.8432
+  Sharpe Ratio                           0.5433
+  Sortino Ratio                           0.721
+  ESR                                    0.4582
+  Avg Asset Turnover (per rebal.)        1.2663
+  Avg Currency Turnover (per rebal.)     1.8901
+────────────────────────────────────────────────
+
+Finished mad_joint_w_mean_u100 at Tue Sep  8 04:14:20 PM CEST 2026 with exit code 0

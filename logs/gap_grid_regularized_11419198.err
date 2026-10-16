@@ -1,0 +1,19 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-08-21 17:00:15  INFO      Grid regularized top-10 mv
+2026-08-21 17:00:22  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-08-21 17:01:00  INFO      Grid regularized top-50 mv
+2026-08-21 17:07:10  INFO      Grid regularized top-100 mv
+2026-08-21 17:44:49  INFO      Grid regularized top-10 es
+2026-08-21 17:47:01  INFO      Grid regularized top-50 es
+2026-08-21 18:14:36  INFO      Grid regularized top-100 es
+2026-08-21 19:26:32  INFO      Grid regularized top-10 mad
+2026-08-21 19:28:22  INFO      Grid regularized top-50 mad
+2026-08-21 19:37:15  INFO      Grid regularized top-100 mad
+2026-08-21 19:55:26  INFO      Wrote 4368 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gaps.csv
+2026-08-21 19:55:29  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_summary.csv
+2026-08-21 19:55:29  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/regression.csv
+2026-08-21 19:55:29  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/overfitting.csv
+2026-08-21 19:55:30  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share_regularized.pdf
+2026-08-21 19:55:31  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share_regularized.png
+2026-08-21 19:55:31  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf
+2026-08-21 19:55:32  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share.png

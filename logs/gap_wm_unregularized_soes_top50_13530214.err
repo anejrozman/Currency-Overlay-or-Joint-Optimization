@@ -1,0 +1,3 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-09 18:42:09  WARNING   Skipping unregularized soes: no usable mean-bearing production run for soes_joint_w_mean top-50, soes_curr_overlay_w_mean top-50 (no entry in top_runs_w_mean.csv, or the backtest has not written selected_params.csv yet).
+2026-09-09 18:42:09  WARNING   Nothing solved for unregularized ['soes'] on [50]; no shard written.

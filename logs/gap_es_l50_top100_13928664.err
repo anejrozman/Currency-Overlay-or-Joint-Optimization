@@ -1,0 +1,5 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-12 14:09:59  INFO      Grid level 50 top-100
+2026-09-12 14:10:12  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-09-12 14:35:50  WARNING   level 50 top-100: 1 of 91 dates dropped, overlay risk not strictly positive (raw ES can be negative at shallow levels).
+2026-09-12 14:35:50  INFO      Wrote 90 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample_es_at_diff_levels/gaps_unregularized_level50_top100.csv

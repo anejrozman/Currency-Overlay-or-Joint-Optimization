@@ -1,0 +1,19 @@
+Starting reg_smv_curr_overlay_u50 at Wed Sep  2 06:45:46 PM CEST 2026 on eu-a2p-311
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Regularized SMV Currency Overlay (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4062
+  ES_95 (daily, %)                       0.7787
+  Volatility (ann., %)                   5.1589
+  MAD (ann., %)                          3.4415
+  Max Drawdown (%)                      36.3944
+  Sharpe Ratio                            0.467
+  Sortino Ratio                          0.6222
+  ESR                                    0.3736
+  Avg Asset Turnover (per rebal.)         0.622
+  Avg Currency Turnover (per rebal.)     1.1776
+────────────────────────────────────────────────
+
+Finished reg_smv_curr_overlay_u50 at Wed Sep  2 08:15:37 PM CEST 2026 with exit code 0

@@ -1,0 +1,3 @@
+Starting reg_soes_curr_overlay_w_mean_u10 at Tue Sep  8 07:40:31 PM CEST 2026 on eu-g5-034-2
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+Finished reg_soes_curr_overlay_w_mean_u10 at Tue Sep  8 09:47:56 PM CEST 2026 with exit code 1

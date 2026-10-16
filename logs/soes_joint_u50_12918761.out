@@ -1,0 +1,19 @@
+Starting soes_joint_u50 at Sat Sep  5 08:19:40 AM CEST 2026 on eu-a2p-036
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  SOES Joint (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4548
+  ES_95 (daily, %)                        0.822
+  Volatility (ann., %)                    5.536
+  MAD (ann., %)                          3.9464
+  Max Drawdown (%)                      32.9061
+  Sharpe Ratio                           0.4665
+  Sortino Ratio                           0.639
+  ESR                                    0.3577
+  Avg Asset Turnover (per rebal.)        1.1052
+  Avg Currency Turnover (per rebal.)     1.5538
+────────────────────────────────────────────────
+
+Finished soes_joint_u50 at Sat Sep  5 09:10:25 AM CEST 2026 with exit code 0

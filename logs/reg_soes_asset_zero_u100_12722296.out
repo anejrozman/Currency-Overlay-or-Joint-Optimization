@@ -1,0 +1,19 @@
+Starting reg_soes_asset_zero_u100 at Thu Sep  3 08:52:56 PM CEST 2026 on eu-a2p-420
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ASSETS-ZERO SOES (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                         0.77
+  ES_95 (daily, %)                       1.3465
+  Volatility (ann., %)                   9.2796
+  MAD (ann., %)                          6.7401
+  Max Drawdown (%)                      35.4967
+  Sharpe Ratio                           0.5298
+  Sortino Ratio                          0.7378
+  ESR                                    0.4022
+  Avg Asset Turnover (per rebal.)        0.9205
+  Avg Currency Turnover (per rebal.)     0.1836
+────────────────────────────────────────────────
+
+Finished reg_soes_asset_zero_u100 at Fri Sep  4 06:57:11 AM CEST 2026 with exit code 0

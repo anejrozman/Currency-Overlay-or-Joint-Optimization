@@ -1,0 +1,19 @@
+Starting mv_curr_overlay_w_mean_u100 at Mon Sep  7 08:40:49 PM CEST 2026 on eu-a2p-083
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Mean-MV Currency Overlay (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.3546
+  ES_95 (daily, %)                       0.7025
+  Volatility (ann., %)                   4.6448
+  MAD (ann., %)                          3.0506
+  Max Drawdown (%)                      27.7821
+  Sharpe Ratio                           0.8588
+  Sortino Ratio                           1.131
+  ESR                                    0.7087
+  Avg Asset Turnover (per rebal.)        0.6121
+  Avg Currency Turnover (per rebal.)     1.8662
+────────────────────────────────────────────────
+
+Finished mv_curr_overlay_w_mean_u100 at Mon Sep  7 09:57:40 PM CEST 2026 with exit code 0

@@ -1,0 +1,19 @@
+Starting es_joint_w_mean_u10 at Sun Sep  6 07:03:00 PM CEST 2026 on eu-a2p-483
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Mean-ES Joint (top-10)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.6761
+  ES_95 (daily, %)                       1.1955
+  Volatility (ann., %)                   8.0555
+  MAD (ann., %)                          5.7071
+  Max Drawdown (%)                      27.9195
+  Sharpe Ratio                           0.1656
+  Sortino Ratio                          0.2269
+  ESR                                    0.1243
+  Avg Asset Turnover (per rebal.)        0.6862
+  Avg Currency Turnover (per rebal.)     2.3671
+────────────────────────────────────────────────
+
+Finished es_joint_w_mean_u10 at Sun Sep  6 07:08:48 PM CEST 2026 with exit code 0

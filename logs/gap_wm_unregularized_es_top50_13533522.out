@@ -1,0 +1,3 @@
+Starting gap_wm_unregularized_es_top50 at Wed Sep  9 07:21:50 PM CEST 2026 on eu-a2p-190
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+Finished gap_wm_unregularized_es_top50 at Wed Sep  9 07:36:05 PM CEST 2026 with exit code 0

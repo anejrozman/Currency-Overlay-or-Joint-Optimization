@@ -1,0 +1,19 @@
+Starting es_joint_a80_u50 at Sat Sep 12 11:55:48 AM CEST 2026 on eu-g9-046-1
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ES Joint (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4347
+  ES_95 (daily, %)                       0.8149
+  Volatility (ann., %)                   5.5263
+  MAD (ann., %)                          3.7194
+  Max Drawdown (%)                      38.8368
+  Sharpe Ratio                           0.5335
+  Sortino Ratio                          0.7271
+  ESR                                    0.4273
+  Avg Asset Turnover (per rebal.)        0.8926
+  Avg Currency Turnover (per rebal.)     1.6734
+────────────────────────────────────────────────
+
+Finished es_joint_a80_u50 at Sat Sep 12 12:05:45 PM CEST 2026 with exit code 0

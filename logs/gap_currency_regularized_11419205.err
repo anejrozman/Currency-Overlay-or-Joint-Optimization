@@ -1,0 +1,15 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-08-21 17:00:32  INFO      Currency arm regularized top-50 K=10: ['HKD', 'SGD', 'USD', 'JPY', 'CAD', 'AUD', 'EUR', 'NOK', 'SEK', 'ZAR']
+2026-08-21 17:00:33  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-08-21 17:37:13  INFO      Currency arm regularized top-50 K=6: ['HKD', 'SGD', 'USD', 'JPY', 'CAD', 'AUD']
+2026-08-21 18:16:50  INFO      Currency arm regularized top-10 K=10: ['EUR', 'JPY', 'USD', 'NZD', 'NOK', 'ZAR', 'HKD', 'SGD', 'GBP', 'DKK']
+2026-08-21 18:21:58  INFO      Currency arm regularized top-10 K=6: ['EUR', 'JPY', 'USD', 'NZD', 'NOK', 'ZAR']
+2026-08-21 18:27:10  INFO      Currency arm regularized top-10 K=3: ['EUR', 'JPY', 'USD']
+2026-08-21 18:32:21  INFO      Wrote 3549 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gaps.csv
+2026-08-21 18:32:24  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_summary.csv
+2026-08-21 18:32:24  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/regression.csv
+2026-08-21 18:32:24  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/overfitting.csv
+2026-08-21 18:32:26  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share_regularized.pdf
+2026-08-21 18:32:26  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share_regularized.png
+2026-08-21 18:32:27  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf
+2026-08-21 18:32:28  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share.png

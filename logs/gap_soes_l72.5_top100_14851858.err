@@ -1,0 +1,5 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-22 13:16:18  INFO      Sweeping Second-Order Expected Shortfall into /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample_soes_at_diff_levels
+2026-09-22 13:16:18  INFO      Grid level 72.5 top-100
+2026-09-22 13:16:32  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-09-22 14:34:31  INFO      Wrote 91 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample_soes_at_diff_levels/gaps_unregularized_level72.5_top100.csv

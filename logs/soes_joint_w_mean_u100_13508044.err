@@ -1,0 +1,78 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-09 15:01:15  INFO      portfolio_backtest.utils.io  Run directory: /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_4
+2026-09-09 15:01:15  INFO      __main__  Strategy: soes_joint_w_mean
+2026-09-09 15:01:15  INFO      __main__  Universe: top-100 per economy
+2026-09-09 15:01:15  INFO      __main__  Run directory: /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_4
+2026-09-09 15:02:16  INFO      __main__  Config saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_4/config.json
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |----------------------------------------| 0.8% (1/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |----------------------------------------| 1.5% (2/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |----------------------------------------| 2.3% (3/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█---------------------------------------| 3.0% (4/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█---------------------------------------| 3.8% (5/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█---------------------------------------| 4.5% (6/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██--------------------------------------| 5.3% (7/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██--------------------------------------| 6.1% (8/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██--------------------------------------| 6.8% (9/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 7.6% (10/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 8.3% (11/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 9.1% (12/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 9.8% (13/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████------------------------------------| 10.6% (14/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████------------------------------------| 11.4% (15/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████------------------------------------| 12.1% (16/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████-----------------------------------| 12.9% (17/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████-----------------------------------| 13.6% (18/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████-----------------------------------| 14.4% (19/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 15.2% (20/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 15.9% (21/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 16.7% (22/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 17.4% (23/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████---------------------------------| 18.2% (24/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████---------------------------------| 18.9% (25/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████---------------------------------| 19.7% (26/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████--------------------------------| 20.5% (27/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████--------------------------------| 21.2% (28/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████--------------------------------| 22.0% (29/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████-------------------------------| 22.7% (30/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████-------------------------------| 23.5% (31/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████-------------------------------| 24.2% (32/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 25.0% (33/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 25.8% (34/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 26.5% (35/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 27.3% (36/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████-----------------------------| 28.0% (37/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████-----------------------------| 28.8% (38/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████-----------------------------| 29.5% (39/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████----------------------------| 30.3% (40/132)
+2026-09-09 15:02:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████----------------------------| 31.1% (41/132)
+2026-09-09 15:02:17  INFO      gurobipy  Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-09-09 15:03:03  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████----------------------------| 31.8% (42/132)
+2026-09-09 15:03:49  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 32.6% (43/132)
+2026-09-09 15:04:50  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 33.3% (44/132)
+2026-09-09 15:05:35  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 34.1% (45/132)
+2026-09-09 15:06:19  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 34.8% (46/132)
+2026-09-09 15:07:47  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████--------------------------| 35.6% (47/132)
+2026-09-09 15:09:06  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████--------------------------| 36.4% (48/132)
+2026-09-09 15:10:53  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████--------------------------| 37.1% (49/132)
+2026-09-09 15:12:28  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████-------------------------| 37.9% (50/132)
+2026-09-09 15:13:46  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████-------------------------| 38.6% (51/132)
+2026-09-09 15:15:00  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████-------------------------| 39.4% (52/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/optimizers/soes_joint_w_mean.py:220: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(
+Traceback (most recent call last):
+  File "/cluster/home/arozman/master_thesis/code/scripts/run_strategy.py", line 317, in <module>
+    main()
+  File "/cluster/home/arozman/master_thesis/code/scripts/run_strategy.py", line 265, in main
+    oos_returns = backtester.run(data_bundle)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/backtest/backtester.py", line 584, in run
+    candidate_weights = opt.optimize()
+                        ^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/optimizers/soes_joint_w_mean.py", line 339, in optimize
+    return self._optimize_joint(self.Y_fh, self.Y_c, self.mu_a, self.mu_c)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/optimizers/soes_joint_w_mean.py", line 281, in _optimize_joint
+    self._solve(cp.Problem(cp.Minimize(objective), constraints))
+  File "/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/optimizers/soes_joint_w_mean.py", line 243, in _solve
+    raise RuntimeError(f"Optimization failed: status={problem.status}")
+RuntimeError: Optimization failed: status=user_limit

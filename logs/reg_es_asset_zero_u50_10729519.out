@@ -1,0 +1,18 @@
+Starting reg_es_asset_zero_u50 at Fri Aug 14 06:52:05 PM CEST 2026 on eu-a2p-305
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ASSETS-ZERO ES (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.6104
+  ES_95 (daily, %)                       1.1082
+  Volatility (ann., %)                   7.2899
+  Max Drawdown (%)                      34.4562
+  Sharpe Ratio                            0.402
+  Sortino Ratio                          0.5582
+  ESR                                    0.3025
+  Avg Asset Turnover (per rebal.)        0.9135
+  Avg Currency Turnover (per rebal.)        0.0
+────────────────────────────────────────────────
+
+Finished reg_es_asset_zero_u50 at Fri Aug 14 08:01:28 PM CEST 2026 with exit code 0

@@ -1,0 +1,4 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-09 18:42:09  INFO      Grid unregularized top-100 smv
+2026-09-09 18:42:28  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-09-09 18:59:51  INFO      Wrote 89 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample_w_mean/gaps_unregularized_smv_top100.csv

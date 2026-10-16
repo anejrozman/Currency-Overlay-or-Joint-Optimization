@@ -1,0 +1,18 @@
+Starting reg_es_asset_full_u100 at Thu Aug 13 07:04:49 PM CEST 2026 on eu-a2p-364
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ASSETS-FULL ES (3m) (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.3293
+  ES_95 (daily, %)                       0.6574
+  Volatility (ann., %)                   4.4379
+  Max Drawdown (%)                      31.5926
+  Sharpe Ratio                           0.8335
+  Sortino Ratio                          1.0745
+  ESR                                    0.7075
+  Avg Asset Turnover (per rebal.)        0.7227
+  Avg Currency Turnover (per rebal.)     0.9625
+────────────────────────────────────────────────
+
+Finished reg_es_asset_full_u100 at Thu Aug 13 09:54:07 PM CEST 2026 with exit code 0

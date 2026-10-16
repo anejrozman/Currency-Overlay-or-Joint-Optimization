@@ -1,0 +1,19 @@
+Starting mad_curr_overlay_u100 at Wed Aug 19 02:53:00 PM CEST 2026 on eu-a2p-500
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  MAD Currency Overlay (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.3302
+  ES_95 (daily, %)                       0.6647
+  Volatility (ann., %)                   4.6303
+  MAD (ann., %)                          2.7765
+  Max Drawdown (%)                      31.2454
+  Sharpe Ratio                            0.526
+  Sortino Ratio                          0.7004
+  ESR                                    0.4646
+  Avg Asset Turnover (per rebal.)        0.8783
+  Avg Currency Turnover (per rebal.)     0.9742
+────────────────────────────────────────────────
+
+Finished mad_curr_overlay_u100 at Wed Aug 19 03:17:57 PM CEST 2026 with exit code 0

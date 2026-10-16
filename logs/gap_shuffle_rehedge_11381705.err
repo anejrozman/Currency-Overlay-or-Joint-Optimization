@@ -1,0 +1,28 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-08-21 10:17:34  INFO      Shuffle draw 1/20
+2026-08-21 10:17:34  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-08-21 10:20:35  INFO      Shuffle draw 2/20
+2026-08-21 10:23:37  INFO      Shuffle draw 3/20
+2026-08-21 10:26:38  INFO      Shuffle draw 4/20
+2026-08-21 10:29:41  INFO      Shuffle draw 5/20
+2026-08-21 10:32:43  INFO      Shuffle draw 6/20
+2026-08-21 10:35:46  INFO      Shuffle draw 7/20
+2026-08-21 10:38:47  INFO      Shuffle draw 8/20
+2026-08-21 10:41:49  INFO      Shuffle draw 9/20
+2026-08-21 10:44:52  INFO      Shuffle draw 10/20
+2026-08-21 10:47:55  INFO      Shuffle draw 11/20
+2026-08-21 10:50:57  INFO      Shuffle draw 12/20
+2026-08-21 10:53:59  INFO      Shuffle draw 13/20
+2026-08-21 10:57:01  INFO      Shuffle draw 14/20
+2026-08-21 11:00:03  INFO      Shuffle draw 15/20
+2026-08-21 11:03:05  INFO      Shuffle draw 16/20
+2026-08-21 11:06:08  INFO      Shuffle draw 17/20
+2026-08-21 11:09:11  INFO      Shuffle draw 18/20
+2026-08-21 11:12:14  INFO      Shuffle draw 19/20
+2026-08-21 11:15:16  INFO      Shuffle draw 20/20
+2026-08-21 11:18:13  INFO      Wrote 6825 rows to /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gaps.csv
+2026-08-21 11:18:16  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_summary.csv
+2026-08-21 11:18:16  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/regression.csv
+2026-08-21 11:18:16  INFO      Wrote /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/overfitting.csv
+2026-08-21 11:18:17  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share.pdf
+2026-08-21 11:18:18  INFO      Saved figure: /cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample/gap_vs_currency_share.png

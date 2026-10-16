@@ -1,0 +1,19 @@
+Starting reg_smv_asset_full_u50 at Wed Sep  2 06:48:26 PM CEST 2026 on eu-a2p-355
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ASSETS-FULL SMV (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4089
+  ES_95 (daily, %)                       0.7883
+  Volatility (ann., %)                   5.2168
+  MAD (ann., %)                          3.4539
+  Max Drawdown (%)                      36.5331
+  Sharpe Ratio                           0.4894
+  Sortino Ratio                           0.647
+  ESR                                    0.3934
+  Avg Asset Turnover (per rebal.)         0.672
+  Avg Currency Turnover (per rebal.)     0.9496
+────────────────────────────────────────────────
+
+Finished reg_smv_asset_full_u50 at Wed Sep  2 07:37:49 PM CEST 2026 with exit code 0

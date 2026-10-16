@@ -1,0 +1,19 @@
+Starting reg_soes_joint_w_mean_u10 at Tue Sep  8 07:40:30 PM CEST 2026 on eu-g5-034-2
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Regularized Mean-SOES Joint (top-10)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.7121
+  ES_95 (daily, %)                        1.267
+  Volatility (ann., %)                   8.3703
+  MAD (ann., %)                          5.9947
+  Max Drawdown (%)                      30.6701
+  Sharpe Ratio                           0.0686
+  Sortino Ratio                          0.0933
+  ESR                                    0.0508
+  Avg Asset Turnover (per rebal.)        0.7985
+  Avg Currency Turnover (per rebal.)      1.728
+────────────────────────────────────────────────
+
+Finished reg_soes_joint_w_mean_u10 at Wed Sep  9 04:40:45 AM CEST 2026 with exit code 0

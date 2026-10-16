@@ -1,0 +1,24 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-09 18:42:10  INFO      Grid unregularized top-100 mv
+2026-09-09 18:42:29  INFO      Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+Traceback (most recent call last):
+  File "/cluster/home/arozman/master_thesis/code/scripts/in_sample_vs_out_of_sample_w_mean.py", line 665, in <module>
+    main()
+  File "/cluster/home/arozman/master_thesis/code/scripts/in_sample_vs_out_of_sample_w_mean.py", line 631, in main
+    solved = grid_arm(solver, args.family, args.measures, args.universes, args.out_dir)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/scripts/in_sample_vs_out_of_sample_w_mean.py", line 513, in grid_arm
+    paired.to_csv(tmp, index=False)
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/core/generic.py", line 3988, in to_csv
+    return DataFrameRenderer(formatter).to_csv(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/io/formats/format.py", line 1025, in to_csv
+    csv_formatter.save()
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/io/formats/csvs.py", line 251, in save
+    with get_handle(
+         ^^^^^^^^^^^
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 797, in get_handle
+    check_parent_directory(str(handle))
+  File "/cluster/home/arozman/master_thesis/code/.venv/lib/python3.12/site-packages/pandas/io/common.py", line 656, in check_parent_directory
+    raise OSError(rf"Cannot save file into a non-existent directory: '{parent}'")
+OSError: Cannot save file into a non-existent directory: '/cluster/home/arozman/master_thesis/results/in_sample_vs_out_of_sample_w_mean'

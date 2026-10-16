@@ -1,0 +1,19 @@
+Starting smv_joint_w_mean_u10 at Tue Sep  8 11:15:09 AM CEST 2026 on eu-a2p-142
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Mean-SMV Joint (top-10)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.6805
+  ES_95 (daily, %)                       1.2143
+  Volatility (ann., %)                    8.147
+  MAD (ann., %)                          5.7505
+  Max Drawdown (%)                      29.3899
+  Sharpe Ratio                           0.2865
+  Sortino Ratio                          0.3931
+  ESR                                    0.2161
+  Avg Asset Turnover (per rebal.)        0.5228
+  Avg Currency Turnover (per rebal.)     2.4229
+────────────────────────────────────────────────
+
+Finished smv_joint_w_mean_u10 at Tue Sep  8 11:23:22 AM CEST 2026 with exit code 0

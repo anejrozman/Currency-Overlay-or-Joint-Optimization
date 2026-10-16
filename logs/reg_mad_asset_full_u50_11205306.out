@@ -1,0 +1,19 @@
+Starting reg_mad_asset_full_u50 at Wed Aug 19 02:51:18 PM CEST 2026 on eu-a2p-503
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ASSETS-FULL MAD (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4035
+  ES_95 (daily, %)                       0.8135
+  Volatility (ann., %)                   6.1929
+  MAD (ann., %)                          3.2886
+  Max Drawdown (%)                      35.9033
+  Sharpe Ratio                           0.4751
+  Sortino Ratio                          0.7718
+  ESR                                    0.4593
+  Avg Asset Turnover (per rebal.)        0.6514
+  Avg Currency Turnover (per rebal.)      0.959
+────────────────────────────────────────────────
+
+Finished reg_mad_asset_full_u50 at Wed Aug 19 03:48:44 PM CEST 2026 with exit code 0

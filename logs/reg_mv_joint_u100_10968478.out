@@ -1,0 +1,18 @@
+Starting reg_mv_joint_u100 at Mon Aug 17 03:04:56 PM CEST 2026 on eu-a2p-364
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Regularized MV Joint (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.3131
+  ES_95 (daily, %)                       0.6312
+  Volatility (ann., %)                   4.2881
+  Max Drawdown (%)                      26.3992
+  Sharpe Ratio                            0.758
+  Sortino Ratio                          0.9799
+  ESR                                    0.6539
+  Avg Asset Turnover (per rebal.)        0.5514
+  Avg Currency Turnover (per rebal.)     1.0315
+────────────────────────────────────────────────
+
+Finished reg_mv_joint_u100 at Wed Aug 19 05:27:50 PM CEST 2026 with exit code 0

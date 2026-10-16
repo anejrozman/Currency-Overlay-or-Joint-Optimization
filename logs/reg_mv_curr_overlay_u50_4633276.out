@@ -1,0 +1,18 @@
+Starting reg_mv_curr_overlay_u50 at Thu Jun 25 04:04:04 PM CEST 2026 on eu-g9-062-3
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Regularized MV Currency Overlay (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.6297
+  ES_95 (daily, %)                       1.2214
+  Volatility (ann., %)                   7.6213
+  Max Drawdown (%)                      45.5529
+  Sharpe Ratio                           0.4247
+  Sortino Ratio                          0.5561
+  ESR                                    0.3238
+  Avg Asset Turnover (per rebal.)        0.1886
+  Avg Currency Turnover (per rebal.)     1.0573
+────────────────────────────────────────────────
+
+Finished reg_mv_curr_overlay_u50 at Thu Jun 25 06:31:46 PM CEST 2026 with exit code 0

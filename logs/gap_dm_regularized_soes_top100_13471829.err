@@ -1,0 +1,3 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-09-09 09:39:58  WARNING   Skipping regularized soes: no usable de-meaned production run for reg_soes_joint top-100 (no entry in top_demeaned_runs.csv, or the backtest has not written selected_params.csv yet).
+2026-09-09 09:39:58  WARNING   Nothing solved for regularized ['soes'] on [100]; no shard written.

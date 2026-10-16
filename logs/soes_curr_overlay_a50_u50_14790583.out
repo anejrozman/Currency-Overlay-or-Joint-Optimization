@@ -1,0 +1,19 @@
+Starting soes_curr_overlay_a50_u50 at Mon Sep 21 05:42:04 PM CEST 2026 on eu-g5-037-3
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  SOES Currency Overlay (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4419
+  ES_95 (daily, %)                       0.8248
+  Volatility (ann., %)                   5.5415
+  MAD (ann., %)                          3.7739
+  Max Drawdown (%)                      37.9058
+  Sharpe Ratio                            0.517
+  Sortino Ratio                          0.6971
+  ESR                                    0.4084
+  Avg Asset Turnover (per rebal.)        0.6657
+  Avg Currency Turnover (per rebal.)     1.4619
+────────────────────────────────────────────────
+
+Finished soes_curr_overlay_a50_u50 at Mon Sep 21 06:26:26 PM CEST 2026 with exit code 0

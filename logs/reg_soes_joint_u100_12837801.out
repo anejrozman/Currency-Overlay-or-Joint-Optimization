@@ -1,0 +1,19 @@
+Starting reg_soes_joint_u100 at Fri Sep  4 02:56:21 PM CEST 2026 on eu-a2p-463
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Regularized SOES Joint (top-100)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.3466
+  ES_95 (daily, %)                       0.6494
+  Volatility (ann., %)                   4.5182
+  MAD (ann., %)                          3.0915
+  Max Drawdown (%)                      24.7002
+  Sharpe Ratio                           0.9056
+  Sortino Ratio                           1.203
+  ESR                                    0.7436
+  Avg Asset Turnover (per rebal.)        0.9327
+  Avg Currency Turnover (per rebal.)     1.2579
+────────────────────────────────────────────────
+
+Finished reg_soes_joint_u100 at Thu Sep 10 12:52:22 PM CEST 2026 with exit code 0

@@ -1,0 +1,19 @@
+Starting mad_curr_overlay_w_mean_u50 at Wed Sep  9 02:58:43 PM CEST 2026 on eu-a2p-228
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  Mean-MAD Currency Overlay (top-50)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.4288
+  ES_95 (daily, %)                        0.836
+  Volatility (ann., %)                   5.6772
+  MAD (ann., %)                          3.6522
+  Max Drawdown (%)                      36.1864
+  Sharpe Ratio                           0.6327
+  Sortino Ratio                          0.8729
+  ESR                                    0.5276
+  Avg Asset Turnover (per rebal.)        0.8199
+  Avg Currency Turnover (per rebal.)     1.6025
+────────────────────────────────────────────────
+
+Finished mad_curr_overlay_w_mean_u50 at Wed Sep  9 03:13:07 PM CEST 2026 with exit code 0

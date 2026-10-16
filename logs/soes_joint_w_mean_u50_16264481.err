@@ -1,0 +1,191 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+2026-10-06 13:30:02  INFO      portfolio_backtest.utils.io  Run directory: /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8
+2026-10-06 13:30:02  INFO      __main__  Strategy: soes_joint_w_mean
+2026-10-06 13:30:02  INFO      __main__  Universe: top-50 per economy
+2026-10-06 13:30:02  INFO      __main__  Run directory: /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8
+2026-10-06 13:30:42  INFO      __main__  Config saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/config.json
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |----------------------------------------| 0.8% (1/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |----------------------------------------| 1.5% (2/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |----------------------------------------| 2.3% (3/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█---------------------------------------| 3.0% (4/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█---------------------------------------| 3.8% (5/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█---------------------------------------| 4.5% (6/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██--------------------------------------| 5.3% (7/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██--------------------------------------| 6.1% (8/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██--------------------------------------| 6.8% (9/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 7.6% (10/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 8.3% (11/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 9.1% (12/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███-------------------------------------| 9.8% (13/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████------------------------------------| 10.6% (14/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████------------------------------------| 11.4% (15/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████------------------------------------| 12.1% (16/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████-----------------------------------| 12.9% (17/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████-----------------------------------| 13.6% (18/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████-----------------------------------| 14.4% (19/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 15.2% (20/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 15.9% (21/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 16.7% (22/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████----------------------------------| 17.4% (23/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████---------------------------------| 18.2% (24/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████---------------------------------| 18.9% (25/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████---------------------------------| 19.7% (26/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████--------------------------------| 20.5% (27/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████--------------------------------| 21.2% (28/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████--------------------------------| 22.0% (29/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████-------------------------------| 22.7% (30/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████-------------------------------| 23.5% (31/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████-------------------------------| 24.2% (32/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 25.0% (33/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 25.8% (34/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 26.5% (35/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████------------------------------| 27.3% (36/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████-----------------------------| 28.0% (37/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████-----------------------------| 28.8% (38/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████-----------------------------| 29.5% (39/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████----------------------------| 30.3% (40/132)
+2026-10-06 13:30:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████----------------------------| 31.1% (41/132)
+2026-10-06 13:30:42  INFO      gurobipy  Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+2026-10-06 13:31:19  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████----------------------------| 31.8% (42/132)
+2026-10-06 13:31:51  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 32.6% (43/132)
+2026-10-06 13:32:29  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 33.3% (44/132)
+2026-10-06 13:33:02  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 34.1% (45/132)
+2026-10-06 13:33:38  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████---------------------------| 34.8% (46/132)
+2026-10-06 13:34:15  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████--------------------------| 35.6% (47/132)
+2026-10-06 13:34:54  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████--------------------------| 36.4% (48/132)
+2026-10-06 13:35:44  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████--------------------------| 37.1% (49/132)
+2026-10-06 13:36:36  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████-------------------------| 37.9% (50/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 13:38:01  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=1992-09-30, window_end=2002-09-30, n_obs=2609, n_assets=466, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 76 barrier iterations), objective 1.777971e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 23 barrier iterations), objective 1.777767e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 13:38:01  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████-------------------------| 38.6% (51/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 13:39:20  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=1992-12-31, window_end=2002-12-31, n_obs=2609, n_assets=468, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 56 barrier iterations), objective 1.835293e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 24 barrier iterations), objective 1.835036e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 13:39:20  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████-------------------------| 39.4% (52/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 13:40:11  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=1993-03-31, window_end=2002-03-29, n_obs=2348, n_assets=471, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 51 barrier iterations), objective 1.407615e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 22 barrier iterations), objective 1.406887e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 13:41:16  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=1993-03-31, window_end=2003-03-31, n_obs=2609, n_assets=471, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 70 barrier iterations), objective 1.938880e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 22 barrier iterations), objective 1.938290e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 13:41:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████------------------------| 40.2% (53/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 13:42:42  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=1993-06-30, window_end=2003-06-30, n_obs=2609, n_assets=477, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 68 barrier iterations), objective 1.894932e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 23 barrier iterations), objective 1.894403e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 13:42:43  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████------------------------| 40.9% (54/132)
+2026-10-06 13:43:35  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████------------------------| 41.7% (55/132)
+2026-10-06 13:44:11  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████------------------------| 42.4% (56/132)
+2026-10-06 13:45:05  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████-----------------------| 43.2% (57/132)
+2026-10-06 13:45:59  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████-----------------------| 43.9% (58/132)
+2026-10-06 13:46:34  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████-----------------------| 44.7% (59/132)
+2026-10-06 13:47:12  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████----------------------| 45.5% (60/132)
+2026-10-06 13:47:46  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████----------------------| 46.2% (61/132)
+2026-10-06 13:48:42  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████----------------------| 47.0% (62/132)
+2026-10-06 13:49:37  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████---------------------| 47.7% (63/132)
+2026-10-06 13:50:15  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████---------------------| 48.5% (64/132)
+2026-10-06 13:50:53  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████---------------------| 49.2% (65/132)
+2026-10-06 13:51:28  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████--------------------| 50.0% (66/132)
+2026-10-06 13:52:02  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████--------------------| 50.8% (67/132)
+2026-10-06 13:52:36  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████--------------------| 51.5% (68/132)
+2026-10-06 13:53:12  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████--------------------| 52.3% (69/132)
+2026-10-06 13:53:52  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████-------------------| 53.0% (70/132)
+2026-10-06 13:54:37  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████-------------------| 53.8% (71/132)
+2026-10-06 13:55:20  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████-------------------| 54.5% (72/132)
+2026-10-06 13:55:59  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████------------------| 55.3% (73/132)
+2026-10-06 13:56:43  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████------------------| 56.1% (74/132)
+2026-10-06 13:57:27  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████------------------| 56.8% (75/132)
+2026-10-06 13:58:05  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████-----------------| 57.6% (76/132)
+2026-10-06 13:58:44  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████-----------------| 58.3% (77/132)
+2026-10-06 13:59:23  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████-----------------| 59.1% (78/132)
+2026-10-06 14:00:02  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████-----------------| 59.8% (79/132)
+2026-10-06 14:00:43  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████----------------| 60.6% (80/132)
+2026-10-06 14:01:26  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████----------------| 61.4% (81/132)
+2026-10-06 14:02:14  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████----------------| 62.1% (82/132)
+2026-10-06 14:02:59  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████---------------| 62.9% (83/132)
+2026-10-06 14:03:43  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████---------------| 63.6% (84/132)
+2026-10-06 14:04:30  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████---------------| 64.4% (85/132)
+2026-10-06 14:05:16  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████--------------| 65.2% (86/132)
+2026-10-06 14:06:03  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████--------------| 65.9% (87/132)
+2026-10-06 14:06:51  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████--------------| 66.7% (88/132)
+2026-10-06 14:07:47  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████--------------| 67.4% (89/132)
+2026-10-06 14:08:34  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████-------------| 68.2% (90/132)
+2026-10-06 14:09:20  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████-------------| 68.9% (91/132)
+2026-10-06 14:10:21  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████-------------| 69.7% (92/132)
+2026-10-06 14:11:10  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████------------| 70.5% (93/132)
+2026-10-06 14:12:00  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████------------| 71.2% (94/132)
+2026-10-06 14:13:13  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████------------| 72.0% (95/132)
+2026-10-06 14:14:28  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████-----------| 72.7% (96/132)
+2026-10-06 14:15:33  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████-----------| 73.5% (97/132)
+2026-10-06 14:16:45  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████-----------| 74.2% (98/132)
+2026-10-06 14:17:47  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████----------| 75.0% (99/132)
+2026-10-06 14:18:56  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████----------| 75.8% (100/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:21:03  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2005-03-31, window_end=2015-03-31, n_obs=2609, n_assets=605, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 55 barrier iterations), objective 2.709546e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 25 barrier iterations), objective 2.709075e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:21:03  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████----------| 76.5% (101/132)
+2026-10-06 14:22:25  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████----------| 77.3% (102/132)
+2026-10-06 14:23:52  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████---------| 78.0% (103/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:25:07  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2006-01-02, window_end=2014-12-31, n_obs=2348, n_assets=600, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 54 barrier iterations), objective 2.882471e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 25 barrier iterations), objective 2.881612e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:26:01  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████---------| 78.8% (104/132)
+2026-10-06 14:27:11  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████---------| 79.5% (105/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:28:35  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2006-06-30, window_end=2015-06-30, n_obs=2348, n_assets=609, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 67 barrier iterations), objective 2.685342e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 22 barrier iterations), objective 2.684665e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:29:08  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████--------| 80.3% (106/132)
+2026-10-06 14:30:44  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████--------| 81.1% (107/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:32:04  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2007-01-01, window_end=2015-12-30, n_obs=2348, n_assets=602, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 58 barrier iterations), objective 3.142992e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 25 barrier iterations), objective 3.141742e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:32:37  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████--------| 81.8% (108/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:34:04  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2007-04-02, window_end=2016-03-31, n_obs=2349, n_assets=604, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 74 barrier iterations), objective 3.169168e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 24 barrier iterations), objective 3.168639e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:35:30  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2007-04-02, window_end=2017-03-31, n_obs=2610, n_assets=604, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 51 barrier iterations), objective 3.248236e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 25 barrier iterations), objective 3.246320e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:35:30  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████-------| 82.6% (109/132)
+2026-10-06 14:36:31  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████-------| 83.3% (110/132)
+2026-10-06 14:37:40  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████-------| 84.1% (111/132)
+2026-10-06 14:39:14  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████-------| 84.8% (112/132)
+2026-10-06 14:40:15  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████████------| 85.6% (113/132)
+2026-10-06 14:41:14  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████████------| 86.4% (114/132)
+2026-10-06 14:42:15  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████████------| 87.1% (115/132)
+2026-10-06 14:43:33  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████████-----| 87.9% (116/132)
+2026-10-06 14:44:34  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████████-----| 88.6% (117/132)
+2026-10-06 14:45:41  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████████-----| 89.4% (118/132)
+2026-10-06 14:46:31  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████████----| 90.2% (119/132)
+2026-10-06 14:47:36  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████████----| 90.9% (120/132)
+2026-10-06 14:48:34  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████████----| 91.7% (121/132)
+2026-10-06 14:49:44  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████████----| 92.4% (122/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:51:47  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2010-09-30, window_end=2020-09-30, n_obs=2610, n_assets=594, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 67 barrier iterations), objective 3.371248e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 29 barrier iterations), objective 3.368708e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:51:47  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████████---| 93.2% (123/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:52:59  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2010-12-31, window_end=2019-12-31, n_obs=2348, n_assets=601, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 59 barrier iterations), objective 1.933752e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 24 barrier iterations), objective 1.930356e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:53:41  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████████---| 93.9% (124/132)
+2026-10-06 14:54:48  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |█████████████████████████████████████---| 94.7% (125/132)
+2026-10-06 14:56:17  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████████████--| 95.5% (126/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 14:57:42  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2011-09-30, window_end=2020-09-30, n_obs=2349, n_assets=594, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 66 barrier iterations), objective 3.745861e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 29 barrier iterations), objective 3.744710e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:59:15  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2011-09-30, window_end=2021-09-30, n_obs=2610, n_assets=594, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 69 barrier iterations), objective 3.880620e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 27 barrier iterations), objective 3.878909e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 14:59:15  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████████████--| 96.2% (127/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 15:00:57  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2012-01-02, window_end=2020-12-31, n_obs=2349, n_assets=599, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 96 barrier iterations), objective 3.538445e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 33 barrier iterations), objective 3.538399e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 15:01:44  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |██████████████████████████████████████--| 97.0% (128/132)
+/cluster/home/arozman/master_thesis/code/src/portfolio_backtest/utils/solver_fallback.py:84: UserWarning: Solution may be inaccurate. Try another solver, adjusting the solver settings, or solve with verbose=True for more information.
+  problem.solve(solver=solver, verbose=False, **params)
+2026-10-06 15:03:16  WARNING   portfolio_backtest.optimizers.soes_joint_w_mean  Solver fallback [solve=joint, window_start=2012-04-02, window_end=2021-03-31, n_obs=2348, n_assets=601, gamma=0.5]. gurobi: user_limit (Gurobi SUBOPTIMAL, 74 barrier iterations), objective 3.605300e-03; gurobi_robust: optimal (Gurobi OPTIMAL, 31 barrier iterations), objective 3.604379e-03; clarabel: not run. Accepted gurobi_robust.
+2026-10-06 15:03:54  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████████████-| 97.7% (129/132)
+2026-10-06 15:04:58  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████████████-| 98.5% (130/132)
+2026-10-06 15:06:10  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |███████████████████████████████████████-| 99.2% (131/132)
+2026-10-06 15:07:14  INFO      portfolio_backtest.backtest.backtester  Backtest progress: |████████████████████████████████████████| 100.0% (132/132)
+2026-10-06 15:07:14  WARNING   __main__  Solver fallbacks: 17 solves needed one (accepted: {'gurobi_robust': 17}). Details saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/solver_fallbacks.csv
+2026-10-06 15:07:14  INFO      __main__  OOS returns saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/oos_returns.csv
+2026-10-06 15:07:14  INFO      __main__  Selected params saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/selected_params.csv
+2026-10-06 15:07:14  INFO      __main__  Weights saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/weights_assets.csv (50559 asset rows) and /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/weights_currencies.csv (1274 currency rows)
+2026-10-06 15:07:14  INFO      __main__  Metrics saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/metrics.json
+2026-10-06 15:07:15  INFO      __main__  Plot saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8/cumulative_returns_plot.png
+2026-10-06 15:07:15  INFO      __main__  All run artifacts saved to /cluster/home/arozman/master_thesis/results/runs/soes_joint_w_mean/run_8
