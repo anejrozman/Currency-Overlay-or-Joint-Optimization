@@ -1,0 +1,19 @@
+Starting reg_mad_asset_full_u10 at Fri Oct 16 04:25:41 PM CEST 2026 on eu-a2p-302
+Set parameter TokenServer to value "lic-gurobi.ethz.ch"
+
+────────────────────────────────────────────────
+  ASSETS-FULL MAD (top-10)
+────────────────────────────────────────────────
+  ES_80 (daily, %)                       0.6852
+  ES_95 (daily, %)                       1.2678
+  Volatility (ann., %)                   8.3582
+  MAD (ann., %)                           5.674
+  Max Drawdown (%)                      28.5915
+  Sharpe Ratio                           0.1989
+  Sortino Ratio                          0.2668
+  ESR                                    0.1528
+  Avg Asset Turnover (per rebal.)         0.541
+  Avg Currency Turnover (per rebal.)     0.9215
+────────────────────────────────────────────────
+
+Finished reg_mad_asset_full_u10 at Fri Oct 16 04:33:54 PM CEST 2026 with exit code 0
