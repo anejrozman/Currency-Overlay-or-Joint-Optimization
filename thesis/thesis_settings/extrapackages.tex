@@ -47,6 +47,38 @@
 \usepackage{listings}
 \lstset{language=TeX,basicstyle={\normalfont\ttfamily}}
 
+%% Python listings of Appendix E: colored syntax highlighting and line
+%% numbers. xcolor is loaded by TikZ. Use with [style=python].
+\definecolor{lstkeyword}{RGB}{0,51,179}
+\definecolor{lstcvxpy}{RGB}{0,122,122}
+\definecolor{lstcomment}{RGB}{0,128,0}
+\definecolor{lststring}{RGB}{163,21,21}
+\definecolor{lstnumber}{gray}{0.55}
+\definecolor{lstframe}{gray}{0.75}
+\definecolor{lstbackground}{gray}{0.97}
+\lstdefinestyle{python}{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  keepspaces=true,
+  keywordstyle=\color{lstkeyword}\bfseries,
+  emph={Variable,Parameter,Problem,Minimize,Maximize,sum,sum_squares,norm,solve,value},
+  emphstyle=\color{lstcvxpy},
+  commentstyle=\color{lstcomment}\itshape,
+  stringstyle=\color{lststring},
+  showstringspaces=false,
+  numbers=left,
+  numberstyle=\tiny\color{lstnumber},
+  numbersep=10pt,
+  xleftmargin=2em,
+  frame=single,
+  framesep=4pt,
+  rulecolor=\color{lstframe},
+  backgroundcolor=\color{lstbackground},
+  breaklines=true,
+  captionpos=b
+}
+
 %% [REC] Fancy character protrusion.  Must be loaded after all fonts.
 \usepackage{microtype}
 

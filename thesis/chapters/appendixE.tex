@@ -1,4 +1,4 @@
-\chapter{Numerical Implementation of the Optimization Problems} \label{app:optimization-implementation}
+\chapter{Numerical Implementation and Analysis of the Optimization Problems} \label{app:optimization-implementation}
 
 In this appendix, we provide details on the numerical implementation of the optimization problems 
 discussed in the thesis. We describe the algorithms used, 
@@ -9,13 +9,100 @@ into the performance of the implemented algorithms across different scenarios.
 
 \section{The CVXPY Library}\label{sec:cvxpy}
 
-The optimization problems were implemented using the CVXPY library in Python, 
-which provides a user-friendly interface for defining and solving convex optimization problems. For the 
-considered risk measures in the thesis, we implemented the optimization 
-problems as linear programs where possible, quadratic programs in most cases due to the $L_2$ regularization norm, 
-and second-order cone programs for the second-order expected shortfall risk measure. 
+All optimization problems in this thesis are implemented with CVXPY, an open-source, Python-embedded modeling language
+for convex optimization problems \cite{DiamondBoyd2016}. It lets us express a problem in a natural way that
+follows the mathematics, rather than in the restrictive standard form required by solvers, and it automatically
+transforms the problem into standard form, calls a solver and returns the results in a readable format \cite{CVXPYDocs}. CVXPY 
+acts as an interface between the problem written in Python and an external numerical
+solver, which in this thesis is the Gurobi solver. In this section, we summarize the parts of
+the CVXPY library needed to understand the implementation of the programs. Further details can be found in the CVXPY documentation \cite{CVXPYDocs}.
 
-The CVXPY library is structured as follows: TODO: summarize the documentation of the library.
+When defining a program in CVXPY, variables, created with
+\texttt{cp.Variable}, are the decision variables of the problem and can be scalars, vectors or matrices. Parameters,
+created with \texttt{cp.Parameter}, are symbolic representations of constants, whose purpose is to change the value of a
+constant in a problem without reconstructing the entire problem. Variables, parameters and numerical constants are combined into 
+expressions through the usual arithmetic operations, and a
+library of functions called atoms, such as \texttt{cp.sum}, \texttt{cp.norm} and \texttt{cp.sum\_squares}. 
+An objective, \texttt{cp.Minimize} or \texttt{cp.Maximize} of a scalar expression, and a list of
+constraints then define a problem \texttt{cp.Problem}. Calling its method \texttt{solve} returns the optimal value and stores
+the optimal solution in the attribute \texttt{value} of every variable.
+
+\Cref{lst:cvxpy-least-squares}, adapted from the CVXPY documentation, illustrates these objects on the least-squares
+problem with the constraint that the solution lies in the unit box
+\begin{equation*}
+    \min_{\bm{x}} \ \|\bm{A}\bm{x} - \bm{b}\|_2^2, \quad \text{s.t. } \bm{x} \in [0,1]^n,
+\end{equation*}
+for a matrix $\bm{A} \in \mathbb{R}^{m \times n}$ and a vector $\bm{b} \in \mathbb{R}^m$, in this example drawn at random with
+$m = 30$ and $n = 20$. Lines 5--8 of the code generate the problem data and line 11 declares the variable
+$\bm{x} \in \mathbb{R}^n$. Line 12 states the objective with the atom \texttt{cp.sum\_squares}, line 13 the two
+elementwise constraints and line 14 combines them into a problem. Line 17 solves the problem with Gurobi set as the solver, and line 18 prints the 
+optimal solution stored in \texttt{x.value} as a NumPy array. 
+
+\begin{lstlisting}[style=python, caption={Least-squares problem with box constraints in CVXPY, adapted from \cite{CVXPYDocs}.}, label={lst:cvxpy-least-squares}]
+import cvxpy as cp
+import numpy as np
+
+# Problem data.
+m = 30
+n = 20
+A = np.random.randn(m, n)
+b = np.random.randn(m)
+
+# Construct the problem.
+x = cp.Variable(n)
+objective = cp.Minimize(cp.sum_squares(A @ x - b))
+constraints = [0 <= x, x <= 1]
+prob = cp.Problem(objective, constraints)
+
+# Solve the problem.
+result = prob.solve(solver=cp.GUROBI)
+print(x.value)
+\end{lstlisting}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  stage/.style={draw=black, fill=gray!20, rounded corners=4pt, align=center,
+                font=\scriptsize, inner sep=5pt, text width=3cm, minimum height=1.3cm},
+  external/.style={stage, fill=white, dashed},
+  flow/.style={-Stealth, thick, draw=black}
+]
+  \node[stage]    (problem)  at (0, 0)      {\textbf{Problem}\\[2pt] variables, parameters,\\ objective, constraints};
+  \node[stage]    (chain)    at (5.2, 0)    {\textbf{Reductions}\\[2pt] auxiliary variables\\ and constraints};
+  \node[stage]    (standard) at (10.4, 0)   {\textbf{Standard form}\\[2pt] matrices and vectors\\ of the solver};
+  \node[external] (solver)   at (10.4, -2.4) {\textbf{Solver}\\[2pt] solves the\\ standard form};
+  \node[stage]    (inverse)  at (5.2, -2.4) {\textbf{Inverse reductions}\\[2pt] solution mapped back\\ to the problem};
+  \node[stage]    (solution) at (0, -2.4)   {\textbf{Solution}\\[2pt] \texttt{x.value},\\ \texttt{prob.status}};
+
+  \draw[flow] (problem)  -- node[above, font=\tiny] {DCP check} (chain);
+  \draw[flow] (chain)    -- (standard);
+  \draw[flow] (standard) -- (solver);
+  \draw[flow] (solver)   -- (inverse);
+  \draw[flow] (inverse)  -- (solution);
+\end{tikzpicture}
+\caption{Compilation of a problem in CVXPY. The problem is checked against the DCP rules and rewritten by a chain of
+reductions into the standard form of the solver, whose solution is mapped back through the inverted reductions to the
+variables of the original problem.}
+\label{fig:cvxpy-chain}
+\end{figure}
+
+When \texttt{solve} is called, CVXPY compiles the problem in the steps shown in \Cref{fig:cvxpy-chain}. 
+It first checks that the problem is convex using the rules of disciplined
+convex programming (DCP). Each variable and function has a
+curvature label (affine, convex or concave), and simple rules combine these
+labels as the expression is built, for example a sum of convex terms is
+convex. If the objective and constraints do not end up with labels that make
+the problem convex, CVXPY rejects it before any solver is called. The problem is then passed through a chain of reductions. A reduction is a
+transformation from one problem to an equivalent one. The reductions
+replace each atom that the solver does not accept directly by auxiliary variables and constraints. For example, each
+absolute value $|x_i|$ in the atom \texttt{cp.norm(x, 1)} is replaced by variables $\Delta_i^+, \Delta_i^- \geq 0$ and the constraints $\Delta_i^+ - \Delta_i^- = x_i$.
+The final reductions save the coefficients of the resulting problem into
+the matrices and vectors of the standard form accepted by the solver. The
+solver returns a solution of this standard form problem, which CVXPY maps back to the original problem by inverting the
+reductions. In
+\Cref{sec:numerical-implementation}, we go through the implementation of the regularized joint 
+optimization problem for Expected Shortfall \eqref{eq:joint_qp} and what these
+steps generate for it.
 
 \section{Numerical Implementation} \label{sec:numerical-implementation}
 

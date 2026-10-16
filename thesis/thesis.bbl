@@ -26,6 +26,17 @@ Stefano Ciliberti, Imre Kondor, and Marc M{\'e}zard.
   shortfall.
 \newblock {\em Quantitative Finance}, 7(4):389--396, 2007.
 
+\bibitem{CVXPYDocs}
+{CVXPY} documentation.
+\newblock \url{https://www.cvxpy.org}, 2026.
+\newblock Accessed: 2026-10-16.
+
+\bibitem{DiamondBoyd2016}
+Steven Diamond and Stephen Boyd.
+\newblock {CVXPY}: A {Python}-embedded modeling language for convex
+  optimization.
+\newblock {\em Journal of Machine Learning Research}, 17(83):1--5, 2016.
+
 \bibitem{ElKaroui2010}
 Noureddine El~Karoui.
 \newblock High-dimensionality effects in the {M}arkowitz problem and other
