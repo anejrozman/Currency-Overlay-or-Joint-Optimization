@@ -87,5 +87,6 @@
 \contentsline {appendix}{\chapternumberline {G}Additional Results}{84}{appendix.G}%
 \contentsline {section}{\numberline {G.1}Hyperparameter Grids}{84}{section.G.1}%
 \contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{87}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Additional Backtest Performance Results}{90}{section.G.3}%
-\contentsline {chapter}{Bibliography}{93}{appendix*.5}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Calibration}{90}{section.G.3}%
+\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{90}{section.G.4}%
+\contentsline {chapter}{Bibliography}{94}{appendix*.5}%

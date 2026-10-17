@@ -195,6 +195,52 @@ lower it further. The joint program instead chooses the asset weights and curren
 \end{figure}
 
 \newpage
+
+\section{Risk Aversion Calibration} \label{app:risk-aversion-calibration}
+
+The mean-risk programs of \Cref{sec:effects-of-adding-a-mean-term} subtract the expected portfolio return, scaled by
+$1/\gamma$, from the risk measure, with the same risk aversion coefficient $\gamma$ in the asset and currency steps of the overlay program and in
+the joint program. The currency exposures reach the
+currency leverage limit $\ell^c = 2$ in the currency whose interest rate differs most from the US interest rate. Without
+this limit, which is added to the mean-risk programs in \Cref{app:mean-risk,app:mv_mean_risk,app:mad_mean_risk}, the
+currency turnover reaches upwards of $20$, which signals instability. 
+
+The risk aversion coefficient is not selected at each rebalancing date, but calibrated once on the first lookback
+window of the small universe, as described in \Cref{sec:backtest-configuration}. Like the lookback windows of the
+penalty grid search, this window is split into a nine-year estimation window and a one-year validation window. For
+every value of $\gamma$ in a grid, the overlay and joint programs of each risk measure are fitted on the estimation
+window and scored on the validation window. Unlike the penalties, which are scored by the risk measure, $\gamma$ is
+scored by the Sharpe ratio, since the mean term is meant to trade additional risk for a higher expected return. For
+each risk measure, we fix the value with the highest validation Sharpe ratio averaged over the overlay and joint
+programs and use it at every rebalancing date in all three universes. The resulting values are reported in
+\Cref{tab:risk-aversion}. Since the first lookback window ends on the first rebalancing date, 30 June 2000, the
+calibration only uses data that is available when the first portfolio is formed and introduces no look-ahead bias into
+the backtests.
+
+\begin{table}[!htbp]
+\centering
+\small
+\begin{tabular}{lc}
+\toprule
+Risk measure  & $\gamma$ \\
+\midrule
+Variance      & $30$ \\
+Semi-Variance & $30$ \\
+MAD           & $0.5$ \\
+ES            & $2$ \\
+SOES          & $0.5$ \\
+\bottomrule
+\end{tabular}
+\caption{Risk aversion coefficients of the mean-risk optimizers.}
+\label{tab:risk-aversion}
+\end{table}
+
+The values in \Cref{tab:risk-aversion} are one to two orders of magnitude larger for variance and semi-variance than
+for MAD, Expected Shortfall and second-order Expected Shortfall. As for the penalty grids in
+\Cref{app:hyperparameter-sensitivity}, this is because variance and semi-variance are measured in squared returns.
+
+
+
 \section{Additional Backtest Performance Results} \label{app:additional-backtest-results}
 
 \begin{table}%[htbp]
