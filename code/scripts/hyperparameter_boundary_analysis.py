@@ -15,6 +15,7 @@ Usage:
     python code/scripts/hyperparameter_boundary_analysis.py mv
     python code/scripts/hyperparameter_boundary_analysis.py mad
     python code/scripts/hyperparameter_boundary_analysis.py smv
+    python code/scripts/hyperparameter_boundary_analysis.py soes
 """
 
 from __future__ import annotations
@@ -49,7 +50,7 @@ DECADES_ABOVE = 2
 SEED = 0
 BASE_CURRENCY = "USD"
 
-MEASURES = ("es", "mv", "mad", "smv")
+MEASURES = ("es", "mv", "mad", "smv", "soes")
 ROLES = ("overlay", "joint")
 
 
@@ -66,6 +67,8 @@ def _resolve_strategies(measure: str) -> dict[str, str]:
             name
             for name in STRATEGY_REGISTRY
             if {"reg", measure, role}.issubset(set(name.split("_")))
+            # The mean-risk variants (*_w_mean) share the name parts but are not swept.
+            and "mean" not in name.split("_")
         ]
         if len(matches) != 1:
             raise ValueError(

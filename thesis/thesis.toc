@@ -85,8 +85,8 @@
 \contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{79}{section.E.3}%
 \contentsline {appendix}{\chapternumberline {F}Transaction Costs}{82}{appendix.F}%
 \contentsline {appendix}{\chapternumberline {G}Additional Results}{84}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Sensitivity Analysis}{84}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{88}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{89}{section.G.3}%
-\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{89}{section.G.4}%
-\contentsline {chapter}{Bibliography}{93}{appendix*.11}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Grids}{84}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{87}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Instability under Mean Variance Optimization}{88}{section.G.3}%
+\contentsline {section}{\numberline {G.4}Additional Backtest Performance Results}{88}{section.G.4}%
+\contentsline {chapter}{Bibliography}{92}{appendix*.8}%

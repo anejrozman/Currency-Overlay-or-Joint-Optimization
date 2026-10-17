@@ -10,191 +10,140 @@ determine these bounds, following a similar approach as
 TODO: Summarize the sparsity analysis and its purpose.
 
 
-\textcolor{red}{this is from the data chapter, maybe it will come in handy}
-Hyperparameter selection follows the walk-forward grid search described in
-\Cref{sec:backtesting-framework}. The tuned hyperparameters are the $L_1$ and
-$L_2$ regularization coefficients applied separately to the asset and currency
-weights, $\lambda_1^a$, $\lambda_2^a$, $\lambda_1^c$, and $\lambda_2^c$, and the
-grid is the full cartesian product of their individual ranges. Each candidate
-configuration is scored by computing, on the validation window, the objective the
-optimizer minimizes, evaluated at the weights that configuration produces. The
-other parameters specific to the optimziation problems (these include the
-risk-aversion coefficient, the leverage budget, and the net currency exposure
-bounds) are fixed a priori rather than tuned. For each penalty the lower bound is
-zero, corresponding to the absence of that regularization term, while the upper bounds
-differ across parameters and are chosen so that larger values leave the optimal
-weights essentially unchanged. 
+\section{Hyperparameter Grids} \label{app:hyperparameter-sensitivity}
 
-\section{Hyperparameter Sensitivity Analysis} \label{app:hyperparameter-sensitivity}
+The regularized overlay and joint programs have four penalties in the objective, the asset penalties $\lambda_1^a$ and $\lambda_2^a$ and
+the currency penalties $\lambda_1^c$ and $\lambda_2^c$, while the asset-only optimizers, Full and Zero, only have the
+two asset penalties. In the backtests, the penalties are selected at every rebalancing date by the grid search described in
+\Cref{sec:backtesting-framework}. The grid we optimize over is the Cartesian product of the penalty values, with $256$ points for the overlay and
+joint programs and $16$ points for Full and Zero programs. The asset leverage
+limit is fixed at $\ell^a = 2$ for all the programs, and the confidence level of Expected Shortfall and second-order Expected Shortfall at
+$\beta = 0.8$.
+ 
+As the penalty sizes are increased, the optimal weights approach a limiting
+allocation, and beyond some threshold a further increase leaves the solution unchanged. A grid whose
+largest value lies past that threshold covers the whole range of regularization, and extending it further would only
+increase the computational cost of the grid search.
 
-The regularized portfolio optimization problems include four regularization parameters, the asset penalties
-$\lambda_1^a, \lambda_2^a$ and the currency penalties $\lambda_1^c, \lambda_2^c$. These
-are selected by grid search on a validation sample, which requires setting a bounded interval for each. The bounds are not arbitrary. As a penalty
-grows, the optimal weights approach a limiting allocation, and beyond some threshold a
-further increase leaves the solution essentially unchanged. A grid whose upper bound
-lies past that threshold is sufficient, in the sense that extending it further would only increase the computational cost of the grid search. 
-
-To locate this threshold we follow
-\cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} and define, for each penalty
-$\lambda \in \{\lambda_1^a, \lambda_2^a, \lambda_1^c, \lambda_2^c\}$, an increasing
-sequence $(\lambda_n)_{n \in \mathbb{N}}$ with $\lambda_0 = 0$. Let $\bm{x}_t(\lambda_n)$
-and $\bm{\psi}_t(\lambda_n)$ denote the optimal asset and currency overlay weights when
-only $\lambda$ is active, that is, when the remaining three penalties are held at zero.
-The marginal effect of an incremental increase in regularization is measured in the
-supremum norm 
-\begin{align*} \label{eq:marginal-effect}
+To locate this threshold, we use a similar approach to \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} and analyze each penalty
+$\lambda \in \{\lambda_1^a, \lambda_2^a, \lambda_1^c, \lambda_2^c\}$ on its own, holding the other three fixed at zero. We consider an
+increasing sequence $0 = \lambda_0 < \lambda_1 < \dots < \lambda_K$.
+Let $\bm{x}_t(\lambda_n)$ and $\bm{\psi}_t(\lambda_n)$ denote the optimal asset weights and currency exposures at
+$\lambda_n$. The marginal effect of the step from $\lambda_{n-1}$ to $\lambda_n$ is measured in the supremum norm
+\begin{equation*} 
+\begin{aligned}
     d_n^a &= \left\| \bm{x}_t(\lambda_n) - \bm{x}_t(\lambda_{n-1}) \right\|_\infty
     \quad \text{for } \lambda \in \{\lambda_1^a, \lambda_2^a\}, \\
     d_n^c &= \left\| \bm{\psi}_t(\lambda_n) - \bm{\psi}_t(\lambda_{n-1}) \right\|_\infty
     \quad \text{for } \lambda \in \{\lambda_1^c, \lambda_2^c\}.
-\end{align*}
- 
-Tthe two 
-penalty types approach their limits in different ways. Under an $L_1$ penalty the
-weights move to the corner of the feasible set, at which point the penalty term
-becomes constant in the weights and doesnt influence the solution. An $L_2$ penalty instead shrinks the
-weights smoothly toward the origin and never reaches a corner, so its marginal
-effect decays gradually without ever vanishing. Such behavior is well documented in \cite{getsomething}. For this reason we report alongside
-$d_n$ the marginal effect on portfolio exposure, $\|\bm{x}_t\|_1$ for the asset penalties
-and $\|\bm{\psi}_t\|_1$ for the currency penalties. Exposure is the economically
-interpretable quantity, and is the one that we use to determine the upper bound of the grid for the $L_2$ penalties.
+\end{aligned}
+\end{equation*} 
 
-The analysis is done on the first estimation window spanning July 1990 to June 2000. To
-account for sampling error, each reported quantity is averaged over 5 bootstraped replicates of the estimation window. The results are reported for the small investable universe. 
+The two penalty types approach their limits in different ways. Under an $L^1$ penalty, the weights reach their limit
+at a finite value of the penalty, a long-only portfolio for the asset weights and a zero overlay for the currency
+exposures, and do not change as the penalty is increased further. An $L^2$ penalty
+instead shrinks the weights smoothly toward their limit, the equally weighted portfolio for the asset weights and a
+zero overlay for the currency exposures, and reaches it only asymptotically, so its marginal effect decays gradually
+without vanishing \cite{HastieTibshiraniFriedman2009}. For this reason, we report alongside $d_n^a$ and $d_n^c$ the
+portfolio exposure, $\|\bm{x}_t(\lambda_n)\|_1$ for the asset penalties and $\|\bm{\psi}_t(\lambda_n)\|_1$ for the
+currency penalties.
 
-\subsection*{Expected Shortfall Hyperparameter Sensitivity Analysis} \label{app:hyperparameter-sensitivity-es}
+The analysis is carried out for the regularized overlay and joint programs of each risk measure on the first lookback
+window of the small universe, which spans July 1990 to June 2000 and contains $2{,}610$ daily observations. To account for sampling error, each reported quantity is averaged over five bootstrap replications of this
+window, each constructed by resampling its daily observations with replacement.
 
-\begin{figure}[ht]
+We visualize the results for the regularized variance programs, whose marginal effects and exposures are shown in
+\Cref{fig:hyperparameter-sensitivity-mv-marginal,fig:hyperparameter-sensitivity-mv}. The overlay and joint programs
+behave very similarly. The difference between the two penalty types is clearest in \Cref{fig:hyperparameter-sensitivity-mv-marginal}. Once the
+weights reach their limit under an $L^1$ penalty, the marginal effect has a sudden drop, to zero for the currency
+exposures and by more than two orders of magnitude for the asset weights. 
+The $L^2$ penalties do not exhibit such a drop, which is why their largest grid values are interpreted from the
+exposure in \Cref{fig:hyperparameter-sensitivity-mv} instead.
+
+For both asset penalties, exposure falls from slightly below the leverage limit to one. 
+Once the portfolio becomes long-only, the $L^1$ penalty equals the constant $\lambda_1^a$, so the solution stops changing.
+We set the largest grid value to $5 \times 10^{-5}$, by which this has happened.
+As discussed in \Cref{app:mv_regularization}, the $L^2$ penalty instead shrinks the covariance estimate toward a scaled identity matrix, since
+$\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t + \lambda_2^a \|\bm{x}_t\|_2^2 = \bm{x}_t^\top (\bm{\Sigma}_t + \lambda_2^a \bm{I}_N)
+\bm{x}_t$, so the weights move toward the equally weighted portfolio. We set the largest grid value to $10^{-2}$, by which there are no longer 
+any short positions.
+
+The currency exposures carry neither a budget nor a leverage constraint, so $\bm{\psi}_t$ shrinks to zero. Under
+$\lambda_1^c$, the currency exposures disappear at $5 \times 10^{-5}$. Under $\lambda_2^c$, they never fully disappear,
+so we determine the largest grid value as the point at which the overlay becomes negligible. From $1.7 \times 10^{-3}$
+onward, less than one percent of the unpenalized currency exposure remains, and we set the largest grid value to
+$2 \times 10^{-3}$.
+
+\begin{figure}[p]
     \centering
-    \includegraphics[width=1\textwidth]{../results/figures/boundary_plots/es_top10_dinf.pdf}
-    \caption{Marginal effect of each regularization penalty, for the regularized Expected Shortfall currency overlay and joint
-    optimizers. The
-    dashed line marks the upper bound of the hyperparameter grid reported in
-    \Cref{tab:hypergrid-es}. The upper plots report $d_n^a$ and the lower plots
-    $d_n^c$. Estimates are averaged over five bootstrap
-    replicates of the first estimation window on the small investment universe.}
-    \label{fig:hyperparameter-sensitivity-es-marginal}
-\end{figure}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=1\textwidth]{../results/figures/boundary_plots/es_top10_gross.pdf}
-    \caption{Portfolio exposure as a function of each
-    regularization penalty, for the regularized Expected Shortfall currency overlay and
-    joint optimizers. The dashed line marks the upper bound of the validation grid reported in
-    \Cref{tab:hypergrid-es}. The upper panels report $\|\bm{x}_t\|_1$ and the lower
-    panels $\|\bm{\psi}_t\|_1$. Estimates are
-    averaged over five bootstrap replicates of the first estimation window on the
-    small investment universe.}
-    \label{fig:hyperparameter-sensitivity-es}
-\end{figure}
-
-\Cref{fig:hyperparameter-sensitivity-es-marginal} and
-\Cref{fig:hyperparameter-sensitivity-es} report the marginal effect and the portfolio
-exposure. The difference between the two penalty types is clearest
-in the marginal effect plots. The $L_1$ penalties collapse abruptly near their bound, whereas the $L_2$
-penalties decay smoothly throughout, which is why their bounds are determined by the exposure
-analysis instead.
-
-For both asset penalties, exposure falls from the leverage limit in the unpenalized
-problem to $1$. The budget constraint $\bm{x}_t^\top \bm{1}_N = 1$ implies
-$\|\bm{x}_t\|_1 \geq 1$, with equality precisely when the portfolio holds no short
-positions. The two penalties reach this floor for different reasons, and only the
-$L_1$ penalty ceases to act once it is there. Under $\lambda_1^a$ the penalty term
-equals $\|\bm{x}_t\|_1 = 1$ everywhere on the long-only set and is therefore constant
-in $\bm{x}_t$, so the solution freezes exactly. Under $\lambda_2^a$ the penalty
-$\|\bm{x}_t\|_2^2$ is not constant on that set: exposure stays pinned at its floor
-while the weights keep spreading toward the equally weighted portfolio, which is the
-limiting allocation as $\lambda_2^a \to \infty$. For the asset $L_2$ penalty we
-therefore read the bound as the point at which the short positions have been
-eliminated and any further movement is a redistribution within a long-only book.
-
-The overlay weights carry neither a budget nor a leverage constraint, so $\bm{\psi}_t$
-shrinks to zero, exactly under $\lambda_1^c$ and asymptotically under $\lambda_2^c$.
-
-On the basis of this analysis we fix the ranges reported in
-\Cref{tab:hypergrid-es}. Each range is discretised on a log-spaced grid that includes
-the zero endpoint, which corresponds to the unregularized optimization problem.
-
-\begin{table}[ht]
-\centering
-\begin{tabular}{lll}
-\toprule
-Hyperparameter & Description & Range \\
-\midrule
-$\lambda_1^a$ & Asset $L_1$ penalty       & $[0,\ 5\times10^{-3}]$ \\
-$\lambda_2^a$ & Asset $L_2$ penalty       & $[0,\ 3]$ \\
-$\lambda_1^c$ & Currency $L_1$ penalty    & $[0,\ 5\times10^{-4}]$ \\
-$\lambda_2^c$ & Currency $L_2$ penalty    & $[0,\ 5\times10^{-2}]$ \\
-\bottomrule
-\end{tabular}
-\caption{Hyperparameter ranges for the regularized Expected Shortfall optimizers. Each
-penalty is searched over a log-spaced grid spanning the reported range, where the lower
-endpoint corresponds to the unregularized problem and the upper endpoint is the bound established in \Cref{app:hyperparameter-sensitivity-es}.}
-\label{tab:hypergrid-es}
-\end{table}
-
-\newpage
-\subsection*{Mean-Variance Hyperparameter Sensitivity Analysis} \label{app:hyperparameter-sensitivity-mv}
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=1\textwidth]{../results/figures/boundary_plots/mv_top10_dinf.pdf}
-    \caption{Marginal effect of each regularization penalty, for the regularized
-    mean-variance currency overlay and joint optimizers. The dashed line marks the
-    upper bound of the hyperparameter grid reported in \Cref{tab:hypergrid-mv}. The
-    upper plots report $d_n^a$ and the lower plots $d_n^c$. Estimates are averaged
-    over five bootstrap replicates of the first estimation window on the small
-    investment universe.}
+    \includegraphics[width=0.9\textwidth]{../results/figures/boundary_plots/mv_top10_dinf.pdf}
+    \caption{Marginal effect of each penalty for the regularized variance overlay and joint programs. The upper panels
+    report $d_n^a$ for the asset penalties and the lower panels $d_n^c$ for the currency penalties. The dashed lines mark
+    the largest value of each grid in \Cref{tab:hypergrid}. Averaged over five bootstrap replications of the first
+    lookback window of the small universe (top-10).}
     \label{fig:hyperparameter-sensitivity-mv-marginal}
-\end{figure}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=1\textwidth]{../results/figures/boundary_plots/mv_top10_gross.pdf}
-    \caption{Portfolio exposure as a function of each regularization penalty, for the
-    regularized mean-variance currency overlay and joint optimizers. The dashed line
-    marks the upper bound of the validation grid reported in \Cref{tab:hypergrid-mv}.
-    The upper panels report $\|\bm{x}_t\|_1$ and the lower panels $\|\bm{\psi}_t\|_1$.
-    Estimates are averaged over five bootstrap replicates of the first estimation
-    window on the small investment universe.}
+    \vspace{1.5em}
+
+    \includegraphics[width=0.9\textwidth]{../results/figures/boundary_plots/mv_top10_gross.pdf}
+    \caption{Portfolio exposure as a function of each penalty for the regularized variance overlay and joint programs.
+    The upper panels report $\|\bm{x}_t\|_1$ for the asset penalties and the lower panels $\|\bm{\psi}_t\|_1$ for the
+    currency penalties. The dashed lines mark the largest value of each grid in \Cref{tab:hypergrid}. Averaged over five
+    bootstrap replications of the first lookback window of the small universe (top-10).}
     \label{fig:hyperparameter-sensitivity-mv}
 \end{figure}
 
-\Cref{fig:hyperparameter-sensitivity-mv-marginal} and
-\Cref{fig:hyperparameter-sensitivity-mv} repeat the analysis for the regularized
-mean-variance optimizers. What differs is the scale. The
-penalties are added to a risk term measured in units of daily variance rather than
-daily expected shortfall, and the two differ by roughly two orders of magnitude. On the
-first estimation window the equally weighted portfolio has a daily variance on the order of
-$10^{-4}$ against a daily expected shortfall (at 80\% level) of approximately $\times 10^{-2}$. 
+We perform the same analysis for the regularized overlay and joint programs of the other four risk measures. 
+They show the same pattern as the variance
+programs. Both asset penalties reduce the asset exposure to one, the currency $L^1$ penalty removes the currency
+exposures at a finite value, and the currency $L^2$ penalty shrinks them smoothly toward zero. 
 
-We fix the hyperparameter ranges reported in \Cref{tab:hypergrid-mv} for the
-regularized mean-variance optimizers, which are discretized on a log-spaced grid the same way as for the Expected Shortfall optimizers.
+On the basis of this analysis, we construct the grids reported in \Cref{tab:hypergrid}. 
+The upper bounds of the asset $L^1$ penalty for variance and
+semi-variance are set to $5 \times 10^{-5}$
+and $10^{-4}$, while those for MAD, Expected Shortfall and second-order Expected Shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$ and $10^{-1}$.
+The asset penalty grids
+of the variance and semi-variance programs lie one to three orders of magnitude below those of the other risk measures. This 
+is because they are measured in squared returns.
 
-\begin{table}[ht]
+\begin{table}[htbp]
 \centering
-\begin{tabular}{lll}
+\small
+\begin{tabular}{llll}
 \toprule
-Hyperparameter & Description & Range \\
+Risk measure & Penalty & Description & Range \\
 \midrule
-$\lambda_1^a$ & Asset $L_1$ penalty       & $[0,\ 5\times10^{-5}]$ \\
-$\lambda_2^a$ & Asset $L_2$ penalty       & $[0,\ 10^{-2}]$ \\
-$\lambda_1^c$ & Currency $L_1$ penalty    & $[0,\ 5\times10^{-5}]$ \\
-$\lambda_2^c$ & Currency $L_2$ penalty    & $[0,\ 2\times10^{-3}]$ \\
+Variance      & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 5\times10^{-5}]$ \\
+              & $\lambda_2^a$ & Asset $L^2$ penalty    & $[0,\ 10^{-2}]$ \\
+              & $\lambda_1^c$ & Currency $L^1$ penalty & $[0,\ 5\times10^{-5}]$ \\
+              & $\lambda_2^c$ & Currency $L^2$ penalty & $[0,\ 2\times10^{-3}]$ \\
+\midrule
+Semi-Variance & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 10^{-4}]$ \\
+              & $\lambda_2^a$ & Asset $L^2$ penalty    & $[0,\ 5\times10^{-2}]$ \\
+              & $\lambda_1^c$ & Currency $L^1$ penalty & $[0,\ 2.5\times10^{-5}]$ \\
+              & $\lambda_2^c$ & Currency $L^2$ penalty & $[0,\ 10^{-3}]$ \\
+\midrule
+MAD           & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 2.5\times10^{-3}]$ \\
+              & $\lambda_2^a$ & Asset $L^2$ penalty    & $[0,\ 1]$ \\
+              & $\lambda_1^c$ & Currency $L^1$ penalty & $[0,\ 1.5\times10^{-3}]$ \\
+              & $\lambda_2^c$ & Currency $L^2$ penalty & $[0,\ 2.5\times10^{-1}]$ \\
+\midrule
+ES            & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 5\times10^{-3}]$ \\
+              & $\lambda_2^a$ & Asset $L^2$ penalty    & $[0,\ 3]$ \\
+              & $\lambda_1^c$ & Currency $L^1$ penalty & $[0,\ 5\times10^{-4}]$ \\
+              & $\lambda_2^c$ & Currency $L^2$ penalty & $[0,\ 5\times10^{-5}]$ \\
+\midrule
+SOES          & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 10^{-1}]$ \\
+              & $\lambda_2^a$ & Asset $L^2$ penalty    & $[0,\ 15]$ \\
+              & $\lambda_1^c$ & Currency $L^1$ penalty & $[0,\ 10^{-2}]$ \\
+              & $\lambda_2^c$ & Currency $L^2$ penalty & $[0,\ 1]$ \\
 \bottomrule
 \end{tabular}
-\caption{Hyperparameter ranges for the regularized mean-variance optimizers. Each
-penalty is searched over a log-spaced grid spanning the reported range, where the lower
-endpoint corresponds to the unregularized problem and the upper endpoint is the bound
-established in \Cref{app:hyperparameter-sensitivity-mv}.}
-\label{tab:hypergrid-mv}
+\caption{Ranges of the hyperparameter grids of the regularized programs.}
+\label{tab:hypergrid}
 \end{table}
 
-% \section{Portfolio Sparsity Analysis} \label{app:portfolio-sparsity}
-
-\subsection*{Mean Absolute Deviation Hyperparameter Sensitivity Analysis} \label{app:mean-absolute-deviation}
-
+\newpage
 \section{Portfolio Sparsity Analysis} \label{app:portfolio-sparsity}
 
 \subsection*{Sparsity of the Regularized Expected Shortfall Optimizers} \label{app:sparsity-es}

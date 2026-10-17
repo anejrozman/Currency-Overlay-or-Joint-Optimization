@@ -137,23 +137,25 @@
       "lambda_l1_asset": 0.005,
       "lambda_l2_asset": 3.0,
       "lambda_l1_curr": 0.0005,
-      "lambda_l2_curr": 0.05
+      "lambda_l2_curr": 5e-05
     },
     "reg_es_joint": {
       "lambda_l1_asset": 0.005,
       "lambda_l2_asset": 3.0,
       "lambda_l1_curr": 0.0005,
-      "lambda_l2_curr": 0.05
+      "lambda_l2_curr": 5e-05
     }
   },
   "fixed_hyperparams": {
     "reg_es_curr_overlay": {
       "alpha": 0.8,
-      "leverage_limit": 2.0
+      "leverage_limit": 2.0,
+      "demean": false
     },
     "reg_es_joint": {
       "alpha": 0.8,
-      "leverage_limit": 2.0
+      "leverage_limit": 2.0,
+      "demean": false
     }
   },
   "clamped_penalties": {
@@ -168,5 +170,6 @@
   "decades_above": 2,
   "active_tol": 1e-06,
   "solve_failures": 0,
-  "total_solve_seconds": 2925.07
+  "solve_errors": {},
+  "total_solve_seconds": 3318.9
 }

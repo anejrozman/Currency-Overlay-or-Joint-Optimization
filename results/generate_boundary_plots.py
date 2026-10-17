@@ -11,6 +11,7 @@ Usage:
     python results/generate_boundary_plots.py mv
     python results/generate_boundary_plots.py mad
     python results/generate_boundary_plots.py smv
+    python results/generate_boundary_plots.py soes
 
 Author: Anej Rozman
 """
@@ -31,19 +32,21 @@ RESULTS_DIR: Path = Path(__file__).resolve().parent
 DATA_DIR: Path = RESULTS_DIR / "hyperparameter_boundary_analysis"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "boundary_plots"
 
+# The Regularized Overlay and Regularized Joint slots of the palette used for the
+# Appendix E runtime figures, so that a program has the same colour across appendices.
 STRATEGY_COLORS: dict[str, str] = {
-    "overlay": "#eb6834",
-    "joint":   "#1baf7a",
+    "overlay": "#eda100",
+    "joint":   "#e87ba4",
 }
 STRATEGY_LABELS: dict[str, str] = {
-    "overlay": "Currency overlay",
-    "joint":   "Joint",
+    "overlay": "Regularized Overlay",
+    "joint":   "Regularized Joint",
 }
 # Asymmetric widths so the two series stay legible where they coincide exactly:
 # the thinner joint line sits on top of an overlay fringe rather than erasing it.
 STRATEGY_LINEWIDTH: dict[str, float] = {
-    "overlay": 2.3,
-    "joint":   1.2,
+    "overlay": 2.0,
+    "joint":   1.0,
 }
 STRATEGY_ZORDER: dict[str, float] = {
     "overlay": 3.0,
@@ -58,11 +61,15 @@ BOUND_COLOR: str = "#8a8983"
 LEGEND_FACE_COLOR: str = "#ffffff"
 
 MEASURE_TITLES: dict[str, str] = {
-    "es":  "Expected Shortfall",
-    "mv":  "Mean-Variance",
-    "mad": "Mean Absolute Deviation",
-    "smv": "Semi-Variance",
+    "es":   "Expected Shortfall",
+    "mv":   "Variance",
+    "mad":  "Mean Absolute Deviation",
+    "smv":  "Semi-Variance",
+    "soes": "Second-Order Expected Shortfall",
 }
+# Drawn at the width the thesis includes them at (0.9 x 156 mm), so the fonts print at
+# their size and both figures of a measure fit on one page.
+FIGURE_SIZE: tuple[float, float] = (5.5, 3.8)
 
 # Panel order: asset block on the top row, currency block on the bottom row.
 PENALTY_ORDER: list[str] = [
@@ -135,7 +142,7 @@ def _style_axes(ax: plt.Axes) -> None:
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_color(GRID_COLOR)
-    ax.tick_params(colors=TEXT_SECONDARY, labelsize=8, length=0)
+    ax.tick_params(colors=TEXT_SECONDARY, labelsize=7.5, length=0)
 
 
 def _draw_panels(
@@ -146,7 +153,7 @@ def _draw_panels(
     y_label: str,
 ) -> tuple[plt.Figure, np.ndarray]:
     # Each penalty keeps its own absolute lambda axis, so the panels do not share x.
-    fig, axes = plt.subplots(2, 2, figsize=(9, 6.2), sharex=False, sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=FIGURE_SIZE, sharex=False, sharey=True)
 
     for ax, penalty in zip(axes.flat, PENALTY_ORDER):
         panel = frame[frame["penalty"] == penalty]
@@ -193,7 +200,7 @@ def _draw_panels(
             bound, 1.015, _format_bound(bound),
             transform=blended_transform_factory(ax.transData, ax.transAxes),
             ha="center", va="bottom",
-            color=BOUND_COLOR, fontsize=7.5, zorder=6,
+            color=BOUND_COLOR, fontsize=7, zorder=6,
         )
         ax.set_xscale("log")
         ax.set_xlim(bound * 7e-4, bound * 1.5e2)
@@ -201,14 +208,14 @@ def _draw_panels(
             ax.set_yscale("log")
         ax.set_title(
             PENALTY_LABELS[penalty],
-            color=TEXT_PRIMARY, fontsize=9.5, pad=20,
+            color=TEXT_PRIMARY, fontsize=9, pad=16,
         )
         _style_axes(ax)
 
     for ax in axes.flat:
-        ax.set_xlabel(r"$\lambda$", color=TEXT_SECONDARY, fontsize=9)
+        ax.set_xlabel(r"$\lambda$", color=TEXT_SECONDARY, fontsize=8.5)
     for ax in axes[:, 0]:
-        ax.set_ylabel(y_label, color=TEXT_SECONDARY, fontsize=9)
+        ax.set_ylabel(y_label, color=TEXT_SECONDARY, fontsize=8.5)
 
     if log_y:
         axes.flat[0].set_ylim(NOISE_FLOOR / 3.0, 3.0)
@@ -228,23 +235,18 @@ def _finish(
     bound_handle = plt.Line2D(
         [], [], color=BOUND_COLOR, linewidth=BOUND_LINEWIDTH, linestyle=(0, (4, 3))
     )
-    seen["Configured grid bound"] = bound_handle
-
-    fig.suptitle(
-        f"Hyperparameter Analysis, regularized {MEASURE_TITLES[measure]} strategies",
-        color=TEXT_PRIMARY, fontsize=12, y=0.995,
-    )
+    seen["Largest grid value"] = bound_handle
 
     legend = fig.legend(
         list(seen.values()), list(seen),
         loc="lower center", bbox_to_anchor=(0.5, 0.018),
-        ncol=3, frameon=True, fontsize=9, labelcolor=TEXT_SECONDARY,
+        ncol=3, frameon=True, fontsize=8, labelcolor=TEXT_SECONDARY,
         handlelength=2.4, facecolor=LEGEND_FACE_COLOR, edgecolor=GRID_COLOR,
         framealpha=1.0, borderpad=0.6,
     )
     legend.get_frame().set_linewidth(0.6)
 
-    fig.tight_layout(rect=(0, 0.085, 1, 0.985))
+    fig.tight_layout(rect=(0, 0.085, 1, 1))
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT_DIR / filename, format="pdf", dpi=600, bbox_inches="tight")
@@ -272,7 +274,7 @@ def main() -> None:
 
         fig, axes = _draw_panels(
             frame, bounds, "d_inf_mean", log_y=True,
-            y_label=r"$d_\infty$, change in block per grid step",
+            y_label=r"Marginal effect $d_n$",
         )
         _finish(
             fig, axes, measure,
@@ -290,7 +292,10 @@ def main() -> None:
             frame, bounds, "gross", log_y=False,
             y_label="Portfolio exposure",
         )
-        axes.flat[0].set_ylim(-0.08, 2.25)
+        # Room for the largest exposure of any panel; the joint currency exposure can
+        # exceed the asset leverage limit of 2, which does not bind on psi.
+        top = max(2.25, 1.08 * float(np.nanmax(frame["gross"])))
+        axes.flat[0].set_ylim(-0.04 * top, top)
         _finish(
             fig, axes, measure,
             filename=f"{measure}_top{universe}_gross.pdf",
