@@ -73,7 +73,7 @@ $\lambda_1^c$, the currency exposures disappear at $5 \times 10^{-5}$. Under $\l
 so we determine the largest grid value as the point at which the overlay becomes negligible. From $1.7 \times 10^{-3}$
 onward, less than one percent of the unpenalized currency exposure remains, and we set the largest grid value to
 $2 \times 10^{-3}$.
-
+ 
 \begin{figure}[p]
     \centering
     \includegraphics[width=0.9\textwidth]{../results/figures/boundary_plots/mv_top10_dinf.pdf}
@@ -106,7 +106,7 @@ The asset penalty grids
 of the variance and semi-variance programs lie one to three orders of magnitude below those of the other risk measures. This 
 is because they are measured in squared returns.
 
-\begin{table}[htbp]
+\begin{table}[!t]
 \centering
 \small
 \begin{tabular}{llll}
@@ -144,74 +144,57 @@ SOES          & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 10^{-1}]$ \\
 \end{table}
 
 \newpage
+
 \section{Portfolio Sparsity Analysis} \label{app:portfolio-sparsity}
 
-\subsection*{Sparsity of the Regularized Expected Shortfall Optimizers} \label{app:sparsity-es}
+\Cref{fig:sparsity-assets,fig:sparsity-currencies} report the share of
+the investable universe in which the unregularized and regularized overlay and joint optimizers hold a position.
+\Cref{fig:sparsity-assets} counts the assets whose weight exceeds $10^{-4}$ in absolute value, and
+\Cref{fig:sparsity-currencies} the foreign currencies whose currency exposure exceeds $10^{-4}$ in absolute value. On the lines of the regularized
+optimizers in \Cref{fig:sparsity-assets}, the markers indicate the rebalancing dates at which the selected asset $L^1$ or
+$L^2$ penalties are at the top of the range.
 
-\begin{figure}[httb]
+Regularization lowers the number of assets held in every universe size, and the share held by the regularized optimizers
+swings from one rebalancing date to the next due to the selection of the $L^1$ and $L^2$ penalties.
+An $L^1$-dominant selection sets weights
+to zero and creates a sparse, concentrated portfolio, whereas an $L^2$-dominant selection shrinks all weights toward the equally
+weighted portfolio. The swings therefore reflect the optimizers alternating between these two regimes across
+the rebalancing quarters, not an instability of the optimizers themselves.
+
+The unregularized optimizers have no such degree of freedom, and the number of assets they hold is determined primarily
+by the leverage limit and the binding constraint on $\|\bm{x}_t\|_1$, which promotes shrinkage in the same way as the $L^1$
+penalty. As a result, the share of the assets they hold falls with the size of the universe. For variance,
+semi-variance, MAD and Expected Shortfall, it falls from $91-99\%$ in the small universe to $60-73\%$
+in the large universe. And for second-order Expected Shortfall optimizers, if falls from $70-78\%$ in 
+the small universe to around $50\%$ in the large universe.
+
+For MAD, Expected Shortfall and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
+currency exposure in the medium and large universes, unlike the joint optimizers. With several hundred
+assets, the asset step of the overlay program likely already fits the in-sample risk so closely that no currency position can
+lower it further. The joint program instead chooses the asset weights and currency exposures together.
+
+
+\begin{figure}[p]
     \centering
-    \includegraphics[width=1\textwidth]{../results/figures/sparsity_analysis/normal/es_assets.pdf}
-    \caption{Sparsity of the regularized Expected Shortfall currency overlay and joint optimizers.}
-    \label{fig:sparsity-es}
+    \includegraphics[width=\textwidth]{../results/figures/sparsity_analysis/normal/assets.pdf}
+    \caption{Share of the assets in the investable universe held by the unregularized and regularized overlay and joint
+    optimizers at each rebalancing date, by risk measure and universe size. An asset counts as held if
+    the absolute value of its weight exceeds $10^{-4}$. The markers on the
+    regularized lines indicate the rebalancing dates at which the selected asset $L^1$ or $L^2$
+    penalty is one of the two largest values of its grid.}
+    \label{fig:sparsity-assets}
 \end{figure}
 
-Figure \ref{fig:sparsity-es} reports the share of the investable universe held at each rebalance date.
-
-Regularization stabilizes the weight vector conditional on the penalty coefficients, 
-but those coefficients are themselves re-selected at every rebalance date. 
-The number of active positions is sensitive to this recalibration, an L1-dominant selection
- sets weights to zero and yields a concentrated portfolio, whereas an L2-dominant selection 
- shrinks all weights toward the equally weighted portfolio. 
- The oscillation therefore reflects the validation criterion alternating between these two regimes 
- across quarters, not instability in the optimizer itself. The unregularized problem has no such 
- degree of freedom. Its support is determined primarily by the leverage limit.
-
-\subsection*{Sparsity of the Regularized Mean-Variance Optimizers} \label{app:sparsity-mv}
-
-\begin{figure}[httb]
+\begin{figure}[p]
     \centering
-    \includegraphics[width=1\textwidth]{../results/figures/sparsity_analysis/normal/mv_assets.pdf}
-    \caption{Sparsity of the regularized Mean-Variance currency overlay and joint optimizers.}
-    \label{fig:sparsity-mv}
+    \includegraphics[width=\textwidth]{../results/figures/sparsity_analysis/normal/currencies.pdf}
+    \caption{Share of the foreign currencies in which the unregularized and regularized overlay and joint optimizers
+    hold a currency exposure at each rebalancing date, by risk measure and universe size. A currency
+    counts as held if the absolute value of its exposure exceeds $10^{-4}$.}
+    \label{fig:sparsity-currencies}
 \end{figure}
-\subsection*{Sparsity of the Regularized Mean Absolute Deviation Optimizers} \label{app:sparsity-mad}
 
-
-\section{Risk Aversion Instability under Mean Variance Optimization} \label{app:instability-mv}
-
-In \Cref{chap:backtest-analysis} we report backtest results for the mean-variance optimizers under infinite risk aversion, 
-which corresponds to the minimum variance problem. We do this because the mean-variance optimization problem is 
-is unstable under finite risk aversion \cite{DeMiguel et al. 2009}. We showcase this by runnign the 
-regularized overlay and joint optimizers under finite risk aversion on the top 10 universe and report the results in 
-\ref{tab:instability-mv}. 
-
-\begin{table}[ht]
-    \centering 
-    \scalebox{0.82}{%
-    \begin{tabular}{lcc}
-        \toprule
-        \multicolumn{3}{c}{\textbf{Mean-Variance Optimizers under Finite Risk Aversion}} \\
-        \midrule
-        \textbf{Metric} &       \textbf{Overlay} &      \textbf{Joint} \\
-        \midrule
-        ES (\%)                   & 2.07                  & 2.20    \\
-        Vol (\%)                  & 26.50                 & 28.54    \\
-        MD (\%)                   & 70.15                 & 69.31   \\
-        SR                        & 0.10                  & 0.11    \\
-        SOR                       & 0.07                  & 0.15    \\
-        ESR                       & 0.08                  & 0.09    \\   
-        $\text{Turnover}^a$       & 1.82                  & 1.84    \\
-        $\text{Turnover}^c$       & 19.04                 & 18.60    \\
-        \bottomrule
-    \end{tabular}
-    }
-    \caption{Performance metrics for the regularized mean-variance currency overlay and joint optimizers under finite risk aversion on the top 10 universe.}
-    \label{tab:instability-mv}
-\end{table}
-
-We can see from table \ref{tab:instability-mv} that the performance of the optimizers is highly unstable and results in poor out of sample performance of the portfolios.
-Two 
-
+\newpage
 \section{Additional Backtest Performance Results} \label{app:additional-backtest-results}
 
 \begin{table}%[htbp]
