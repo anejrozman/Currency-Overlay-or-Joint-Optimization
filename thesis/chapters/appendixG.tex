@@ -200,10 +200,11 @@ lower it further. The joint program instead chooses the asset weights and curren
 
 The mean-risk programs of \Cref{sec:effects-of-adding-a-mean-term} subtract the expected portfolio return, scaled by
 $1/\gamma$, from the risk measure, with the same risk aversion coefficient $\gamma$ in the asset and currency steps of the overlay program and in
-the joint program. The currency exposures reach the
+the joint program. As $\gamma \to 0$, the mean term dominates, and the programs maximize the expected portfolio return
+subject to the budget and leverage constraints. The currency exposures then reach the
 currency leverage limit $\ell^c = 2$ in the currency whose interest rate differs most from the US interest rate. Without
 this limit, which is added to the mean-risk programs in \Cref{app:mean-risk,app:mv_mean_risk,app:mad_mean_risk}, the
-currency turnover reaches upwards of $20$, which signals instability. 
+currency turnover reaches upwards of $20$, which clearly signals instability. 
 
 The risk aversion coefficient is not selected at each rebalancing date, but calibrated once on the first lookback
 window of the small universe, as described in \Cref{sec:backtest-configuration}. Like the lookback windows of the
