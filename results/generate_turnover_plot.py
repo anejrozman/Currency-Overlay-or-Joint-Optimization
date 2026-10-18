@@ -1,15 +1,20 @@
 """
-Asset and currency turnover per rebalancing date, one column per universe size.
+Asset and currency turnover per rebalancing date (Appendix G.5).
 
 Turnover is not stored in the run artifacts (metrics.json keeps only the average),
 so it is rebuilt here from the saved weights and the recomputed return panel,
 following Backtester.run: asset turnover is |x_t - drifted_x| and currency
-turnover the traded forward notional |phi_t| excluding USD.
+turnover the traded forward notional |phi_t| excluding USD. As in the thesis
+tables, asset turnover is reported at twice this value.
+
+Without --optimizer, two figures are drawn, one for asset and one for currency
+turnover, each with a row per risk measure and a column per universe, showing the
+unregularized, regularized and mean-risk overlay and joint optimizers. With
+--optimizer, the same two figures are drawn for that measure alone.
 
 Usage:
-    python results/generate_turnover_plot.py --optimizer-family normal --optimizer es
-    python results/generate_turnover_plot.py --optimizer-family demeaned --optimizer soes
-    python results/generate_turnover_plot.py --optimizer-family with-mean-term --optimizer mv
+    python results/generate_turnover_plot.py
+    python results/generate_turnover_plot.py --optimizer es
 
 Author: Anej Rozman
 """
@@ -20,7 +25,9 @@ import argparse
 import json
 from pathlib import Path
 
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
 import pandas as pd
 
 from portfolio_backtest import config
@@ -34,23 +41,38 @@ RESULTS_DIR: Path = Path(__file__).resolve().parent
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "turnover"
 
-FAMILIES: dict[str, tuple[str, str, str]] = {
-    "normal": ("top_runs.csv", "", "normal"),
-    "demeaned": ("top_demeaned_runs.csv", "", "demeaned"),
-    "with-mean-term": ("top_runs_w_mean.csv", "_w_mean", "with_mean_term"),
+# Thesis names and table order of the risk measures.
+MEASURE_TITLES: dict[str, str] = {
+    "mv": "Variance",
+    "smv": "Semi-Variance",
+    "mad": "MAD",
+    "es": "ES",
+    "soes": "SOES",
 }
 
-MEASURE_TITLES: dict[str, str] = {
-    "es": "Expected Shortfall",
-    "soes": "Second-Order Expected Shortfall",
-    "mv": "Mean-Variance",
-    "smv": "Semi-Variance",
-    "mad": "Mean Absolute Deviation",
-}
+# (runs table, strategy template, legend label, colour, line style, line width). The
+# overlay and joint programs keep the colours of the Appendix E runtime figures and the
+# sparsity and drawdown figures; unregularized programs are dashed and the mean-risk
+# programs dotted. Listed so that the legend fills one column per family.
+PROGRAMS: tuple[tuple[str, str, str, str, object, float], ...] = (
+    ("top_runs.csv", "{}_curr_overlay", "Overlay", "#eb6834", (0, (4, 2)), 0.7),
+    ("top_runs.csv", "{}_joint", "Joint", "#2a78d6", (0, (4, 2)), 0.7),
+    ("top_runs.csv", "reg_{}_curr_overlay", "Regularized Overlay", "#eda100", "-", 0.8),
+    ("top_runs.csv", "reg_{}_joint", "Regularized Joint", "#e87ba4", "-", 0.8),
+    ("top_runs_w_mean.csv", "{}_curr_overlay_w_mean", "Mean-Risk Overlay", "#5b3a99", (0, (1, 1.2)), 0.9),
+    ("top_runs_w_mean.csv", "{}_joint_w_mean", "Mean-Risk Joint", "#0f6e6e", (0, (1, 1.2)), 0.9),
+)
+
+# Asset turnover is reported at twice the Backtester value, as in the thesis tables.
+ASSET_SCALE: float = 2.0
+BLOCKS: tuple[tuple[str, int, float], ...] = (("asset", 0, ASSET_SCALE), ("currency", 1, 1.0))
 
 UNIVERSES: tuple[int, ...] = (10, 50, 100)
 
+plt.rcParams["pdf.fonttype"] = 42
+
 _RETURNS: dict[str, tuple[pd.DataFrame, dict[str, str]]] = {}
+_TABLES: dict[str, pd.DataFrame] = {}
 
 
 def _returns(universe_file: str) -> tuple[pd.DataFrame, dict[str, str]]:
@@ -67,14 +89,21 @@ def _returns(universe_file: str) -> tuple[pd.DataFrame, dict[str, str]]:
     return _RETURNS[universe_file]
 
 
-def _strategies(measure: str, suffix: str, family: str) -> list[tuple[str, str]]:
-    entries = [("equal_weight_optimizer", "Equal weight")]
-    if family == "normal":
-        entries.append((f"reg_{measure}_asset_full", "Assets-full"))
-    for role, label in (("curr_overlay", "Overlay"), ("joint", "Joint")):
-        entries.append((f"{measure}_{role}{suffix}", label))
-        entries.append((f"reg_{measure}_{role}{suffix}", f"Regularized {label.lower()}"))
-    return entries
+def _table(name: str) -> pd.DataFrame:
+    if name not in _TABLES:
+        table = pd.read_csv(RUNS_DIR / name, skipinitialspace=True)
+        table.columns = [c.strip() for c in table.columns]
+        table["strategy_name"] = table["strategy_name"].astype(str).str.strip()
+        _TABLES[name] = table
+    return _TABLES[name]
+
+
+def _run_dir(runs_file: str, strategy: str, universe: int) -> Path | None:
+    table = _table(runs_file)
+    row = table[table["strategy_name"] == strategy]
+    if row.empty or pd.isna(row[f"top_{universe}_run"].iloc[0]):
+        return None
+    return RUNS_DIR / strategy / f"run_{int(row[f'top_{universe}_run'].iloc[0])}"
 
 
 def _turnover(run_dir: Path) -> tuple[pd.Series, pd.Series] | None:
@@ -107,52 +136,105 @@ def _turnover(run_dir: Path) -> tuple[pd.Series, pd.Series] | None:
     return pd.Series(asset_turnover, index=dates), pd.Series(currency_turnover, index=dates)
 
 
+def _panel(measure: str, universe: int) -> list[tuple[tuple[pd.Series, pd.Series], tuple]]:
+    """The turnover series of one measure and universe, one entry per program with saved weights."""
+    drawn = []
+    for program in PROGRAMS:
+        run_dir = _run_dir(program[0], program[1].format(measure), universe)
+        series = None if run_dir is None else _turnover(run_dir)
+        if series is not None:
+            drawn.append((series, program))
+    return drawn
+
+
+def _style_axis(axis: plt.Axes, top: float) -> None:
+    axis.grid(alpha=0.3, linewidth=0.5)
+    axis.set_axisbelow(True)
+    for side in ("top", "right"):
+        axis.spines[side].set_visible(False)
+    axis.tick_params(labelsize=7, length=2)
+    axis.set_ylim(0.0, top)
+    axis.yaxis.set_major_locator(mticker.MaxNLocator(nbins=4, integer=True))
+    axis.xaxis.set_major_locator(mdates.YearLocator(base=10))
+    axis.xaxis.set_minor_locator(mdates.YearLocator(base=5))
+    axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+
+
+def _draw(axis: plt.Axes, panel: list, block: tuple[str, int, float], handles: dict[str, object]) -> None:
+    _, index, scale = block
+    for series, (_, _, label, colour, style, width) in panel:
+        values = series[index] * scale
+        line, = axis.plot(values.index, values.to_numpy(), color=colour, linestyle=style, linewidth=width)
+        handles.setdefault(label, line)
+
+
+def _legend(fig: plt.Figure, handles: dict[str, object]) -> None:
+    labels = [label for _, _, label, _, _, _ in PROGRAMS if label in handles]
+    # Filled column by column: unregularized, regularized and mean-risk programs.
+    fig.legend([handles[label] for label in labels], labels, loc="lower center",
+               ncol=3, fontsize=7.5, frameon=False, handlelength=2.4)
+
+
+def _top(panels: list[list], block: tuple[str, int, float]) -> float:
+    highest = max(float(series[block[1]].max()) * block[2] for panel in panels for series, _ in panel)
+    return 1.05 * highest
+
+
+def _plot_grid(block: tuple[str, int, float], panels: dict, out_dir: Path) -> None:
+    """One figure with a row per risk measure and a column per universe."""
+    measures = [m for m in MEASURE_TITLES if any(panels[(m, u)] for u in UNIVERSES)]
+    fig, axes = plt.subplots(len(measures), len(UNIVERSES), figsize=(6.2, 1.64 * len(measures)),
+                             sharex=True, sharey=True, squeeze=False)
+    handles: dict[str, object] = {}
+    top = _top([panels[(m, u)] for m in measures for u in UNIVERSES if panels[(m, u)]], block)
+    for row, measure in enumerate(measures):
+        for column, universe in enumerate(UNIVERSES):
+            axis = axes[row, column]
+            _draw(axis, panels[(measure, universe)], block, handles)
+            _style_axis(axis, top)
+            if row == 0:
+                axis.set_title(f"top-{universe}", fontsize=8.5)
+            if column == 0:
+                axis.set_ylabel(MEASURE_TITLES[measure], fontsize=8.5)
+    _legend(fig, handles)
+    fig.tight_layout(rect=(0, 0.05, 1, 1), h_pad=0.6, w_pad=0.6)
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_dir / f"{block[0]}.pdf", bbox_inches="tight")
+    plt.close(fig)
+
+
+def _plot_measure(measure: str, block: tuple[str, int, float], panels: dict, out_dir: Path) -> None:
+    """One figure for a single risk measure with a panel per universe."""
+    fig, axes = plt.subplots(1, len(UNIVERSES), figsize=(6.2, 2.4), sharex=True, sharey=True)
+    handles: dict[str, object] = {}
+    top = _top([panels[(measure, u)] for u in UNIVERSES if panels[(measure, u)]], block)
+    for axis, universe in zip(axes, UNIVERSES):
+        _draw(axis, panels[(measure, universe)], block, handles)
+        _style_axis(axis, top)
+        axis.set_title(f"top-{universe}", fontsize=8.5)
+    axes[0].set_ylabel(MEASURE_TITLES[measure], fontsize=8.5)
+    _legend(fig, handles)
+    fig.tight_layout(rect=(0, 0.2, 1, 1))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    fig.savefig(out_dir / f"{measure}_{block[0]}.pdf", bbox_inches="tight")
+    plt.close(fig)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--optimizer-family", required=True, choices=list(FAMILIES))
-    parser.add_argument("--optimizer", required=True, choices=list(MEASURE_TITLES))
+    parser.add_argument("--optimizer", choices=list(MEASURE_TITLES),
+                        help="Draw one measure alone; without it, the grid over all measures.")
     args = parser.parse_args()
 
-    runs_file, suffix, out_name = FAMILIES[args.optimizer_family]
-    table = pd.read_csv(RUNS_DIR / runs_file, skipinitialspace=True)
-    table.columns = [c.strip() for c in table.columns]
-    table["strategy_name"] = table["strategy_name"].astype(str).str.strip()
-
-    fig, axes = plt.subplots(2, len(UNIVERSES), figsize=(15, 7), sharex=True)
-    handles: dict[str, object] = {}
-    plotted = False
-
-    for column, universe in enumerate(UNIVERSES):
-        for strategy, label in _strategies(args.optimizer, suffix, args.optimizer_family):
-            row = table[table["strategy_name"] == strategy]
-            if row.empty or pd.isna(row[f"top_{universe}_run"].iloc[0]):
-                continue
-            run = int(row[f"top_{universe}_run"].iloc[0])
-            series = _turnover(RUNS_DIR / strategy / f"run_{run}")
-            if series is None:
-                continue
-            for axis, values in zip(axes[:, column], series):
-                line, = axis.plot(values.index, values.to_numpy(), linewidth=0.9, label=label)
-            handles.setdefault(label, line)
-            if strategy != "equal_weight_optimizer":
-                plotted = True
-        axes[0, column].set_title(f"top-{universe}")
-        for axis in axes[:, column]:
-            axis.grid(alpha=0.3)
-
-    if not plotted:
-        raise SystemExit(f"No {args.optimizer} runs with saved weights recorded in {runs_file}.")
-
-    axes[0, 0].set_ylabel("Asset turnover")
-    axes[1, 0].set_ylabel("Currency turnover")
-    fig.suptitle(f"Turnover series, {MEASURE_TITLES[args.optimizer]}")
-    fig.legend(list(handles.values()), list(handles), loc="lower center", ncol=len(handles))
-    fig.tight_layout(rect=(0, 0.07, 1, 1))
-
-    out_dir = OUT_DIR / out_name
-    out_dir.mkdir(parents=True, exist_ok=True)
-    fig.savefig(out_dir / f"{args.optimizer}.pdf", bbox_inches="tight")
-    plt.close(fig)
+    measures = list(MEASURE_TITLES) if args.optimizer is None else [args.optimizer]
+    panels = {(m, u): _panel(m, u) for m in measures for u in UNIVERSES}
+    if not any(panels.values()):
+        raise SystemExit("No runs with saved weights recorded.")
+    for block in BLOCKS:
+        if args.optimizer is None:
+            _plot_grid(block, panels, OUT_DIR)
+        else:
+            _plot_measure(args.optimizer, block, panels, OUT_DIR)
 
 
 if __name__ == "__main__":

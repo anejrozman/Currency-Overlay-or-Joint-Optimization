@@ -240,6 +240,7 @@ The values in \Cref{tab:risk-aversion} are one to two orders of magnitude larger
 for MAD, Expected Shortfall and second-order Expected Shortfall. As for the penalty grids in
 \Cref{app:hyperparameter-sensitivity}, this is because variance and semi-variance are measured in squared returns.
 
+\newpage
 \section{Drawdown Analysis} \label{app:drawdown-analysis}
 
 \Cref{fig:drawdowns,fig:drawdowns-mean-risk} show the drawdown of the optimizers at each trading day of the
@@ -297,203 +298,270 @@ the overlay and joint optimizers.
 \newpage
 \section{Additional Backtest Performance Results} \label{app:additional-backtest-results}
 
-\begin{table}%[htbp]
-  \centering 
-  \scalebox{0.82}{%
-  \begin{tabular}{lcccccccc}
+In this section, we report additional out-of-sample performance metrics for the optimizers of
+\Cref{chap:backtest-analysis}. \Cref{tab:additional-baseline,tab:additional-regularized,tab:additional-mean-risk}
+report, for the baseline, regularized and mean-risk optimizers, the realized values of the risk measures the optimizers
+minimize and the Expected Shortfall ratio.
+\Cref{fig:turnover-asset,fig:turnover-currency} show the asset and currency turnover of the overlay and joint
+optimizers at each rebalancing date.
+
+The risk measures are evaluated on the empirical distribution of the realized daily out-of-sample returns and, unlike
+the annualized metrics of \Cref{chap:backtest-analysis}, we report them as daily values. When defining the sample estimates of the 
+risk measures, we use the notation of
+\Cref{sec:performance-evaluation-metrics}. The realized Expected Shortfall is the average loss on the days with a
+loss of at least the realized Value-at-Risk
+\begin{equation*}
+    \mathrm{ES}_{\beta,\mathcal P} = -\frac{1}{|\mathcal T_{\mathcal P}|} \sum_{t \in \mathcal T_{\mathcal P}} R_{\mathcal P,t},
+    \qquad \mathcal T_{\mathcal P} = \left\{ t \mid -R_{\mathcal P,t} \ge \mathrm{VaR}_{\beta,\mathcal P} \right\},
+\end{equation*}
+where $\mathrm{VaR}_{\beta,\mathcal P}$ is the empirical $\beta$-quantile of the daily losses $-R_{\mathcal P,t}$. 
+The realized
+second-order Expected Shortfall is the sample estimate of \eqref{eq:soes_def}
+\begin{equation*}
+    \mathrm{SOES}_{\beta,\mathcal P} = \min_{\alpha} \left\{ \alpha + \frac{1}{1-\beta} \left( \frac{1}{T}
+    \sum_{t=1}^{T} \left( \left( -R_{\mathcal P,t} - \alpha \right)^+ \right)^2 \right)^{1/2} \right\},
+\end{equation*}
+and the realized semi-deviation and mean absolute deviation, the sample estimates of
+\eqref{eq:svar_def} and \eqref{eq:mad_def}, are
+\begin{equation*}
+    \mathrm{SD}_{\mathcal P} = \left( \frac{1}{T} \sum_{t=1}^{T} \left( \left( \bar R_{\mathcal P}
+    - R_{\mathcal P,t} \right)^+ \right)^2 \right)^{1/2}, \qquad
+    \mathrm{MAD}_{\mathcal P} = \frac{1}{T} \sum_{t=1}^{T} \bigl| R_{\mathcal P,t}
+    - \bar R_{\mathcal P} \bigr|.
+\end{equation*}
+The Expected Shortfall ratio replaces the volatility in the Sharpe ratio with the realized Expected Shortfall,
+annualized like the volatility
+\begin{equation*}
+    \mathrm{ESR}_{\mathcal P} = 252\, \frac{\bar R_{\mathcal P} - \bar R_f}{\sqrt{252}\, \mathrm{ES}_{\beta,\mathcal P}},
+\end{equation*}
+and measures the excess return per unit of tail risk.
+
+As for the volatility in \Cref{sec:baseline-backtests}, the optimizers realize much lower values of all four risk
+measures than the equally weighted portfolio, and the reduction grows with the size of the universe. Without a mean
+term, the overlay, joint and Full optimizers realize between $30.2\%$ and $45.2\%$ lower ES, SOES, SD and MAD than the
+equally weighted portfolio in the small universe, between $51.4\%$ and $61.8\%$ in the medium universe and between
+$52.4\%$ and $67.8\%$ in the large universe. For the mean-risk optimizers, the reduction is between $26.0\%$ and
+$64.1\%$.
+
+The joint optimizers also realize lower risk than the overlay optimizers. Without regularization, they realize a lower
+ES in $14$, a lower SOES in $15$, a lower SD in $15$ and a lower MAD in $13$ of the $15$ combinations of risk measure
+and universe, consistent with their lower volatility in \Cref{sec:baseline-backtests}. With regularization, the pattern
+is the same, with $14$, $14$, $15$ and $13$ combinations, while with a mean term it is weaker, with $11$, $13$, $12$
+and $7$. As for the out-of-sample gaps in \Cref{chap:joint-vs-sequential}, which compare the unregularized optimizers
+on the risk measure they minimize in each holding quarter, the advantage of the joint optimizers falls with the size of
+the universe. Without regularization, the realized risk of the joint optimizers is on average $3.65\%$ lower than that
+of the overlay optimizers in the small universe, $2.57\%$ in the medium and $0.92\%$ in the large universe, and all three
+cases in which the overlay optimizers realize the lower risk involve the Expected Shortfall and second-order Expected
+Shortfall optimizers in the large universe, where the out-of-sample gaps of the two tail measures are zero or slightly
+negative. Since the risk measures here are computed over the full out-of-sample period, the days with the largest losses
+carry more weight than in the quarterly averages of \Cref{chap:joint-vs-sequential}. In the medium universe, for
+example, the joint second-order Expected Shortfall optimizer realizes an $8.75\%$ lower SOES than the overlay optimizer,
+although its average out-of-sample gap is zero.
+
+Leaving the currency exposure unhedged raises the tail risk by a similar factor as the volatility. Zero, which optimizes
+the same objective as Full but is evaluated on unhedged returns, realizes $1.34$ to $2.33$ times the ES of Full, $1.34$
+to $1.94$ times its SD and $1.37$ to $2.40$ times its MAD, against $1.35$ to $2.09$ times its volatility. Only SOES,
+which weights the largest losses most, rises less, by $1.33$ to $1.73$ times.
+
+The Expected Shortfall ratios lead to the same comparison with the equally weighted portfolio as the Sharpe ratios in
+\Cref{chap:backtest-analysis}. In the small universe, $4$ of the $10$ baseline optimizers, $14$ of the $20$ regularized
+overlay, joint, Full and Zero optimizers, and $7$ of the $10$ mean-risk optimizers have a higher Expected Shortfall
+ratio than the equally weighted portfolio, and in the medium and large universes all of them do. In every case, these
+are exactly the optimizers with a higher Sharpe ratio than the equally weighted portfolio. 
+
+
+Finally, \Cref{fig:turnover-asset} shows that the asset turnover spikes once a year, at the rebalancing date that
+follows the annual reconstitution of the investable universe, when the optimizers are forced to rebalance based on the new constituents. 
+In \Cref{fig:turnover-currency},
+the currency turnover of the joint optimizers exceeds that of the overlay optimizers at $60\%$ to $100\%$ of the
+rebalancing dates without regularization, but only at $50\%$ to $74\%$ with regularization. This is in line with the analysis of the average
+currency turnover in \Cref{sec:effects-of-regularization}, where the two optimizers differ by at most $7\%$ with regularization.
+
+\begin{table}[p]
+  \centering
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.80}{%
+  \begin{tabular}{l*{11}{c}}
     \toprule
-    \multicolumn{8}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} & \textbf{EW} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                   & 1.15                 & 0.71                    & 0.98             & 0.69                & 0.67            & 0.67                & 0.66        \\
-    Vol (\%)                  & 13.96                & 8.51                    & 11.84            & 8.18                & 7.99            & 7.97                & 7.85        \\
-    MD (\%)                   & 54.76                & 30.81                   & 44.28            & 29.31               & 29.77           & 28.31               & 28.89       \\
-    SR                        & 0.12                 & 0.10                    & 0.21             & 0.08                & 0.13            & 0.08                & 0.17        \\
-    SOR                       & 0.17                 & 0.13                    & 0.28             & 0.10                & 0.18            & 0.11                & 0.23        \\
-    ESR                       & 0.09                 & 0.08                    & 0.15             & 0.06                & 0.10            & 0.06                & 0.13        \\
-    $\text{Turnover}^a$       & 0.29                 & 1.27                    & 1.23             & 1.30                & 1.06            & 1.27                & 1.15        \\
-    $\text{Turnover}^c$       & 0.92                 & 0.93                    & 0                & 2.39                & 1.67            & 2.98                & 1.77        \\
+    ES (\%) & 1.15 & 0.67 & 0.64 & 0.68 & 0.66 & 0.65 & 0.64 & 0.69 & 0.67 & 0.77 & 0.73 \\
+    SOES (\%) & 2.72 & 1.54 & 1.49 & 1.58 & 1.50 & 1.53 & 1.49 & 1.56 & 1.50 & 1.73 & 1.60 \\
+    SD (\%) & 0.65 & 0.37 & 0.36 & 0.38 & 0.37 & 0.37 & 0.36 & 0.38 & 0.37 & 0.42 & 0.40 \\
+    MAD (\%) & 0.59 & 0.35 & 0.34 & 0.36 & 0.35 & 0.35 & 0.34 & 0.37 & 0.36 & 0.41 & 0.40 \\
+    ESR & 0.10 & 0.11 & 0.12 & 0.06 & 0.06 & 0.12 & 0.14 & 0.06 & 0.06 & 0.06 & 0.02 \\
     \midrule
-    \multicolumn{8}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investable Universe (top 50 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} & \textbf{EW} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                   & 1.04                    & 0.43                & 0.80              & 0.44              & 0.42             & 0.44                & 0.42    \\
-    Vol (\%)                  & 12.50                   & 5.84                & 9.87              & 5.68              & 5.73             & 5.53                & 5.58    \\
-    MD (\%)                   & 55.74                   & 38.54               & 42.37             & 38.59             & 38.56            & 38.84               & 36.38   \\
-    SR                        & 0.32                    & 0.56                & 0.45              & 0.56              & 0.55             & 0.54                & 0.55    \\
-    SOR                       & 0.44                    & 0.77                & 0.64              & 0.75              & 0.77             & 0.73                & 0.76    \\
-    ESR                       & 0.24                    & 0.48                & 0.36              & 0.45              & 0.48             & 0.43                & 0.46    \\
-    $\text{Turnover}^a$       & 0.27                    & 1.60                & 1.58              & 1.78              & 1.52             & 1.78                & 1.46    \\
-    $\text{Turnover}^c$       & 0.92                    & 0.95                & 0                 & 0.97              & 1.26             & 1.67                & 1.29    \\
+    ES (\%) & 1.04 & 0.41 & 0.40 & 0.42 & 0.41 & 0.41 & 0.41 & 0.44 & 0.43 & 0.47 & 0.46 \\
+    SOES (\%) & 2.49 & 1.08 & 1.06 & 1.09 & 1.06 & 1.13 & 1.08 & 1.17 & 1.12 & 1.19 & 1.08 \\
+    SD (\%) & 0.59 & 0.25 & 0.24 & 0.25 & 0.25 & 0.26 & 0.25 & 0.27 & 0.26 & 0.28 & 0.26 \\
+    MAD (\%) & 0.53 & 0.22 & 0.22 & 0.23 & 0.22 & 0.22 & 0.22 & 0.24 & 0.23 & 0.26 & 0.25 \\
+    ESR & 0.25 & 0.37 & 0.40 & 0.36 & 0.39 & 0.42 & 0.41 & 0.45 & 0.43 & 0.32 & 0.37 \\
     \midrule
-    \multicolumn{8}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investable Universe (top 100 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} & \textbf{EW} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                   & 0.97                    & 0.34                  & 0.76            & 0.35              & 0.33             & 0.35                & 0.33 \\
-    Vol (\%)                  & 11.67                   & 4.46                  & 9.21            & 4.57              & 4.45             & 4.55                & 4.40\\
-    MD (\%)                   & 56.26                   & 31.60                 & 35.12           & 31.32             & 30.61            & 30.45               & 30.11\\
-    SR                        & 0.37                    & 0.89                  & 0.57            & 0.72              & 0.87             & 0.76                & 0.89\\
-    SOR                       & 0.49                    & 1.18                  & 0.80            & 0.95              & 1.14             & 1.01                & 1.17\\
-    ESR                       & 0.28                    & 0.76                  & 0.44            & 0.59              & 0.74             & 0.62                & 0.74\\
-    $\text{Turnover}^a$       & 0.27                    & 1.61                  & 1.61            & 1.89              & 1.42             & 1.91                & 1.62\\
-    $\text{Turnover}^c$       & 0.91                    & 0.96                  & 0               & 0.97              & 1.15             & 1.43                & 1.23\\
+    ES (\%) & 0.97 & 0.32 & 0.32 & 0.32 & 0.32 & 0.33 & 0.33 & 0.35 & 0.35 & 0.36 & 0.37 \\
+    SOES (\%) & 2.37 & 0.93 & 0.91 & 0.93 & 0.91 & 1.02 & 1.01 & 0.99 & 0.97 & 0.99 & 0.98 \\
+    SD (\%) & 0.56 & 0.21 & 0.20 & 0.21 & 0.21 & 0.22 & 0.22 & 0.22 & 0.22 & 0.23 & 0.22 \\
+    MAD (\%) & 0.49 & 0.17 & 0.17 & 0.18 & 0.18 & 0.17 & 0.17 & 0.19 & 0.19 & 0.20 & 0.20 \\
+    ESR & 0.28 & 0.54 & 0.55 & 0.53 & 0.54 & 0.46 & 0.46 & 0.59 & 0.62 & 0.41 & 0.42 \\
     \bottomrule
-  \end{tabular}% 
-}
-  \caption{Performance metrics for Expected Shortfall optimization approaches on increasing universe sizes}
-    \label{tab:es-universe-sizes}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}  
-  \raggedright\small
-    Table \ref{tab:es-universe-sizes} reports out-of-sample performance metrics for the international
-  portfolio optimization under expected shortfall, with portfolios rebalanced
-  quarterly. The realized out-of-sample statistics shown are Expected Shortfall (ES), volatility (Vol),
-  maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), the Expected Shortfall Ratio (ESR), 
-  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. 
-  Each panel corresponds to a different investment universe:
-  Panel A covers the small universe, made up of the 10 largest companies by market
-  capitalization in each economy; Panel B the medium universe, comprising the 50 largest
-  companies per economy; and Panel C the large universe, consisting of the 100 largest
-  companies per economy. The sample period runs from June 1990 to June 2023, and the
-  first out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and 
-    performance metrics are provided in section \ref{todo}.
-  \end{minipage}
+  \end{tabular}
+  }
+  \caption{Additional out-of-sample performance metrics of the baseline optimizers. ES, SOES, SD and MAD are daily
+  values in percent.}
+  \label{tab:additional-baseline}
 \end{table}
 
-\begin{table}[htbp]
+\begin{table}[p]
   \centering
-  \scalebox{0.82}{%
-  \begin{tabular}{lcccccccc}
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.80}{%
+  \begin{tabular}{l*{11}{c}}
     \toprule
-    \multicolumn{8}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} &  & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                   & 1.15                  & 0.69                    & 0.97              & 0.66                 & 0.65             & 0.64              & 0.64                \\  
-    Vol (\%)                  & 13.96                 & 8.39                    & 11.80             & 7.97                 & 7.82             & 7.73              & 7.75               \\
-    MD (\%)                   & 54.76                 & 28.00                   & 42.18             & 28.23                & 27.80            & 27.92             & 27.79                \\
-    SR                        & 0.12                  & 0.12                    & 0.22              & 0.14                 & 0.17             & 0.16              & 0.17               \\
-    SOR                       & 0.17                  & 0.17                    & 0.30              & 0.19                 & 0.22             & 0.22              & 0.22               \\
-    ESR                       & 0.09                  & 0.10                    & 0.17              & 0.11                 & 0.12             & 0.12              & 0.12               \\
-    $\text{Turnover}^a$       & 0.29                  & 1.02                    & 1.02              & 0.87                 & 0.92             & 0.82              & 0.98              \\
-    $\text{Turnover}^c$       & 0.92                  & 0.93                    & 0                 & 1.70                 & 1.43             & 1.88              & 1.47               \\
+    ES (\%) &  & 0.66 & 0.65 & 0.67 & 0.65 & 0.65 & 0.64 & 0.67 & 0.66 & 0.72 & 0.71 \\
+    SOES (\%) &  & 1.52 & 1.52 & 1.53 & 1.49 & 1.53 & 1.53 & 1.56 & 1.52 & 1.59 & 1.56 \\
+    SD (\%) &  & 0.37 & 0.36 & 0.37 & 0.36 & 0.37 & 0.37 & 0.38 & 0.37 & 0.40 & 0.39 \\
+    MAD (\%) &  & 0.35 & 0.34 & 0.35 & 0.34 & 0.34 & 0.34 & 0.35 & 0.35 & 0.39 & 0.38 \\
+    ESR &  & 0.12 & 0.12 & 0.10 & 0.08 & 0.16 & 0.16 & 0.10 & 0.13 & 0.09 & 0.00 \\
     \midrule
-    \multicolumn{8}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \textbf{Metric} & \textbf{EW} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    ES (\%) & 1.15 & 0.69 & 0.97 & 0.70 & 0.96 & 0.69 & 0.96 & 0.71 & 0.98 & 0.76 & 1.02 \\
+    SOES (\%) & 2.72 & 1.70 & 2.33 & 1.69 & 2.29 & 1.69 & 2.31 & 1.70 & 2.32 & 1.79 & 2.38 \\
+    SD (\%) & 0.65 & 0.40 & 0.55 & 0.40 & 0.55 & 0.40 & 0.55 & 0.40 & 0.55 & 0.43 & 0.57 \\
+    MAD (\%) & 0.59 & 0.36 & 0.52 & 0.36 & 0.52 & 0.36 & 0.51 & 0.37 & 0.52 & 0.40 & 0.54 \\
+    ESR & 0.10 & 0.10 & 0.17 & 0.10 & 0.17 & 0.15 & 0.21 & 0.08 & 0.16 & 0.05 & 0.12 \\
     \midrule
-    ES (\%)                 & 1.04                        & 0.41                 & 0.79                & 0.41                & 0.40             & 0.40             & 0.40                \\
-    Vol (\%)                & 12.50                       & 5.31                 & 9.58                & 5.17                & 5.26             & 5.09             & 5.19               \\
-    MD (\%)                 & 55.74                       & 35.05                & 42.05               & 35.85               & 35.03            & 34.89            & 34.26               \\
-    SR                      & 0.32                        & 0.48                 & 0.40                & 0.47                & 0.45             & 0.50             & 0.45               \\
-    SOR                     & 0.44                        & 0.62                 & 0.55                & 0.62                & 0.59             & 0.67             & 0.59               \\
-    ESR                     & 0.24                        & 0.39                 & 0.31                & 0.37                & 0.37             & 0.40             & 0.37               \\
-    $\text{Turnover}^a$     & 0.27                        & 1.07                 & 1.06                & 1.04                & 1.12             & 1.05             & 1.13               \\
-    $\text{Turnover}^c$     & 0.92                        & 0.95                 & 0                   & 1.16                & 1.11             & 1.37             & 1.11               \\
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investable Universe (top 50 stocks per economy)}} \\
     \midrule
-    \multicolumn{8}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} &  & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    ES (\%) &  & 0.40 & 0.40 & 0.41 & 0.40 & 0.40 & 0.40 & 0.42 & 0.42 & 0.45 & 0.45 \\
+    SOES (\%) &  & 1.16 & 1.13 & 1.08 & 1.07 & 1.07 & 1.05 & 1.17 & 1.14 & 1.11 & 1.10 \\
+    SD (\%) &  & 0.26 & 0.25 & 0.25 & 0.25 & 0.24 & 0.24 & 0.26 & 0.26 & 0.26 & 0.26 \\
+    MAD (\%) &  & 0.21 & 0.21 & 0.22 & 0.22 & 0.21 & 0.20 & 0.22 & 0.22 & 0.24 & 0.24 \\
+    ESR &  & 0.37 & 0.37 & 0.37 & 0.36 & 0.44 & 0.47 & 0.47 & 0.46 & 0.40 & 0.43 \\
     \midrule
-    ES (\%)                     & 0.97                      & 0.32                & 0.74                & 0.32              & 0.31              & 0.31             & 0.31 \\
-    Vol (\%)                    & 11.67                     & 4.37                & 8.99                & 4.24              & 4.35              & 4.19             & 4.29 \\
-    MD (\%)                     & 56.26                     & 26.60               & 33.06               & 26.72             & 26.28             & 26.36            & 26.40\\
-    SR                          & 0.37                      & 0.72                & 0.49                & 0.65              & 0.77              & 0.67             & 0.76\\
-    SOR                         & 0.49                      & 0.93                & 0.68                & 0.85              & 0.99              & 0.89             & 1.00\\
-    ESR                         & 0.28                      & 0.63                & 0.38                & 0.54              & 0.67              & 0.55             & 0.65\\
-    $\text{Turnover}^a$         & 0.27                      & 1.09                & 1.12                & 1.08              & 1.15              & 1.08             & 1.10\\
-    $\text{Turnover}^c$         & 0.91                      & 0.96                & 0                   & 1.06              & 1.06              & 1.24             & 1.03\\
+    \textbf{Metric} & \textbf{EW} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} \\
+    \midrule
+    ES (\%) & 1.04 & 0.41 & 0.79 & 0.41 & 0.78 & 0.40 & 0.79 & 0.43 & 0.80 & 0.46 & 0.81 \\
+    SOES (\%) & 2.49 & 1.17 & 1.85 & 1.11 & 1.78 & 1.07 & 1.72 & 1.20 & 1.84 & 1.15 & 1.81 \\
+    SD (\%) & 0.59 & 0.26 & 0.45 & 0.25 & 0.44 & 0.24 & 0.43 & 0.27 & 0.45 & 0.27 & 0.45 \\
+    MAD (\%) & 0.53 & 0.21 & 0.43 & 0.22 & 0.43 & 0.21 & 0.41 & 0.22 & 0.43 & 0.24 & 0.45 \\
+    ESR & 0.25 & 0.39 & 0.31 & 0.39 & 0.32 & 0.46 & 0.31 & 0.48 & 0.36 & 0.42 & 0.35 \\
+    \midrule
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investable Universe (top 100 stocks per economy)}} \\
+    \midrule
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} &  & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
+    \midrule
+    ES (\%) &  & 0.31 & 0.31 & 0.32 & 0.31 & 0.33 & 0.32 & 0.33 & 0.33 & 0.35 & 0.35 \\
+    SOES (\%) &  & 1.00 & 0.98 & 0.95 & 0.93 & 1.13 & 1.10 & 0.99 & 0.96 & 0.98 & 0.96 \\
+    SD (\%) &  & 0.22 & 0.21 & 0.21 & 0.21 & 0.24 & 0.23 & 0.22 & 0.22 & 0.22 & 0.22 \\
+    MAD (\%) &  & 0.17 & 0.17 & 0.17 & 0.17 & 0.17 & 0.17 & 0.18 & 0.18 & 0.20 & 0.19 \\
+    ESR &  & 0.67 & 0.65 & 0.70 & 0.71 & 0.52 & 0.53 & 0.74 & 0.74 & 0.72 & 0.74 \\
+    \midrule
+    \textbf{Metric} & \textbf{EW} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} & \textbf{Full} & \textbf{Zero} \\
+    \midrule
+    ES (\%) & 0.97 & 0.32 & 0.74 & 0.32 & 0.74 & 0.33 & 0.76 & 0.33 & 0.76 & 0.35 & 0.77 \\
+    SOES (\%) & 2.37 & 1.01 & 1.68 & 0.96 & 1.63 & 1.11 & 1.78 & 0.99 & 1.69 & 0.98 & 1.70 \\
+    SD (\%) & 0.56 & 0.22 & 0.42 & 0.21 & 0.41 & 0.24 & 0.43 & 0.22 & 0.43 & 0.22 & 0.43 \\
+    MAD (\%) & 0.49 & 0.17 & 0.41 & 0.17 & 0.41 & 0.17 & 0.40 & 0.18 & 0.42 & 0.20 & 0.42 \\
+    ESR & 0.28 & 0.63 & 0.38 & 0.70 & 0.42 & 0.54 & 0.34 & 0.76 & 0.44 & 0.67 & 0.40 \\
     \bottomrule
-  \end{tabular}%
-}
-  \caption{Performance metrics for mean-variance optimization approaches on increasing universe sizes}
-  \label{tab:mv-universe-sizes}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Table \ref{tab:mv-universe-sizes} reports out-of-sample performance metrics for the international
-  portfolio optimization under mean-variance, with portfolios rebalanced
-  quarterly. The realized out-of-sample statistics shown are Expected Shortfall (ES), volatility (Vol),
-  maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), the Expected Shortfall Ratio (ESR), 
-  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. 
-  Each panel corresponds to a different investment universe:
-  Panel A covers the small universe, made up of the 10 largest companies by market
-  capitalization in each economy; Panel B the medium universe, comprising the 50 largest
-  companies per economy; and Panel C the large universe, consisting of the 100 largest
-  companies per economy. The sample period runs from June 1990 to June 2023, and the
-  first out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and 
-    performance metrics are provided in section \ref{todo}.
-  \end{minipage}
+  \end{tabular}
+  }
+  \caption{Additional out-of-sample performance metrics of the regularized optimizers and the benchmarks. ES, SOES, SD
+  and MAD are daily values in percent.}
+  \label{tab:additional-regularized}
 \end{table}
 
-\begin{table}[htbp]
+\begin{table}[p]
   \centering
-  \scalebox{0.82}{%
-  \begin{tabular}{lcccccccc}
+  \setlength{\tabcolsep}{4pt}
+  \scalebox{0.80}{%
+  \begin{tabular}{l*{11}{c}}
     \toprule
-    \multicolumn{8}{c}{\textbf{Panel A: Small Investment Universe (top 10 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} & \textbf{EW} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                   & 1.15                  & 0.69                    & 0.96              & 0.65                 & 0.65             & 0.64              & 0.64                \\  
-    Vol (\%)                  & 13.96                 & 8.36                    & 11.70             & 7.87                 & 7.82             & 7.71              & 7.74               \\
-    MAD (\%)                  & 54.76                 & 5.67                    & 8.06              & 5.51                 & 5.47             & 5.38              & 5.35                \\
-    MD (\%)                   & 54.76                 & 28.59                   & 40.88             & 27.67                & 27.83            & 27.31             & 26.01                \\
-    SR                        & 0.12                  & 0.20                    & 0.27              & 0.16                 & 0.21             & 0.18              & 0.22               \\
-    SOR                       & 0.17                  & 0.27                    & 0.36              & 0.22                 & 0.27             & 0.25              & 0.29               \\
-    ESR                       & 0.09                  & 0.15                    & 0.21              & 0.12                 & 0.16             & 0.14              & 0.16               \\
-    $\text{Turnover}^a$       & 0.29                  & 1.08                    & 1.08              & 1.10                 & 1.04             & 1.06              & 1.06              \\
-    $\text{Turnover}^c$       & 0.92                  & 0.92                    & 0                 & 1.51                 & 1.36             & 1.84              & 1.44               \\
+    ES (\%) & 1.15 & 0.71 & 0.70 & 0.82 & 0.81 & 0.69 & 0.67 & 0.69 & 0.67 & 0.77 & 0.74 \\
+    SOES (\%) & 2.72 & 1.63 & 1.60 & 1.85 & 1.83 & 1.62 & 1.57 & 1.57 & 1.49 & 1.73 & 1.60 \\
+    SD (\%) & 0.65 & 0.40 & 0.39 & 0.46 & 0.45 & 0.39 & 0.38 & 0.38 & 0.37 & 0.43 & 0.40 \\
+    MAD (\%) & 0.59 & 0.38 & 0.37 & 0.43 & 0.43 & 0.36 & 0.36 & 0.37 & 0.36 & 0.41 & 0.40 \\
+    ESR & 0.10 & 0.28 & 0.28 & 0.29 & 0.29 & 0.26 & 0.29 & 0.09 & 0.10 & 0.12 & 0.09 \\
     \midrule
-    \multicolumn{8}{c}{\textbf{Panel B: Medium Investment Universe (top 50 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel B: Medium Investable Universe (top 50 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} & \textbf{EW} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                 & 1.04                        & 0.40                 & 0.79                & 0.41                & 0.40             & 0.41             & 0.40                \\
-    Vol (\%)                & 12.50                       & 6.19                 & 9.97                & 5.72                & 6.16             & 5.55             & 6.08               \\
-    MAD (\%)                & 55.74                       & 3.29                 & 6.56                & 3.47                & 3.26             & 3.44             & 3.24               \\
-    MD (\%)                 & 55.74                       & 35.90                & 43.81               & 35.93               & 35.92            & 36.94            & 35.51               \\
-    SR                      & 0.32                        & 0.48                 & 0.39                & 0.48                & 0.46             & 0.48             & 0.49               \\
-    SOR                     & 0.44                        & 0.77                 & 0.57                & 0.69                & 0.75             & 0.69             & 0.79               \\
-    ESR                     & 0.24                        & 0.46                 & 0.31                & 0.42                & 0.44             & 0.41             & 0.47               \\
-    $\text{Turnover}^a$     & 0.27                        & 1.30                 & 1.31                & 1.67                & 1.30             & 1.69             & 1.27               \\
-    $\text{Turnover}^c$     & 0.92                        & 0.96                 & 0                   & 1.98                & 1.09             & 1.25             & 1.05               \\
+    ES (\%) & 1.04 & 0.51 & 0.51 & 0.64 & 0.65 & 0.43 & 0.43 & 0.44 & 0.44 & 0.48 & 0.46 \\
+    SOES (\%) & 2.49 & 1.30 & 1.28 & 1.55 & 1.55 & 1.16 & 1.13 & 1.17 & 1.13 & 1.19 & 1.09 \\
+    SD (\%) & 0.59 & 0.31 & 0.30 & 0.37 & 0.38 & 0.27 & 0.26 & 0.27 & 0.26 & 0.28 & 0.27 \\
+    MAD (\%) & 0.53 & 0.28 & 0.28 & 0.34 & 0.35 & 0.23 & 0.23 & 0.24 & 0.24 & 0.26 & 0.26 \\
+    ESR & 0.25 & 0.56 & 0.58 & 0.47 & 0.50 & 0.53 & 0.56 & 0.45 & 0.47 & 0.35 & 0.48 \\
     \midrule
-    \multicolumn{8}{c}{\textbf{Panel C: Large Investment Universe (top 100 stocks per economy)}} \\
+    \multicolumn{12}{c}{\textbf{Panel C: Large Investable Universe (top 100 stocks per economy)}} \\
     \midrule
-    \textbf{Metric} & \textbf{Equal Weight} & \textbf{Assets-Full} & \textbf{Assets-Zero} & \textbf{Overlay} & \textbf{Overlay-Reg} & \textbf{Joint} & \textbf{Joint-Reg}\\
+    & & \multicolumn{2}{c}{\textbf{Variance}} & \multicolumn{2}{c}{\textbf{Semi-Variance}} & \multicolumn{2}{c}{\textbf{MAD}} & \multicolumn{2}{c}{\textbf{ES}} & \multicolumn{2}{c}{\textbf{SOES}} \\
+    \cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10} \cmidrule(lr){11-12}
+    \textbf{Metric} & \textbf{EW} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
-    ES (\%)                     & 0.97                      & 0.33                & 0.76                & 0.33              & 0.32              & 0.32             & 0.32 \\
-    Vol (\%)                    & 11.67                     & 4.94                & 9.36                & 4.63              & 4.97              & 4.57             & 4.85 \\
-    MAD (\%)                    & 56.26                     & 2.67                & 6.40                & 2.78              & 2.65              & 2.75             & 2.62\\
-    MD (\%)                     & 56.26                     & 31.28               & 36.99               & 31.25             & 31.28             & 31.41            & 31.62\\
-    SR                          & 0.37                      & 0.57                & 0.44                & 0.53              & 0.55              & 0.52             & 0.56\\
-    SOR                         & 0.49                      & 0.77                & 0.62                & 0.70              & 0.73              & 0.69             & 0.76\\
-    ESR                         & 0.28                      & 0.54                & 0.34                & 0.47              & 0.52              & 0.46             & 0.53\\
-    $\text{Turnover}^a$         & 0.27                      & 1.58                & 1.58                & 1.74              & 1.58              & 1.67             & 1.46\\
-    $\text{Turnover}^c$         & 0.91                      & 0.97                & 0                   & 0.97              & 1.01              & 1.16             & 1.03\\ 
+    ES (\%) & 0.97 & 0.45 & 0.46 & 0.59 & 0.61 & 0.35 & 0.35 & 0.35 & 0.35 & 0.37 & 0.37 \\
+    SOES (\%) & 2.37 & 1.19 & 1.19 & 1.48 & 1.50 & 1.06 & 1.04 & 0.99 & 0.98 & 1.00 & 0.99 \\
+    SD (\%) & 0.56 & 0.28 & 0.28 & 0.35 & 0.36 & 0.23 & 0.23 & 0.22 & 0.22 & 0.23 & 0.23 \\
+    MAD (\%) & 0.49 & 0.25 & 0.25 & 0.32 & 0.33 & 0.18 & 0.19 & 0.19 & 0.19 & 0.20 & 0.20 \\
+    ESR & 0.28 & 0.69 & 0.73 & 0.60 & 0.66 & 0.58 & 0.58 & 0.59 & 0.66 & 0.43 & 0.49 \\
     \bottomrule
-  \end{tabular}% 
-}
-  \caption{Performance metrics for mean absolute deviation optimization approaches on increasing universe sizes}
-  \label{tab:mad-universe-sizes}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Table \ref{tab:mad-universe-sizes} reports out-of-sample performance metrics for the international
-  portfolio optimization under mean absolute deviation, with portfolios rebalanced
-  quarterly. The realized out-of-sample statistics shown are Expected Shortfall (ES), volatility (Vol),
-  maximum drawdown (MD), the Sharpe Ratio (SR), the Sortino Ratio (SOR), the Expected Shortfall Ratio (ESR), 
-  and average asset and currency turnover, denoted Turnover$^a$ and Turnover$^c$, respectively. 
-  Each panel corresponds to a different investment universe:
-  Panel A covers the small universe, made up of the 10 largest companies by market
-  capitalization in each economy; Panel B the medium universe, comprising the 50 largest
-  companies per economy; and Panel C the large universe, consisting of the 100 largest
-  companies per economy. The sample period runs from June 1990 to June 2023, and the
-  first out-of-sample portfolio is formed in June 2000. Details on the optimization approaches and 
-    performance metrics are provided in section \ref{todo}.
-  \end{minipage}
+  \end{tabular}
+  }
+  \caption{Additional out-of-sample performance metrics of the mean-risk optimizers. ES, SOES, SD and MAD are daily
+  values in percent.}
+  \label{tab:additional-mean-risk}
 \end{table}
+
+\clearpage
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{../results/figures/turnover/asset.pdf}
+    \caption{Asset turnover of the unregularized, regularized and mean-risk overlay and joint optimizers at each
+    rebalancing date, by risk measure and universe size.}
+    \label{fig:turnover-asset}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{../results/figures/turnover/currency.pdf}
+    \caption{Currency turnover of the unregularized, regularized and mean-risk overlay and joint optimizers at each
+    rebalancing date, by risk measure and universe size.}
+    \label{fig:turnover-currency}
+\end{figure}

@@ -67,8 +67,9 @@ PROGRAMS: dict[str, tuple[tuple[str, str, str, object, float], ...]] = {
         ("reg_{}_joint", "Regularized Joint", "#e87ba4", "-", 1.0),
     ),
     "with-mean-term": (
-        ("{}_curr_overlay_w_mean", "Mean-Risk Overlay", "#7d5bc6", "-", 1.0),
-        ("{}_joint_w_mean", "Mean-Risk Joint", "#14a3a3", "-", 1.0),
+        # Dark enough to stay apart from the joint colours where they share a figure (turnover).
+        ("{}_curr_overlay_w_mean", "Mean-Risk Overlay", "#5b3a99", "-", 1.0),
+        ("{}_joint_w_mean", "Mean-Risk Joint", "#0f6e6e", "-", 1.0),
     ),
 }
 BENCHMARK: tuple[str, str, str, object, float] = (
