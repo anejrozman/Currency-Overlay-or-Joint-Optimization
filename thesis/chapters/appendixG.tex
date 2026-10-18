@@ -240,8 +240,61 @@ The values in \Cref{tab:risk-aversion} are one to two orders of magnitude larger
 for MAD, Expected Shortfall and second-order Expected Shortfall. As for the penalty grids in
 \Cref{app:hyperparameter-sensitivity}, this is because variance and semi-variance are measured in squared returns.
 
+\section{Drawdown Analysis} \label{app:drawdown-analysis}
 
+\Cref{fig:drawdowns,fig:drawdowns-mean-risk} show the drawdown of the optimizers at each trading day of the
+out-of-sample period, that is, the decline of their cumulative wealth from its running maximum, whose largest value is
+the maximum drawdown as defined in \Cref{sec:performance-evaluation-metrics}. \Cref{fig:drawdowns} reports the
+unregularized and regularized overlay and joint optimizers and the Zero optimizer, and \Cref{fig:drawdowns-mean-risk}
+the mean-risk optimizers, each against the equally weighted portfolio. 
 
+To compare the optimizers in the main market
+crashes of the sample, we also report their crisis drawdowns, which include the dot-com crash, from the start of the out-of-sample period in July 2000 to June 2003,
+the global financial crisis, from 2007 to 2009, and the COVID-19 crash, from January to June 2020. In addition, we
+report the recovery time of the maximum drawdown, the time from the peak preceding it until the cumulative wealth
+regains that peak.
+
+In the medium and large universes, all optimizers reach their maximum drawdown in the global financial crisis. The
+overlay and joint optimizers lose between $24.7\%$ and $38.6\%$ and the mean-risk optimizers between $29.6\%$ and
+$41.5\%$, against $55.7\%$ and $56.3\%$ for the equally weighted portfolio. However, they need $7.2$ to $12.1$ years to
+regain their pre-crisis peak, against $6.7$ to $6.9$ years for the equally weighted portfolio. Their smaller losses
+require smaller gains to recover, between $33\%$ and $71\%$ against $126\%$ and $129\%$, but in the two years after each portfolio's cumulative wealth reaches its lowest point in the
+crisis, they gain only $7\%$ to $32\%$, while the equally weighted portfolio gains $86\%$ and $89\%$. The low-risk assets
+that limit their losses in the crisis therefore also limit their gains in the recovery. In the dot-com and COVID-19
+crashes, they lose $4.7\%$ to $26.3\%$, against $30.2\%$ to $33.9\%$ for
+the equally weighted portfolio.
+
+The small universe backtests differ in two respects. First, the overlay and joint optimizers lose as much in the dot-com crash
+as in the global financial crisis, between $26.0\%$ and $36.2\%$ against $23.3\%$ to $34.1\%$, whereas in the medium and
+large universes they lose at most $10.2\%$ in the dot-com crash. With ten stocks per economy, there are fewer low-risk assets for the optimizers to move into, as
+discussed in \Cref{sec:baseline-backtests}. Second, six of the ten unregularized overlay and joint optimizers and both
+second-order Expected Shortfall mean-risk optimizers reach their maximum drawdown, between $28.2\%$ and $37.1\%$, in
+October 2022, and have not regained their early-2020 peak by the end of the sample in April 2023. The equally weighted
+portfolio had already regained its pre-COVID-19 peak in January 2021.
+
+Zero leaves the currency exposure of its asset positions unhedged and loses between $33.1\%$ and $44.8\%$ in the global
+financial crisis, more than the overlay and joint optimizers of the same risk measure in every universe. Between July 2008 and March 2009, the foreign
+currencies lost $16.6\%$ against the US dollar on average, and only the Japanese yen and the Hong Kong dollar
+appreciated, so the unhedged portfolio lost on its currency exposure in addition to its equities. The same exposure
+helps Zero in the recovery, as $12$ of the $13$ foreign currencies appreciated over the following two years, and in the
+medium and large universes Zero regains its pre-crisis peak sooner than 
+the overlay and joint optimizers.
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{../results/figures/drawdowns/normal/drawdowns.pdf}
+    \caption{Drawdown of the equally weighted portfolio and the unregularized and regularized overlay and joint optimizers and the Zero optimizer in the out of sample period, by risk measure and universe size. The out of sample period runs from July 2000 to April 2023.}
+    \label{fig:drawdowns}
+\end{figure}
+
+\begin{figure}[p]
+    \centering
+    \includegraphics[width=\textwidth]{../results/figures/drawdowns/with_mean_term/drawdowns.pdf}
+    \caption{Drawdown of the equally weighted portfolio and the mean-risk overlay and joint optimizers in the out of sample period, by risk measure and universe size. The out of sample period runs from July 2000 to April 2023.}
+    \label{fig:drawdowns-mean-risk}
+\end{figure}
+
+\newpage
 \section{Additional Backtest Performance Results} \label{app:additional-backtest-results}
 
 \begin{table}%[htbp]
