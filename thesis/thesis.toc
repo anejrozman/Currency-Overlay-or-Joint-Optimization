@@ -90,4 +90,4 @@
 \contentsline {section}{\numberline {G.3}Risk Aversion Calibration}{90}{section.G.3}%
 \contentsline {section}{\numberline {G.4}Drawdown Analysis}{91}{section.G.4}%
 \contentsline {section}{\numberline {G.5}Additional Backtest Performance Results}{94}{section.G.5}%
-\contentsline {chapter}{Bibliography}{101}{appendix*.5}%
+\contentsline {chapter}{Bibliography}{100}{appendix*.5}%

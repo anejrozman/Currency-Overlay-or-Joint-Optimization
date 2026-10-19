@@ -305,8 +305,8 @@ minimize and the Expected Shortfall ratio.
 \Cref{fig:turnover-asset,fig:turnover-currency} show the asset and currency turnover of the overlay and joint
 optimizers at each rebalancing date.
 
-The risk measures are evaluated on the empirical distribution of the realized daily out-of-sample returns and, unlike
-the annualized metrics of \Cref{chap:backtest-analysis}, we report them as daily values. When defining the sample estimates of the 
+The risk measures are evaluated on the empirical distribution of the realized daily out-of-sample returns, and we report
+them as daily values, unlike the annualized metrics of \Cref{chap:backtest-analysis}. When defining the sample estimates of the 
 risk measures, we use the notation of
 \Cref{sec:performance-evaluation-metrics}. The realized Expected Shortfall is the average loss on the days with a
 loss of at least the realized Value-at-Risk
@@ -337,37 +337,31 @@ annualized like the volatility
 and measures the excess return per unit of tail risk.
 
 As for the volatility in \Cref{sec:baseline-backtests}, the optimizers realize much lower values of all four risk
-measures than the equally weighted portfolio, and the reduction grows with the size of the universe. Without a mean
+measures than the equally weighted portfolio, and the reduction is larger in the medium and large universes than in
+the small universe. Without a mean
 term, the overlay, joint and Full optimizers realize between $30.2\%$ and $45.2\%$ lower ES, SOES, SD and MAD than the
 equally weighted portfolio in the small universe, between $51.4\%$ and $61.8\%$ in the medium universe and between
 $52.4\%$ and $67.8\%$ in the large universe. For the mean-risk optimizers, the reduction is between $26.0\%$ and
 $64.1\%$.
 
-The joint optimizers also realize lower risk than the overlay optimizers. Without regularization, they realize a lower
-ES in $14$, a lower SOES in $15$, a lower SD in $15$ and a lower MAD in $13$ of the $15$ combinations of risk measure
-and universe, consistent with their lower volatility in \Cref{sec:baseline-backtests}. With regularization, the pattern
-is the same, with $14$, $14$, $15$ and $13$ combinations, while with a mean term it is weaker, with $11$, $13$, $12$
-and $7$. As for the out-of-sample gaps in \Cref{chap:joint-vs-sequential}, which compare the unregularized optimizers
-on the risk measure they minimize in each holding quarter, the advantage of the joint optimizers falls with the size of
-the universe. Without regularization, the realized risk of the joint optimizers is on average $3.65\%$ lower than that
-of the overlay optimizers in the small universe, $2.57\%$ in the medium and $0.92\%$ in the large universe, and all three
-cases in which the overlay optimizers realize the lower risk involve the Expected Shortfall and second-order Expected
-Shortfall optimizers in the large universe, where the out-of-sample gaps of the two tail measures are zero or slightly
-negative. Since the risk measures here are computed over the full out-of-sample period, the days with the largest losses
-carry more weight than in the quarterly averages of \Cref{chap:joint-vs-sequential}. In the medium universe, for
-example, the joint second-order Expected Shortfall optimizer realizes an $8.75\%$ lower SOES than the overlay optimizer,
-although its average out-of-sample gap is zero.
+Without regularization, the joint optimizers also realize lower risk than the overlay optimizers and, as for the
+out-of-sample gaps in \Cref{chap:joint-vs-sequential}, their advantage falls with the size of the universe. Their
+realized risk is on average $3.65\%$ lower than that of the overlay optimizers in the small universe, $2.57\%$ in the
+medium and $0.92\%$ in the large universe. With regularization, the joint optimizers realize lower risk in almost all
+comparisons, while with a mean term, they do so in all comparisons in the small universe but only in about half of them
+in the large universe.
 
-Leaving the currency exposure unhedged raises the tail risk by a similar factor as the volatility. Zero, which optimizes
-the same objective as Full but is evaluated on unhedged returns, realizes $1.34$ to $2.33$ times the ES of Full, $1.34$
-to $1.94$ times its SD and $1.37$ to $2.40$ times its MAD, against $1.35$ to $2.09$ times its volatility. Only SOES,
-which weights the largest losses most, rises less, by $1.33$ to $1.73$ times.
+Leaving the currency exposure unhedged raises the risk measures by a similar factor as the volatility. The Zero
+optimizer optimizes the same objective as the Full optimizer but is evaluated on unhedged returns. Its Expected
+Shortfall is $1.34$ to $2.33$ times larger than that of the Full optimizer, its semi-deviation $1.34$ to $1.94$ times larger and its mean
+absolute deviation $1.37$ to $2.40$ times larger. The increase in risk when leaving the currency exposure unhedged rises proportionally with the 
+volatility. As we report in \Cref{sec:effects-of-regularization}, the increase in volatility is $1.35$ to $2.09$ times larger for the Zero optimizer than of the Full optimizer. 
 
 The Expected Shortfall ratios lead to the same comparison with the equally weighted portfolio as the Sharpe ratios in
-\Cref{chap:backtest-analysis}. In the small universe, $4$ of the $10$ baseline optimizers, $14$ of the $20$ regularized
-overlay, joint, Full and Zero optimizers, and $7$ of the $10$ mean-risk optimizers have a higher Expected Shortfall
-ratio than the equally weighted portfolio, and in the medium and large universes all of them do. In every case, these
-are exactly the optimizers with a higher Sharpe ratio than the equally weighted portfolio. 
+\Cref{chap:backtest-analysis}. In the small universe, fewer than half of the unregularized optimizers but most of the
+regularized and mean-risk optimizers achieve a higher Expected Shortfall ratio than the equally weighted portfolio, and
+in the medium and large universes all of them do. In every case, these are the optimizers with a higher Sharpe ratio
+than the equally weighted portfolio.
 
 
 Finally, \Cref{fig:turnover-asset} shows that the asset turnover spikes once a year, at the rebalancing date that
@@ -377,10 +371,10 @@ the currency turnover of the joint optimizers exceeds that of the overlay optimi
 rebalancing dates without regularization, but only at $50\%$ to $74\%$ with regularization. This is in line with the analysis of the average
 currency turnover in \Cref{sec:effects-of-regularization}, where the two optimizers differ by at most $7\%$ with regularization.
 
-\begin{table}[p]
+\begin{table}[!htbp]
   \centering
   \setlength{\tabcolsep}{4pt}
-  \scalebox{0.80}{%
+  \scalebox{0.85}{%
   \begin{tabular}{l*{11}{c}}
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
@@ -429,7 +423,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
 \begin{table}[p]
   \centering
   \setlength{\tabcolsep}{4pt}
-  \scalebox{0.80}{%
+  \scalebox{0.85}{%
   \begin{tabular}{l*{11}{c}}
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
@@ -502,7 +496,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
 \begin{table}[p]
   \centering
   \setlength{\tabcolsep}{4pt}
-  \scalebox{0.80}{%
+  \scalebox{0.85}{%
   \begin{tabular}{l*{11}{c}}
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
