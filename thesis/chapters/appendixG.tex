@@ -1,14 +1,14 @@
 \chapter{Additional Results}\label{app:additional-results}
 
-In this appendix, we justify the bounded hyperparameter grids over which the
-regularization penalties are selected in the empirical analysis of
-\Cref{chap:backtest-analysis}. In
-\Cref{app:hyperparameter-sensitivity} we describe the sensitivity analysis used to
-determine these bounds, following a similar approach as
-\cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}.
-
-TODO: Summarize the sparsity analysis and its purpose.
-
+In this appendix, we report additional results that support the empirical analysis of \Cref{chap:backtest-analysis}.
+In \Cref{app:hyperparameter-sensitivity}, we justify the bounded hyperparameter grids over which the regularization
+penalties are selected. In
+\Cref{app:portfolio-sparsity}, we show how many of the available assets and currencies the overlay and joint optimizers
+hold and how regularization influences the portfolio construction. In \Cref{app:risk-aversion-calibration}, we describe how the risk
+aversion coefficients of the mean-risk optimizers are calibrated. \Cref{app:drawdown-analysis} analyzes the drawdowns
+of the optimizers, with a focus on the main market crashes of the out-of-sample period, and
+\Cref{app:additional-backtest-results} reports the realized values of the risk measures and the Expected Shortfall
+ratios of the optimizers, together with their turnover at each rebalancing date.
 
 \section{Hyperparameter Grids} \label{app:hyperparameter-sensitivity}
 
@@ -16,7 +16,7 @@ The regularized overlay and joint programs have four penalties in the objective,
 the currency penalties $\lambda_1^c$ and $\lambda_2^c$, while the asset-only optimizers, Full and Zero, only have the
 two asset penalties. In the backtests, the penalties are selected at every rebalancing date by the grid search described in
 \Cref{sec:backtesting-framework}. The grid we optimize over is the Cartesian product of the penalty values, with $256$ points for the overlay and
-joint programs and $16$ points for Full and Zero programs. The asset leverage
+joint programs and $16$ points for the Full and Zero programs. The asset leverage
 limit is fixed at $\ell^a = 2$ for all the programs, and the confidence level of Expected Shortfall and second-order Expected Shortfall at
 $\beta = 0.8$.
  
@@ -101,7 +101,7 @@ exposures at a finite value, and the currency $L^2$ penalty shrinks them smoothl
 On the basis of this analysis, we construct the grids reported in \Cref{tab:hypergrid}. 
 The upper bounds of the asset $L^1$ penalty for variance and
 semi-variance are set to $5 \times 10^{-5}$
-and $10^{-4}$, while those for MAD, Expected Shortfall and second-order Expected Shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$ and $10^{-1}$.
+and $10^{-4}$, while those for mean absolute deviation, Expected Shortfall and second-order Expected Shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$ and $10^{-1}$.
 The asset penalty grids
 of the variance and semi-variance programs lie one to three orders of magnitude below those of the other risk measures. This 
 is because they are measured in squared returns.
@@ -144,6 +144,9 @@ SOES          & $\lambda_1^a$ & Asset $L^1$ penalty    & $[0,\ 10^{-1}]$ \\
 \end{table}
 
 \newpage
+% Table G.1 stays at the top of this page, and the sparsity analysis starts on the next.
+\null
+\newpage
 
 \section{Portfolio Sparsity Analysis} \label{app:portfolio-sparsity}
 
@@ -161,14 +164,14 @@ to zero and creates a sparse, concentrated portfolio, whereas an $L^2$-dominant 
 weighted portfolio. The swings therefore reflect the optimizers alternating between these two regimes across
 the rebalancing quarters, not an instability of the optimizers themselves.
 
-The unregularized optimizers have no such degree of freedom, and the number of assets they hold is determined primarily
-by the leverage limit and the binding constraint on $\|\bm{x}_t\|_1$, which promotes shrinkage in the same way as the $L^1$
-penalty. As a result, the share of the assets they hold falls with the size of the universe. For variance,
-semi-variance, MAD and Expected Shortfall, it falls from $91-99\%$ in the small universe to $60-73\%$
-in the large universe. And for second-order Expected Shortfall optimizers, if falls from $70-78\%$ in 
+The unregularized optimizers have no such degree of freedom. Besides the budget constraint, their asset weights are only
+restricted by the leverage limit $\|\bm{x}_t\|_1 \le \ell^a$, which promotes sparsity in the same way as the $L^1$ penalty. 
+As a result, the share of the assets they hold falls with the size of the universe. For variance,
+semi-variance, mean absolute deviation and Expected Shortfall, it falls from $91$--$99\%$ in the small universe to $60$--$73\%$
+in the large universe. And for second-order Expected Shortfall optimizers, it falls from $70$--$78\%$ in 
 the small universe to around $50\%$ in the large universe.
 
-For MAD, Expected Shortfall and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
+For mean absolute deviation, Expected Shortfall and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
 currency exposure in the medium and large universes, unlike the joint optimizers. With several hundred
 assets, the asset step of the overlay program likely already fits the in-sample risk so closely that no currency position can
 lower it further. The joint program instead chooses the asset weights and currency exposures together.
@@ -237,7 +240,7 @@ SOES          & $0.5$ \\
 \end{table}
 
 The values in \Cref{tab:risk-aversion} are one to two orders of magnitude larger for variance and semi-variance than
-for MAD, Expected Shortfall and second-order Expected Shortfall. As for the penalty grids in
+for mean absolute deviation, Expected Shortfall and second-order Expected Shortfall. As for the penalty grids in
 \Cref{app:hyperparameter-sensitivity}, this is because variance and semi-variance are measured in squared returns.
 
 \newpage
@@ -284,14 +287,14 @@ the overlay and joint optimizers.
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{../results/figures/drawdowns/normal/drawdowns.pdf}
-    \caption{Drawdown of the equally weighted portfolio and the unregularized and regularized overlay and joint optimizers and the Zero optimizer in the out of sample period, by risk measure and universe size. The out of sample period runs from July 2000 to April 2023.}
+    \caption{Drawdown of the equally weighted portfolio and the unregularized and regularized overlay and joint optimizers and the Zero optimizer in the out-of-sample period, by risk measure and universe size. The out-of-sample period runs from July 2000 to April 2023.}
     \label{fig:drawdowns}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{../results/figures/drawdowns/with_mean_term/drawdowns.pdf}
-    \caption{Drawdown of the equally weighted portfolio and the mean-risk overlay and joint optimizers in the out of sample period, by risk measure and universe size. The out of sample period runs from July 2000 to April 2023.}
+    \caption{Drawdown of the equally weighted portfolio and the mean-risk overlay and joint optimizers in the out-of-sample period, by risk measure and universe size. The out-of-sample period runs from July 2000 to April 2023.}
     \label{fig:drawdowns-mean-risk}
 \end{figure}
 
