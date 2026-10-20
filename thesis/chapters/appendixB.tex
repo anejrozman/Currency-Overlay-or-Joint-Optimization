@@ -4,7 +4,7 @@ In this appendix, we derive the portfolio optimization problems used in the main
 of variance and semi-variance to the programs solved in the empirical analysis. In \Cref{app:mv_definitions} we define
 both risk measures and show that they are convex in the portfolio weights. In \Cref{app:mv_representation} we write the
 portfolio optimization problem as a quadratic program for both risk measures. In \Cref{app:mv_regularization} we
-regularize the programs by adding an $L^1$ penalty, an $L^2$ penalty and a leverage constraint. We then extend the
+regularize the programs by adding an $L^1$ penalty, an $L^2$ penalty, and a leverage constraint. We then extend the
 programs to the multi-currency setting, for sequential optimization in \Cref{app:mv_separate} and for joint
 optimization in \Cref{app:mv_joint}. Finally, in \Cref{app:mv_mean_risk} we add the expected portfolio return to the
 objectives of the sequential and joint problems.
@@ -20,7 +20,7 @@ risk, and the semi-variance, which Markowitz et al.~\cite{Markowitz1993} conside
 variance, and show that both are convex in the portfolio weights. The two definitions allow for writing the portfolio
 optimization problem as a quadratic program for both risk measures in \Cref{app:mv_representation}.
 
-Let $\bm{x}_t \in \mathbb{R}^N$ denote the portfolio weights, $\bm{R}_{t+1} \in \mathbb{R}^N$ the asset return vector
+Let $\bm{x}_t \in \mathbb{R}^N$ denote the portfolio weights, $\bm{R}_{t+1} \in \mathbb{R}^N$ the asset return vector,
 and $\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}] \in \mathbb{R}^N$ the expected asset return. The variance of the
 portfolio return is
 \begin{equation} \label{eq:variance_def}
@@ -59,7 +59,7 @@ $\bm{x}_t^\top \bm{R}_{t+1}$. The portfolio optimization problem is
     \bm{x}_t^* = \argmin_{\bm{x}_t} \rho\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation}
 where the budget constraint enforces full investment. Each program in this appendix defines its own decision vector,
-vector of constants and penalty and constraint matrices, so the same symbols denote slightly different objects in
+vector of constants, and penalty and constraint matrices, so the same symbols denote slightly different objects in
 different programs, and we refer to a specific program by its equation number when discussing them.
 
 \subsection{Variance} \label{app:mv_var_qp} 
@@ -135,7 +135,7 @@ the portfolio optimization problem \eqref{eq:empirical_svar} can be written as a
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q)}$ encodes the budget constraint, while $\bm{A} \in \mathbb{R}^{q \times (N+q)}$
 and $\bm{b} \in \mathbb{R}^q$ encode the $q$ inequality constraints \eqref{eq:svar_slack}. The matrix
 $\mathring{\bm{R}}^{\text{data}} = \bm{R}^{\text{data}} - \bm{1}_q \bar{\bm{y}}^\top \in \mathbb{R}^{q \times N}$ is the
-demeaned sample matrix, where $\bm{R}^{\text{data}}$ is comprised of the sampled return vectors $\bm{y}_k^\top$ row by
+demeaned sample matrix, where $\bm{R}^{\text{data}}$ is composed of the sampled return vectors $\bm{y}_k^\top$ row by
 row, so that the $k$-th row of $\mathring{\bm{R}}^{\text{data}}$ is $(\bm{y}_k - \bar{\bm{y}})^\top$.
 This formulation serves as the base
 unregularized portfolio optimization problem under semi-variance.
@@ -145,7 +145,7 @@ unregularized portfolio optimization problem under semi-variance.
 
 The base problems \eqref{eq:var_base_qp} and \eqref{eq:svar_base_qp} are known to be unstable in high-dimensional
 settings, where the programs are prone to producing extreme and concentrated weights \citep{Michaud1989, kondor2007noise}. As for
-Expected Shortfall, we stabilize them with the $L^1$ penalty, the $L^2$ penalty and the asset leverage constraint of
+Expected Shortfall, we stabilize them with the $L^1$ penalty, the $L^2$ penalty, and the asset leverage constraint of
 Sections~\ref{app:l1}--\ref{app:leverage}, using the decomposition \eqref{eq:l1_decomp} of the weights into positive
 and negative parts and the leverage constraint \eqref{eq:leverage_constraint}.
 
@@ -248,8 +248,8 @@ leverage constraint \eqref{eq:leverage_constraint}.
 
 As we have considered for Expected Shortfall in \Cref{app:separate-optimization}, constructing an international portfolio also requires
 selecting currency exposures. In the sequential portfolio optimization approach, the asset weights and currency
-exposures are optimized in two steps. First, the asset weights $\bm{x}_t$ are optimized on the fully hedged returns,
-then, conditional on the optimal $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The
+exposures are optimized in two steps. First, the asset weights $\bm{x}_t$ are optimized on the fully hedged returns.
+Then, conditional on the optimal $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The
 two optimization steps are given by
 \begin{equation} \label{eq:mv_sep_asset_obj}
 \begin{gathered}
@@ -276,7 +276,7 @@ expected value $\bm{\mu}^{fh}_t = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \mathbb{R}
 which in the programs is the Ledoit--Wolf estimator of \Cref{chap:optimization-framework}. The asset step
 \eqref{eq:mv_sep_asset_obj} is therefore identical to the regularized programs \eqref{eq:var_reg_qp} for variance and
 \eqref{eq:svar_reg_qp} for semi-variance, and is obtained from them by substituting $\bm{\Sigma}^a_t$ for
-$\bm{\Sigma}_t$ in \eqref{eq:var_reg_qp}, and the demeaned matrix $\mathring{\bm{R}}^{fh}$ of the historically sampled fully hedged returns
+$\bm{\Sigma}_t$ in \eqref{eq:var_reg_qp} and the demeaned matrix $\mathring{\bm{R}}^{fh}$ of the historically sampled fully hedged returns
 $\bm{R}^{fh} \in \mathbb{R}^{q \times N}$ for $\mathring{\bm{R}}^{\text{data}}$ in \eqref{eq:svar_reg_qp}.
 
 In the currency step \eqref{eq:mv_sep_curr_obj}, the asset weights $\bm{x}_t^*$ are fixed and the currency exposures
@@ -285,7 +285,7 @@ exposure of the portfolio to the foreign currency $c$ as defined in \Cref{sec:ma
 net exposure earns the excess currency return $e_{c,t+1} - f_{c,t}$. The currency step has no budget constraint, since
 the currency overlay is a zero-investment portfolio whose domestic exposure $\psi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$ is
 inferred residually, and no leverage constraint is imposed on the currency exposures. We linearize the currency $L^1$
-penalty with the decomposition $\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1}, and write
+penalty with the decomposition $\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1} and write
 the currency $L^2$ penalty as a quadratic form as in \Cref{app:l2}.
 
 \subsection{Currency Overlay under Variance} \label{app:mv_var_sep_curr}
@@ -350,7 +350,7 @@ the fixed asset weights are present through the linear term $2\, (\bm{\Sigma}^{a
 For semi-variance, we use the empirical approximation of \Cref{app:mv_svar_qp} for the hedged portfolio return. As
 in \Cref{app:separate-optimization}, let $\bm{R}^{fh}_k$ denote the $k$-th sampled fully hedged return vector, and
 $\bm{e}_k$ and $\bm{f}_k$ the $k$-th sampled currency return and forward premium vectors. We stack the sampled excess
-currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix $\bm{R}^c \in \mathbb{R}^{q \times M}$, and
+currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix $\bm{R}^c \in \mathbb{R}^{q \times M}$ and
 collect the fixed asset-portfolio returns in $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the
 sample mean of the hedged portfolio returns $\bm{R}^{fh}_P + \bm{R}^c \bm{\psi}_t$ is linear in $\bm{\psi}_t$, their
 demeaned formulation is simply $\mathring{\bm{R}}^{fh}_P + \mathring{\bm{R}}^c \bm{\psi}_t$, where
@@ -559,7 +559,7 @@ $1/\gamma$, from the risk measure, where $\gamma > 0$ is the risk aversion coeff
 \end{equation}
 where $\bm{\mu}_t$ is the expected asset return of \Cref{app:mv_definitions}.
 
-For the expected returns $\bm{\mu}^{fh}_t$, $\bm{\mu}^c_t$ and $\bm{\mu}^{\text{all}}_t$ of
+For the expected returns $\bm{\mu}^{fh}_t$, $\bm{\mu}^c_t$, and $\bm{\mu}^{\text{all}}_t$ of
 Sections~\ref{app:mv_separate} and~\ref{app:mv_joint}, the asset means are estimated from the equally weighted return
 of each economy, whose mean is shrunk toward zero with a James--Stein estimator, and the currency means are set to the
 negative forward premium $-\bm{f}_t$. Both estimators are defined and further discussed in
