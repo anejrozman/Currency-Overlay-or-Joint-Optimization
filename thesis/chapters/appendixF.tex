@@ -30,7 +30,7 @@ To define the individual per-unit costs $\tau^{asset}_{i, t+1}$ and $\tau^{curr}
 &= \log \left( \frac{P_{i,t+1}S_{c_i,t+1}}{P_{i,t}S_{c_i,t}} \right) + \log \left( \frac{ 1 - \frac{\delta^{asset}_{i,t+1}}{2P_{i,t+1}} }{ 1 + \frac{\delta^{asset}_{i,t}}{2P_{i,t}} } \right) + \log \left( \frac{ 1 - \frac{\delta^{curr}_{c_i,t+1}}{2S_{c_i,t+1}} }{ 1 + \frac{\delta^{curr}_{c_i,t}}{2S_{c_i,t}} } \right) \\
 &= \log \left( \frac{P_{i,t+1}S_{c_i,t+1}}{P_{i,t}S_{c_i,t}} \right) - \log \left( \frac{1 + \frac{\delta^{asset}_{i,t}}{2P_{i,t}}}{1 - \frac{\delta^{asset}_{i,t+1}}{2P_{i,t+1}}} \right) - \log \left( \frac{1 + \frac{\delta^{curr}_{c_i,t}}{2S_{c_i,t}}}{1 - \frac{\delta^{curr}_{c_i,t+1}}{2S_{c_i,t+1}}} \right),
 \end{align*}
-where $\delta^{asset}_{i}$ and $\delta^{curr}_{c_i}$ are the bid-ask spreads. Comparing this to equation \eqref{eq:hedged-portfolio-return-net}, the transaction cost is precisely the difference between the actual realized log return and mid-price returs for the asset and currency. 
+where $\delta^{asset}_{i}$ and $\delta^{curr}_{c_i}$ are the bid-ask spreads. Comparing this to equation \eqref{eq:hedged-portfolio-return-net}, the transaction cost is precisely the difference between the actual realized log return and mid-price returns for the asset and currency. 
 
 Defining half of the bid-ask spreads as 
 \begin{equation*}
@@ -53,4 +53,4 @@ and
 \end{cases}
 \end{equation*}
 
-For our empirical analysis, we adopt the simplifying assumption that proportional bid-ask spreads remain constant both over time and across the cross-sections of both assets and currencies. We set the half-spreads to $\chi^{asset} = 0.001$ (10 bps) for all equities and $\chi^{curr} = 0.0001$ (1 bp) for all currencies, consistent with empirical finidngs in \citep{Jones2002, NeelyWellerUlrich2009, MenkhoffSarnoSchmelingSchrimpf2012, FrazziniIsraelMoskowitz2018}. Under these assumptions, the transaction costs simplify to constant values of $\tau^{asset} \approx 0.002$ and $\tau^{curr} \approx 0.0002$. 
+For our empirical analysis, we adopt the simplifying assumption that proportional bid-ask spreads remain constant both over time and across the cross-sections of both assets and currencies. We set the half-spreads to $\chi^{asset} = 0.001$ (10 bps) for all equities and $\chi^{curr} = 0.0001$ (1 bp) for all currencies, consistent with empirical findings in \citep{Jones2002, NeelyWellerUlrich2009, MenkhoffSarnoSchmelingSchrimpf2012, FrazziniIsraelMoskowitz2018}. Under these assumptions, the transaction costs simplify to constant values of $\tau^{asset} \approx 0.002$ and $\tau^{curr} \approx 0.0002$. 
