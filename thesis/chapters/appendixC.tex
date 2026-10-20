@@ -2,9 +2,9 @@
 
 In this appendix, we derive the portfolio optimization problems used in the main text, building up from the definition
 of the mean absolute deviation to the programs solved in the empirical analysis. In \Cref{app:mad_representation} we
-define the mean absolute deviation, show that it is convex in the portfolio weights and write the portfolio
+define the mean absolute deviation, show that it is convex in the portfolio weights, and write the portfolio
 optimization problem as a linear program. In \Cref{app:mad_regularization} we regularize the program by adding an
-$L^1$ penalty, an $L^2$ penalty and a leverage constraint. We then extend the program to the multi-currency setting,
+$L^1$ penalty, an $L^2$ penalty, and a leverage constraint. We then extend the program to the multi-currency setting,
 for sequential optimization in \Cref{app:mad_separate} and for joint optimization in \Cref{app:mad_joint}. Finally, in
 \Cref{app:mad_mean_risk} we add the expected portfolio return to the objectives of the sequential and joint problems.
 
@@ -14,7 +14,7 @@ We define the mean absolute deviation of the portfolio return, which Konno and Y
 propose as an alternative to variance for portfolio optimization. Unlike variance, mean absolute deviation requires no
 estimate of the covariance matrix and can be implemented efficiently as a linear program instead of a quadratic program. 
 
-Let $\bm{x}_t \in \mathbb{R}^N$ denote the portfolio weights, $\bm{R}_{t+1} \in \mathbb{R}^N$ the asset return vector
+Let $\bm{x}_t \in \mathbb{R}^N$ denote the portfolio weights, $\bm{R}_{t+1} \in \mathbb{R}^N$ the asset return vector,
 and $\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}] \in \mathbb{R}^N$ the expected asset return. The mean absolute deviation
 of the portfolio return is
 \begin{equation} \label{eq:mad_def}
@@ -88,7 +88,7 @@ Here $\bm{D} \in \mathbb{R}^{1 \times (N+q)}$ encodes the budget constraint, whi
 $\bm{A} \in \mathbb{R}^{q \times (N+q)}$ and $\bm{b} \in \mathbb{R}^q$ encode the $q$ inequality constraints
 \eqref{eq:mad_slack}. The matrix
 $\mathring{\bm{R}}^{\text{data}} = \bm{R}^{\text{data}} - \bm{1}_q \bar{\bm{y}}^\top \in \mathbb{R}^{q \times N}$ is the
-demeaned sample matrix introduced in \Cref{app:mv_svar_qp}, where $\bm{R}^{\text{data}}$ is comprised of the sampled
+demeaned sample matrix introduced in \Cref{app:mv_svar_qp}, where $\bm{R}^{\text{data}}$ is composed of the sampled
 return vectors $\bm{y}_k^\top$ row by row, so that the $k$-th row of $\mathring{\bm{R}}^{\text{data}}$ is
 $(\bm{y}_k - \bar{\bm{y}})^\top$. This formulation serves as the base unregularized portfolio optimization problem under
 mean absolute deviation.
@@ -98,7 +98,7 @@ mean absolute deviation.
 The base problem \eqref{eq:mad_base_lp} is known to be unstable in high-dimensional settings, where the portfolio weights
 can fluctuate strongly from sample to sample \cite{kondor2007noise}. As for the other risk measures in Appendices~\ref{app:es_derivation} and~\ref{app:mv_derivation}, we stabilize it with
 the three regularization techniques of Sections~\ref{app:l1}--\ref{app:leverage}, an $L^1$ penalty
-$\lambda_1 \|\bm{x}_t\|_1$, an $L^2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2$ and an asset leverage constraint
+$\lambda_1 \|\bm{x}_t\|_1$, an $L^2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2$, and an asset leverage constraint
 $\|\bm{x}_t\|_1 \le \ell^a$, with $\lambda_1, \lambda_2 \ge 0$ and $\ell^a \ge 1$. Splitting the weights into their
 positive and negative parts gives
 \begin{equation} \label{eq:mad_l1_decomp}
@@ -156,7 +156,7 @@ leverage constraint \eqref{eq:mad_l1_decomp}.
 As for the other risk measures in Sections~\ref{app:separate-optimization} and~\ref{app:mv_separate}, we consider  an
 international portfolio optimization problem that also requires selecting currency exposures. In the sequential portfolio optimization approach,
 the asset weights and currency exposures are optimized in two steps. First, the asset weights $\bm{x}_t$ are optimized
-on the fully hedged returns, then, conditional on the optimal $\bm{x}_t^*$, the currency exposures
+on the fully hedged returns. Then, conditional on the optimal $\bm{x}_t^*$, the currency exposures
 $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The two optimization steps are given by
 \begin{equation} \label{eq:mad_sep_asset_obj}
 \begin{gathered}
@@ -190,7 +190,7 @@ penalty as the quadratic form $\bm{\psi}_t^\top (\lambda_2^c \bm{I}_M) \bm{\psi}
 For the empirical approximation of the currency step, let $\bm{R}^{fh}_k$ denote the $k$-th sampled fully hedged
 return vector, and $\bm{e}_k$ and $\bm{f}_k$ the $k$-th sampled currency return and forward premium vectors. We stack
 the sampled excess currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix
-$\bm{R}^c \in \mathbb{R}^{q \times M}$, and collect the fixed asset-portfolio returns in
+$\bm{R}^c \in \mathbb{R}^{q \times M}$ and collect the fixed asset-portfolio returns in
 $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the sample mean is linear in the returns, the
 demeaned hedged portfolio returns are $\mathring{\bm{R}}^{fh}_P + \mathring{\bm{R}}^c \bm{\psi}_t$, as for
 semi-variance in \Cref{app:mv_svar_sep_curr}, where $\mathring{\bm{R}}^{fh}_P = \mathring{\bm{R}}^{fh} \bm{x}_t^*$ and
