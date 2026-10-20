@@ -99,7 +99,7 @@ exposures at a finite value, and the currency $L^2$ penalty shrinks them smoothl
 On the basis of this analysis, we construct the grids reported in \Cref{tab:hypergrid}. 
 The upper bounds of the asset $L^1$ penalty for variance and
 semi-variance are set to $5 \times 10^{-5}$
-and $10^{-4}$, while those for mean absolute deviation, Expected Shortfall and second-order Expected Shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$ and $10^{-1}$.
+and $10^{-4}$, while those for mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$, and $10^{-1}$.
 The asset penalty grids
 of the variance and semi-variance programs lie one to three orders of magnitude below those of the other risk measures. This 
 is because they are measured in squared returns.
@@ -165,11 +165,11 @@ the rebalancing quarters, not an instability of the optimizers themselves.
 The unregularized optimizers have no such degree of freedom. Besides the budget constraint, their asset weights are only
 restricted by the leverage limit $\|\bm{x}_t\|_1 \le \ell^a$, which promotes sparsity in the same way as the $L^1$ penalty. 
 As a result, the share of the assets they hold falls with the size of the universe. For variance,
-semi-variance, mean absolute deviation and Expected Shortfall, it falls from $91$--$99\%$ in the small universe to $60$--$73\%$
+semi-variance, mean absolute deviation, and Expected Shortfall, it falls from $91$--$99\%$ in the small universe to $60$--$73\%$
 in the large universe. And for second-order Expected Shortfall optimizers, it falls from $70$--$78\%$ in 
 the small universe to around $50\%$ in the large universe.
 
-For mean absolute deviation, Expected Shortfall and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
+For mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
 currency exposure in the medium and large universes, unlike the joint optimizers. With several hundred
 assets, the asset step of the overlay program likely already fits the in-sample risk so closely that no currency position can
 lower it further. The joint program instead chooses the asset weights and currency exposures together.
@@ -204,10 +204,10 @@ $1/\gamma$, from the risk measure, with the same risk aversion coefficient $\gam
 the joint program. As $\gamma \to 0$, the mean term dominates, and the programs maximize the expected portfolio return
 subject to the budget and leverage constraints. The currency exposures then reach the
 currency leverage limit $\ell^c = 2$ in the currency whose interest rate differs most from the US interest rate. Without
-this limit, which is added to the mean-risk programs in \Cref{app:mean-risk,app:mv_mean_risk,app:mad_mean_risk}, the
+this limit, which is added to the mean-risk programs in Sections~\ref{app:mean-risk}, \ref{app:mv_mean_risk}, and~\ref{app:mad_mean_risk}, the
 currency turnover reaches upwards of $20$, which clearly signals instability. 
 
-The risk aversion coefficient is not selected at each rebalancing date, but calibrated once on the first lookback
+The risk aversion coefficient is not selected at each rebalancing date but calibrated once on the first lookback
 window of the small universe, as described in \Cref{sec:backtest-configuration}. Like the lookback windows of the
 penalty grid search, this window is split into a nine-year estimation window and a one-year validation window. For
 every value of $\gamma$ in a grid, the overlay and joint programs of each risk measure are fitted on the estimation
@@ -238,7 +238,7 @@ SOES          & $0.5$ \\
 \end{table}
 
 The values in \Cref{tab:risk-aversion} are one to two orders of magnitude larger for variance and semi-variance than
-for mean absolute deviation, Expected Shortfall and second-order Expected Shortfall. As for the penalty grids in
+for mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall. As for the penalty grids in
 \Cref{app:hyperparameter-sensitivity}, this is because variance and semi-variance are measured in squared returns.
 
 \newpage
@@ -257,7 +257,7 @@ report the recovery time of the maximum drawdown, the time from the peak precedi
 regains that peak.
 
 In the medium and large universes, all optimizers reach their maximum drawdown in the global financial crisis. The
-overlay and joint optimizers lose between $24.7\%$ and $38.6\%$ and the mean-risk optimizers between $29.6\%$ and
+overlay and joint optimizers lose between $24.7\%$ and $38.6\%$, and the mean-risk optimizers between $29.6\%$ and
 $41.5\%$, against $55.7\%$ and $56.3\%$ for the equally weighted portfolio. However, they need $7.2$ to $12.1$ years to
 regain their pre-crisis peak, against $6.7$ to $6.9$ years for the equally weighted portfolio. Their smaller losses
 require smaller gains to recover, between $33\%$ and $71\%$ against $126\%$ and $129\%$, but in the two years after each portfolio's cumulative wealth reaches its lowest point in the
@@ -266,7 +266,7 @@ that limit their losses in the crisis therefore also limit their gains in the re
 crashes, they lose $4.7\%$ to $26.3\%$, against $30.2\%$ to $33.9\%$ for
 the equally weighted portfolio.
 
-The small universe backtests differ in two respects. First, the overlay and joint optimizers lose as much in the dot-com crash
+The small-universe backtests differ in two respects. First, the overlay and joint optimizers lose as much in the dot-com crash
 as in the global financial crisis, between $26.0\%$ and $36.2\%$ against $23.3\%$ to $34.1\%$, whereas in the medium and
 large universes they lose at most $10.2\%$ in the dot-com crash. With ten stocks per economy, there are fewer low-risk assets for the optimizers to move into, as
 discussed in \Cref{sec:baseline-backtests}. Second, six of the ten unregularized overlay and joint optimizers and both
@@ -301,7 +301,7 @@ the overlay and joint optimizers.
 
 In this section, we report additional out-of-sample performance metrics for the optimizers of
 \Cref{chap:backtest-analysis}. \Cref{tab:additional-baseline,tab:additional-regularized,tab:additional-mean-risk}
-report, for the baseline, regularized and mean-risk optimizers, the realized values of the risk measures the optimizers
+report, for the baseline, regularized, and mean-risk optimizers, the realized values of the risk measures the optimizers
 minimize and the Expected Shortfall ratio.
 \Cref{fig:turnover-asset,fig:turnover-currency} show the asset and currency turnover of the overlay and joint
 optimizers at each rebalancing date.
@@ -340,23 +340,23 @@ and measures the excess return per unit of tail risk.
 As for the volatility in \Cref{sec:baseline-backtests}, the optimizers realize much lower values of all four risk
 measures than the equally weighted portfolio, and the reduction is larger in the medium and large universes than in
 the small universe. Without a mean
-term, the overlay, joint and Full optimizers realize between $30.2\%$ and $45.2\%$ lower ES, SOES, SD and MAD than the
-equally weighted portfolio in the small universe, between $51.4\%$ and $61.8\%$ in the medium universe and between
+term, the overlay, joint, and Full optimizers realize between $30.2\%$ and $45.2\%$ lower ES, SOES, SD, and MAD than the
+equally weighted portfolio in the small universe, between $51.4\%$ and $61.8\%$ in the medium universe, and between
 $52.4\%$ and $67.8\%$ in the large universe. For the mean-risk optimizers, the reduction is between $26.0\%$ and
 $64.1\%$.
 
 Without regularization, the joint optimizers also realize lower risk than the overlay optimizers and, as for the
 out-of-sample gaps in \Cref{chap:joint-vs-sequential}, their advantage falls with the size of the universe. Their
 realized risk is on average $3.65\%$ lower than that of the overlay optimizers in the small universe, $2.57\%$ in the
-medium and $0.92\%$ in the large universe. With regularization, the joint optimizers realize lower risk in almost all
+medium, and $0.92\%$ in the large universe. With regularization, the joint optimizers realize lower risk in almost all
 comparisons, while with a mean term, they do so in all comparisons in the small universe but only in about half of them
 in the large universe.
 
 Leaving the currency exposure unhedged raises the risk measures by a similar factor as the volatility. The Zero
 optimizer optimizes the same objective as the Full optimizer but is evaluated on unhedged returns. Its Expected
-Shortfall is $1.34$ to $2.33$ times larger than that of the Full optimizer, its semi-deviation $1.34$ to $1.94$ times larger and its mean
+Shortfall is $1.34$ to $2.33$ times larger than that of the Full optimizer, its semi-deviation $1.34$ to $1.94$ times larger, and its mean
 absolute deviation $1.37$ to $2.40$ times larger. The increase in risk when leaving the currency exposure unhedged rises proportionally with the 
-volatility. As we report in \Cref{sec:effects-of-regularization}, the increase in volatility is $1.35$ to $2.09$ times larger for the Zero optimizer than of the Full optimizer. 
+volatility. As we report in \Cref{sec:effects-of-regularization}, the increase in volatility is $1.35$ to $2.09$ times larger for the Zero optimizer than for the Full optimizer. 
 
 The Expected Shortfall ratios lead to the same comparison with the equally weighted portfolio as the Sharpe ratios in
 \Cref{chap:backtest-analysis}. In the small universe, fewer than half of the unregularized optimizers but most of the
