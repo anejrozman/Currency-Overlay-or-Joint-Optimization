@@ -246,7 +246,7 @@ interaction is summarized in \Cref{fig:backtest}.
 \end{figure} 
 
 Data ingestion and alignment are implemented in the \texttt{DataHandler}.
-It loads the input data the local unhedged asset returns $R^u$, the currency returns
+It loads the input data, the local unhedged asset returns $R^u$, the currency returns
 $R^c$, the forward premia $f$, and the universe mask that identifies which
 assets constitute the investable universe at each date. It then aligns them into a
 \texttt{data\_bundle}, which is passed to the backtester. The optimizers operate only on the
