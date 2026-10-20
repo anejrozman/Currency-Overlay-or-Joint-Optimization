@@ -5,7 +5,7 @@ Expected Shortfall and second-order Expected Shortfall to the programs solved in
 In \Cref{app:es_auxiliary_formulation} we derive the auxiliary formulation of
 Expected Shortfall and introduce second-order Expected Shortfall. In \Cref{app:linear-program-representation} we write the portfolio optimization problem as a linear program for Expected Shortfall
 and as a second-order cone program for second-order Expected Shortfall. In \Cref{app:regularization} we regularize the programs by adding an $L^1$
-penalty, an $L^2$ penalty and a leverage constraint. We
+penalty, an $L^2$ penalty, and a leverage constraint. We
 then extend the programs to the multi-currency setting, for sequential optimization in \Cref{app:separate-optimization}
 and for joint optimization in \Cref{app:joint-optimization}. Finally, in \Cref{app:mean-risk} we add the expected
 portfolio return to the objectives of the sequential and joint problems.
@@ -85,7 +85,7 @@ Thus, minimizing $\text{ES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is equiv
     \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+] \right).
 \end{equation}
 
-Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite[Section~3.2.2]{boyd2004convex}, thus $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator which preserves convexity and the sum of convex functions is convex.
+Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite[Section~3.2.2]{boyd2004convex}. Thus, $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator which preserves convexity, and the sum of convex functions is convex.
 
 
 \subsection{Second-Order Expected Shortfall} \label{app:soes_auxiliary}
@@ -107,7 +107,7 @@ receive more weight than in Expected Shortfall. Second-order Expected Shortfall 
 Unlike Expected Shortfall, second-order Expected Shortfall is defined directly through the minimization over $\alpha$,
 so there is no equivalence to derive. Instead, we only have to verify that $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$.  
 
-We argued for the case of $F_\beta$ that the map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is convex. The $L^2$ norm is a convex function \cite[Section~3.1.5]{boyd2004convex}, and nondecreasing for non-negative random variables.  The composition of a convex nondecreasing function with a convex
+We argued for the case of $F_\beta$ that the map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is convex. The $L^2$ norm is a convex function \cite[Section~3.1.5]{boyd2004convex} and nondecreasing for non-negative random variables.  The composition of a convex nondecreasing function with a convex
 function is again convex \cite[Section~3.2.4]{boyd2004convex}. Hence $\big\| (L(\bm{x}_t) - \alpha)^+ \big\|_{L^2} $ is jointly convex in $(\bm{x}_t, \alpha)$, and the sum of convex functions is convex. 
 
 By definition \eqref{eq:soes_def}, minimizing $\text{SOES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is
@@ -130,7 +130,7 @@ function of the portfolio return $\bm{x}_t^\top \bm{R}_{t+1}$. The portfolio opt
 where the budget constraint enforces full investment. By \eqref{eq:joint_opt} and \eqref{eq:soes_joint_opt}, problem
 \eqref{eq:risk_min} is equivalent to minimizing $F_\beta(\bm{x}_t, \alpha)$ or $G_\beta(\bm{x}_t, \alpha)$ jointly
 with respect to $\bm{x}_t$ and $\alpha$.
-Each program in this appendix defines its own decision vector, vector of constants and penalty and constraint matrices, so
+Each program in this appendix defines its own decision vector, vector of constants, and penalty and constraint matrices, so
 the same symbols denote slightly different objects in different programs, and we refer to a specific program by its equation
 number when discussing them. 
 
@@ -187,7 +187,7 @@ the portfolio optimization problem \eqref{eq:empirical_es} can be written as a l
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+1)}$ encodes the budget constraint, while
 $\bm{A} \in \mathbb{R}^{q \times (N+q+1)}$ and $\bm{b} \in \mathbb{R}^{q}$ encode the
 $q$ inequality constraints arising from the linearization \eqref{eq:slack_constraint}. The matrix
-$\bm{R}^{\text{data}} \in \mathbb{R}^{q \times N}$ is comprised of the sampled return vectors $\bm{y}_k^\top$ row by
+$\bm{R}^{\text{data}} \in \mathbb{R}^{q \times N}$ is composed of the sampled return vectors $\bm{y}_k^\top$ row by
 row, $\bm{0}_q$ is the $q$-dimensional zero vector, and $\bm{I}_q$ the $q$-dimensional identity matrix.
 
 Problem \eqref{eq:base_lp} has a linear objective subject to one linear equality and $q$
@@ -223,7 +223,7 @@ $\|\bm{u}\|_2 \le s$ and minimize $\alpha + \frac{1}{(1-\beta)\sqrt{q}} s$ inste
 $\|\bm{u}\|_2 \le s$ requires the vector $(\bm{u}, s) \in \mathbb{R}^{q+1}$ to lie in the second-order cone, the set of
 vectors whose last entry is at least the Euclidean norm of the remaining entries \cite[Section~2.2.3]{boyd2004convex}.
 This set is a cone, since it contains every non-negative multiple of its elements, and it is convex, so the constraint
-keeps the optimization problem convex. An optimization problem with a linear objective, linear constraints and
+keeps the optimization problem convex. An optimization problem with a linear objective, linear constraints, and
 second-order cone constraints is a second-order cone program \cite[Section~4.4.2]{boyd2004convex}.
 
 By collecting the decision variables in the vector
@@ -401,7 +401,7 @@ for the variable $s$, and the cone constraint is the same as in \eqref{eq:base_s
 So far, we have formulated the portfolio optimization problem over the asset weights only. An international portfolio,
 however, holds assets and currency positions as well, so constructing it
 also requires selecting currency exposures. In the sequential portfolio optimization approach, the asset weights and currency exposures are optimized in two steps. First, the
-asset weights $\bm{x}_t$ are optimized on the fully hedged returns, then, conditional on the optimal
+asset weights $\bm{x}_t$ are optimized on the fully hedged returns. Then, conditional on the optimal
 $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The two optimization steps are given
 by
 \begin{equation} \label{eq:sep_asset_obj}
@@ -439,13 +439,13 @@ representation for the risk measures and the empirical approximation as in \Cref
 \end{equation*}
 where $\bm{R}^{fh}_k$ is the $k$-th sampled fully hedged return vector, and $\bm{e}_k$ and $\bm{f}_k$ are the $k$-th
 sampled currency return and forward premium vectors. We stack the sampled excess currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix
-$\bm{R}^c \in \mathbb{R}^{q \times M}$, and collect the fixed asset-portfolio returns in
+$\bm{R}^c \in \mathbb{R}^{q \times M}$ and collect the fixed asset-portfolio returns in
 $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$.
 
 The currency step has no budget constraint, since the currency overlay is a zero-investment portfolio whose domestic
 exposure $\psi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$ is inferred residually, and no leverage constraint is imposed on the
 currency exposures. We linearize the currency $L^1$ penalty with the decomposition
-$\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1}, and write the currency $L^2$ penalty as
+$\psi_{c,t} = \Delta_{\psi,c,t}^+ - \Delta_{\psi,c,t}^-$ as in \Cref{app:l1} and write the currency $L^2$ penalty as
 a quadratic form with the block $\lambda_2^c \bm{I}_M$ as in \Cref{app:l2}.
 
 \subsection{Currency Overlay under Expected Shortfall} \label{app:sep_curr_es}
