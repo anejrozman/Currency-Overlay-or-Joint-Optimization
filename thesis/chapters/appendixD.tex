@@ -5,7 +5,7 @@ random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$.
 
 \begin{definition}[Deviation measure]\label{def:deviation}
 A functional $\mathcal{D} : L^2(\Omega) \to [0, \infty]$ is a \emph{deviation measure} if for all
-$X, X' \in L^2(\Omega)$, every constant $C$ and every $\lambda > 0$,
+$X, X' \in L^2(\Omega)$, every constant $C$, and every $\lambda > 0$,
 \begin{align*}
 &\text{(D1)} && \mathcal{D}(X + C) = \mathcal{D}(X), \\
 &\text{(D2)} && \mathcal{D}(0) = 0 \quad \text{and} \quad \mathcal{D}(\lambda X) = \lambda \mathcal{D}(X), \\
@@ -46,9 +46,9 @@ is a deviation measure.
 
 \begin{proof}
 The proof is a straightforward verification of the four properties in Definition \ref{def:deviation}.
-Write $\bar X = X - \mathbb{E}[X]$, then $\mathcal{D}(X) = \mathcal{R}(\bar X)$.
+Write $\bar X = X - \mathbb{E}[X]$. Then $\mathcal{D}(X) = \mathcal{R}(\bar X)$.
 
-\emph{(D1):} For any constant $C$ we have $(X + C) - \mathbb{E}[X + C] = \bar X$, hence
+\emph{(D1):} For any constant $C$ we have $(X + C) - \mathbb{E}[X + C] = \bar X$. Hence,
 $\mathcal{D}(X + C) = \mathcal{R}(\bar X) = \mathcal{D}(X)$.
 
 \emph{(D2):} Taking $X = 0$ gives $\mathcal{D}(0) = \mathcal{R}(0) = 0$ by \emph{(R2)}. For $\lambda > 0$,
@@ -64,13 +64,13 @@ is $\bar X$, and \emph{(R5)} applied to $\bar X$ gives
 $\mathcal{D}(X) = \mathcal{R}(\bar X) > \mathbb{E}[-\bar X] = 0$.
 \end{proof}
 
-The proof uses the properties \emph{(R2)}, \emph{(R3)} and \emph{(R5)} only. Monotonicity \emph{(R4)} is never used, which is the reason the
-original Theorem in \cite{RockafellarUryasevZabarankin2006} is stated more generally for strictly expectation bounded risk
+The proof uses the properties \emph{(R2)}, \emph{(R3)}, and \emph{(R5)} only. Monotonicity \emph{(R4)} is never used, which is the reason the
+original theorem in \cite{RockafellarUryasevZabarankin2006} is stated more generally for strictly expectation bounded risk
 measures rather than coherent risk measures.
 
 We now show that both Expected Shortfall and second-order Expected Shortfall are strictly expectation bounded coherent risk measures, and we can therefore apply    
 \Cref{thm:demeaning} to transform them into deviation measures. Write $z^{+} = \max\{z, 0\}$ and $z^{-} = \max\{-z, 0\}$, fix a confidence level
-$\beta \in (0,1)$ and set $\kappa \coloneqq (1-\beta)^{-1} > 1$. 
+$\beta \in (0,1)$, and set $\kappa \coloneqq (1-\beta)^{-1} > 1$. 
 In the Rockafellar--Uryasev form \cite{RockafellarUryasev2002} the Expected Shortfall is
 \begin{equation}
 \mathrm{ES}_\beta(X) = \min_{\alpha \in \mathbb{R}} F_\beta(X, \alpha),
@@ -96,7 +96,7 @@ $\mathrm{ES}_\beta$ is strictly expectation bounded.
 \end{proposition}
 
 \begin{proof}
-Fix $\alpha$, write $\mu = \mathbb{E}[X]$ and put $Y = -X - \alpha$, so that
+Fix $\alpha$, write $\mu = \mathbb{E}[X]$, and put $Y = -X - \alpha$, so that
 $\mathbb{E}[Y] = -\mu - \alpha$ and hence $\alpha + \mu = -\mathbb{E}[Y]$. Using
 $\mathbb{E}[Y] = \mathbb{E}[Y^{+}] - \mathbb{E}[Y^{-}]$ we write
 \begin{align*}
@@ -107,7 +107,7 @@ F_\beta(X, \alpha) - \mathbb{E}[-X]
 \end{align*}
 Both terms on the right are non-negative, the second because $\kappa > 1$, so
 $F_\beta(X, \alpha) \geq \mathbb{E}[-X]$ for every $\alpha$, with equality if and only if
-$Y = 0$ almost surely, that is $X \equiv -\alpha$. If $X$ is nonconstant the inequality is
+$Y = 0$ almost surely, that is, $X \equiv -\alpha$. If $X$ is nonconstant the inequality is
 therefore strict at every $\alpha$, and since the
 minimum is attained, $\mathrm{ES}_\beta(X) > \mathbb{E}[-X]$. If $X \equiv C$, then $\alpha = -C$ attains equality,
 so $\mathrm{ES}_\beta(X) = \mathbb{E}[-X]$.
@@ -120,7 +120,7 @@ $\mathrm{SOES}_\beta$ is a coherent, strictly expectation bounded risk measure.
 \begin{proof}
 \emph{(R1):} Substituting $\alpha' = \alpha + C$ gives $-X - C - \alpha = -X - \alpha'$ and
 $G_\beta(X + C, \alpha) = \alpha' - C + \kappa \|(-X-\alpha')^{+}\|_{L^2} = G_\beta(X, \alpha') - C$. As $\alpha$ ranges over
-$\mathbb{R}$ so does $\alpha'$, so minimizing both sides gives
+$\mathbb{R}$, so does $\alpha'$, so minimizing both sides gives
 $\mathrm{SOES}_\beta(X + C) = \mathrm{SOES}_\beta(X) - C$.
 
 \emph{(R2):} For $X = 0$ we have $G_\beta(0, \alpha) = \alpha + \kappa\, \alpha^{-}$, which equals $\alpha \geq 0$ for
