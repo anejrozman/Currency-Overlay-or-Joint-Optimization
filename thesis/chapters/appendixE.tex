@@ -13,17 +13,17 @@ with the investable universe and analyze their running time.
 All optimization problems in this thesis are implemented with CVXPY, an open-source, Python-embedded modeling language
 for convex optimization problems \cite{DiamondBoyd2016}. It lets us express a problem in a natural way that
 follows the mathematics, rather than in the restrictive standard form required by solvers, and it automatically
-transforms the problem into standard form, calls a solver and returns the results in a readable format \cite{CVXPYDocs}. CVXPY 
+transforms the problem into standard form, calls a solver, and returns the results in a readable format \cite{CVXPYDocs}. CVXPY 
 acts as an interface between the problem written in Python and an external numerical
 solver, which in this thesis is the Gurobi solver. In this section, we summarize the parts of
 the CVXPY library needed to understand the implementation of the programs. Further details can be found in the CVXPY documentation \cite{CVXPYDocs}.
 
 When defining a program in CVXPY, variables, created with
-\texttt{cp.Variable}, are the decision variables of the problem and can be scalars, vectors or matrices. Parameters,
+\texttt{cp.Variable}, are the decision variables of the problem and can be scalars, vectors, or matrices. Parameters,
 created with \texttt{cp.Parameter}, are symbolic representations of constants, whose purpose is to change the value of a
-constant in a problem without reconstructing the entire problem. Variables, parameters and numerical constants are combined into 
-expressions through the usual arithmetic operations, and a
-library of functions called atoms, such as \texttt{cp.sum}, \texttt{cp.norm} and \texttt{cp.sum\_squares}. 
+constant in a problem without reconstructing the entire problem. Variables, parameters, and numerical constants are combined into
+expressions through the usual arithmetic operations and a
+library of functions called atoms, such as \texttt{cp.sum}, \texttt{cp.norm}, and \texttt{cp.sum\_squares}. 
 An objective, \texttt{cp.Minimize} or \texttt{cp.Maximize} of a scalar expression, and a list of
 constraints then define a problem \texttt{cp.Problem}. Calling its method \texttt{solve} returns the optimal value and stores
 the optimal solution in the attribute \texttt{value} of every variable.
@@ -36,7 +36,7 @@ problem with the constraint that the solution lies in the unit box
 for a matrix $\bm{A} \in \mathbb{R}^{m \times n}$ and a vector $\bm{b} \in \mathbb{R}^m$, in this example drawn at random with
 $m = 30$ and $n = 20$. Lines 5--8 of the code generate the problem data and line 11 declares the variable
 $\bm{x} \in \mathbb{R}^n$. Line 12 states the objective with the atom \texttt{cp.sum\_squares}, line 13 the two
-elementwise constraints and line 14 combines them into a problem. Line 17 solves the problem with Gurobi set as the solver, and line 18 prints the 
+elementwise constraints, and line 14 combines them into a problem. Line 17 solves the problem with Gurobi set as the solver, and line 18 prints the 
 optimal solution stored in \texttt{x.value} as a NumPy array. 
 
 \begin{lstlisting}[style=python, caption={Least-squares problem with box constraints in CVXPY, adapted from \cite{CVXPYDocs}.}, label={lst:cvxpy-least-squares}]
@@ -90,8 +90,8 @@ variables of the original problem.}
 When \texttt{solve} is called, CVXPY compiles the problem in the steps shown in \Cref{fig:cvxpy-chain}. 
 It first checks that the problem is convex using the rules of disciplined
 convex programming (DCP). Each variable and function has a
-curvature label (affine, convex or concave), and simple rules combine these
-labels as the expression is built, for example a sum of convex terms is
+curvature label (affine, convex, or concave), and simple rules combine these
+labels as the expression is built. For example, a sum of convex terms is
 convex. If the objective and constraints do not end up with labels that make
 the problem convex, CVXPY rejects it before any solver is called. The problem is then passed through a chain of reductions. A reduction is a
 transformation from one problem to an equivalent one. The reductions
@@ -99,7 +99,7 @@ replace each atom that the solver does not accept directly by auxiliary variable
 absolute value $|x_i|$ in the atom \texttt{cp.norm(x, 1)} is replaced by variables $\Delta_i^+, \Delta_i^- \geq 0$ and the constraints $\Delta_i^+ - \Delta_i^- = x_i$.
 The final reductions save the coefficients of the resulting problem into
 the matrices and vectors of the standard form accepted by the solver. The
-solver returns a solution of this standard form problem, which CVXPY maps back to the original problem by inverting the
+solver returns a solution of this standard-form problem, which CVXPY maps back to the original problem by inverting the
 reductions. In
 \Cref{sec:numerical-implementation}, we go through the implementation of the regularized joint 
 optimization problem for Expected Shortfall \eqref{eq:joint_qp} and what these
@@ -124,7 +124,7 @@ as
 \end{equation}
 As in \eqref{eq:joint_qp}, the Expected Shortfall is linearized with the auxiliary
 variables $\bm{u}$ of \eqref{eq:slack_constraint}, but the penalties and the leverage constraint are kept as norms
-instead of split as in \eqref{eq:l1_decomp}.
+instead of being split as in \eqref{eq:l1_decomp}.
 
 \begin{lstlisting}[style=python, float=htbp, caption={Regularized joint Expected Shortfall program implementation in CVXPY.}, label={lst:joint-es}]
 import cvxpy as cp
@@ -165,12 +165,12 @@ problem.solve(solver=cp.GUROBI)
 x_opt, psi_opt = x.value, psi.value
 \end{lstlisting}
 
-Lines 5 and 6 of \Cref{lst:joint-es} read the dimensions $q$, $N$ and $M$ from the return matrices $\bm{R}^{fh}$ and
-$\bm{R}^c$, and lines 9--12 declare the variables $\bm{x}_t$, $\bm{\psi}_t$, $\alpha$ and $\bm{u}$. Lines 15 and 16 declare
+Lines 5 and 6 of \Cref{lst:joint-es} read the dimensions $q$, $N$, and $M$ from the return matrices $\bm{R}^{fh}$ and
+$\bm{R}^c$, and lines 9--12 declare the variables $\bm{x}_t$, $\bm{\psi}_t$, $\alpha$, and $\bm{u}$. Lines 15 and 16 declare
 the four penalties as parameters, whose values are set only after the problem is built. Line 19 is the Expected Shortfall term of
 \eqref{eq:joint_es_cvxpy}, lines 20 and 21 are the $L^1$ and $L^2$ penalties, and lines 22--27 are the constraints, namely
 the linearization of the Expected Shortfall in line 23, the non-negativity of $\bm{u}$ in line 24, the budget constraint in
-line 25 and the leverage constraint in line 26. Line 28 combines the objective and the constraints into a problem. Lines
+line 25, and the leverage constraint in line 26. Line 28 combines the objective and the constraints into a problem. Lines
 31 and 32 assign the penalties of one point of the hyperparameter grid. Finally, line 35 solves the problem with Gurobi, 
 configured as in \Cref{lst:gurobi-config}, and line 36 reads out the solution. 
 
@@ -179,7 +179,7 @@ out the steps of \Cref{fig:cvxpy-chain}. The norms in lines 20 and 26 are replac
 and negative parts \eqref{eq:l1_decomp}, the variables are combined into one vector, which corresponds to the decision
 vector $\tilde{\bm{\theta}}_t$ of \eqref{eq:joint_qp}, and the coefficients of the objective and the constraints are
 combined into the vector of constants, the penalty matrix, and the constraint matrices, which take the form 
-of $\tilde{\bm{c}}$, $\tilde{\bm{Q}}$, $\tilde{\bm{D}}$, $\tilde{\bm{E}}$, $\tilde{\bm{A}}$ and
+of $\tilde{\bm{c}}$, $\tilde{\bm{Q}}$, $\tilde{\bm{D}}$, $\tilde{\bm{E}}$, $\tilde{\bm{A}}$, and
 $\tilde{\bm{b}}$ in \eqref{eq:joint_qp}. 
 
 In the backtest, this program is solved at every rebalancing date for all 256 points of the hyperparameter grid (further details on hyperparameter 
@@ -192,7 +192,7 @@ per window.
 The cache holds two problems at a time, one for the estimation window, used by all grid points, and one for the
 estimation and validation windows together, used for the final refit.
 
-All programs are solved with Gurobi, a state-of-the-art solver for linear, quadratic and second-order cone programs. 
+All programs are solved with Gurobi, a state-of-the-art solver for linear, quadratic, and second-order cone programs. 
 The solver is configured to use the barrier method with tight convergence and
 accuracy tolerances. The exact configuration is given in \Cref{lst:gurobi-config}.
 
@@ -234,13 +234,13 @@ For each program, we average these step
 times over all logged backtests. 
 
 \Cref{fig:runtime-small,fig:runtime-medium,fig:runtime-large} show the step times at each rebalancing date for the
-small, medium and large universe. The times grow with the size of the universe, from about a minute per rebalancing
+small, medium, and large universes. The times grow with the size of the universe, from about a minute per rebalancing
 date for the regularized joint Expected Shortfall program in the small universe to about half an hour in the large
 universe, and within each universe they rise over the backtest period as the number of assets in the investable
 universe grows. The regularized programs are considerably slower than the unregularized ones, 
 and the regularized joint programs are the slowest of all programs. Across the risk measures, the second-order
 Expected Shortfall programs are computationally the most expensive, followed by the Expected Shortfall programs. The variance programs
-are the cheapest in the small and medium universes, but their cost grows faster because the size of the covariance matrix grows quadratically with the number of assets. In the large universe they are solved as fast as the Expected Shortfall programs,
+are the cheapest in the small and medium universes, but their cost grows faster because the size of the covariance matrix grows quadratically with the number of assets. In the large universe they are solved as fast as the Expected Shortfall programs
 but slower than the semi-variance and MAD programs.
 
 Without regularization, the joint and the overlay programs are similar in terms of computational cost. With regularization, the joint programs
