@@ -2,16 +2,11 @@
 
 In this thesis, we studied how risk-based portfolio optimization performs for an investor who holds assets denominated
 in several currencies, and whether optimizing the asset and currency weights jointly improves on the industry-standard
-sequential currency overlay. We
-considered five risk measures, variance, semi-variance, mean absolute deviation, Expected Shortfall and second-order
-Expected Shortfall, and investable universes of three sizes, built from the largest stocks of 14 economies by market capitalization. In \Cref{chap:backtest-analysis} we backtested the joint and overlay programs in
-an unregularized, a regularized and a mean-risk formulation against the equally weighted portfolio and two asset-only
-benchmarks, and in \Cref{chap:joint-vs-sequential} we compared how well the two programs minimize their target risk
-measure in and out of sample. We find that the optimizers achieve a much lower risk than the equally weighted portfolio
-in every universe and consistently achieve higher risk-adjusted returns in the medium and large universes. The benefit of joint over sequential optimization is limited to two
-settings, objectives with a mean term in the medium and large universes, and risk minimization in the small universe.
+sequential currency overlay. In \Cref{sec:conclusion-findings} we summarize the findings of
+\Cref{chap:backtest-analysis,chap:joint-vs-sequential}, and in \Cref{sec:conclusion-limitations} we discuss the
+limitations of our analysis and directions for future research.
 
-\section{Findings}
+\section{Findings}\label{sec:conclusion-findings}
 
 Out of sample, the unregularized risk-minimizing optimizers reduce volatility by $34\%$ to $64\%$ relative to the equally weighted
 portfolio, and its maximum drawdown by up to $30$ percentage points. Without a return
@@ -82,7 +77,7 @@ joint optimization is most pronounced in small universes, which we find for risk
 mean-variance setting, which we find in the medium and large universes once a mean term is added. 
 
 \newpage
-\section{Limitations and Future Research}
+\section{Limitations and Future Research}\label{sec:conclusion-limitations}
 
 Our analysis covers one base currency, the US dollar, 14 economies, and one out-of-sample period from 2000 to 2023,
 so the results reflect the dependence between asset and currency returns for a US investor over this period. For

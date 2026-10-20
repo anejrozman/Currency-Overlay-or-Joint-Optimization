@@ -1,15 +1,14 @@
 \chapter{Joint versus Sequential Optimization}\label{chap:joint-vs-sequential}
 
-\Cref{chap:backtest-analysis} shows that the joint and overlay programs achieve similar returns, and that the most consistent difference between them is the lower realized volatility of the joint optimizers. In this chapter, we analyze the performance of the joint and overlay programs in terms of risk minimization.
-We first show in \Cref{sec:joint-in-sample-case} that the joint program has an advantage over the overlay program by construction in terms of minimizing its target risk measure,
-since the overlay program's solution is feasible for the joint program. We define the in-sample and out-of-sample gaps between the two programs and investigate the realized advantage of joint optimization
-across the five risk measures for investable universes of different sizes. The results, as in \Cref{chap:backtest-analysis}, separate the risk measures into two groups, deviation and tail 
-measures. In \Cref{sec:mechanism-level} we look at the tail measures more closely. We perform the same gap analysis across different confidence levels and show that the in-sample advantage of joint 
-optimization grows with the tail depth while the out-of-sample advantage does not. This identifies a tail-fitting mechanism that does not generalize. We then transform the tail measures into 
-deviation measures by de-meaning them and show that the in-sample advantage begins to fall with universe size, which identifies an implicit risk-return tradeoff as a second cause of the tail measures 
-in-sample advantage. Finally, in \Cref{sec:mechanism-measures} we focus on the deviation measures and argue, with the two mechanisms from \Cref{sec:mechanism-level}, why a larger percentage of the 
-in-sample advantage of joint optimization is realized out of sample.
-
+\Cref{chap:backtest-analysis} shows that the joint and overlay programs achieve similar returns, and that the most
+consistent difference between them is the lower realized volatility of the joint optimizers. In this chapter, we
+compare how well the two programs minimize their target risk measure, in sample and out of sample. In
+\Cref{sec:joint-in-sample-case} we show why the joint program has an in-sample advantage over the overlay program by
+construction, define the in-sample and out-of-sample gaps between the two programs, and estimate them for the five risk
+measures and three universe sizes. In \Cref{sec:mechanism-level} we study the tail measures in more detail. We repeat
+the gap analysis across confidence levels in \Cref{sec:mechanism-level-analysis} and for the de-meaned tail measures in
+\Cref{sec:mechanism-level-demeaning}. In \Cref{sec:mechanism-measures} we analyze the deviation measures and compare
+them with the tail measures in terms of how much of the in-sample advantage is realized out of sample.
 
 \section{Advantage of Joint Optimization for Risk Minimization}\label{sec:joint-in-sample-case}
 

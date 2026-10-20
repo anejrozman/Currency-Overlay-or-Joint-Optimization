@@ -1,16 +1,15 @@
 \chapter{Data and Implementation}\label{chap:data-and-implementation}
 
-In this chapter, we describe the dataset and the backtest implementation used for the empirical evaluation of the
-portfolio optimization strategies in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. In \Cref{sec:data} we
-detail the construction of three investable universes of different sizes from the largest stocks of 14 global economies. We
-analyze the fully hedged asset returns and the excess currency returns, and show that as the universe size increases,
-the average asset returns tend to decrease and their volatilities rise. We further show that the correlations between the asset and
-excess currency returns are mostly positive, with the commodity and risk-sensitive currencies being the most positively
-correlated and the safe-haven currencies negatively correlated with most economies. This dependence structure stays stable across universe sizes. In \Cref{sec:backtest-implementation} we describe the implementation of the backtest. We first
-present in \Cref{sec:backtesting-framework} the modular structure of the backtesting framework. In \Cref{sec:backtest-configuration} we present the backtested strategies
-and their benchmarks, and specify the rebalancing frequency, the lookback window, the selection of the hyperparameters, and the
-modelling of transaction cost. Finally, in \Cref{sec:performance-evaluation-metrics} we define the performance metrics on which the
-strategies are evaluated in \Cref{chap:backtest-analysis}.
+In this chapter, we describe the data and the backtest implementation with which we evaluate the optimization programs
+of \Cref{chap:optimization-framework} in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. In \Cref{sec:data}
+we describe the data sources and the construction of three investable universes of different sizes from the largest
+stocks of 14 global economies, and analyze the fully hedged asset returns, the excess currency returns, and the
+correlations between them. In \Cref{sec:backtest-implementation} we describe the implementation of the backtest. We
+first present in \Cref{sec:backtesting-framework} the modular structure of the backtesting framework. In
+\Cref{sec:backtest-configuration} we present the backtested strategies and their benchmarks, and specify the
+rebalancing frequency, the lookback window, the selection of the hyperparameters, and the modeling of transaction
+costs. Finally, in \Cref{sec:performance-evaluation-metrics} we define the performance metrics on which the strategies
+are evaluated in \Cref{chap:backtest-analysis}.
 
 \section{Data}\label{sec:data}
 
