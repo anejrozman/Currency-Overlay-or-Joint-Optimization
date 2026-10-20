@@ -30,7 +30,9 @@ cumulative out-of-sample returns of the Joint optimizers together with the
 equally weighted benchmark, and in the lower panel of each figure the 
 cumulative difference between the Joint and Overlay optimizers for each risk 
 measure. The latter helps us visualize the realized return difference  
-between the two optimization approaches over time.
+between the two optimization approaches over time. In \Cref{app:additional-backtest-results}, we also report the
+realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of all
+optimizers in this chapter.
 
 \begin{table}[H]
   \centering
@@ -95,7 +97,7 @@ between the two optimization approaches over time.
   absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
   out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
   (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average asset and currency turnover,
-  respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
+  respectively. The realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of the same optimizers are reported in \Cref{tab:additional-baseline}. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
   formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
@@ -105,7 +107,8 @@ between the two optimization approaches over time.
 Across all five risk measures and universe sizes, the Overlay and Joint optimizers achieve substantially lower
 volatility than the equally weighted portfolio. In the small universe, their volatility ranges from $7.71\%$ to $9.17\%$,
 against $13.96\%$ for the equally weighted portfolio, a reduction of $34\%$ to $45\%$. In the medium and large 
-universes, the reduction is even larger, by up to $59\%$ and $64\%$, respectively. 
+universes, the reduction is even larger, by up to $59\%$ and $64\%$, respectively. The other four risk measures in
+\Cref{app:additional-backtest-results} fall by a similar amount.
 The equally weighted portfolio ignores the dependence between asset returns.
 Since it already holds a broad cross-section of stocks, most idiosyncratic
 risk is diversified away, and further adding stocks does little to reduce
@@ -115,7 +118,7 @@ toward assets with low risk, and a larger universe offers more such
 assets to choose from. As a result, maximum drawdowns are
 also substantially reduced, by up to $27$ percentage points in the small, $23$ in the medium and $30$ in
 the large universe, relative to drawdowns of $54.77\%$ to $56.26\%$ for the equally weighted portfolio.  Large drawdowns occur
-in market crashes, when the correlations between assets rise and diversification offers less protection. The optimizers reduce the portfolio's exposure to these crashes, but cannot completely mitigate them, since in a crash even low-risk equities tend to fall together, which is why the drawdowns remain sizeable for all strategies.
+in market crashes, when the correlations between assets rise and diversification offers less protection. The optimizers reduce the portfolio's exposure to these crashes, but cannot completely mitigate them, since in a crash even low-risk equities tend to fall together, which is why the drawdowns remain sizeable for all strategies. \Cref{app:drawdown-analysis} shows the drawdowns over the whole out-of-sample period and compares the optimizers in the main market crashes of the sample.
 
 For excess returns, we observe the opposite effect. The Overlay and Joint optimizers deliver lower excess returns than
 the equally weighted portfolio for every risk measure and universe size. This is partially due to the fact that the optimizers are
@@ -381,7 +384,7 @@ the squared losses of the few most extreme observations in the lookback window. 
   deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
   out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
   (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average asset and currency turnover,
-  respectively. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
+  respectively. The realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of the same optimizers are reported in \Cref{tab:additional-regularized}. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
   formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
   \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
@@ -590,7 +593,7 @@ optimizers it remains stable around its previous level. We analyze the implicit 
   variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected
   Shortfall (SOES). The realized out-of-sample performance metrics shown are the annualized excess return (ER),
   volatility (Vol), maximum drawdown (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average
-  asset and currency turnover, respectively. The sample period runs from June 1990 to June 2023, and the first
+  asset and currency turnover, respectively. The realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of the same optimizers are reported in \Cref{tab:additional-mean-risk}. The sample period runs from June 1990 to June 2023, and the first
   out-of-sample portfolio is formed in June 2000. More details on the optimization approaches, backtest configuration, and performance
   metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
   \end{minipage}
@@ -701,7 +704,7 @@ already reward a higher mean, so the explicit mean term changes them much less.
 
 The Joint and Overlay optimizers perform very similarly when they only minimize risk. The Joint optimizer achieves a lower volatility and, without regularization, a higher currency
 turnover. With regularization, the currency turnover decreases to about the size of those of
-the Overlay. In both cases, neither approach achieves consistently higher risk-adjusted returns. This changes when a mean term is added. The
+the Overlay. In both cases, neither approach achieves consistently higher risk-adjusted returns. This changes when a mean term is added to the unregularized programs. The
 Joint optimizer then has higher Sharpe and Sortino ratios than the Overlay for every risk measure in the medium and large
 universes, and this advantage is consistent over the sample. Once expected returns enter the objective, the joint program can optimize the expected
 returns of assets and currencies against each other, which the overlay program cannot
