@@ -440,12 +440,6 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
         for color, label in styles.values()
     ]
     axes[0].legend(handles=handles, fontsize=7, loc="lower left", framealpha=0.9)
-    qualifier = "" if family == "unregularized" else f", {family} programs"
-    fig.suptitle(
-        "Joint vs overlay optimization across increasing investable universe sizes "
-        f"(de-meaned{qualifier})",
-        fontsize=12,
-    )
     fig.tight_layout()
     for ext in ("pdf", "png"):
         fig.savefig(stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")

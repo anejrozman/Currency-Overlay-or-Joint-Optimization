@@ -8,16 +8,16 @@ ROOT = Path(__file__).resolve().parent
 MEASURES = {"mv": ("Variance", "tab:blue"), "smv": ("Semi-Variance", "tab:green"), "mad": ("MAD", "tab:orange"),
             "es": ("ES", "tab:red"), "soes": ("SOES", "tab:purple")}
 TYPES = {
-    "unregularized": ("top_runs.csv", "{}_{}", "Unregularized joint vs. overlay"),
-    "regularized": ("top_runs.csv", "reg_{}_{}", "Regularized joint vs. overlay"),
-    "w_mean": ("top_runs_w_mean.csv", "{}_{}_w_mean", "Unregularized joint vs. overlay with mean term"),
+    "unregularized": ("top_runs.csv", "{}_{}"),
+    "regularized": ("top_runs.csv", "reg_{}_{}"),
+    "w_mean": ("top_runs_w_mean.csv", "{}_{}_w_mean"),
 }
 plt.rcParams.update({"axes.grid": True, "grid.alpha": 0.3})
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--type", choices=TYPES, required=True)
 kind = parser.parse_args().type
-file, pattern, title = TYPES[kind]
+file, pattern = TYPES[kind]
 measures = MEASURES
 runs = pd.read_csv(ROOT / "runs" / file, skipinitialspace=True, index_col=0)
 out = ROOT / "figures" / "cumulative_and_difference"
@@ -37,7 +37,7 @@ for n in (10, 50, 100):
         bottom.plot((joint - overlay).cumsum(), color=color, linewidth=1)
     top.plot((1 + r["equal_weight_optimizer"]).cumprod(), color="black", linestyle="--", linewidth=1, label="EW")
     bottom.axhline(0, color="black", linewidth=0.8)
-    top.set(title=f"{title}, top-{n}", ylabel="Cumulative wealth")
+    top.set(ylabel="Cumulative wealth")
     bottom.set(ylabel="Return difference (joint-overlay)")
     fig.legend(loc="upper center", bbox_to_anchor=(0.5, -0.02), ncol=6, frameon=False)
     fig.savefig(out / f"{kind}_top{n}.pdf", bbox_inches="tight")

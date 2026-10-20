@@ -534,12 +534,6 @@ def plot_delta_epsilon(table: pd.DataFrame, stem: Path, family: str) -> None:
         # different scales, and a single left-hand label invites reading the right
         # panel off the left axis.
         ax.set_ylabel(r"$\tilde{g}^{\mathrm{IS}} - \tilde{g}^{\mathrm{OOS}}$ (pp)")
-    qualifier = "" if family == "unregularized" else f" ({family} programs)"
-    fig.suptitle(
-        "Unrealized in-sample advantage of Joint optimization across Risk Measures "
-        f"and Investable Universe Sizes{qualifier}",
-        fontsize=12,
-    )
     fig.tight_layout()
     for ext in ("pdf", "png"):
         fig.savefig(stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")
@@ -616,12 +610,6 @@ def plot(summary: pd.DataFrame, stem: Path, family: str) -> None:
         for color, label in styles.values()
     ]
     axes_by_row[0][0].legend(handles=handles, fontsize=8, loc="lower left", framealpha=0.9)
-    qualifier = "" if family == "unregularized" else f" ({family} programs)"
-    fig.suptitle(
-        "Joint vs Overlay Optimization across Risk Measures and "
-        f"Investable Universe Sizes{qualifier}",
-        fontsize=13,
-    )
     for ext in ("pdf", "png"):
         fig.savefig(stem.with_suffix(f".{ext}"), dpi=300, bbox_inches="tight")
         logger.info("Saved figure: %s", stem.with_suffix(f".{ext}"))

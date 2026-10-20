@@ -79,8 +79,7 @@ $2 \times 10^{-3}$.
     \includegraphics[width=0.9\textwidth]{../results/figures/boundary_plots/mv_top10_dinf.pdf}
     \caption{Marginal effect of each penalty for the regularized variance overlay and joint programs. The upper panels
     report $d_n^a$ for the asset penalties and the lower panels $d_n^c$ for the currency penalties. The dashed lines mark
-    the largest value of each grid in \Cref{tab:hypergrid}. Averaged over five bootstrap replications of the first
-    lookback window of the small universe (top-10).}
+    the largest value of each grid in \Cref{tab:hypergrid}. Each quantity is averaged over five bootstrap replications of the first lookback window of the small investable universe (top 10 stocks per economy).}
     \label{fig:hyperparameter-sensitivity-mv-marginal}
 
     \vspace{1.5em}
@@ -88,8 +87,7 @@ $2 \times 10^{-3}$.
     \includegraphics[width=0.9\textwidth]{../results/figures/boundary_plots/mv_top10_gross.pdf}
     \caption{Portfolio exposure as a function of each penalty for the regularized variance overlay and joint programs.
     The upper panels report $\|\bm{x}_t\|_1$ for the asset penalties and the lower panels $\|\bm{\psi}_t\|_1$ for the
-    currency penalties. The dashed lines mark the largest value of each grid in \Cref{tab:hypergrid}. Averaged over five
-    bootstrap replications of the first lookback window of the small universe (top-10).}
+    currency penalties. The dashed lines mark the largest value of each grid in \Cref{tab:hypergrid}. Each quantity is averaged over five bootstrap replications of the first lookback window of the small investable universe (top 10 stocks per economy).}
     \label{fig:hyperparameter-sensitivity-mv}
 \end{figure}
 
@@ -287,14 +285,14 @@ the overlay and joint optimizers.
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{../results/figures/drawdowns/normal/drawdowns.pdf}
-    \caption{Drawdown of the equally weighted portfolio and the unregularized and regularized overlay and joint optimizers and the Zero optimizer in the out-of-sample period, by risk measure and universe size. The out-of-sample period runs from July 2000 to April 2023.}
+    \caption{Drawdown of the unregularized and regularized overlay and joint optimizers, the Zero optimizer, and the equally weighted portfolio in the out-of-sample period, by risk measure and universe size. The out-of-sample period runs from July 2000 to April 2023, and returns are net of transaction costs.}
     \label{fig:drawdowns}
 \end{figure}
 
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{../results/figures/drawdowns/with_mean_term/drawdowns.pdf}
-    \caption{Drawdown of the equally weighted portfolio and the mean-risk overlay and joint optimizers in the out-of-sample period, by risk measure and universe size. The out-of-sample period runs from July 2000 to April 2023.}
+    \caption{Drawdown of the mean-risk overlay and joint optimizers and the equally weighted portfolio in the out-of-sample period, by risk measure and universe size. The out-of-sample period runs from July 2000 to April 2023, and returns are net of transaction costs.}
     \label{fig:drawdowns-mean-risk}
 \end{figure}
 
@@ -418,8 +416,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
     \bottomrule
   \end{tabular}
   }
-  \caption{Additional out-of-sample performance metrics of the baseline optimizers. ES, SOES, SD and MAD are daily
-  values in percent.}
+  \caption{Realized risk measures and Expected Shortfall ratios of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure. ES, SOES, SD, and MAD are daily values in percent, and ESR is the Expected Shortfall ratio. All are computed from returns net of transaction costs.}
   \label{tab:additional-baseline}
 \end{table}
 
@@ -491,8 +488,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
     \bottomrule
   \end{tabular}
   }
-  \caption{Additional out-of-sample performance metrics of the regularized optimizers and the benchmarks. ES, SOES, SD
-  and MAD are daily values in percent.}
+  \caption{Realized risk measures and Expected Shortfall ratios of the regularized overlay (Overlay) and joint (Joint) optimizers and of the benchmarks, the equally weighted portfolio (EW) and the asset-only optimizers Full and Zero, in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure. ES, SOES, SD, and MAD are daily values in percent, and ESR is the Expected Shortfall ratio. All are computed from returns net of transaction costs.}
   \label{tab:additional-regularized}
 \end{table}
 
@@ -540,8 +536,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
     \bottomrule
   \end{tabular}
   }
-  \caption{Additional out-of-sample performance metrics of the mean-risk optimizers. ES, SOES, SD and MAD are daily
-  values in percent.}
+  \caption{Realized risk measures and Expected Shortfall ratios of the mean-risk overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the risk measure in the objective. ES, SOES, SD, and MAD are daily values in percent, and ESR is the Expected Shortfall ratio. All are computed from returns net of transaction costs.}
   \label{tab:additional-mean-risk}
 \end{table}
 
@@ -550,7 +545,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{../results/figures/turnover/asset.pdf}
-    \caption{Asset turnover of the unregularized, regularized and mean-risk overlay and joint optimizers at each
+    \caption{Asset turnover of the unregularized, regularized, and mean-risk overlay and joint optimizers at each
     rebalancing date, by risk measure and universe size.}
     \label{fig:turnover-asset}
 \end{figure}
@@ -558,7 +553,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
 \begin{figure}[p]
     \centering
     \includegraphics[width=\textwidth]{../results/figures/turnover/currency.pdf}
-    \caption{Currency turnover of the unregularized, regularized and mean-risk overlay and joint optimizers at each
+    \caption{Currency turnover of the unregularized, regularized, and mean-risk overlay and joint optimizers at each
     rebalancing date, by risk measure and universe size.}
     \label{fig:turnover-currency}
 \end{figure}

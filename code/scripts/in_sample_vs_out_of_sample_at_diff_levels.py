@@ -870,11 +870,6 @@ def plot_vs_universe(summary: pd.DataFrame, stem: Path) -> None:
 
     axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     _legend(axes[0], STYLES)
-    fig.suptitle(
-        "Joint vs overlay optimization across increasing investable universe sizes, "
-        f"by {MEASURE_LABEL} confidence level",
-        fontsize=12,
-    )
     _save(fig, stem)
 
 
@@ -913,10 +908,6 @@ def plot_vs_level(summary: pd.DataFrame, stem: Path) -> None:
 
     axes[0].set_ylabel("Risk reduction, joint vs sequential (%)")
     _legend(axes[0], STYLES)
-    fig.suptitle(
-        f"Joint vs overlay optimization across {MEASURE_LABEL} confidence levels",
-        fontsize=12,
-    )
     _save(fig, stem)
 
 

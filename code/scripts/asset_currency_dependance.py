@@ -144,11 +144,10 @@ def _save(fig: plt.Figure, stem: Path) -> None:
     plt.close(fig)
 
 
-def plot_heatmap(corr: pd.DataFrame, title: str, stem: Path) -> None:
+def plot_heatmap(corr: pd.DataFrame, stem: Path) -> None:
     norm, vabs = _symmetric_norm(corr)
     fig, ax = plt.subplots(figsize=(10, 8))
     im = _draw_heatmap(ax, corr, norm, vabs, show_ylabels=True)
-    ax.set_title(title)
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04, label="Pearson correlation")
     fig.tight_layout()
     _save(fig, stem)
@@ -201,11 +200,7 @@ def main() -> None:
 
         csv_path = figures_dir / f"asset_currency_corr_top{n}.csv"
         corr.to_csv(csv_path)
-        plot_heatmap(
-            corr,
-            f"Equally weighted economy fully hedged return vs. currency excess return (top-{n})",
-            figures_dir / f"asset_currency_corr_top{n}",
-        )
+        plot_heatmap(corr, figures_dir / f"asset_currency_corr_top{n}")
 
     plot_combined(corrs, figures_dir / "asset_currency_corr_combined")
 

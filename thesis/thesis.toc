@@ -23,8 +23,8 @@
 \contentsline {subsection}{\numberline {4.2.3}Performance Evaluation Metrics}{13}{subsection.4.2.3}%
 \contentsline {chapter}{\chapternumberline {5}Empirical Analysis}{16}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Baseline Backtest Results}{16}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Regularization}{22}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Mean-Risk Optimization}{28}{section.5.3}%
+\contentsline {section}{\numberline {5.2}Regularization}{21}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Mean-Risk Optimization}{27}{section.5.3}%
 \contentsline {section}{\numberline {5.4}Conclusion}{32}{section.5.4}%
 \contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{34}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Advantage of Joint Optimization for Risk Minimization}{34}{section.6.1}%

@@ -39,7 +39,6 @@ optimizers in this chapter.
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
   \begin{tabular}{l*{11}{c}}
-    \multicolumn{12}{c}{\textbf{Baseline Backtest Performance across Universe Sizes}} \\[2pt]
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
@@ -85,22 +84,8 @@ optimizers in this chapter.
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the baseline backtests in the small, medium and large investable universes}
+  \caption{Out-of-sample performance of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-baseline}.}
   \label{tab:baseline}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Table \ref{tab:baseline} reports out-of-sample performance metrics for the unregularized optimizers in
-  the three investable universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
-  medium and Panel C the large investable universe. Each panel reports the unregularized sequential currency
-  overlay (Overlay) and joint (Joint) optimizers, together with the equally weighted portfolio (EW). Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean
-  absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
-  out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
-  (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average asset and currency turnover,
-  respectively. The realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of the same optimizers are reported in \Cref{tab:additional-baseline}. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
-  formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
-  \Cref{chap:optimization-framework,chap:data-and-implementation}.
-  \end{minipage}
 \end{table}
 \vspace{0.8em}
 
@@ -152,33 +137,22 @@ percentage points and Sharpe ratios by at most $0.07$. However, the sign of thes
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top10.pdf}
-  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy).}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy). The top panel shows the cumulative wealth of the joint optimizer of each risk measure and of the equally weighted portfolio (EW), and the bottom panel the cumulative sum of the daily return differences between the joint and the overlay optimizers. Portfolios are rebalanced quarterly, and returns are net of transaction costs. The performance metrics are reported in Panel A of \Cref{tab:baseline}.}
   \label{fig:baseline-top10}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top50.pdf}
-  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy).}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy). Panels  are as in \Cref{fig:baseline-top10}. The performance metrics are reported in Panel B of \Cref{tab:baseline}.}
   \label{fig:baseline-top50}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top100.pdf}
-  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy).}
+  \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy). Panels are as in \Cref{fig:baseline-top10}. The performance metrics are reported in Panel C of \Cref{tab:baseline}.}
   \label{fig:baseline-top100}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} show the out-of-sample performance of the
-  unregularized optimizers in the small, medium and large investable universes, respectively. In each figure,
-  the top panel shows the cumulative wealth of the joint optimizers and the equally weighted portfolio, and
-  the bottom panel shows the cumulative sum of the daily return differences between the joint and the
-  overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction costs. The
-  corresponding performance metrics are reported in
-  Panels A, B and C of \Cref{tab:baseline}, respectively.
-  \end{minipage}
 \end{figure}
 
 \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} present the cumulative performance of the Overlay and Joint optimizers 
@@ -213,39 +187,42 @@ performance metrics of the regularized optimizers and the three benchmarks.
   \centering
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{l*{6}{c}}
-    \multicolumn{7}{c}{\textbf{Change in Sharpe Ratio from Regularization}} \\[2pt]
     \toprule
                           & \multicolumn{3}{c}{\textbf{Overlay}}             & \multicolumn{3}{c}{\textbf{Joint}} \\
     \cmidrule(lr){2-4} \cmidrule(lr){5-7}
     \textbf{Risk Measure} & \textbf{Small} & \textbf{Medium} & \textbf{Large} & \textbf{Small} & \textbf{Medium} & \textbf{Large} \\
     \midrule
-    Variance              & $+0.02$        & $-0.02$         & $+0.12$        & $0.00$         & $-0.05$         & $+0.10$ \\
-    Semi-Variance         & $+0.05$        & $+0.02$         & $+0.19$        & $+0.03$        & $-0.03$         & $+0.18$ \\
-    MAD                   & $+0.04$        & $-0.02$         & $+0.02$        & $+0.03$        & $+0.01$         & $+0.04$ \\
-    ES                    & $+0.05$        & $-0.01$         & $+0.15$        & $+0.09$        & $+0.02$         & $+0.13$ \\
-    SOES                  & $+0.04$        & $+0.12$         & $+0.38$        & $-0.02$        & $+0.08$         & $+0.38$ \\
+    \multicolumn{7}{c}{\textbf{Panel A: Absolute Change}} \\
     \midrule
-    Average               & $+0.04$        & $+0.02$         & $+0.17$        & $+0.03$        & $+0.01$         & $+0.17$ \\
+    Variance              & $+0.02$ & $-0.01$ & $+0.12$ & $0.00$ & $-0.04$ & $+0.09$ \\
+    Semi-Variance         & $+0.05$ & $+0.02$ & $+0.19$ & $+0.03$ & $-0.03$ & $+0.18$ \\
+    MAD                   & $+0.04$ & $-0.02$ & $+0.02$ & $+0.03$ & $+0.01$ & $+0.04$ \\
+    ES                    & $+0.06$ & $-0.01$ & $+0.15$ & $+0.09$ & $+0.02$ & $+0.13$ \\
+    SOES                  & $+0.04$ & $+0.12$ & $+0.38$ & $-0.03$ & $+0.08$ & $+0.38$ \\
+    \midrule
+    Average               & $+0.04$ & $+0.02$ & $+0.17$ & $+0.02$ & $+0.01$ & $+0.17$ \\
+    \midrule
+    \multicolumn{7}{c}{\textbf{Panel B: Relative Change (\%)}} \\
+    \midrule
+    Variance              & $+17$ & $-3$ & $+19$ & $-2$ & $-9$ & $+14$ \\
+    Semi-Variance         & $+60$ & $+4$ & $+30$ & $+39$ & $-6$ & $+28$ \\
+    MAD                   & $+28$ & $-5$ & $+4$ & $+17$ & $+2$ & $+7$ \\
+    ES                    & $+78$ & $-1$ & $+21$ & $+113$ & $+3$ & $+18$ \\
+    SOES                  & $+53$ & $+29$ & $+73$ & $-117$ & $+17$ & $+72$ \\
+    \midrule
+    Average               & $+41$ & $+4$ & $+28$ & $+24$ & $+1$ & $+26$ \\
     \bottomrule
   \end{tabular}
-  \caption{Change in the out-of-sample Sharpe ratio of the Overlay and Joint optimizers from regularization}
+  \caption{Change in the out-of-sample Sharpe ratio of the overlay and joint optimizers from regularization in the small, medium, and large investable universes. Panel A reports the absolute change, the Sharpe ratio of each regularized optimizer in \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} minus that of its unregularized version in \Cref{tab:baseline}, and Panel B the relative change in percent of the unregularized Sharpe ratio. Rows correspond to the minimized risk measure, and the last row of each panel reports the change of the average Sharpe ratio across the five risk measures.}
   \label{tab:regularization-sharpe-change}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    \Cref{tab:regularization-sharpe-change} reports the change in the out-of-sample Sharpe ratio from regularization,
-  computed as the Sharpe ratio of each regularized optimizer in
-  \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} minus that of its unregularized version in
-  \Cref{tab:baseline}, for the Overlay and Joint optimizers in the small, medium and
-  large investable universes. Rows correspond to the
-  risk measure that is minimized, and the last row reports the average change across the five risk measures.
-  \end{minipage}
 \end{table}
 
 We see in \Cref{tab:regularization-sharpe-change} that regularization improves the Sharpe ratios of the Overlay and Joint optimizers for most risk measures and universe sizes. 
-The improvement is the largest in the large universe, where the Sharpe ratio
-rises by $0.17$ on average, while the effect is modest in the small universe and mixed in the medium universe. The
-penalties stabilize the weights by limiting the extreme positions that the unregularized programs fit to noise in the
+In absolute terms, the improvement is the largest in the large universe, where the Sharpe ratio
+rises by $0.17$ on average, while the effect is modest in the small universe and mixed in the medium universe. Relative
+to the low unregularized Sharpe ratios of the small universe, the gain there is substantial as well, $41\%$ on average
+for the Overlay and $24\%$ for the Joint optimizers, against $28\%$ and $26\%$ in the large universe and at most $4\%$
+in the medium universe. The penalties stabilize the weights by limiting the extreme positions that the unregularized programs fit to noise in the
 lookback window, which becomes more important when the number of assets increases relative to the length of the lookback
 window. The unregularized second-order Expected Shortfall optimizers are the least stable, since the measure is driven by
 the squared losses of the few most extreme observations in the lookback window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
@@ -255,7 +232,6 @@ the squared losses of the few most extreme observations in the lookback window. 
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
   \begin{tabular}{l*{11}{c}}
-    \multicolumn{12}{c}{\textbf{Regularized Backtest Performance: Small Universe (top 10 stocks per economy)}} \\[2pt]
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A1: Regularized Overlay and Joint Optimizers}} \\
     \midrule
@@ -287,7 +263,7 @@ the squared losses of the few most extreme observations in the lookback window. 
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the regularized optimizers in the small investable universe (top 10 stocks per economy)}
+  \caption{Out-of-sample performance of the regularized overlay (Overlay) and joint (Joint) optimizers (Panel A1) and of the benchmarks (Panel B1) in the small investable universe (top 10 stocks per economy). The benchmarks are the equally weighted portfolio (EW) and the regularized asset-only optimizers Assets-Full (Full), which fully hedges the currency exposure of its assets, and Assets-Zero (Zero), which leaves it unhedged. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-regularized}.}
   \label{tab:regularized-top10}
 \end{table}
 
@@ -296,7 +272,6 @@ the squared losses of the few most extreme observations in the lookback window. 
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
   \begin{tabular}{l*{11}{c}}
-    \multicolumn{12}{c}{\textbf{Regularized Backtest Performance: Medium Universe (top 50 stocks per economy)}} \\[2pt]
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A2: Regularized Overlay and Joint Optimizers}} \\
     \midrule
@@ -328,7 +303,7 @@ the squared losses of the few most extreme observations in the lookback window. 
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the regularized optimizers in the medium investable universe (top 50 stocks per economy)}
+  \caption{Out-of-sample performance of the regularized optimizers (Panel A2) and the benchmarks (Panel B2) in the medium investable universe (top 50 stocks per economy). The layout and reported metrics are as in \Cref{tab:regularized-top10}.}
   \label{tab:regularized-top50}
 \end{table}
 
@@ -337,7 +312,6 @@ the squared losses of the few most extreme observations in the lookback window. 
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
   \begin{tabular}{l*{11}{c}}
-    \multicolumn{12}{c}{\textbf{Regularized Backtest Performance: Large Universe (top 100 stocks per economy)}} \\[2pt]
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A3: Regularized Overlay and Joint Optimizers}} \\
     \midrule
@@ -369,25 +343,8 @@ the squared losses of the few most extreme observations in the lookback window. 
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the regularized optimizers in the large investable universe (top 100 stocks per economy)}
+  \caption{Out-of-sample performance of the regularized optimizers (Panel A3) and the benchmarks (Panel B3) in the large investable universe (top 100 stocks per economy). The layout and reported metrics are as in \Cref{tab:regularized-top10}.}
   \label{tab:regularized-top100}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} report out-of-sample performance metrics
-  for the regularized optimizers in
-  the three investable universes, with portfolios rebalanced quarterly.
-  Panels A1, A2 and A3 report the regularized sequential
-  currency overlay (Overlay) and joint (Joint) optimizers, and Panels B1, B2 and B3 the benchmarks, the
-  equally weighted portfolio (EW) and the asset-only optimizers Assets-Full (Full) and Assets-Zero (Zero).
-  Columns are grouped by the risk measure that is minimized, that is, variance, semi-variance, mean absolute
-  deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES). The realized
-  out-of-sample performance metrics shown are the annualized excess return (ER), volatility (Vol), maximum drawdown
-  (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average asset and currency turnover,
-  respectively. The realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of the same optimizers are reported in \Cref{tab:additional-regularized}. The sample period runs from June 1990 to June 2023, and the first out-of-sample portfolio is
-  formed in June 2000. More details on the optimization approaches, backtest configuration, and performance metrics are provided in
-  \Cref{chap:optimization-framework,chap:data-and-implementation}.
-  \end{minipage}
 \end{table}
 
 Comparing the performance of the Full optimizer with Overlay and Joint optimizers in  \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100}, 
@@ -414,33 +371,22 @@ total risk.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
-  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy).}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy). The top panel shows the cumulative wealth of the joint optimizer of each risk measure and of the equally weighted portfolio (EW), and the bottom panel the cumulative sum of the daily return differences between the joint and the overlay optimizers. Portfolios are rebalanced quarterly, and returns are net of transaction costs. The performance metrics are reported in \Cref{tab:regularized-top10}.}
   \label{fig:regularized-top10}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
-  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy).}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy). Panels are as in \Cref{fig:regularized-top10}. The performance metrics are reported in \Cref{tab:regularized-top50}.}
   \label{fig:regularized-top50}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top100.pdf}
-  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy).}
+  \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy). Panels are as in \Cref{fig:regularized-top10}. The performance metrics are reported in \Cref{tab:regularized-top100}.}
   \label{fig:regularized-top100}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    \Cref{fig:regularized-top10,fig:regularized-top50,fig:regularized-top100} show the out-of-sample
-  performance of the regularized optimizers in the small, medium and large investable universes, respectively.
-  In each figure, the top panel shows the cumulative wealth of the joint optimizers and the equally weighted
-  portfolio, and the bottom panel shows the cumulative sum of the daily return differences between the joint
-  and the overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction
-  costs. The corresponding performance metrics are reported in
-  \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100}.
-  \end{minipage}
 \end{figure}
 
 After regularization, the performance of the Joint and Overlay optimizers remains very similar. Their Sharpe ratios in
@@ -482,40 +428,41 @@ metrics.
   \centering
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{l*{6}{c}}
-    \multicolumn{7}{c}{\textbf{Change in Sharpe Ratio from Adding a Mean Term}} \\[2pt]
     \toprule
                           & \multicolumn{3}{c}{\textbf{Overlay}}             & \multicolumn{3}{c}{\textbf{Joint}} \\
     \cmidrule(lr){2-4} \cmidrule(lr){5-7}
     \textbf{Risk Measure} & \textbf{Small} & \textbf{Medium} & \textbf{Large} & \textbf{Small} & \textbf{Medium} & \textbf{Large} \\
     \midrule
-    Variance              & $+0.23$        & $+0.24$        & $+0.22$        & $+0.21$        & $+0.24$        & $+0.25$ \\
-    Semi-Variance         & $+0.30$        & $+0.16$        & $+0.12$        & $+0.30$        & $+0.17$        & $+0.18$ \\
-    MAD                   & $+0.18$        & $+0.15$        & $+0.14$        & $+0.19$        & $+0.21$        & $+0.18$ \\
-    ES                    & $+0.04$        & $-0.01$        & $0.00$         & $+0.05$        & $+0.05$        & $+0.04$ \\
-    SOES                  & $+0.09$        & $+0.04$        & $+0.02$        & $+0.10$        & $+0.14$        & $+0.08$ \\
+    \multicolumn{7}{c}{\textbf{Panel A: Absolute Change}} \\
     \midrule
-    Deviation measures    & $+0.24$        & $+0.18$        & $+0.16$        & $+0.23$        & $+0.21$        & $+0.20$ \\
-    Tail measures         & $+0.07$        & $+0.02$        & $+0.01$        & $+0.08$        & $+0.10$        & $+0.06$ \\
+    Variance              & $+0.23$ & $+0.25$ & $+0.23$ & $+0.21$ & $+0.24$ & $+0.25$ \\
+    Semi-Variance         & $+0.30$ & $+0.16$ & $+0.12$ & $+0.30$ & $+0.16$ & $+0.18$ \\
+    MAD                   & $+0.18$ & $+0.15$ & $+0.14$ & $+0.19$ & $+0.21$ & $+0.17$ \\
+    ES                    & $+0.04$ & $0.00$ & $0.00$ & $+0.05$ & $+0.05$ & $+0.05$ \\
+    SOES                  & $+0.09$ & $+0.04$ & $+0.02$ & $+0.10$ & $+0.14$ & $+0.09$ \\
+    \midrule
+    Deviation measures    & $+0.24$ & $+0.19$ & $+0.16$ & $+0.24$ & $+0.20$ & $+0.20$ \\
+    Tail measures         & $+0.07$ & $+0.02$ & $+0.01$ & $+0.07$ & $+0.10$ & $+0.07$ \\
+    \midrule
+    \multicolumn{7}{c}{\textbf{Panel B: Relative Change (\%)}} \\
+    \midrule
+    Variance              & $+167$ & $+53$ & $+35$ & $+130$ & $+48$ & $+37$ \\
+    Semi-Variance         & $+361$ & $+36$ & $+18$ & $+389$ & $+33$ & $+28$ \\
+    MAD                   & $+111$ & $+32$ & $+27$ & $+108$ & $+44$ & $+33$ \\
+    ES                    & $+55$ & $0$ & $0$ & $+63$ & $+10$ & $+6$ \\
+    SOES                  & $+120$ & $+11$ & $+4$ & $+448$ & $+30$ & $+17$ \\
+    \midrule
+    Deviation measures    & $+185$ & $+40$ & $+27$ & $+168$ & $+42$ & $+33$ \\
+    Tail measures         & $+88$ & $+4$ & $+2$ & $+146$ & $+19$ & $+10$ \\
     \bottomrule
   \end{tabular}
-  \caption{Change in the out-of-sample Sharpe ratio of the Overlay and Joint optimizers from adding a mean term}
+  \caption{Change in the out-of-sample Sharpe ratio of the overlay and joint optimizers from adding a mean term in the small, medium, and large investable universes. Panel A reports the absolute change, the Sharpe ratio of each mean-risk optimizer in \Cref{tab:mean-risk} minus that of the same unregularized optimizer without a mean term in \Cref{tab:baseline}, and Panel B the relative change in percent of the latter. Rows correspond to the risk measure in the objective, and the last two rows of each panel report the change of the average Sharpe ratio across the deviation measures (variance, semi-variance, and MAD) and across the tail measures (ES and SOES). The relative changes in the small universe are large because several Sharpe ratios without a mean term are close to zero.}
   \label{tab:mean-sharpe-change}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    \Cref{tab:mean-sharpe-change} reports the change in the out-of-sample Sharpe ratio from adding a mean term to the
-  objective, computed as the Sharpe ratio of each mean-risk optimizer in \Cref{tab:mean-risk} minus that of the
-  unregularized version in \Cref{tab:baseline}, for the Overlay and Joint optimizers in the small,
-  medium and large investable universes. Rows correspond to the risk measure in the objective, that is, variance,
-  semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected Shortfall (SOES), and the
-  last two rows report the average change across the deviation measures (variance, semi-variance and MAD) and across the
-  tail measures (ES and SOES).
-  \end{minipage}
 \end{table}
 
 Looking at \Cref{tab:mean-sharpe-change}, we see that adding a mean term to the objective raises the Sharpe ratios of the Overlay and Joint optimizers in 28 of the 30 combinations of risk
-measure and universe size. Unlike regularization, which was most beneficial in the large universe, the addition of a mean term
-improves the Sharpe ratios by a similar amount in all three universes. Minimizing risk alone ignores expected returns, and the mean term recovers part
+measure and universe size. Unlike regularization, which has the highest absolute gain in the large universe, the addition of a mean
+term improves the Sharpe ratios by a similar absolute amount in all three universes. Minimizing risk alone ignores expected returns, and the mean term recovers part
 of the excess return the optimizers otherwise give up. Though we can see that the improvement is very uneven across
 risk measures. The Sharpe ratios of the deviation measures rise by $0.16$ to $0.24$ on average, while those of the tail
 measures rise by at most $0.10$.
@@ -534,7 +481,6 @@ optimizers it remains stable around its previous level. We analyze the implicit 
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
   \begin{tabular}{l*{11}{c}}
-    \multicolumn{12}{c}{\textbf{Mean-Risk Backtest Performance across Universe Sizes}} \\[2pt]
     \toprule
     \multicolumn{12}{c}{\textbf{Panel A: Small Investable Universe (top 10 stocks per economy)}} \\
     \midrule
@@ -580,23 +526,8 @@ optimizers it remains stable around its previous level. We analyze the implicit 
     \bottomrule
   \end{tabular}%
 }
-  \caption{Performance metrics of the mean-risk optimizers in the small, medium and large investable universes}
+  \caption{Out-of-sample performance of the mean-risk overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. The mean-risk optimizers are the unregularized optimizers of \Cref{tab:baseline} with a mean term added to the objective. Columns are grouped by the risk measure in the objective: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-mean-risk}.}
   \label{tab:mean-risk}
-   \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    Table \ref{tab:mean-risk} reports out-of-sample performance metrics for the mean-risk optimizers in the
-  three investable universes, with portfolios rebalanced quarterly. Panel A covers the small, Panel B the
-  medium and Panel C the large investable universe. Each panel reports the unregularized sequential currency
-  overlay (Overlay) and joint (Joint) optimizers with an added mean term, together with the equally weighted
-  portfolio (EW) as a benchmark. Columns are grouped by the risk measure, that is,
-  variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES) and second-order Expected
-  Shortfall (SOES). The realized out-of-sample performance metrics shown are the annualized excess return (ER),
-  volatility (Vol), maximum drawdown (MD), the Sharpe ratio (SR), the Sortino ratio (SOR), and average
-  asset and currency turnover, respectively. The realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of the same optimizers are reported in \Cref{tab:additional-mean-risk}. The sample period runs from June 1990 to June 2023, and the first
-  out-of-sample portfolio is formed in June 2000. More details on the optimization approaches, backtest configuration, and performance
-  metrics are provided in \Cref{chap:optimization-framework,chap:data-and-implementation}.
-  \end{minipage}
 \end{table}
 
 As we can see in \Cref{tab:mean-risk}, the higher Sharpe ratios come from substantially higher excess returns achieved by the mean-risk optimizers. The excess returns are increased by $1.9$ to $3.6$ percentage points for the variance and semi-variance optimizers and by
@@ -627,32 +558,22 @@ comparison focused on downside risk does not change the conclusion.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
-  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy).}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy). The top panel shows the cumulative wealth of the joint optimizer of each risk measure and of the equally weighted portfolio (EW), and the bottom panel the cumulative sum of the daily return differences between the joint and the overlay optimizers. Portfolios are rebalanced quarterly, and returns are net of transaction costs. The performance metrics are reported in Panel A of \Cref{tab:mean-risk}.}
   \label{fig:mean-risk-top10}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
-  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy).}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy). Panels are as in \Cref{fig:mean-risk-top10}.  The performance metrics are reported in Panel B of \Cref{tab:mean-risk}.}
   \label{fig:mean-risk-top50}
 \end{figure}
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top100.pdf}
-  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy).}
+  \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy). Panels are as in \Cref{fig:mean-risk-top10}.  The performance metrics are reported in Panel C of \Cref{tab:mean-risk}.}
   \label{fig:mean-risk-top100}
-  \vspace{0.5em}
-  \begin{minipage}{\textwidth}
-  \raggedright\small
-    \Cref{fig:mean-risk-top10,fig:mean-risk-top50,fig:mean-risk-top100} show the out-of-sample performance of
-  the mean-risk optimizers in the small, medium and large investable universes, respectively. In each figure,
-  the top panel shows the cumulative wealth of the joint optimizers and the equally weighted portfolio, and
-  the bottom panel shows the cumulative sum of the daily return differences between the joint and the
-  overlay optimizers. The portfolios are rebalanced quarterly and reported net of transaction costs. The
-  corresponding performance metrics are reported in Panels A, B and C of \Cref{tab:mean-risk}, respectively.
-  \end{minipage}
 \end{figure}
 
 The addition of a mean term also changes the comparison between the Joint and Overlay optimizers. In the previous
