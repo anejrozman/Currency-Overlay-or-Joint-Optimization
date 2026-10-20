@@ -25,7 +25,7 @@
 \contentsline {section}{\numberline {5.1}Baseline Backtest Results}{16}{section.5.1}%
 \contentsline {section}{\numberline {5.2}Regularization}{21}{section.5.2}%
 \contentsline {section}{\numberline {5.3}Mean-Risk Optimization}{27}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Conclusion}{32}{section.5.4}%
+\contentsline {section}{\numberline {5.4}Summary}{32}{section.5.4}%
 \contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{34}{chapter.6}%
 \contentsline {section}{\numberline {6.1}Advantage of Joint Optimization for Risk Minimization}{34}{section.6.1}%
 \contentsline {section}{\numberline {6.2}Tail Measures}{38}{section.6.2}%
