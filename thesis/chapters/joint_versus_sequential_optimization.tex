@@ -158,7 +158,7 @@ We report the results in \Cref{fig:gap-vs-level-es,fig:gap-vs-level-soes}.
   
 
 Expected Shortfall at confidence level $\alpha$ is the average loss over the worst $1-\alpha$ fraction of the lookback window, 
-which is roughly $1{,}000$ observations at $60\%$ and $63$ at $97.5\%$. Which observations fall in the tail depends largely on the portfolio weights. 
+which is roughly $1{,}000$ observations at $60\%$ and $65$ at $97.5\%$. Which observations fall in the tail depends largely on the portfolio weights. 
 The joint program chooses the asset and currency weights together, so it can select assets whose worst days the currency 
 positions can offset. The overlay program fixes the asset weights of the fully hedged portfolio, 
 and its currency step can adjust $M$ weights against a largely fixed set of the worst-performing days. As we increase the confidence level, the number of observations in the tail shrinks, so the joint program's currency weights can cover a larger share of the worst-performing days, and the in-sample advantage grows. 
@@ -193,7 +193,7 @@ and is only present in the small universe.
 \subsection{De-meaning the Tail Measures}\label{sec:mechanism-level-demeaning}
 As discussed in \Cref{chap:optimization-framework}, Expected Shortfall and second-order Expected Shortfall are coherent (strictly expectation bounded) risk measures rather than deviation 
 measures. Unlike variance, mean absolute deviation, and semi-variance, they are not invariant to translation, so
-a portfolio with a higher mean return is scored favorably to one with a lower mean return, everything else being equal. The objectives
+a portfolio with a higher mean return is scored more favorably than one with a lower mean return, everything else being equal. The objectives
 therefore carry an implicit risk-return tradeoff that the three deviation measures do not. We can transform a coherent strictly 
 expectation bounded risk measure $\mathcal{R}$ into a deviation measure $\mathcal{D}$ via a simple de-meaning operation. More precisely
 

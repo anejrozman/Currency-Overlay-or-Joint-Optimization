@@ -307,14 +307,14 @@ positions. Zero optimizes the same objective as Full but is evaluated on unhedge
 exposure of its asset positions. The following portfolio strategies are considered:
 \begin{itemize}
   \item \textbf{EW}: The fully hedged equally weighted portfolio.
-  \item \textbf{Full}: The fully hedged regularized asset portfolio with both $L_1$ and $L_2$ penalties.
-  \item \textbf{Zero}: The unhedged regularized asset portfolio with both $L_1$ and $L_2$ penalties.
+  \item \textbf{Full}: The fully hedged regularized asset portfolio with both $L^1$ and $L^2$ penalties.
+  \item \textbf{Zero}: The unhedged regularized asset portfolio with both $L^1$ and $L^2$ penalties.
   \item \textbf{Overlay}: The unregularized sequential currency overlay portfolio.
-  \item \textbf{Regularized Overlay}: The overlay portfolio with both $L_1$ and $L_2$ penalties on the asset and currency
+  \item \textbf{Regularized Overlay}: The overlay portfolio with both $L^1$ and $L^2$ penalties on the asset and currency
   weights.
   \item \textbf{Mean-risk Overlay}: The unregularized overlay portfolio with an added mean term.
   \item \textbf{Joint}: The unregularized joint optimization portfolio.
-  \item \textbf{Regularized Joint}: The joint optimization portfolio with both $L_1$ and $L_2$ penalties on the asset and
+  \item \textbf{Regularized Joint}: The joint optimization portfolio with both $L^1$ and $L^2$ penalties on the asset and
   currency weights.
   \item \textbf{Mean-risk Joint}: The unregularized joint optimization portfolio with an added mean term.
 \end{itemize}
@@ -341,7 +341,7 @@ economy returns are shrunk toward zero with a
 James--Stein estimator, and every asset inherits the shrunk mean of its economy. The expected excess currency returns are
 not estimated from returns but set to the negative forward premium at the end of the lookback window. 
 Due to computational complexity considerations, the risk aversion coefficient $\gamma$ is not selected on the
-validation window. Instead, we run each mean-risk optimizer over a grid of $\gamma$ values on the first lookback window between June 1990 and June 2000 and fix one value for each risk
+validation window. Instead, we run each mean-risk optimizer over a grid of $\gamma$ values on the first lookback window between July 1990 and June 2000 and fix one value for each risk
 measure. More details on the risk aversion parameter selection can be found in \Cref{app:risk-aversion-calibration}.
 
 

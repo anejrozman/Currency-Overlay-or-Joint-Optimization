@@ -136,13 +136,13 @@ and the reduction in volatility outweighs the lost return.
 Sortino ratios follow the same pattern, so accounting only
 for downside risk does not change the comparison. 
 
-Both the overlay and joint optimizers have much higher asset and currency turnover than the equally weighted portfolio. This is expected since the equally weighted portfolio has fixed target weights and only trades to undo the price drift.
-Comparing the asset turnover of the joint and overlay optimizers, we see that it is very similar, differing at most by $6\%$. This tells us that the asset weights are determined primarily by the risk measure being optimized and not by the optimization approach itself. The difference between the two optimizers is in currency 
+Both the overlay and joint optimizers have higher asset and currency turnover than the equally weighted portfolio. This is expected since the equally weighted portfolio has fixed target weights and only trades to undo the price drift.
+Comparing the asset turnover of the joint and overlay optimizers, we see that it is very similar, differing at most by $7\%$. This tells us that the asset weights are determined primarily by the risk measure being optimized and not by the optimization approach itself. The difference between the two optimizers is in currency 
 turnover, where that of the joint optimizer is higher than that of the overlay optimizer in every measure-universe combination, by 
 between $11\%$ and $82\%$.  Since returns are reported net of transaction costs, the comparisons above already incorporate these differences. The extra currency turnover does not reduce the risk-adjusted returns of the joint optimizer relative to the overlay optimizer, and the higher turnover of both optimizers does not change their advantage over the equally weighted portfolio.
 
 Finally, comparing the performance of the unregularized joint and overlay optimizers under the same risk measures, across all reported metrics, we see that they perform very similarly.
-The joint optimizer does consistently achieve a lower volatility, but the differences shrink as we increase the universe size, from up to a $7\%$ decrease in the
+The joint optimizer does consistently achieve a lower volatility, but the differences shrink as we increase the universe size, from up to a $5\%$ decrease in the
 small universe to essentially no difference in the large universe. This is in line with the
 joint program being able to exploit the asset and currency dependence structure when the number of assets compared to the number of currencies is smaller. In \Cref{chap:joint-vs-sequential}, we study in more detail how much the joint program reduces the minimized risk measure relative to the overlay program, and why. The other metrics differ by small
 amounts, with excess returns differing by at most $0.5$ percentage points, maximum drawdowns by at most $1.96$
@@ -166,7 +166,7 @@ universe size. In the small universe, the joint and overlay optimizers do not co
 \section{Regularization} \label{sec:effects-of-regularization}
 
 We now repeat the analysis of \Cref{sec:baseline-backtests} for the regularized versions of the joint and
-overlay optimizers. We add $L_1$ and $L_2$ penalties on the asset weights and, separately, on the currency
+overlay optimizers. We add $L^1$ and $L^2$ penalties on the asset weights and, separately, on the currency
 weights to the objective, following the regularization scheme of \Cref{chap:optimization-framework}. The penalty
 weights are selected at every rebalancing date by a grid search over the validation window described in
 \Cref{sec:backtest-configuration}. All other aspects of the backtests remain unchanged. We also compare the joint and overlay
@@ -417,7 +417,7 @@ coefficient, as introduced in \Cref{sec:mean-risk-portfolio-optimization}. In th
 expected asset returns and the currency step the expected excess currency returns. The expected asset returns are averaged
 across the stocks of each economy and shrunk toward zero, while the expected excess currency returns are set to the
 negative forward premium, that is, the difference between the foreign and the US interest rate. The choice of $\gamma$ for each risk measure is described in
-\Cref{app:risk-aversion-calibration}. All other aspects of the backtests remain unchanged. \Cref{tab:mean-sharpe-change} reports the
+\Cref{app:risk-aversion-calibration}. In both programs, we also introduce a currency leverage constraint. \Cref{tab:mean-sharpe-change} reports the
 change in the Sharpe ratio from adding the mean term, and \Cref{tab:mean-risk} reports the performance
 metrics.
 
@@ -553,8 +553,8 @@ $0.8$ to $1.7$ percentage points for the mean absolute deviation optimizers, but
 the tail measures. This comes at the cost of an increase in volatility, which rises by $0.6$ to $3.4$ percentage points for the
 variance and semi-variance optimizers, while for mean absolute deviation
 and the tail measures it changes by less than half a percentage point. Even with the increase, the volatility of the variance and
-semi-variance optimizers remains at between $50\%$ and $70\%$ of that of the equally weighted portfolio, and the
-maximum drawdowns of all mean-risk optimizers stay below $70\%$ of that of the equally weighted portfolio. The mean
+semi-variance optimizers remains at $50\%$ to $70\%$ of that of the equally weighted portfolio, and the
+maximum drawdowns of all mean-risk optimizers stay below $75\%$ of that of the equally weighted portfolio. The mean
 term thus raises returns without giving up the lower volatility and drawdowns that distinguish the optimizers from the equally
 weighted portfolio. As a result, every mean-risk optimizer outperforms the equally weighted portfolio on a risk-adjusted
 basis in the medium and large universes. In the small universe, the deviation measures reach Sharpe ratios of $0.34$ to
