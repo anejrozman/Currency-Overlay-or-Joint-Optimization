@@ -5,6 +5,16 @@ C.~Acerbi and D.~Tasche.
 \newblock On the coherence of expected shortfall.
 \newblock arXiv preprint arXiv:cond-mat/0104295, 2002.
 
+\bibitem{CoherentMeasuresOfRisk}
+P.~Artzner, F.~Delbaen, J.-M. Eber, and D.~Heath.
+\newblock Coherent measures of risk.
+\newblock {\em Mathematical Finance}, 9(3):203--228, 1999.
+
+\bibitem{BCBS2019}
+{Basel Committee on Banking Supervision}.
+\newblock Minimum capital requirements for market risk.
+\newblock Standard, Bank for International Settlements, 2019.
+
 \bibitem{boyd2004convex}
 S.~Boyd and L.~Vandenberghe.
 \newblock {\em Convex Optimization}.
@@ -37,6 +47,12 @@ S.~Ciliberti, I.~Kondor, and M.~M{\'e}zard.
 \newblock \url{https://www.cvxpy.org}, 2026.
 \newblock Accessed: 2026-10-16.
 
+\bibitem{DeMiguelGarlappiUppal2009}
+V.~DeMiguel, L.~Garlappi, and R.~Uppal.
+\newblock Optimal versus naive diversification: How inefficient is the 1/{N}
+  portfolio strategy?
+\newblock {\em The Review of Financial Studies}, 22(5):1915--1953, 2009.
+
 \bibitem{DiamondBoyd2016}
 S.~Diamond and S.~Boyd.
 \newblock {CVXPY}: A {Python}-embedded modeling language for convex
@@ -49,10 +65,20 @@ N.~El~Karoui.
   quadratic programs with linear constraints: Risk underestimation.
 \newblock {\em The Annals of Statistics}, 38(6):3487--3566, 2010.
 
+\bibitem{Estrada2008}
+J.~Estrada.
+\newblock Mean-semivariance optimization: A heuristic approach.
+\newblock {\em Journal of Applied Finance}, 18(1):57--72, 2008.
+
 \bibitem{FrazziniIsraelMoskowitz2018}
 A.~Frazzini, R.~Israel, and T.~J. Moskowitz.
 \newblock Trading costs.
 \newblock Working paper, AQR Capital Management and Yale University, 2018.
+
+\bibitem{goldberg2013minimizingshortfall}
+L.~R. Goldberg, M.~Y. Hayes, and O.~Mahmoud.
+\newblock Minimizing shortfall.
+\newblock arXiv preprint arXiv:1102.0938, 2013.
 
 \bibitem{HastieTibshiraniFriedman2009}
 T.~Hastie, R.~Tibshirani, and J.~Friedman.
@@ -81,6 +107,17 @@ H.~Konno and H.~Yamazaki.
 P.~A. Krokhmal.
 \newblock Higher moment coherent risk measures.
 \newblock {\em Quantitative Finance}, 7(4):373--387, 2007.
+
+\bibitem{LedoitWolf2003}
+O.~Ledoit and M.~Wolf.
+\newblock Honey, {I} shrunk the sample covariance matrix.
+\newblock Working paper 691, Universitat Pompeu Fabra, 2003.
+
+\bibitem{LedoitWolf2004}
+O.~Ledoit and M.~Wolf.
+\newblock A well-conditioned estimator for large-dimensional covariance
+  matrices.
+\newblock {\em Journal of Multivariate Analysis}, 88(2):365--411, 2004.
 
 \bibitem{Li2015}
 J.~Li.
@@ -124,6 +161,12 @@ A.~J. McNeil, R.~Frey, and P.~Embrechts.
 L.~Menkhoff, L.~Sarno, M.~Schmeling, and A.~Schrimpf.
 \newblock Carry trades and global foreign exchange volatility.
 \newblock {\em The Journal of Finance}, 67(2):681--718, 2012.
+
+\bibitem{Merton1980}
+R.~C. Merton.
+\newblock On estimating the expected return on the market: An exploratory
+  investigation.
+\newblock {\em Journal of Financial Economics}, 8(4):323--361, 1980.
 
 \bibitem{Michaud1989}
 R.~Michaud.

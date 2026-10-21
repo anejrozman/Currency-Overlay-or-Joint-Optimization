@@ -66,8 +66,8 @@ different programs, and we refer to a specific program by its equation number wh
 
 By \eqref{eq:variance_def}, the objective of problem \eqref{eq:mv_risk_min} under variance is the quadratic form
 $\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$. In the programs, $\bm{\Sigma}_t$ is the Ledoit--Wolf estimator of the covariance
-matrix defined in \Cref{chap:optimization-framework}, which is positive semi-definite, so the convexity shown in
-\Cref{app:mv_definitions} is preserved. With the decision vector $\bm{x}_t \in \mathbb{R}^N$ and the penalty matrix
+matrix, denoted $\hat{\bm{\Sigma}}_t$ in \Cref{sec:risk-variance}, which is positive semi-definite, so the convexity
+shown in \Cref{app:mv_definitions} is preserved. With the decision vector $\bm{x}_t \in \mathbb{R}^N$ and the penalty matrix
 $\bm{Q} = \bm{\Sigma}_t \in \mathbb{R}^{N \times N}$, the portfolio optimization problem under
 variance can be written as a quadratic program
 \begin{equation} \label{eq:var_base_qp}

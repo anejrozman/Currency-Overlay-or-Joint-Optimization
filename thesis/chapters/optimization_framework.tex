@@ -1,12 +1,419 @@
 \chapter{Optimization Framework} 
 \label{chap:optimization-framework}
 
-This chapter develops the optimization framework used throughout the thesis, building up from a model of multi-currency portfolio returns to the risk objectives, the regularization that stabilizes them, and the two formulations through which asset and currency decisions are combined. The derivations follow the methodology presented in \cite{SparseAndStableInternationalPortfolioOptimization} and \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, use simple returns, and assume that rebalancing occurs at the end of each investment period. We begin in Section~\ref{sec:returns} with a model-free representation of one-period portfolio returns for an investor who holds assets denominated in multiple currencies and can take currency forward positions for hedging, decomposing the unhedged return of a foreign asset into its local, currency, and cross-currency components, introducing the currency-mapping matrix that links assets to their implicit currency exposures, and expressing the hedged portfolio return in terms of net currency exposures.
+% Chapter introduction: written last.
 
-With the return model in place, we formulate the optimization problem. Section~\ref{sec:mv-formulation} states the classical mean-variance criterion, and Section~\ref{sec:es-formulation} introduces Expected Shortfall as a coherent downside-risk measure, together with the Rockafellar--Uryasev representation that casts its minimization as a tractable linear program. Both are presented as instances of a common mean--risk objective, so that the framework treats the risk measure as a swappable component rather than a fixed choice. Section~\ref{sec:regularization} then introduces the $L_1$ and $L_2$ penalties and the leverage constraint used to stabilize the optimization and improve out-of-sample performance.
+\section{Risk-Based Portfolio Optimization}\label{sec:risk-based-optimization}
 
-Finally, Sections~\ref{sec:separate-optimization} and~\ref{sec:joint-optimization} assemble these elements into the two approaches to multi-currency allocation studied throughout the thesis: the separate (currency overlay) formulation, in which asset and currency decisions are made sequentially, and the joint formulation, in which they are optimized simultaneously. The detailed derivations of the resulting quadratic programs are found in Appendix~\ref{app:es_derivation} and Appendix~\ref{app:mv_derivation}.
- 
+Portfolio optimization theory studies how an investor should allocate their wealth across a set of different risky assets. In one of the most 
+influential works in finance, Markowitz \cite{Markowitz1952} proposes to choose among the assets by trading off the expected
+portfolio return against its variance. This requires estimates of the expected asset returns, which are
+less precise than estimates of variances and covariances. Merton \cite{Merton1980} shows that the precision
+of an estimated expected return depends only on the length of the sample period and not on how often the returns are
+observed within it, whereas the precision of an estimated variance increases with the observation frequency. Michaud
+\cite{Michaud1989} describes mean-variance optimizers as estimation-error maximizers, since they overweight the assets
+with large estimated expected returns and small estimated variances, which are the assets most likely to have large
+estimation errors. DeMiguel et al.~\cite{DeMiguelGarlappiUppal2009} find that, out of sample, none of the optimized
+portfolios they consider consistently outperforms the equally weighted portfolio, because the gain from optimal
+diversification is more than offset by estimation error. Following Lucescu and Ulrych
+\cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we therefore first consider portfolios that minimize a
+measure of risk alone and require no estimates of expected returns. We consider the expected portfolio return later in
+this chapter.
+
+We initially formulate the portfolio optimization problem for an investor who holds $N$ assets denominated in a single currency, and extend the setting
+to multiple currencies in the next section. Let $\bm{x}_t \in \R^N$ denote the portfolio weights chosen at time $t$ and
+held until $t+1$, and $\bm{R}_{t+1} \in \R^N$ the vector of simple asset returns over the period from $t$ to $t+1$. The
+portfolio return at time $t+1$ is then $\bm{x}_t^\top \bm{R}_{t+1}$, and the weights satisfy the budget constraint
+$\bm{x}_t^\top \bm{1}_N = 1$, where $\bm{1}_N \in \R^N$ is the vector of ones. A risk measure $\rho$ assigns to the
+random portfolio return a real number that quantifies its risk. We write
+$\rho$ as a function of the portfolio return $\bm{x}_t^\top \bm{R}_{t+1}$, so that the risk-based portfolio optimization problem is
+\begin{equation} \label{eq:risk-based-problem}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \rho\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
+\end{equation}
+The risk measure is evaluated under the distribution of $\bm{R}_{t+1}$ conditional on the information available at time
+$t$.
+
+\subsection{Variance}\label{sec:risk-variance}
+
+In the portfolio theory of Markowitz \cite{Markowitz1952}, the risk of a portfolio is measured by the variance of its
+return. Let $\mathbb{E}_t[\cdot]$ denote the expectation conditional on the information available at time $t$, and let
+$\bm{\mu}_t = \mathbb{E}_t[\bm{R}_{t+1}] \in \R^N$ and
+$\bm{\Sigma}_t = \mathbb{E}_t\bigl[ (\bm{R}_{t+1} - \bm{\mu}_t)(\bm{R}_{t+1} - \bm{\mu}_t)^\top \bigr] \in \R^{N \times N}$
+denote the expected asset return and the conditional covariance matrix of the asset returns. The variance of the portfolio
+return is
+\begin{equation*}
+    \text{Var}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    = \mathbb{E}_t\bigl[ (\bm{x}_t^\top \bm{\mu}_t - \bm{x}_t^\top \bm{R}_{t+1})^2 \bigr]
+    = \bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t.
+\end{equation*}
+The variance thus depends on the distribution of the asset returns only through their covariance matrix.
+
+With the variance as the risk measure, the objective of problem \eqref{eq:risk-based-problem} is the quadratic form
+$\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$. Since $\bm{\Sigma}_t$ is positive semi-definite, the objective is convex in the
+weights, and the problem is a convex quadratic program, which standard solvers handle efficiently
+\cite{boyd2004convex}. If $\bm{\Sigma}_t$ is positive definite, the first-order conditions of its Lagrangian further give
+the unique solution in closed form
+\begin{equation*}
+    \bm{x}_t^* = \frac{\bm{\Sigma}_t^{-1} \bm{1}_N}{\bm{1}_N^\top \bm{\Sigma}_t^{-1} \bm{1}_N},
+\end{equation*}
+which is known as the global minimum-variance portfolio. The closed form is a particularity of the variance, since the
+problems under the other risk measures we consider have no closed-form solution in general and must be solved
+numerically. It no longer applies once we add the leverage constraint and other penalties later in this chapter, although
+the problem remains a convex quadratic program. The closed form also shows that the weights depend on the covariance
+matrix through its inverse, so that errors in an estimate of $\bm{\Sigma}_t$ carry over directly to the portfolio.
+
+Since the conditional distribution of $\bm{R}_{t+1}$ is unknown, $\bm{\Sigma}_t$ has to be estimated. For the variance
+and for the other risk measures later in the chapter, we use $q$ historical realizations $\bm{y}_1, \dots, \bm{y}_q \in \R^N$ of
+$\bm{R}_{t+1}$. In the empirical analysis, these are the daily asset returns over a lookback window of the ten years
+before time $t$, so that $q \approx 2{,}500$. We denote their sample mean
+by $\bar{\bm{y}} = \frac{1}{q} \sum_{k=1}^q \bm{y}_k$.
+
+The natural estimate of $\bm{\Sigma}_t$ is the sample covariance matrix of the realizations
+\begin{equation*}
+    \bar{\bm{\Sigma}}_t = \frac{1}{q} \sum_{k=1}^q (\bm{y}_k - \bar{\bm{y}})(\bm{y}_k - \bar{\bm{y}})^\top.
+\end{equation*}
+It has $N(N+1)/2$ distinct
+entries, all estimated from the same $q$ observations, and when $N$ is large relative to $q$, its eigenvalues are more
+dispersed than those of $\bm{\Sigma}_t$, with the smallest eigenvalues biased downward \cite{LedoitWolf2004}. Through
+the inverse in the closed form, the minimum-variance portfolio then concentrates on the combinations of assets whose
+risk is most underestimated, and its in-sample variance understates its out-of-sample variance \cite{ElKaroui2010}.
+When $N \ge q$, the sample covariance matrix is singular, and the closed form does not exist.
+
+We therefore estimate $\bm{\Sigma}_t$ with the shrinkage estimator of Ledoit and Wolf \cite{LedoitWolf2003}, which
+combines the sample covariance matrix with a structured target. The sample covariance matrix imposes no structure but
+has a large estimation error when $N$ is large relative to $q$, while a structured target has few parameters and
+therefore a small estimation error but is biased whenever its structure does not hold. A weighted average of the two
+trades off the estimation error of the one against the bias of the other. Ledoit and Wolf use the constant-correlation
+target, which keeps the sample variances of the assets and replaces every pairwise correlation by the average sample
+correlation.
+
+To define the estimator, let $y_{k,i}$ denote the $i$th entry of $\bm{y}_k$, $\bar{y}_i$ the $i$th entry of
+$\bar{\bm{y}}$, and $\mathring{y}_{k,i} = y_{k,i} - \bar{y}_i$ the demeaned return of asset $i$ in realization $k$. We
+suppress the dependence on $t$ of the scalar quantities that follow. The sample covariance matrix $\bar{\bm{\Sigma}}_t$
+has the entries
+\begin{equation*}
+    \bar{\sigma}_{ij} = \frac{1}{q} \sum_{k=1}^q \mathring{y}_{k,i}\, \mathring{y}_{k,j},
+\end{equation*}
+from which we obtain the sample correlations $r_{ij} = \bar{\sigma}_{ij} / \sqrt{\bar{\sigma}_{ii} \bar{\sigma}_{jj}}$
+and their average $\bar{r} = \frac{2}{N(N-1)} \sum_{i<j} r_{ij}$. The constant-correlation target $\bm{T}_t$ has the
+diagonal entries $\bar{\sigma}_{ii}$ and the off-diagonal entries $\bar{r} \sqrt{\bar{\sigma}_{ii} \bar{\sigma}_{jj}}$,
+and the Ledoit--Wolf estimate is the convex combination
+\begin{equation*}
+    \hat{\bm{\Sigma}}_t = \hat{\delta}\, \bm{T}_t + (1 - \hat{\delta})\, \bar{\bm{\Sigma}}_t
+\end{equation*}
+with the shrinkage intensity $\hat{\delta} \in [0, 1]$.
+
+Ledoit and Wolf choose the intensity that minimizes the expected squared Frobenius distance between
+$\hat{\bm{\Sigma}}_t$ and $\bm{\Sigma}_t$, that is, the expected sum of the squared differences between their entries.
+The optimal intensity is asymptotically proportional to $1/q$, and its estimate is
+\begin{equation*}
+    \hat{\delta} = \max\Bigl\{ 0, \min\Bigl\{ \frac{\hat{\pi} - \hat{\nu}}{q\, \hat{\omega}}, 1 \Bigr\} \Bigr\},
+\end{equation*}
+where
+\begin{align*}
+    \hat{\pi} &= \sum_{i,j} \hat{\pi}_{ij},
+    \qquad \hat{\pi}_{ij} = \frac{1}{q} \sum_{k=1}^q \bigl( \mathring{y}_{k,i}\, \mathring{y}_{k,j} - \bar{\sigma}_{ij} \bigr)^2, \\
+    \hat{\nu} &= \sum_{i} \hat{\pi}_{ii} + \bar{r} \sum_{i \neq j} \sqrt{\bar{\sigma}_{jj} / \bar{\sigma}_{ii}}\;
+    \hat{\vartheta}_{ij}, \\
+    \hat{\vartheta}_{ij} &= \frac{1}{q} \sum_{k=1}^q \bigl( \mathring{y}_{k,i}^2 - \bar{\sigma}_{ii} \bigr)
+    \bigl( \mathring{y}_{k,i}\, \mathring{y}_{k,j} - \bar{\sigma}_{ij} \bigr), \\
+    \hat{\omega} &= \sum_{i \neq j} \bigl( \bar{r} \sqrt{\bar{\sigma}_{ii} \bar{\sigma}_{jj}} - \bar{\sigma}_{ij} \bigr)^2.
+\end{align*}
+The quantity $\hat{\pi}$ estimates the sum of the asymptotic variances of the entries of $\sqrt{q}\,\bar{\bm{\Sigma}}_t$,
+and $\hat{\nu}$ the sum of the asymptotic covariances between the entries of $\sqrt{q}\,\bm{T}_t$ and those of
+$\sqrt{q}\,\bar{\bm{\Sigma}}_t$, which arise because both matrices are computed from the same realizations. The quantity
+$\hat{\omega}$ is the squared Frobenius distance between $\bm{T}_t$ and $\bar{\bm{\Sigma}}_t$, which measures how far the
+structure of the target is from the data. The intensity therefore increases with the estimation error of the sample
+covariance matrix, decreases with the misspecification of the target, and tends to zero as $q$ grows, so that
+$\hat{\bm{\Sigma}}_t$ approaches the sample covariance matrix when many observations are available. For the positive
+average correlations typical of stock returns, the target is positive definite, and $\hat{\bm{\Sigma}}_t$ is then
+positive definite whenever $\hat{\delta} > 0$, even when $N \ge q$.
+
+The variance program replaces $\bm{\Sigma}_t$ by the Ledoit--Wolf estimate,
+\begin{equation*} \label{eq:variance-program}
+    \bm{x}_t^* = \argmin_{\bm{x}_t} \bm{x}_t^\top \hat{\bm{\Sigma}}_t \bm{x}_t, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
+\end{equation*}
+and we write it in the standard form of a quadratic program in Appendix~\ref{app:mv_var_qp}.
+
+One of the common criticisms of the variance is that it penalizes returns above the expected portfolio return as much as returns below it, although an
+investor is typically concerned with underperformance rather than outperformance \cite{Markowitz1993}. This motivates
+the semi-variance, which we consider next. 
+
+\subsection{Semi-Variance}\label{sec:risk-semi-variance}
+
+The semi-variance only considers the deviations of the portfolio return
+below a threshold, so that returns above the threshold do not add to the risk of the portfolio. Markowitz et
+al.~\cite{Markowitz1993} consider two thresholds, the expected portfolio return and a benchmark return, which may also be
+a constant. Measured against a benchmark, the semi-variance captures the risk of underperforming the benchmark, while
+measured against the expected return, it captures the dispersion of the portfolio return below its mean. We use the
+expected portfolio return as the threshold. With $z^+ = \max\{z, 0\}$, the semi-variance of the portfolio return is
+\begin{equation*}
+    \text{SVar}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    = \mathbb{E}_t\Bigl[ \bigl( (\bm{x}_t^\top \bm{\mu}_t - \bm{x}_t^\top \bm{R}_{t+1})^+ \bigr)^2 \Bigr].
+\end{equation*}
+
+As for the variance, the
+conditional expectation has to be estimated. With the historical realizations $\bm{y}_1, \dots, \bm{y}_q$ and their
+sample mean $\bar{\bm{y}}$ of \Cref{sec:risk-variance}, we replace $\bm{\mu}_t$ by $\bar{\bm{y}}$ and the conditional
+expectation by the empirical average over the realizations, which gives the sample semi-variance
+\begin{equation}\label{eq:sample-semi-variance}
+    \frac{1}{q} \sum_{k=1}^q \bigl( (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+ \bigr)^2
+    = \bm{x}_t^\top \bm{\Sigma}^-(\bm{x}_t)\, \bm{x}_t,
+\end{equation}
+where
+\begin{equation*}
+    \bm{\Sigma}^-(\bm{x}_t) = \frac{1}{q} \sum_{k \,:\, \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) < 0}
+    (\bm{y}_k - \bar{\bm{y}})(\bm{y}_k - \bar{\bm{y}})^\top
+\end{equation*}
+is the sample semi-covariance matrix of the realizations in which the portfolio return falls below its sample mean.
+
+The sample semi-covariance matrix has the same form as the sample covariance matrix of \Cref{sec:risk-variance}, but it
+only contains the realizations in which the portfolio underperforms its mean, and which realizations these are depends
+on the weights. The semi-covariance matrix is therefore endogenous \cite{Estrada2008}, so unlike for the variance,
+there is no fixed matrix that could be estimated before the optimization. For the same reason, the problem has no
+closed-form solution, and the Ledoit--Wolf estimator of \Cref{sec:risk-variance} cannot be used. Estrada \cite{Estrada2008} proposes a heuristic semi-covariance
+matrix that does not depend on the weights, but it only approximates the semi-variance of the portfolio. We therefore
+minimize the sample semi-variance directly.
+
+Each summand of the sample semi-variance \eqref{eq:sample-semi-variance} is only piecewise quadratic in the weights. Following Markowitz et al.~\cite{Markowitz1993}, we introduce for each realization $k$ an
+auxiliary variable $u_k \ge 0$ subject to $u_k \ge \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k$, and collect
+them in $\bm{u} = [u_1, \dots, u_q]^\top$. Since the objective $\frac{1}{q} \sum_{k=1}^q u_k^2$ increases in every
+$u_k \ge 0$, each $u_k$ equals $(\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+$ at the optimum, and the
+semi-variance program is the quadratic program
+\begin{equation*} 
+\begin{aligned}
+    \bm{x}_t^*, \bm{u}^* = \argmin_{\bm{x}_t,\, \bm{u}} \quad & \frac{1}{q} \sum_{k=1}^q u_k^2, \\
+    \text{s.t.} \quad & \bm{x}_t^\top \bm{1}_N = 1, \\
+    & \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) + u_k \ge 0, \quad u_k \ge 0, \quad k = 1, \dots, q.
+\end{aligned}
+\end{equation*}
+Each realization adds one auxiliary variable and one linear constraint, so that the size of the program grows with the
+number of realizations, whereas the variance program works with a covariance matrix whose size grows quadratically with
+the number of assets. We write the program in the standard form of a quadratic program in
+Appendix~\ref{app:mv_svar_qp}.
+
+Like the variance, the semi-variance squares the deviations, so that a few large deviations below the mean can dominate
+its estimate, and minimizing it requires a quadratic program. The mean absolute deviation, which we consider next,
+measures the deviations linearly instead.
+
+\subsection{Mean Absolute Deviation}\label{sec:risk-mad}
+
+Konno and Yamazaki \cite{KonnoYamazaki1991} propose the mean absolute deviation as an alternative to the variance. It
+measures the deviations of the portfolio return from its expected return by their absolute values instead of their
+squares. Large deviations therefore have less
+influence on the measure. The mean absolute deviation of the portfolio return is
+\begin{equation*}
+    \text{MAD}_t\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
+    = \mathbb{E}_t\bigl[ \lvert \bm{x}_t^\top \bm{\mu}_t - \bm{x}_t^\top \bm{R}_{t+1} \rvert \bigr].
+\end{equation*}
+The main motivation of Konno and Yamazaki is computational. Since the absolute value is piecewise linear, minimizing the
+sample mean absolute deviation can be formulated as a linear program rather than a quadratic program, which makes it more efficient for larger problems, 
+and setting up the problem requires no estimate of the covariance matrix.
+
+As for the semi-variance, we replace $\bm{\mu}_t$ by the sample mean $\bar{\bm{y}}$ and the conditional expectation by
+the empirical average over the realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref{sec:risk-variance}, which gives the
+sample mean absolute deviation $\frac{1}{q} \sum_{k=1}^q \lvert \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k
+\rvert$. Since the deviations $\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k$ sum to zero over the sample, the sum
+of their positive parts equals the sum of their negative parts, and the absolute value of each deviation is the sum of
+its two parts. The sample mean absolute deviation is therefore twice the average shortfall of the portfolio return below
+its sample mean \cite{Speranza1993, OgryczakRuszczynski1999}
+\begin{equation*}
+    \frac{1}{q} \sum_{k=1}^q \lvert \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k \rvert
+    = \frac{2}{q} \sum_{k=1}^q (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+.
+\end{equation*}
+
+To write the problem as a linear program, we introduce, as for the semi-variance, an auxiliary variable $u_k \ge 0$ for
+each realization $k$ subject to $u_k \ge \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k$.
+Since the objective $\frac{2}{q} \sum_{k=1}^q u_k$ increases in every $u_k$, each $u_k$ equals
+$(\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+$ at the optimum, and the mean absolute deviation program is the
+linear program
+\begin{equation*}
+\begin{aligned}
+    \bm{x}_t^*, \bm{u}^* = \argmin_{\bm{x}_t,\, \bm{u}} \quad & \frac{2}{q} \sum_{k=1}^q u_k, \\
+    \text{s.t.} \quad & \bm{x}_t^\top \bm{1}_N = 1, \\
+    & \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) + u_k \ge 0, \quad u_k \ge 0, \quad k = 1, \dots, q.
+\end{aligned}
+\end{equation*}
+It has the same constraints as the semi-variance program, with the auxiliary variables in the objective in linear form. We write it in the standard form of a linear program in Appendix~\ref{app:mad_representation}.
+
+The linear program is computationally efficient, but its solution is sensitive to estimation error. Kondor et
+al.~\cite{kondor2007noise} show that portfolios optimized under the mean absolute deviation are even more sensitive to
+estimation error than those optimized under the variance, and that their weights fluctuate more strongly from sample to
+sample.
+
+The three risk measures considered so far measure the dispersion of the portfolio return around its mean. Expected
+Shortfall, which we consider next, instead measures the size of the largest losses.
+
+\subsection{Expected Shortfall}\label{sec:risk-es}
+
+Expected Shortfall measures the risk of a portfolio by the average of its largest losses. Let
+$L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$ denote the loss of the portfolio at time $t+1$ and $\mathbb{P}_t(\cdot)$
+the probability conditional on the information available at time $t$. The Value-at-Risk (VaR) at confidence level
+$\beta \in (0, 1)$ is the $\beta$-quantile of the loss distribution,
+\begin{equation*}
+    \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha \mid \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
+\end{equation*}
+VaR does not take into account how large the losses beyond it are. Expected Shortfall is the expected loss given that
+the loss exceeds VaR,
+\begin{equation*}
+    \text{ES}_\beta(\bm{x}_t) = \mathbb{E}_t\bigl[ L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t) \bigr],
+\end{equation*}
+so that it accounts for both the probability and the size of the losses in the tail. For loss distributions with atoms,
+such as the empirical distribution used below, Expected Shortfall is defined as the average of the quantiles of the loss
+distribution above $\beta$, which is equivalent to the conditional expectation for continuous distributions
+\cite{acerbi2002coherenceexpectedshortfall}. In its capital requirements for market risk, the Basel Committee on Banking
+Supervision has replaced VaR at the $99\%$ level by Expected Shortfall at the $97.5\%$ level \cite{BCBS2019}, indicating
+that it is a more appropriate measure of risk than VaR.
+
+Since $\text{VaR}_\beta(\bm{x}_t)$ itself depends on the portfolio weights, the conditional expectation in the definition is not
+in a suitable form for optimization. Rockafellar and Uryasev \cite{RockafellarUryasev2000, RockafellarUryasev2002} show
+that Expected Shortfall is the minimum over $\alpha \in \R$ of the auxiliary function
+\begin{equation*}
+    F_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta}\, \mathbb{E}_t\bigl[ (L(\bm{x}_t) - \alpha)^+ \bigr],
+\end{equation*}
+and that the minimizing $\alpha$ is $\text{VaR}_\beta(\bm{x}_t)$. Minimizing Expected Shortfall over the portfolio weights $\bm{x}_t$ is
+therefore equivalent to minimizing $F_\beta$ jointly over $\bm{x}_t$ and $\alpha$,
+\begin{equation*}
+    \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} F_\beta(\bm{x}_t, \alpha),
+\end{equation*}
+where $F_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$. The derivation of this representation is given in Appendix~\ref{app:es_auxiliary}.
+
+With the historical realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref{sec:risk-variance}, we replace the conditional
+expectation in $F_\beta$ by the empirical average, which gives the objective
+$\alpha + \frac{1}{q(1-\beta)} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$. As for the semi-variance and the
+mean absolute deviation, we introduce for each realization $k$ an auxiliary variable $u_k \ge 0$ subject to
+$u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha$. Since the objective increases in every $u_k$, each $u_k$ equals
+$(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ at the optimum, and the Expected Shortfall program is the linear program
+\begin{equation*}
+\begin{aligned}
+    \bm{x}_t^*, \alpha^*, \bm{u}^* = \argmin_{\bm{x}_t,\, \alpha,\, \bm{u}} \quad
+    & \alpha + \frac{1}{q(1-\beta)} \sum_{k=1}^q u_k, \\
+    \text{s.t.} \quad & \bm{x}_t^\top \bm{1}_N = 1, \\
+    & \bm{x}_t^\top \bm{y}_k + \alpha + u_k \ge 0, \quad u_k \ge 0, \quad k = 1, \dots, q.
+\end{aligned}
+\end{equation*}
+Since Expected Shortfall measures losses rather than deviations from the mean, the constraints contain the realizations
+$\bm{y}_k$ themselves instead of their deviations from the sample mean. We write the program in the standard form of a
+linear program in Appendix~\ref{app:lp_es}.
+
+At the optimum, only the realizations whose loss exceeds $\alpha^*$, which are about the $(1-\beta) q$ realizations with
+the largest losses, contribute to the objective. The estimate of Expected Shortfall is therefore based on a fraction of the
+sample, and Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under Expected Shortfall are more
+sensitive to estimation error than those optimized under the variance and the mean absolute deviation. Goldberg et
+al.~\cite{goldberg2013minimizingshortfall} note that estimation error matters more for Expected Shortfall than for the
+variance, since most realizations only serve to determine which losses are the largest. The confidence level thus
+trades off the focus on the tail against the number of realizations that determine the estimate. We use $\beta = 0.8$,
+at which about $500$ of the $q \approx 2{,}500$ daily realizations contribute to the objective. Testing confidence levels from $60\%$ to $99\%$, Goldberg et al.~\cite{goldberg2013minimizingshortfall} also find
+that minimum Expected Shortfall portfolios outperform minimum-variance portfolios most at relatively low confidence
+levels, at which Expected Shortfall captures the asymmetry of the return distribution rather than its extreme losses.
+
+Furthermore, Ciliberti et
+al.~\cite{ciliberti2007feasibility} show that, without bounds on the portfolio weights, the program is unbounded in some samples. 
+For large portfolios, it
+has no finite solution once $N/q$ exceeds a critical value, which is about $0.5$ for high confidence levels, and the weights fluctuate from sample to sample as $N/q$ approaches this value. In the large
+universe of the empirical analysis, which contains up to $1{,}400$ stocks, $N/q$ can come close to it. The leverage
+constraint that we add later in this chapter bounds the positions and thereby ensures that the program has a solution.
+
+Expected Shortfall weighs all losses beyond VaR equally, so that the largest losses in the tail count no more
+than the losses just beyond the quantile. Second-order Expected Shortfall, which we consider next, puts more weight on
+the largest losses.
+
+\subsection{Second-Order Expected Shortfall}\label{sec:risk-soes}
+
+Second-order Expected Shortfall belongs to the family of higher-moment coherent risk measures of Krokhmal
+\cite{Krokhmal2007}, which measure the risk in the tail of the loss distribution through its higher moments and contain
+Expected Shortfall as the first-order member. The second-order member replaces the expected excess loss in the auxiliary
+function $F_\beta$ of \Cref{sec:risk-es} by its $L^2$ norm $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$, which gives the
+auxiliary function
+\begin{equation*}
+    G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta}\, \bigl\| (L(\bm{x}_t) - \alpha)^+ \bigr\|_{L^2},
+\end{equation*}
+and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$,
+\begin{equation*}
+    \text{SOES}_\beta(\bm{x}_t) = \min_{\alpha \in \R} G_\beta(\bm{x}_t, \alpha).
+\end{equation*}
+Since the $L^2$ norm squares the excess losses, large losses beyond $\alpha$ receive more weight than in Expected
+Shortfall. Krokhmal notes that second-order Expected Shortfall measures the risk in the tail through the second moment
+of the losses, which relates it to the mean-variance framework. In a case study on fifty S\&P~500 stocks with
+heavy-tailed returns, he finds that portfolios minimizing the higher-moment measures at the $90\%$ level outperform
+those minimizing Expected Shortfall or the variance out of sample when the required expected return is low, while the
+strategies perform similarly when it is high, and he stresses that the results are specific to the data.
+
+By definition, minimizing second-order Expected Shortfall is
+\begin{equation*}
+    \min_{\bm{x}_t} \text{SOES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} G_\beta(\bm{x}_t, \alpha),
+\end{equation*}
+where $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$, which we show in Appendix~\ref{app:soes_auxiliary}.
+
+With the historical realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref{sec:risk-variance}, we replace the $L^2$ norm in
+$G_\beta$ by its empirical counterpart
+$\bigl( \frac{1}{q} \sum_{k=1}^q \bigl( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \bigr)^2 \bigr)^{1/2}$. As for Expected
+Shortfall, we introduce for each realization $k$ an auxiliary variable $u_k \ge 0$ subject to
+$u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha$, so that the empirical norm becomes $\frac{1}{\sqrt{q}} \|\bm{u}\|_2$ and each
+$u_k$ equals $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ at the optimum. Since the objective is still not linear, we introduce
+one more auxiliary variable $s$ subject to $\|\bm{u}\|_2 \le s$, which equals $\|\bm{u}\|_2$ at the optimum, and the
+second-order Expected Shortfall program is
+\begin{equation*}
+\begin{aligned}
+    \bm{x}_t^*, \alpha^*, \bm{u}^*, s^* = \argmin_{\bm{x}_t,\, \alpha,\, \bm{u},\, s} \quad
+    & \alpha + \frac{1}{(1-\beta)\sqrt{q}}\, s, \\
+    \text{s.t.} \quad & \bm{x}_t^\top \bm{1}_N = 1, \\
+    & \bm{x}_t^\top \bm{y}_k + \alpha + u_k \ge 0, \quad u_k \ge 0, \quad k = 1, \dots, q, \\
+    & \|\bm{u}\|_2 \le s.
+\end{aligned}
+\end{equation*}
+The constraint $\|\bm{u}\|_2 \le s$ requires the vector $[\bm{u}^\top, s]^\top$ to lie in the second-order cone, the set
+of vectors whose last entry is at least the Euclidean norm of the remaining entries \cite[Section~2.2.3]{boyd2004convex},
+so that the program is a second-order cone program \cite[Section~4.4.2]{boyd2004convex}. We write it in standard form in
+Appendix~\ref{app:socp_soes}.
+
+The cone constraint makes the program harder to solve than the linear and quadratic programs of the other risk
+measures, and the second-order Expected Shortfall programs are computationally the most expensive programs in our
+backtests (Appendix~\ref{sec:computational-complexity}). We use the same confidence level $\beta = 0.8$ as for Expected
+Shortfall, so that the two tail measures can be compared, and as for Expected Shortfall, the leverage constraint that we
+add later in this chapter bounds the positions and thereby ensures that the program has a solution.
+
+Expected Shortfall and second-order Expected Shortfall measure the size of the largest losses, whereas the variance,
+the semi-variance, and the mean absolute deviation measure deviations from the mean. We compare these two classes of
+risk measures next.
+
+\subsection{Coherent Risk Measures and Deviation Measures}\label{sec:coherent-and-deviation-measures}
+
+The five risk measures of this section fall into two classes, which differ in how they treat the location of the return
+distribution. To describe them, we write $X$ for the portfolio return $\bm{x}_t^\top \bm{R}_{t+1}$ and $C$ for a
+constant.
+
+Artzner et al.~\cite{CoherentMeasuresOfRisk} call a risk measure $\mathcal{R}$ coherent if it satisfies four
+properties. Adding a riskless amount to the return reduces the risk by that amount,
+$\mathcal{R}(X + C) = \mathcal{R}(X) - C$, scaling the position by a positive factor scales the risk by the same
+factor, the risk of a combined position is at most the sum of the risks of its parts, so that diversification does not
+increase risk, and a return that is higher in every state of the world carries no more risk. VaR violates the third
+property, subadditivity, in general, whereas Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
+second-order Expected Shortfall \cite{Krokhmal2007} are coherent. Both are moreover strictly expectation bounded, that
+is, their risk exceeds the expected loss of every nonconstant return.
+
+Rockafellar et al.~\cite{RockafellarUryasevZabarankin2006} define deviation measures $\mathcal{D}$, which quantify
+the uncertainty of a return rather than its losses. They share positive homogeneity and subadditivity with coherent risk
+measures, are non-negative and zero only for constant returns, and replace the first property by translation
+invariance, $\mathcal{D}(X + C) = \mathcal{D}(X)$. The standard deviation, the semi-deviation, which is the square root
+of the semi-variance, and the mean absolute deviation are deviation measures. The variance and the semi-variance are the
+squares of the standard deviation and the semi-deviation, so they are not positively homogeneous and therefore not
+deviation measures themselves. They are, however, translation invariant, and since squaring is increasing on
+non-negative numbers, they have the same minimizers as the standard deviation and the semi-deviation.
+
+The two translation properties capture the difference between the classes. A deviation measure depends only on the
+dispersion of the return around its mean and is unaffected by a shift of the whole distribution, whereas a coherent
+risk measure decreases when the distribution shifts upward. We state the formal definitions of both classes and prove
+that Expected Shortfall and second-order Expected Shortfall are coherent and strictly expectation bounded in
+Appendix~\ref{app:demeaning}.
+
+So far, we have treated the asset returns as given and denominated in the investor's domestic currency. An
+international investor, however, holds assets denominated in several currencies, whose returns in the domestic currency
+also depend on the exchange rates and on the currency positions that the investor takes to hedge them. All five risk
+measures are evaluated on the portfolio return in the domestic currency, so before we can formulate the multi-currency
+programs, we have to express this return in terms of the asset weights and the currency positions. The next section
+derives this representation exactly, without assuming a model for the joint distribution of asset and currency returns.
+
 \section{Model-Free Multi-Currency Portfolio Returns}\label{sec:returns}
 \subsection{Unhedged Portfolio Returns}
 
@@ -38,7 +445,7 @@ R_{i,t+1} + e_{c_i,t+1} + R_{i,t+1}\,e_{c_i,t+1}.
 \label{eq:unhedged-asset-return}
 \end{align}
 
-Let $\bm{x}_t\in\R^N$ be the vector of asset portfolio weights chosen at time $t$ and held until $t{+}1$, where $x_{i,t}$ is the fraction of total portfolio value invested in asset $i$ at time $t$. We impose the standard budget constraint $\bm{1}^\T \bm{x}_t = 1$.
+Let $\bm{x}_t\in\R^N$ be the vector of asset portfolio weights chosen at time $t$ and held until $t{+}1$, where $x_{i,t}$ is the fraction of total portfolio value invested in asset $i$ at time $t$. We impose the standard budget constraint $\bm{1}_N^\top \bm{x}_t = 1$.
 
 Assuming no rebalancing between times $t$ and $t{+}1$, the domestic-currency portfolio's unhedged return is given by
 \begin{equation*}
@@ -74,11 +481,11 @@ C_{i,c} \coloneqq
 \end{equation*}
 Each row of $\bm{C}$ has at most one nonzero entry, and the rows corresponding to domestic assets are identically zero. This allows us to define the portfolio's \emph{implicit foreign-currency exposure} as
 \begin{equation*}
-\bm{w}_t \coloneqq \bm{C}^\T \bm{x}_t \in \R^M,
+\bm{w}_t \coloneqq \bm{C}^\top \bm{x}_t \in \R^M,
 \qquad
 w_{c,t} = \sum_{i:\,c_i=c} x_{i,t},
 \end{equation*}
-such that $w_{c,t}$ is the total portfolio weight invested in assets denominated in currency $c$. The implicit domestic exposure follows residually as $w_{0,t} = 1 - \bm{1}_M^\T \bm{w}_t$, since the asset weights sum to one.
+such that $w_{c,t}$ is the total portfolio weight invested in assets denominated in currency $c$. The implicit domestic exposure follows residually as $w_{0,t} = 1 - \bm{1}_M^\top \bm{w}_t$, since the asset weights sum to one.
 
 We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premiums as $\bm{f}_t \in \R^M$. The product $\bm{C}\bm{e}_{t+1}\in\R^N$ aligns currency returns to assets, with $i$th component $e_{c_i,t+1}$ for foreign assets and $0$ for domestic ones. Using \eqref{eq:unhedged-asset-return}, the vector of \emph{unhedged domestic returns} across assets can be written as
 \begin{equation*}
@@ -94,20 +501,20 @@ where $\had$ denotes the Hadamard product.
 
 Expressing the forward positions in vector form as $\bm{\upphi}_t\in\R^M$, the hedged portfolio return \eqref{eq:hedged-portfolio-return} can be written as
 \begin{equation}
-R^{h}_{\mathcal{P},t+1} = \bm{x}_t^\T \bm{R}^{u}_{t+1} + \bm{\upphi}_t^\T(\bm{f}_t-\bm{e}_{t+1}).
+R^{h}_{\mathcal{P},t+1} = \bm{x}_t^\top \bm{R}^{u}_{t+1} + \bm{\upphi}_t^\top(\bm{f}_t-\bm{e}_{t+1}).
 \label{eq:hedged-vector}
 \end{equation}
 
-Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\T\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this together with the unhedged return vector into \eqref{eq:hedged-vector}, the \emph{fully hedged portfolio return} is
+Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\top\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this together with the unhedged return vector into \eqref{eq:hedged-vector}, the \emph{fully hedged portfolio return} is
 \begin{align*}
 R^{fh}_{\mathcal{P},t+1}
-&= \bm{x}_t^\T\bm{R}^{u}_{t+1} + \big(\bm{C}^\T\bm{x}_t\big)^\T(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
-&= \bm{x}_t^\T\Big[\bm{R}_{t+1} + \bm{C}\bm{e}_{t+1} + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big] + \bm{x}_t^\T\bm{C}(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
-&= \bm{x}_t^\T\Big[\bm{R}_{t+1} + \bm{C}\bm{e}_{t+1} + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big) + \bm{C}\bm{f}_t - \bm{C}\bm{e}_{t+1}\Big]\\[2pt]
-&= \bm{x}_t^\T\Big[\bm{R}_{t+1} + \bm{C}\bm{f}_t + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big]\\[2pt]
-&= \bm{x}_t^\T\bm{R}^{fh}_{t+1}.
+&= \bm{x}_t^\top\bm{R}^{u}_{t+1} + \big(\bm{C}^\top\bm{x}_t\big)^\top(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
+&= \bm{x}_t^\top\Big[\bm{R}_{t+1} + \bm{C}\bm{e}_{t+1} + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big] + \bm{x}_t^\top\bm{C}(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
+&= \bm{x}_t^\top\Big[\bm{R}_{t+1} + \bm{C}\bm{e}_{t+1} + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big) + \bm{C}\bm{f}_t - \bm{C}\bm{e}_{t+1}\Big]\\[2pt]
+&= \bm{x}_t^\top\Big[\bm{R}_{t+1} + \bm{C}\bm{f}_t + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big]\\[2pt]
+&= \bm{x}_t^\top\bm{R}^{fh}_{t+1}.
 \end{align*}
-The first-order currency terms $\pm\,\bm{x}_t^\T\bm{C}\bm{e}_{t+1}$ cancel, leaving the \emph{fully hedged asset return vector}
+The first-order currency terms $\pm\,\bm{x}_t^\top\bm{C}\bm{e}_{t+1}$ cancel, leaving the \emph{fully hedged asset return vector}
 \begin{equation*}
 \bm{R}^{fh}_{t+1}
 =
@@ -121,24 +528,20 @@ The first-order currency terms $\pm\,\bm{x}_t^\T\bm{C}\bm{e}_{t+1}$ cancel, leav
 More generally, define the \emph{net currency exposure} $\bm{\psi}_t \coloneqq \bm{w}_t-\bm{\upphi}_t$. Imposing $\sum_{c=0}^M \upphi_{c,t}=1$ gives $\sum_{c=0}^M \psi_{c,t}=0$, so the currency overlay is a zero-investment portfolio. Substituting $\bm{\upphi}_t=\bm{w}_t-\bm{\psi}_t$ into \eqref{eq:hedged-vector} expresses the hedged return in terms of net exposures,
 \begin{align}
 R^{h}_{\mathcal{P},t+1}
-&= \bm{x}_t^\T \bm{R}^{u}_{t+1} + (\bm{w}_t-\bm{\psi}_t)^\T(\bm{f}_t-\bm{e}_{t+1})\nonumber \\[2pt]
-&= \bm{x}_t^\T \bm{R}^{u}_{t+1} + \bm{w}_t^\T(\bm{f}_t-\bm{e}_{t+1}) + \bm{\psi}_t^\T(\bm{e}_{t+1}-\bm{f}_t) \nonumber\\[2pt]
-&= \bm{x}_t^\T \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\T(\bm{e}_{t+1}-\bm{f}_t),
+&= \bm{x}_t^\top \bm{R}^{u}_{t+1} + (\bm{w}_t-\bm{\psi}_t)^\top(\bm{f}_t-\bm{e}_{t+1})\nonumber \\[2pt]
+&= \bm{x}_t^\top \bm{R}^{u}_{t+1} + \bm{w}_t^\top(\bm{f}_t-\bm{e}_{t+1}) + \bm{\psi}_t^\top(\bm{e}_{t+1}-\bm{f}_t) \nonumber\\[2pt]
+&= \bm{x}_t^\top \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top(\bm{e}_{t+1}-\bm{f}_t),
 \label{eq:hedged-net}
 \end{align}
 
 which we adopt throughout the following portfolio optimization formulations, as it makes the asset weights $\bm{x}_t$ and the net currency exposures $\bm{\psi}_t$ the explicit variables of the optimization.
 
-\section{Mean--Risk Portfolio Optimization} \label{sec:mean-risk-portfolio-optimization}
+\section{Regularized Multi-Currency Portfolio Optimization}\label{sec:regularized-multi-currency}
 
-\section{Variance and Semi-Variance} \label{sec:mv-smv-formulation}
+\subsection{Regularization}\label{sec:regularization}
 
-\section{Mean Absolute Deviation} \label{sec:mad-formulation}
+\subsection{Sequential Optimization}\label{sec:sequential-optimization}
 
+\subsection{Joint Optimization}\label{sec:joint-optimization}
 
-\section{Expected Shortfall and Second Order Expected Shortfall} \label{sec:es-soes-formulation}
-
-
-
-
-
+\section{Mean-Risk Portfolio Optimization} \label{sec:mean-risk-portfolio-optimization}

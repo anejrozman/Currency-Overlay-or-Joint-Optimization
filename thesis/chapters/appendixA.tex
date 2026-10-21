@@ -31,7 +31,7 @@ distribution over all levels above the confidence level \cite{acerbi2002coherenc
 \newpage
 Define the loss random variable at time $t+1$, given portfolio weights $\bm{x}_t\in\mathbb{R}^N$, as $L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$, where $\bm{R}_{t+1}\in\mathbb{R}^N$ is the asset return vector. Let $f(l)$ denote the probability density function of the loss $L(\bm{x}_t)$.\ The VaR at confidence level $\beta$ is defined as the $\beta$-quantile of the loss distribution
 \begin{equation*}
-    \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha : \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
+    \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha \mid \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
 \end{equation*}
 
 The Expected Shortfall at confidence level $\beta$ is defined as the conditional expectation of losses exceeding $\text{VaR}_\beta$
