@@ -29,7 +29,7 @@ between the two optimization approaches over time. In \Cref{app:additional-backt
 realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of all
 optimizers in this chapter.
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -82,7 +82,6 @@ optimizers in this chapter.
   \caption{Out-of-sample performance of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-baseline}.}
   \label{tab:baseline}
 \end{table}
-\vspace{0.8em}
 
 Across all five risk measures and universe sizes, the overlay and joint optimizers achieve substantially lower
 volatility than the equally weighted portfolio. In the small universe, their volatility ranges from $7.71\%$ to $9.17\%$,
@@ -129,21 +128,21 @@ amounts, with excess returns differing by at most $0.5$ percentage points, maxim
 percentage points, and Sharpe ratios by at most $0.07$. However, the sign of these differences changes across risk measures within every universe, so one optimization approach does not consistently outperform the other. 
 
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
   \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top10.pdf}
   \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy). The top panel shows the cumulative wealth of the joint optimizer of each risk measure and of the equally weighted portfolio (EW), and the bottom panel the cumulative sum of the daily return differences between the joint and the overlay optimizers. Portfolios are rebalanced quarterly, and returns are net of transaction costs. The performance metrics are reported in Panel A of \Cref{tab:baseline}.}
   \label{fig:baseline-top10}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
   \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top50.pdf}
   \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy). Panels  are as in \Cref{fig:baseline-top10}. The performance metrics are reported in Panel B of \Cref{tab:baseline}.}
   \label{fig:baseline-top50}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
   \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/unregularized_top100.pdf}
   \caption{Cumulative performance of the unregularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy). Panels are as in \Cref{fig:baseline-top10}. The performance metrics are reported in Panel C of \Cref{tab:baseline}.}
@@ -178,7 +177,7 @@ benchmarks for optimizing only the asset weights under the same risk measures, w
 and \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} report 
 performance metrics of the regularized optimizers and the three benchmarks.
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{l*{6}{c}}
@@ -222,7 +221,7 @@ lookback window, which becomes more important when the number of assets increase
 window. The unregularized second-order Expected Shortfall optimizers are the least stable, since the measure is driven by
 the squared losses of the few most extreme observations in the lookback window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -262,7 +261,7 @@ the squared losses of the few most extreme observations in the lookback window. 
   \label{tab:regularized-top10}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -302,7 +301,7 @@ the squared losses of the few most extreme observations in the lookback window. 
   \label{tab:regularized-top50}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -367,23 +366,23 @@ benefits of active currency management in larger universes, where equity risk is
 reduced further and currency risk makes up a larger share of the portfolio's
 total risk.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/regularized_top10.pdf}
   \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy). The top panel shows the cumulative wealth of the joint optimizer of each risk measure and of the equally weighted portfolio (EW), and the bottom panel the cumulative sum of the daily return differences between the joint and the overlay optimizers. Portfolios are rebalanced quarterly, and returns are net of transaction costs. The performance metrics are reported in \Cref{tab:regularized-top10}.}
   \label{fig:regularized-top10}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/regularized_top50.pdf}
   \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy). Panels are as in \Cref{fig:regularized-top10}. The performance metrics are reported in \Cref{tab:regularized-top50}.}
   \label{fig:regularized-top50}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.72\textwidth]{../results/figures/cumulative_and_difference/regularized_top100.pdf}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/regularized_top100.pdf}
   \caption{Cumulative performance of the regularized joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy). Panels are as in \Cref{fig:regularized-top10}. The performance metrics are reported in \Cref{tab:regularized-top100}.}
   \label{fig:regularized-top100}
 \end{figure}
@@ -423,7 +422,7 @@ negative forward premium, that is, the difference between the foreign and the US
 change in the Sharpe ratio from adding the mean term, and \Cref{tab:mean-risk} reports the performance
 metrics.
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{l*{6}{c}}
@@ -475,7 +474,7 @@ the variance and semi-variance optimizers to two to three times its previous lev
 optimizers it remains stable around its previous level. We analyze the implicit risk-return tradeoff of the tail measures in more detail in
 \Cref{sec:mechanism-level}.
 
-\begin{table}[H]
+\begin{table}[tbp]
   \centering
   \setlength{\tabcolsep}{4pt}
   \scalebox{0.82}{%
@@ -554,23 +553,23 @@ comparison focused on downside risk does not change the conclusion.
 % currency returns passively by leaving the entire currency exposure unhedged, whereas the mean-risk optimizers take
 % currency exposure selectively and earn more at a lower risk.
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/w_mean_top10.pdf}
   \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the small investable universe (top 10 stocks per economy). The top panel shows the cumulative wealth of the joint optimizer of each risk measure and of the equally weighted portfolio (EW), and the bottom panel the cumulative sum of the daily return differences between the joint and the overlay optimizers. Portfolios are rebalanced quarterly, and returns are net of transaction costs. The performance metrics are reported in Panel A of \Cref{tab:mean-risk}.}
   \label{fig:mean-risk-top10}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/w_mean_top50.pdf}
   \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the medium investable universe (top 50 stocks per economy). Panels are as in \Cref{fig:mean-risk-top10}.  The performance metrics are reported in Panel B of \Cref{tab:mean-risk}.}
   \label{fig:mean-risk-top50}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[tbp]
   \centering
-  \includegraphics[width=0.70\textwidth]{../results/figures/cumulative_and_difference/w_mean_top100.pdf}
+  \includegraphics[width=0.75\textwidth]{../results/figures/cumulative_and_difference/w_mean_top100.pdf}
   \caption{Cumulative performance of the mean-risk joint optimizers and their return difference to the overlay optimizers in the large investable universe (top 100 stocks per economy). Panels are as in \Cref{fig:mean-risk-top10}.  The performance metrics are reported in Panel C of \Cref{tab:mean-risk}.}
   \label{fig:mean-risk-top100}
 \end{figure}

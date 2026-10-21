@@ -23,71 +23,71 @@
 \contentsline {subsection}{\numberline {4.2.3}Performance Evaluation Metrics}{13}{subsection.4.2.3}%
 \contentsline {chapter}{\chapternumberline {5}Empirical Analysis}{16}{chapter.5}%
 \contentsline {section}{\numberline {5.1}Baseline Backtest Results}{16}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Regularization}{21}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Mean-Risk Optimization}{27}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Summary}{32}{section.5.4}%
-\contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{34}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Advantage of Joint Optimization for Risk Minimization}{34}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Tail Measures}{38}{section.6.2}%
-\contentsline {subsection}{\numberline {6.2.1}Level Analysis}{38}{subsection.6.2.1}%
-\contentsline {subsection}{\numberline {6.2.2}De-meaning the Tail Measures}{39}{subsection.6.2.2}%
-\contentsline {section}{\numberline {6.3}Deviation Measures}{40}{section.6.3}%
-\contentsline {section}{\numberline {6.4}Summary}{41}{section.6.4}%
-\contentsline {chapter}{\chapternumberline {7}Conclusion}{42}{chapter.7}%
-\contentsline {section}{\numberline {7.1}Findings}{42}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Limitations and Future Research}{44}{section.7.2}%
-\contentsline {chapter}{Appendices}{45}{section*.3}%
-\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall and Second-Order Expected Shortfall}{46}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Auxiliary Formulations of Expected Shortfall and Second-Order Expected Shortfall}{46}{section.A.1}%
-\contentsline {subsection}{\numberline {A.1.1}Expected Shortfall}{46}{subsection.A.1.1}%
-\contentsline {subsection}{\numberline {A.1.2}Second-Order Expected Shortfall}{48}{subsection.A.1.2}%
-\contentsline {section}{\numberline {A.2}Representation for Portfolio Optimization}{49}{section.A.2}%
-\contentsline {subsection}{\numberline {A.2.1}Expected Shortfall}{49}{subsection.A.2.1}%
-\contentsline {subsection}{\numberline {A.2.2}Second-Order Expected Shortfall}{50}{subsection.A.2.2}%
-\contentsline {section}{\numberline {A.3}Regularization}{51}{section.A.3}%
-\contentsline {subsection}{\numberline {A.3.1}$L^1$ Regularization}{51}{subsection.A.3.1}%
-\contentsline {subsection}{\numberline {A.3.2}$L^2$ Regularization}{51}{subsection.A.3.2}%
-\contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{52}{subsection.A.3.3}%
-\contentsline {subsection}{\numberline {A.3.4}Expected Shortfall}{52}{subsection.A.3.4}%
-\contentsline {subsection}{\numberline {A.3.5}Second-Order Expected Shortfall}{52}{subsection.A.3.5}%
-\contentsline {section}{\numberline {A.4}Sequential Optimization}{53}{section.A.4}%
-\contentsline {subsection}{\numberline {A.4.1}Currency Overlay under Expected Shortfall}{54}{subsection.A.4.1}%
-\contentsline {subsection}{\numberline {A.4.2}Currency Overlay under Second-Order Expected Shortfall}{54}{subsection.A.4.2}%
-\contentsline {section}{\numberline {A.5}Joint Optimization}{55}{section.A.5}%
-\contentsline {subsection}{\numberline {A.5.1}Joint Optimization under Expected Shortfall}{56}{subsection.A.5.1}%
-\contentsline {subsection}{\numberline {A.5.2}Joint Optimization under Second-Order Expected Shortfall}{56}{subsection.A.5.2}%
-\contentsline {section}{\numberline {A.6}Mean-Risk Optimization}{57}{section.A.6}%
-\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Variance and Semi-Variance}{59}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Definitions and Convexity}{59}{section.B.1}%
-\contentsline {section}{\numberline {B.2}Representation for Portfolio Optimization}{60}{section.B.2}%
-\contentsline {subsection}{\numberline {B.2.1}Variance}{60}{subsection.B.2.1}%
-\contentsline {subsection}{\numberline {B.2.2}Semi-Variance}{60}{subsection.B.2.2}%
-\contentsline {section}{\numberline {B.3}Regularization}{61}{section.B.3}%
-\contentsline {subsection}{\numberline {B.3.1}Variance}{61}{subsection.B.3.1}%
-\contentsline {subsection}{\numberline {B.3.2}Semi-Variance}{62}{subsection.B.3.2}%
-\contentsline {section}{\numberline {B.4}Sequential Optimization}{63}{section.B.4}%
-\contentsline {subsection}{\numberline {B.4.1}Currency Overlay under Variance}{63}{subsection.B.4.1}%
-\contentsline {subsection}{\numberline {B.4.2}Currency Overlay under Semi-Variance}{64}{subsection.B.4.2}%
-\contentsline {section}{\numberline {B.5}Joint Optimization}{65}{section.B.5}%
-\contentsline {subsection}{\numberline {B.5.1}Joint Optimization under Variance}{65}{subsection.B.5.1}%
-\contentsline {subsection}{\numberline {B.5.2}Joint Optimization under Semi-Variance}{66}{subsection.B.5.2}%
-\contentsline {section}{\numberline {B.6}Mean-Risk Optimization}{67}{section.B.6}%
-\contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{68}{appendix.C}%
-\contentsline {section}{\numberline {C.1}Definition and Representation for Portfolio Optimization}{68}{section.C.1}%
-\contentsline {section}{\numberline {C.2}Regularization}{69}{section.C.2}%
-\contentsline {section}{\numberline {C.3}Sequential Optimization}{70}{section.C.3}%
-\contentsline {section}{\numberline {C.4}Joint Optimization}{71}{section.C.4}%
-\contentsline {section}{\numberline {C.5}Mean-Risk Optimization}{73}{section.C.5}%
-\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{75}{appendix.D}%
-\contentsline {appendix}{\chapternumberline {E}Numerical Implementation and Analysis of the Optimization Problems}{78}{appendix.E}%
-\contentsline {section}{\numberline {E.1}The CVXPY Library}{78}{section.E.1}%
-\contentsline {section}{\numberline {E.2}Numerical Implementation}{80}{section.E.2}%
-\contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{81}{section.E.3}%
-\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{84}{appendix.F}%
-\contentsline {appendix}{\chapternumberline {G}Additional Results}{86}{appendix.G}%
-\contentsline {section}{\numberline {G.1}Hyperparameter Grids}{86}{section.G.1}%
-\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{90}{section.G.2}%
-\contentsline {section}{\numberline {G.3}Risk Aversion Calibration}{93}{section.G.3}%
-\contentsline {section}{\numberline {G.4}Drawdown Analysis}{94}{section.G.4}%
-\contentsline {section}{\numberline {G.5}Additional Backtest Performance Results}{97}{section.G.5}%
-\contentsline {chapter}{Bibliography}{103}{appendix*.5}%
+\contentsline {section}{\numberline {5.2}Regularization}{20}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Mean-Risk Optimization}{25}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Summary}{30}{section.5.4}%
+\contentsline {chapter}{\chapternumberline {6}Joint versus Sequential Optimization}{32}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Advantage of Joint Optimization for Risk Minimization}{32}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Tail Measures}{36}{section.6.2}%
+\contentsline {subsection}{\numberline {6.2.1}Level Analysis}{36}{subsection.6.2.1}%
+\contentsline {subsection}{\numberline {6.2.2}De-meaning the Tail Measures}{37}{subsection.6.2.2}%
+\contentsline {section}{\numberline {6.3}Deviation Measures}{38}{section.6.3}%
+\contentsline {section}{\numberline {6.4}Summary}{39}{section.6.4}%
+\contentsline {chapter}{\chapternumberline {7}Conclusion}{40}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Findings}{40}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Limitations and Future Research}{42}{section.7.2}%
+\contentsline {chapter}{Appendices}{43}{section*.3}%
+\contentsline {appendix}{\chapternumberline {A}Optimization Derivation: Expected Shortfall and Second-Order Expected Shortfall}{44}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Auxiliary Formulations of Expected Shortfall and Second-Order Expected Shortfall}{44}{section.A.1}%
+\contentsline {subsection}{\numberline {A.1.1}Expected Shortfall}{44}{subsection.A.1.1}%
+\contentsline {subsection}{\numberline {A.1.2}Second-Order Expected Shortfall}{46}{subsection.A.1.2}%
+\contentsline {section}{\numberline {A.2}Representation for Portfolio Optimization}{47}{section.A.2}%
+\contentsline {subsection}{\numberline {A.2.1}Expected Shortfall}{47}{subsection.A.2.1}%
+\contentsline {subsection}{\numberline {A.2.2}Second-Order Expected Shortfall}{48}{subsection.A.2.2}%
+\contentsline {section}{\numberline {A.3}Regularization}{49}{section.A.3}%
+\contentsline {subsection}{\numberline {A.3.1}$L^1$ Regularization}{49}{subsection.A.3.1}%
+\contentsline {subsection}{\numberline {A.3.2}$L^2$ Regularization}{49}{subsection.A.3.2}%
+\contentsline {subsection}{\numberline {A.3.3}Leverage Constraint}{50}{subsection.A.3.3}%
+\contentsline {subsection}{\numberline {A.3.4}Expected Shortfall}{50}{subsection.A.3.4}%
+\contentsline {subsection}{\numberline {A.3.5}Second-Order Expected Shortfall}{50}{subsection.A.3.5}%
+\contentsline {section}{\numberline {A.4}Sequential Optimization}{51}{section.A.4}%
+\contentsline {subsection}{\numberline {A.4.1}Currency Overlay under Expected Shortfall}{52}{subsection.A.4.1}%
+\contentsline {subsection}{\numberline {A.4.2}Currency Overlay under Second-Order Expected Shortfall}{52}{subsection.A.4.2}%
+\contentsline {section}{\numberline {A.5}Joint Optimization}{53}{section.A.5}%
+\contentsline {subsection}{\numberline {A.5.1}Joint Optimization under Expected Shortfall}{54}{subsection.A.5.1}%
+\contentsline {subsection}{\numberline {A.5.2}Joint Optimization under Second-Order Expected Shortfall}{54}{subsection.A.5.2}%
+\contentsline {section}{\numberline {A.6}Mean-Risk Optimization}{55}{section.A.6}%
+\contentsline {appendix}{\chapternumberline {B}Optimization Derivation: Variance and Semi-Variance}{57}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Definitions and Convexity}{57}{section.B.1}%
+\contentsline {section}{\numberline {B.2}Representation for Portfolio Optimization}{58}{section.B.2}%
+\contentsline {subsection}{\numberline {B.2.1}Variance}{58}{subsection.B.2.1}%
+\contentsline {subsection}{\numberline {B.2.2}Semi-Variance}{58}{subsection.B.2.2}%
+\contentsline {section}{\numberline {B.3}Regularization}{59}{section.B.3}%
+\contentsline {subsection}{\numberline {B.3.1}Variance}{59}{subsection.B.3.1}%
+\contentsline {subsection}{\numberline {B.3.2}Semi-Variance}{60}{subsection.B.3.2}%
+\contentsline {section}{\numberline {B.4}Sequential Optimization}{61}{section.B.4}%
+\contentsline {subsection}{\numberline {B.4.1}Currency Overlay under Variance}{61}{subsection.B.4.1}%
+\contentsline {subsection}{\numberline {B.4.2}Currency Overlay under Semi-Variance}{62}{subsection.B.4.2}%
+\contentsline {section}{\numberline {B.5}Joint Optimization}{63}{section.B.5}%
+\contentsline {subsection}{\numberline {B.5.1}Joint Optimization under Variance}{63}{subsection.B.5.1}%
+\contentsline {subsection}{\numberline {B.5.2}Joint Optimization under Semi-Variance}{64}{subsection.B.5.2}%
+\contentsline {section}{\numberline {B.6}Mean-Risk Optimization}{65}{section.B.6}%
+\contentsline {appendix}{\chapternumberline {C}Optimization Derivation: Mean Absolute Deviation}{66}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Definition and Representation for Portfolio Optimization}{66}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Regularization}{67}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Sequential Optimization}{68}{section.C.3}%
+\contentsline {section}{\numberline {C.4}Joint Optimization}{69}{section.C.4}%
+\contentsline {section}{\numberline {C.5}Mean-Risk Optimization}{71}{section.C.5}%
+\contentsline {appendix}{\chapternumberline {D}Coherent Risk Measures and Deviation Measures}{73}{appendix.D}%
+\contentsline {appendix}{\chapternumberline {E}Numerical Implementation and Analysis of the Optimization Problems}{76}{appendix.E}%
+\contentsline {section}{\numberline {E.1}The CVXPY Library}{76}{section.E.1}%
+\contentsline {section}{\numberline {E.2}Numerical Implementation}{78}{section.E.2}%
+\contentsline {section}{\numberline {E.3}Computational Complexity and Performance}{79}{section.E.3}%
+\contentsline {appendix}{\chapternumberline {F}Transaction Costs}{82}{appendix.F}%
+\contentsline {appendix}{\chapternumberline {G}Additional Results}{84}{appendix.G}%
+\contentsline {section}{\numberline {G.1}Hyperparameter Grids}{84}{section.G.1}%
+\contentsline {section}{\numberline {G.2}Portfolio Sparsity Analysis}{88}{section.G.2}%
+\contentsline {section}{\numberline {G.3}Risk Aversion Calibration}{91}{section.G.3}%
+\contentsline {section}{\numberline {G.4}Drawdown Analysis}{92}{section.G.4}%
+\contentsline {section}{\numberline {G.5}Additional Backtest Performance Results}{95}{section.G.5}%
+\contentsline {chapter}{Bibliography}{101}{appendix*.5}%
