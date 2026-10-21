@@ -181,7 +181,7 @@ the portfolio optimization problem \eqref{eq:empirical_es} can be written as a l
     & \bm{A} \tilde{\bm{x}}_t =
     \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q \end{bmatrix}
     \tilde{\bm{x}}_t \le \bm{b} = \bm{0}_q, \\[2pt]
-    & \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q.
+    & u_k \ge 0 \quad \text{for } k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+1)}$ encodes the budget constraint, while
@@ -247,7 +247,7 @@ the portfolio optimization problem \eqref{eq:empirical_soes} can be written as a
     \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_q \end{bmatrix}
     \tilde{\bm{x}}_t \le \bm{b} = \bm{0}_q, \\[2pt]
     & \|\bm{u}\|_2 \le s, \\[2pt]
-    & \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q.
+    & u_k \ge 0 \quad \text{for } k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+2)}$ and $\bm{A} \in \mathbb{R}^{q \times (N+q+2)}$ are the constraint
@@ -346,7 +346,7 @@ The portfolio optimization problem under Expected Shortfall then becomes a quadr
     \begin{bmatrix} -\bm{R}^{\text{data}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times N} & \bm{0}_{q \times N} \\
     \bm{0}_N^\top & 0 & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top \end{bmatrix} \tilde{\bm{x}}_t
     \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
-     \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+     & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
@@ -390,7 +390,7 @@ with a convex quadratic objective
     \bm{0}_N^\top & 0 & \bm{0}_q^\top & \bm{1}_N^\top & \bm{1}_N^\top & 0 \end{bmatrix} \tilde{\bm{x}}_t
     \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
      \|\bm{u}\|_2 &\le s, \\[2pt]
-     \alpha \ge 0, & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
+     & \quad u_k \ge 0,\quad \Delta_{i,t}^- \ge 0,\quad \Delta_{i,t}^+ \ge 0
     \quad \text{for } i = 1, \dots, N,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
@@ -479,7 +479,7 @@ The currency overlay optimization under Expected Shortfall then becomes a quadra
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
     \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_P, \\[4pt]
-    \alpha_\psi \ge 0, & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
+    & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
@@ -521,7 +521,7 @@ a convex quadratic objective
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} & \bm{0}_q \end{bmatrix}
     \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_P, \\[4pt]
     \|\bm{u}_\psi\|_2 &\le s_\psi, \\[2pt]
-    \alpha_\psi \ge 0, & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
+    & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
@@ -633,7 +633,7 @@ constraints
     \begin{bmatrix} -\bm{R}^{\text{all}} & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times (N+M)} & \bm{0}_{q \times (N+M)} \\
     \bm{0}_{N+M}^\top & 0 & \bm{0}_q^\top & \bm{q}_{N,M}^\top & \bm{q}_{N,M}^\top \end{bmatrix} \tilde{\bm{\theta}}_t
     \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
-    & \quad \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
+    & \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
     & \quad \Delta_{x,i,t}^\pm \ge 0,\quad \Delta_{\psi,c,t}^\pm \ge 0
     \quad \text{for } i = 1, \dots, N,\ c = 1, \dots, M.
 \end{aligned}
@@ -686,7 +686,7 @@ program with a convex quadratic objective
     \bm{0}_{N+M}^\top & 0 & \bm{0}_q^\top & \bm{q}_{N,M}^\top & \bm{q}_{N,M}^\top & 0 \end{bmatrix} \tilde{\bm{\theta}}_t
     \le \tilde{\bm{b}} = \begin{bmatrix} \bm{0}_q \\ \ell^a \end{bmatrix}, \\[6pt]
     \|\bm{u}\|_2 &\le s, \\[2pt]
-    & \quad \alpha \ge 0, \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
+    & \quad u_k \ge 0 \quad \text{for } k = 1, \dots, q, \\[2pt]
     & \quad \Delta_{x,i,t}^\pm \ge 0,\quad \Delta_{\psi,c,t}^\pm \ge 0
     \quad \text{for } i = 1, \dots, N,\ c = 1, \dots, M.
 \end{aligned}
