@@ -87,7 +87,7 @@ trades off the estimation error of the one against the bias of the other. Ledoit
 target, which keeps the sample variances of the assets and replaces every pairwise correlation by the average sample
 correlation.
 
-To define the estimator, let $y_{k,i}$ denote the $i$th entry of $\bm{y}_k$, $\bar{y}_i$ the $i$th entry of
+To define the estimator, let $y_{k,i}$ denote the $i$-th entry of $\bm{y}_k$, $\bar{y}_i$ the $i$-th entry of
 $\bar{\bm{y}}$, and $\mathring{y}_{k,i} = y_{k,i} - \bar{y}_i$ the demeaned return of asset $i$ in realization $k$. We
 suppress the dependence on $t$ of the scalar quantities that follow. The sample covariance matrix $\bar{\bm{\Sigma}}_t$
 has the entries
@@ -406,26 +406,33 @@ international investor, however, holds assets denominated in several currencies,
 also depend on the exchange rates and on the currency positions that the investor takes to hedge them. All five risk
 measures are evaluated on the portfolio return in the domestic currency, so before we can formulate the multi-currency
 programs, we have to express this return in terms of the asset weights and the currency positions. In the next section
-we derive this representation, without assuming any underyling model for the joint distribution of asset and currency returns.
+we derive this representation, without assuming any underlying model for the joint distribution of asset and currency returns.
 
 \section{Model-Free Multi-Currency Portfolio Returns}\label{sec:returns}
+
+Burkhardt and Ulrych \cite{SparseAndStableInternationalPortfolioOptimization} express the return of an international
+portfolio in the domestic currency in terms of its asset weights and currency positions, and use this representation for
+regularized mean-variance optimization, with the currency positions chosen either jointly with the asset weights or after
+them. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} apply the same representation to
+Expected Shortfall portfolios, and we follow their derivation and notation.
+
 \subsection{Unhedged Portfolio Returns}
 
-We consider an international investor who allocates their wealth across $N$ assets denominated in up to $M+1$ currencies. We fix a discrete time index $t\in\{0,1,2,\dots\}$ and one investment period from $t$ to $t{+}1$. Let the investor's \emph{domestic currency} be indexed by $0$ and let the remaining $M$ foreign currencies be indexed by $\mathcal{C} \coloneqq \{1,2,\dots,M\}$.
+We consider an international investor who allocates their wealth across $N$ assets denominated in up to $M+1$ currencies. Let the investor's domestic currency be indexed by $0$ and let the remaining $M$ foreign currencies be indexed by $\mathcal{C} = \{1,2,\dots,M\}$.
 
-Let $P_{i,t}>0$ be the price of asset $i$ at time $t$ in its local currency $c_i \in \mathcal{C}\cup \{0\}$. Define the corresponding \emph{simple local-currency asset return} over $(t,t{+}1]$ as
+Let $P_{i,t}>0$ be the price of asset $i$ at time $t$ in its local currency $c_i \in \mathcal{C}\cup \{0\}$. Define the corresponding simple local-currency asset return over the period from $t$ to $t+1$ as
 \begin{equation*}
-R_{i,t+1} \coloneqq \frac{P_{i,t+1}-P_{i,t}}{P_{i,t}}.
+R_{i,t+1} = \frac{P_{i,t+1}-P_{i,t}}{P_{i,t}}.
 \end{equation*}
-Thus $P_{i,t+1}=P_{i,t}(1+R_{i,t+1})$.
+Thus $P_{i,t+1}=P_{i,t}(1+R_{i,t+1})$. For a domestic asset, $R_{i,t+1}$ is also the return in the domestic currency, as in the previous section.
 
-For each foreign currency $c\in\mathcal{C}$, let $S_{c,t} > 0$ denote the exchange rate at time $t$, quoted as units of domestic currency per one unit of foreign currency $c$. The associated \emph{simple currency return} over $(t,t{+}1]$ is
+For each foreign currency $c\in\mathcal{C}$, let $S_{c,t} > 0$ denote the exchange rate at time $t$, quoted as units of domestic currency per unit of foreign currency $c$. The associated simple currency return over the period from $t$ to $t+1$ is
 \begin{equation*}
-e_{c,t+1} \coloneqq \frac{S_{c,t+1}-S_{c,t}}{S_{c,t}}.
+e_{c,t+1} = \frac{S_{c,t+1}-S_{c,t}}{S_{c,t}}.
 \end{equation*}
 Equivalently, $S_{c,t+1} = S_{c,t}(1+e_{c,t+1})$. For the domestic currency, we set $S_{0,t}\equiv 1$ and $e_{0,t+1}\equiv 0$.
 
-The domestic-currency value of holding one unit of asset $i$ at time $t$ is $P_{i,t}\,S_{c_i,t}$. Therefore, the \emph{unhedged domestic-currency simple return} of asset $i$ is
+The domestic-currency value of holding one unit of asset $i$ at time $t$ is $P_{i,t}\,S_{c_i,t}$. Therefore, the unhedged return of asset $i$ in the domestic currency is
 \begin{align}
 R^{u}_{i,t+1}
 &=
@@ -439,21 +446,22 @@ R_{i,t+1} + e_{c_i,t+1} + R_{i,t+1}\,e_{c_i,t+1}.
 \label{eq:unhedged-asset-return}
 \end{align}
 
-Let $\bm{x}_t\in\R^N$ be the vector of asset portfolio weights chosen at time $t$ and held until $t{+}1$, where $x_{i,t}$ is the fraction of total portfolio value invested in asset $i$ at time $t$. We impose the standard budget constraint $\bm{1}_N^\top \bm{x}_t = 1$.
+Again, as in the previous section, we denote the portfolio weights at time $t$ by $\bm{x}_t = [x_{1,t}, \dots, x_{N,t}]^\top$, with $x_{i,t}$ the fraction of total portfolio value invested in asset $i$. 
+And we impose the budget constraint $\bm{1}_N^\top \bm{x}_t = 1$.
 
-Assuming no rebalancing between times $t$ and $t{+}1$, the domestic-currency portfolio's unhedged return is given by
+Assuming no rebalancing between times $t$ and $t+1$, the unhedged portfolio return in the domestic currency is given by
 \begin{equation*}
 R^{u}_{\mathcal{P},t+1} = \sum_{i=1}^N x_{i,t}\,R^{u}_{i,t+1}.
 \end{equation*}
 
 \subsection{Hedged Portfolio Returns}
 
-To manage currency risk, the investor can take positions in one-period currency forward contracts. For each foreign currency $c\in\mathcal{C}$, let $F_{c,t}$ be the forward rate quoted at time $t$ for settlement at $t{+}1$, in units of domestic currency per unit of foreign currency $c$. We define the \emph{forward premium} by
+To manage currency risk, the investor can take positions in one-period currency forward contracts. For each foreign currency $c\in\mathcal{C}$, let $F_{c,t}$ be the forward rate quoted at time $t$ for settlement at $t+1$, in units of domestic currency per unit of foreign currency $c$. We define the forward premium by
 \begin{equation*}
-f_{c,t} \coloneqq \frac{F_{c,t}-S_{c,t}}{S_{c,t}}.
+f_{c,t} = \frac{F_{c,t}-S_{c,t}}{S_{c,t}}.
 \end{equation*}
 
-The investor hedges by selling foreign currency forward. Let $\upphi_{c,t}$ denote the relative notional of the \emph{short} forward position in currency $c$ at time $t$, expressed as a fraction of total portfolio value, with the convention that $\upphi_{c,t}>0$ corresponds to hedging. Per unit of notional, the short position pays $f_{c,t}-e_{c,t+1}$ in domestic currency over the period. Adding these forward payoffs to the unhedged asset returns, the \emph{hedged portfolio return} is
+The investor hedges by selling foreign currency forward. Let $\upphi_{c,t}$ denote the relative notional of the short forward position in currency $c$ at time $t$, expressed as a fraction of total portfolio value, with the convention that $\upphi_{c,t}>0$ corresponds to hedging. Per unit of notional, the short position pays $f_{c,t}-e_{c,t+1}$ in domestic currency over the period. Adding these forward payoffs to the unhedged asset returns, the hedged portfolio return is
 \begin{equation}
 R^{h}_{\mathcal{P},t+1}
 =
@@ -467,21 +475,21 @@ R^{h}_{\mathcal{P},t+1}
 
 To express the returns in a compact form suitable for optimization, we define the currency incidence matrix $\bm{C}\in\{0,1\}^{N\times M}$ by
 \begin{equation*}
-C_{i,c} \coloneqq
+C_{i,c} =
 \begin{cases}
 1, & \text{if asset $i$ is denominated in foreign currency $c$},\\
 0, & \text{otherwise}.
 \end{cases}
 \end{equation*}
-Each row of $\bm{C}$ has at most one nonzero entry, and the rows corresponding to domestic assets are identically zero. This allows us to define the portfolio's \emph{implicit foreign-currency exposure} as
+Each row of $\bm{C}$ has at most one nonzero entry, and the rows corresponding to domestic assets are identically zero. This allows us to define the portfolio's implicit foreign-currency exposure as
 \begin{equation*}
-\bm{w}_t \coloneqq \bm{C}^\top \bm{x}_t \in \R^M,
+\bm{w}_t = \bm{C}^\top \bm{x}_t \in \R^M,
 \qquad
 w_{c,t} = \sum_{i:\,c_i=c} x_{i,t},
 \end{equation*}
 such that $w_{c,t}$ is the total portfolio weight invested in assets denominated in currency $c$. The implicit domestic exposure follows residually as $w_{0,t} = 1 - \bm{1}_M^\top \bm{w}_t$, since the asset weights sum to one.
 
-We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premiums as $\bm{f}_t \in \R^M$. The product $\bm{C}\bm{e}_{t+1}\in\R^N$ aligns currency returns to assets, with $i$th component $e_{c_i,t+1}$ for foreign assets and $0$ for domestic ones. Using \eqref{eq:unhedged-asset-return}, the vector of \emph{unhedged domestic returns} across assets can be written as
+We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premia as $\bm{f}_t \in \R^M$. The product $\bm{C}\bm{e}_{t+1}\in\R^N$ aligns currency returns to assets, with $i$-th component $e_{c_i,t+1}$ for foreign assets and $0$ for domestic ones. Using \eqref{eq:unhedged-asset-return}, the vector of unhedged asset returns in the domestic currency can be written as
 \begin{equation*}
 \bm{R}^{u}_{t+1}
 =
@@ -499,7 +507,7 @@ R^{h}_{\mathcal{P},t+1} = \bm{x}_t^\top \bm{R}^{u}_{t+1} + \bm{\upphi}_t^\top(\b
 \label{eq:hedged-vector}
 \end{equation}
 
-Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\top\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this together with the unhedged return vector into \eqref{eq:hedged-vector}, the \emph{fully hedged portfolio return} is
+Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\top\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this together with the unhedged return vector into \eqref{eq:hedged-vector}, the fully hedged portfolio return is
 \begin{align*}
 R^{fh}_{\mathcal{P},t+1}
 &= \bm{x}_t^\top\bm{R}^{u}_{t+1} + \big(\bm{C}^\top\bm{x}_t\big)^\top(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
@@ -508,7 +516,7 @@ R^{fh}_{\mathcal{P},t+1}
 &= \bm{x}_t^\top\Big[\bm{R}_{t+1} + \bm{C}\bm{f}_t + \big(\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}\big)\Big]\\[2pt]
 &= \bm{x}_t^\top\bm{R}^{fh}_{t+1}.
 \end{align*}
-The first-order currency terms $\pm\,\bm{x}_t^\top\bm{C}\bm{e}_{t+1}$ cancel, leaving the \emph{fully hedged asset return vector}
+The first-order currency terms $\pm\,\bm{x}_t^\top\bm{C}\bm{e}_{t+1}$ cancel, leaving the fully hedged asset return vector
 \begin{equation*}
 \bm{R}^{fh}_{t+1}
 =
@@ -519,7 +527,7 @@ The first-order currency terms $\pm\,\bm{x}_t^\top\bm{C}\bm{e}_{t+1}$ cancel, le
 (\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}).
 \end{equation*}
 
-More generally, define the \emph{net currency exposure} $\bm{\psi}_t \coloneqq \bm{w}_t-\bm{\upphi}_t$. Imposing $\sum_{c=0}^M \upphi_{c,t}=1$ gives $\sum_{c=0}^M \psi_{c,t}=0$, so the currency overlay is a zero-investment portfolio. Substituting $\bm{\upphi}_t=\bm{w}_t-\bm{\psi}_t$ into \eqref{eq:hedged-vector} expresses the hedged return in terms of net exposures,
+More generally, define the net currency exposure $\bm{\psi}_t = \bm{w}_t-\bm{\upphi}_t$. Since a forward position in the domestic currency has no payoff, we can set the domestic position to $\upphi_{0,t} = 1 - \bm{1}_M^\top \bm{\upphi}_t$. The domestic net exposure is then $\psi_{0,t} = w_{0,t} - \upphi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$, so the net currency exposures sum to zero and form a zero-investment portfolio, the currency overlay. Substituting $\bm{\upphi}_t=\bm{w}_t-\bm{\psi}_t$ into \eqref{eq:hedged-vector} expresses the hedged return in terms of net exposures,
 \begin{align}
 R^{h}_{\mathcal{P},t+1}
 &= \bm{x}_t^\top \bm{R}^{u}_{t+1} + (\bm{w}_t-\bm{\psi}_t)^\top(\bm{f}_t-\bm{e}_{t+1})\nonumber \\[2pt]
@@ -527,8 +535,7 @@ R^{h}_{\mathcal{P},t+1}
 &= \bm{x}_t^\top \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top(\bm{e}_{t+1}-\bm{f}_t),
 \label{eq:hedged-net}
 \end{align}
-
-which we adopt throughout the following portfolio optimization formulations, as it makes the asset weights $\bm{x}_t$ and the net currency exposures $\bm{\psi}_t$ the explicit variables of the optimization.
+where $\bm{e}_{t+1} - \bm{f}_t$ is the vector of excess currency returns. We adopt this representation in all programs that follow, as it makes the asset weights $\bm{x}_t$ and the net currency exposures $\bm{\psi}_t$ the decision variables.
 
 \section{Regularized Multi-Currency Portfolio Optimization}\label{sec:regularized-multi-currency}
 
