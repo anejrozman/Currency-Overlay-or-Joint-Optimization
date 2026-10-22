@@ -296,13 +296,13 @@ Since Expected Shortfall measures losses rather than deviations from the mean, t
 $\bm{y}_k$ themselves instead of their deviations from the sample mean. We write the program in the standard form of a
 linear program in Appendix~\ref{app:lp_es}.
 
-At the optimum, only the realizations whose loss exceeds $\alpha^*$, which are about the $(1-\beta) q$ realizations with
+At the optimum, only the realizations whose loss exceeds $\alpha^*$, which are $(1-\beta) q$ realizations with
 the largest losses, contribute to the objective. The estimate of Expected Shortfall is therefore based on a fraction of the
 sample, and Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under Expected Shortfall are more
 sensitive to estimation error than those optimized under the variance and the mean absolute deviation. Goldberg et
 al.~\cite{goldberg2013minimizingshortfall} note that estimation error matters more for Expected Shortfall than for the
 variance, since most realizations only serve to determine which losses are the largest. The confidence level thus
-trades off the focus on the tail against the number of realizations that determine the estimate. We use $\beta = 0.8$,
+trades off the focus on the tail against the number of realizations that determine the estimate. We set $\beta = 0.8$,
 at which about $500$ of the $q \approx 2{,}500$ daily realizations contribute to the objective. Testing confidence levels from $60\%$ to $99\%$, Goldberg et al.~\cite{goldberg2013minimizingshortfall} also find
 that minimum Expected Shortfall portfolios outperform minimum-variance portfolios most at relatively low confidence
 levels, at which Expected Shortfall captures the asymmetry of the return distribution rather than its extreme losses.
@@ -321,8 +321,8 @@ the largest losses.
 \subsection{Second-Order Expected Shortfall}\label{sec:risk-soes}
 
 Second-order Expected Shortfall belongs to the family of higher-moment coherent risk measures of Krokhmal
-\cite{Krokhmal2007}, which measure the risk in the tail of the loss distribution through its higher moments and contain
-Expected Shortfall as the first-order member. The second-order member replaces the expected excess loss in the auxiliary
+\cite{Krokhmal2007}, which measure the risk in the tail of the loss distribution through its higher moments and also contain
+Expected Shortfall. The second-order formulation replaces the expected excess loss in the auxiliary
 function $F_\beta$ of \Cref{sec:risk-es} by its $L^2$ norm $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$, which gives the
 auxiliary function
 \begin{equation*}
@@ -334,10 +334,9 @@ and second-order Expected Shortfall at confidence level $\beta$ is defined as it
 \end{equation*}
 Since the $L^2$ norm squares the excess losses, large losses beyond $\alpha$ receive more weight than in Expected
 Shortfall. Krokhmal notes that second-order Expected Shortfall measures the risk in the tail through the second moment
-of the losses, which relates it to the mean-variance framework. In a case study on fifty S\&P~500 stocks with
-heavy-tailed returns, he finds that portfolios minimizing the higher-moment measures at the $90\%$ level outperform
-those minimizing Expected Shortfall or the variance out of sample when the required expected return is low, while the
-strategies perform similarly when it is high, and he stresses that the results are specific to the data.
+of the losses, which relates it to the mean-variance framework. In a case study on fifty S\&P~500 stocks, he finds that 
+portfolios minimizing the higher-moment measures at the $90\%$ level outperform
+those minimizing Expected Shortfall or the variance out of sample \cite{Krokhmal2007}.
 
 By definition, minimizing second-order Expected Shortfall is
 \begin{equation*}
@@ -346,11 +345,10 @@ By definition, minimizing second-order Expected Shortfall is
 where $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$, which we show in Appendix~\ref{app:soes_auxiliary}.
 
 With the historical realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref{sec:risk-variance}, we replace the $L^2$ norm in
-$G_\beta$ by its empirical counterpart
+$G_\beta$ by its empirical estimate
 $\bigl( \frac{1}{q} \sum_{k=1}^q \bigl( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \bigr)^2 \bigr)^{1/2}$. As for Expected
 Shortfall, we introduce for each realization $k$ an auxiliary variable $u_k \ge 0$ subject to
-$u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha$, so that the empirical norm becomes $\frac{1}{\sqrt{q}} \|\bm{u}\|_2$ and each
-$u_k$ equals $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ at the optimum. Since the objective is still not linear, we introduce
+$u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha$, so that the empirical norm becomes $\frac{1}{\sqrt{q}} \|\bm{u}\|_2$. Since the objective is still not linear, we introduce
 one more auxiliary variable $s$ subject to $\|\bm{u}\|_2 \le s$, which equals $\|\bm{u}\|_2$ at the optimum, and the
 second-order Expected Shortfall program is
 \begin{equation*}
@@ -369,19 +367,15 @@ Appendix~\ref{app:socp_soes}.
 
 The cone constraint makes the program harder to solve than the linear and quadratic programs of the other risk
 measures, and the second-order Expected Shortfall programs are computationally the most expensive programs in our
-backtests (Appendix~\ref{sec:computational-complexity}). We use the same confidence level $\beta = 0.8$ as for Expected
+backtests (see Appendix~\ref{sec:computational-complexity}). We use the same confidence level $\beta = 0.8$ as for Expected
 Shortfall, so that the two tail measures can be compared, and as for Expected Shortfall, the leverage constraint that we
 add later in this chapter bounds the positions and thereby ensures that the program has a solution.
 
-Expected Shortfall and second-order Expected Shortfall measure the size of the largest losses, whereas the variance,
-the semi-variance, and the mean absolute deviation measure deviations from the mean. We compare these two classes of
-risk measures next.
-
 \subsection{Coherent Risk Measures and Deviation Measures}\label{sec:coherent-and-deviation-measures}
-
-The five risk measures of this section fall into two classes, which differ in how they treat the location of the return
-distribution. To describe them, we write $X$ for the portfolio return $\bm{x}_t^\top \bm{R}_{t+1}$ and $C$ for a
-constant.
+Expected Shortfall and second-order Expected Shortfall measure the size of the largest losses, whereas the variance,
+the semi-variance, and the mean absolute deviation measure deviations from the mean.
+The five risk measures can be divided into two classes, which differ in how they treat the return
+distribution.
 
 Artzner et al.~\cite{CoherentMeasuresOfRisk} call a risk measure $\mathcal{R}$ coherent if it satisfies four
 properties. Adding a riskless amount to the return reduces the risk by that amount,
@@ -389,30 +383,30 @@ $\mathcal{R}(X + C) = \mathcal{R}(X) - C$, scaling the position by a positive fa
 factor, the risk of a combined position is at most the sum of the risks of its parts, so that diversification does not
 increase risk, and a return that is higher in every state of the world carries no more risk. VaR violates the third
 property, subadditivity, in general, whereas Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
-second-order Expected Shortfall \cite{Krokhmal2007} are coherent. Both are moreover strictly expectation bounded, that
+second-order Expected Shortfall \cite{Krokhmal2007} are coherent. Additionally, they are both strictly expectation bounded, that
 is, their risk exceeds the expected loss of every nonconstant return.
 
 Rockafellar et al.~\cite{RockafellarUryasevZabarankin2006} define deviation measures $\mathcal{D}$, which quantify
 the uncertainty of a return rather than its losses. They share positive homogeneity and subadditivity with coherent risk
 measures, are non-negative and zero only for constant returns, and replace the first property by translation
-invariance, $\mathcal{D}(X + C) = \mathcal{D}(X)$. The standard deviation, the semi-deviation, which is the square root
-of the semi-variance, and the mean absolute deviation are deviation measures. The variance and the semi-variance are the
+invariance, $\mathcal{D}(X + C) = \mathcal{D}(X)$. The standard deviation, the semi-deviation, and the mean absolute deviation are deviation measures.
+The variance and the semi-variance are the
 squares of the standard deviation and the semi-deviation, so they are not positively homogeneous and therefore not
-deviation measures themselves. They are, however, translation invariant, and since squaring is increasing on
-non-negative numbers, they have the same minimizers as the standard deviation and the semi-deviation.
+deviation measures themselves. They are, however, translation invariant, and they have the same minimizers as 
+the standard deviation and the semi-deviation.
 
 The two translation properties capture the difference between the classes. A deviation measure depends only on the
 dispersion of the return around its mean and is unaffected by a shift of the whole distribution, whereas a coherent
-risk measure decreases when the distribution shifts upward. We state the formal definitions of both classes and prove
-that Expected Shortfall and second-order Expected Shortfall are coherent and strictly expectation bounded in
-Appendix~\ref{app:demeaning}.
-
+risk measure decreases when the distribution shifts upward. This fundamental difference between the two classes of risk measures is reflected 
+in our empirical results in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. More technical details on coherent risk measures 
+and deviation measures are given in Appendix~\ref{app:demeaning}.
+ 
 So far, we have treated the asset returns as given and denominated in the investor's domestic currency. An
 international investor, however, holds assets denominated in several currencies, whose returns in the domestic currency
 also depend on the exchange rates and on the currency positions that the investor takes to hedge them. All five risk
 measures are evaluated on the portfolio return in the domestic currency, so before we can formulate the multi-currency
-programs, we have to express this return in terms of the asset weights and the currency positions. The next section
-derives this representation exactly, without assuming a model for the joint distribution of asset and currency returns.
+programs, we have to express this return in terms of the asset weights and the currency positions. In the next section
+we derive this representation, without assuming any underyling model for the joint distribution of asset and currency returns.
 
 \section{Model-Free Multi-Currency Portfolio Returns}\label{sec:returns}
 \subsection{Unhedged Portfolio Returns}
