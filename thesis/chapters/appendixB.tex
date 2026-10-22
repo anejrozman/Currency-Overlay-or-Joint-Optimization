@@ -351,15 +351,15 @@ For semi-variance, we use the empirical approximation of \Cref{app:mv_svar_qp} f
 in \Cref{app:separate-optimization}, let $\bm{R}^{fh}_k$ denote the $k$-th sampled fully hedged return vector, and
 $\bm{e}_k$ and $\bm{f}_k$ the $k$-th sampled currency return and forward premium vectors. We stack the sampled excess
 currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix $\bm{R}^c \in \mathbb{R}^{q \times M}$ and
-collect the fixed asset-portfolio returns in $\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the
-sample mean of the hedged portfolio returns $\bm{R}^{fh}_P + \bm{R}^c \bm{\psi}_t$ is linear in $\bm{\psi}_t$, their
-demeaned formulation is simply $\mathring{\bm{R}}^{fh}_P + \mathring{\bm{R}}^c \bm{\psi}_t$, where
-$\mathring{\bm{R}}^{fh}_P = \mathring{\bm{R}}^{fh} \bm{x}_t^*$. Introducing the auxiliary variables
+collect the fixed asset-portfolio returns in $\bm{R}^{fh}_{\mathcal{P}} = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the
+sample mean of the hedged portfolio returns $\bm{R}^{fh}_{\mathcal{P}} + \bm{R}^c \bm{\psi}_t$ is linear in $\bm{\psi}_t$, their
+demeaned formulation is simply $\mathring{\bm{R}}^{fh}_{\mathcal{P}} + \mathring{\bm{R}}^c \bm{\psi}_t$, where
+$\mathring{\bm{R}}^{fh}_{\mathcal{P}} = \mathring{\bm{R}}^{fh} \bm{x}_t^*$. Introducing the auxiliary variables
 $\bm{u}_\psi \ge \bm{0}_q$, the slack constraint \eqref{eq:svar_slack} becomes
 \begin{equation*}
-    \bm{u}_\psi \ge -\mathring{\bm{R}}^c \bm{\psi}_t - \mathring{\bm{R}}^{fh}_P
+    \bm{u}_\psi \ge -\mathring{\bm{R}}^c \bm{\psi}_t - \mathring{\bm{R}}^{fh}_{\mathcal{P}}
     \qquad \Longleftrightarrow \qquad
-    -\mathring{\bm{R}}^c \bm{\psi}_t - \bm{u}_\psi \le \mathring{\bm{R}}^{fh}_P.
+    -\mathring{\bm{R}}^c \bm{\psi}_t - \bm{u}_\psi \le \mathring{\bm{R}}^{fh}_{\mathcal{P}}.
 \end{equation*}
 The decision vector of the currency step is
 \begin{equation*}
@@ -391,7 +391,7 @@ The currency overlay optimization under semi-variance then becomes a quadratic p
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\mathring{\bm{R}}^c & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
-    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \mathring{\bm{R}}^{fh}_P, \\[4pt]
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \mathring{\bm{R}}^{fh}_{\mathcal{P}}, \\[4pt]
     u_{k,\psi} \ge 0, & \quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}

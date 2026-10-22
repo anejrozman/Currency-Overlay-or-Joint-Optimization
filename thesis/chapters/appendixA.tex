@@ -440,7 +440,7 @@ representation for the risk measures and the empirical approximation as in \Cref
 where $\bm{R}^{fh}_k$ is the $k$-th sampled fully hedged return vector, and $\bm{e}_k$ and $\bm{f}_k$ are the $k$-th
 sampled currency return and forward premium vectors. We stack the sampled excess currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix
 $\bm{R}^c \in \mathbb{R}^{q \times M}$ and collect the fixed asset-portfolio returns in
-$\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$.
+$\bm{R}^{fh}_{\mathcal{P}} = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$.
 
 The currency step has no budget constraint, since the currency overlay is a zero-investment portfolio whose domestic
 exposure $\psi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$ is inferred residually, and no leverage constraint is imposed on the
@@ -478,14 +478,14 @@ The currency overlay optimization under Expected Shortfall then becomes a quadra
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
-    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_P, \\[4pt]
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_{\mathcal{P}}, \\[4pt]
     & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}
 \end{equation}
 The $M$ rows of $\tilde{\bm{D}}$ enforce the weight decomposition \eqref{eq:l1_decomp} for the currency exposures,
 and the $q$ rows of $\tilde{\bm{A}}$ encode the slack constraints of the currency step, with the fixed
-asset-portfolio returns $\bm{R}^{fh}_P$ on the right-hand side.
+asset-portfolio returns $\bm{R}^{fh}_{\mathcal{P}}$ on the right-hand side.
 
 \subsection{Currency Overlay under Second-Order Expected Shortfall} \label{app:sep_curr_soes}
 
@@ -519,7 +519,7 @@ a convex quadratic objective
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\bm{R}^c & -\bm{1}_q & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} & \bm{0}_q \end{bmatrix}
-    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_P, \\[4pt]
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \bm{R}^{fh}_{\mathcal{P}}, \\[4pt]
     \|\bm{u}_\psi\|_2 &\le s_\psi, \\[2pt]
     & \quad u_{k,\psi} \ge 0,\quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.

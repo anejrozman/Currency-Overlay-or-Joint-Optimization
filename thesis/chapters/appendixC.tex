@@ -191,16 +191,16 @@ For the empirical approximation of the currency step, let $\bm{R}^{fh}_k$ denote
 return vector, and $\bm{e}_k$ and $\bm{f}_k$ the $k$-th sampled currency return and forward premium vectors. We stack
 the sampled excess currency returns $(\bm{e}_k - \bm{f}_k)^\top$ row by row into the matrix
 $\bm{R}^c \in \mathbb{R}^{q \times M}$ and collect the fixed asset-portfolio returns in
-$\bm{R}^{fh}_P = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the sample mean is linear in the returns, the
-demeaned hedged portfolio returns are $\mathring{\bm{R}}^{fh}_P + \mathring{\bm{R}}^c \bm{\psi}_t$, as for
-semi-variance in \Cref{app:mv_svar_sep_curr}, where $\mathring{\bm{R}}^{fh}_P = \mathring{\bm{R}}^{fh} \bm{x}_t^*$ and
+$\bm{R}^{fh}_{\mathcal{P}} = \bm{R}^{fh} \bm{x}_t^* \in \mathbb{R}^q$. Since the sample mean is linear in the returns, the
+demeaned hedged portfolio returns are $\mathring{\bm{R}}^{fh}_{\mathcal{P}} + \mathring{\bm{R}}^c \bm{\psi}_t$, as for
+semi-variance in \Cref{app:mv_svar_sep_curr}, where $\mathring{\bm{R}}^{fh}_{\mathcal{P}} = \mathring{\bm{R}}^{fh} \bm{x}_t^*$ and
 $\mathring{\bm{R}}^c$ is the demeaned matrix of the sampled excess currency returns. These demeaned returns also sum to
 zero, so the identity \eqref{eq:mad_identity} applies, and introducing the auxiliary variables
 $\bm{u}_\psi \ge \bm{0}_q$, the slack constraint \eqref{eq:mad_slack} becomes
 \begin{equation*}
-    \bm{u}_\psi \ge -\mathring{\bm{R}}^c \bm{\psi}_t - \mathring{\bm{R}}^{fh}_P
+    \bm{u}_\psi \ge -\mathring{\bm{R}}^c \bm{\psi}_t - \mathring{\bm{R}}^{fh}_{\mathcal{P}}
     \qquad \Longleftrightarrow \qquad
-    -\mathring{\bm{R}}^c \bm{\psi}_t - \bm{u}_\psi \le \mathring{\bm{R}}^{fh}_P,
+    -\mathring{\bm{R}}^c \bm{\psi}_t - \bm{u}_\psi \le \mathring{\bm{R}}^{fh}_{\mathcal{P}},
 \end{equation*}
 with the objective $\frac{2}{q} \bm{1}_q^\top \bm{u}_\psi$.
 
@@ -234,7 +234,7 @@ constraints
     = \tilde{\bm{E}} = \bm{0}_M, \\[4pt]
     \tilde{\bm{A}} \tilde{\bm{\psi}}_t &=
     \begin{bmatrix} -\mathring{\bm{R}}^c & -\bm{I}_q & \bm{0}_{q \times M} & \bm{0}_{q \times M} \end{bmatrix}
-    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \mathring{\bm{R}}^{fh}_P, \\[4pt]
+    \tilde{\bm{\psi}}_t \le \tilde{\bm{b}} = \mathring{\bm{R}}^{fh}_{\mathcal{P}}, \\[4pt]
     u_{k,\psi} \ge 0, & \quad \Delta_{\psi,c,t}^- \ge 0,\quad \Delta_{\psi,c,t}^+ \ge 0
     \quad \text{for } c = 1, \dots, M,\ k = 1, \dots, q.
 \end{aligned}
