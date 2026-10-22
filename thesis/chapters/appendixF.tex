@@ -2,12 +2,12 @@
 
 In this appendix, we detail the modeling of transaction costs in the context of international portfolio optimization. Following \citep{SparseAndStableInternationalPortfolioOptimization, RegularizedMultiCurrencyExpectedShortfallPortfolios, Li2015}, and keeping the notation introduced in \Cref{chap:optimization-framework}, we model transaction costs as proportional to the volume of traded assets and currencies, ignoring any fixed trading costs. The return of the hedged portfolio is expressed as the sum of unhedged asset returns and gains from forward currency positions
 \begin{equation}
-R^{h}_{P,t+1} = \sum_{i=1}^{N} x_{i,t} R^{u}_{i,t+1} + \sum_{c=1}^{M} \upphi_{c,t} (f_{c,t} - e_{c,t+1}). \tag*{\eqref{eq:hedged-portfolio-return}}
+R^{h}_{\mathcal{P},t+1} = \sum_{i=1}^{N} x_{i,t} R^{u}_{i,t+1} + \sum_{c=1}^{M} \upphi_{c,t} (f_{c,t} - e_{c,t+1}). \tag*{\eqref{eq:hedged-portfolio-return}}
 \end{equation}
 
 Let $\tau^{asset}_{t+1}$ and $\tau^{curr}_{t+1}$ denote the total transaction costs associated with asset and currency trades, respectively. The portfolio return net of transaction costs is then given by
 \begin{equation}
-R^{h,net}_{P,t+1} = R^{h}_{P,t+1} - \tau^{asset}_{t+1} - \tau^{curr}_{t+1}.
+R^{h,net}_{\mathcal{P},t+1} = R^{h}_{\mathcal{P},t+1} - \tau^{asset}_{t+1} - \tau^{curr}_{t+1}.
 \label{eq:hedged-portfolio-return-net}
 \end{equation}
  
