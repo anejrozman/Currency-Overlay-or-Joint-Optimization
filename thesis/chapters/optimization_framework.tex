@@ -1,7 +1,14 @@
 \chapter{Optimization Framework} 
 \label{chap:optimization-framework}
 
-% Chapter introduction: written last.
+In this chapter, we formulate the portfolio optimization programs that we evaluate in
+\Cref{chap:backtest-analysis,chap:joint-vs-sequential}. In \Cref{sec:risk-based-optimization} we state the risk-based
+portfolio optimization problem for a single currency and introduce the five risk measures that we consider in the thesis. In \Cref{sec:returns} we derive the return of an international
+portfolio in the domestic currency and decompose it into the return of the fully hedged asset portfolio and the excess
+return of the currency overlay. In \Cref{sec:regularized-multi-currency} we formulate the regularized multi-currency
+programs of the sequential and the joint optimization approaches. Finally, in
+\Cref{sec:mean-risk-portfolio-optimization} we add a mean term to these programs and specify the expected asset returns
+and the expected excess currency returns estimators.
 
 \section{Risk-Based Portfolio Optimization}\label{sec:risk-based-optimization}
 
@@ -17,10 +24,10 @@ estimation errors. DeMiguel et al.~\cite{DeMiguelGarlappiUppal2009} find that, o
 portfolios they consider consistently outperforms the equally weighted portfolio, because the gain from optimal
 diversification is more than offset by estimation error. Following Lucescu and Ulrych
 \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we therefore first consider portfolios that minimize a
-measure of risk alone and require no estimates of expected returns. We consider the expected portfolio return later in
+measure of risk alone and require no explicit estimates of expected returns. We consider the expected portfolio return later in
 this chapter.
 
-We initially formulate the portfolio optimization problem for an investor who holds $N$ assets denominated in a single currency, and extend the setting
+We initially formulate the portfolio optimization problem for an investor who holds $N$ assets denominated in a single currency and extend the setting
 to multiple currencies in the next section. Let $\bm{x}_t \in \R^N$ denote the portfolio weights chosen at time $t$ and
 held until $t+1$, and $\bm{R}_{t+1} \in \R^N$ the vector of simple asset returns over the period from $t$ to $t+1$. The
 portfolio return at time $t+1$ is then $\bm{x}_t^\top \bm{R}_{t+1}$, and the weights satisfy the budget constraint
@@ -51,14 +58,14 @@ The variance thus depends on the distribution of the asset returns only through 
 With the variance as the risk measure, the objective of problem \eqref{eq:risk-based-problem} is the quadratic form
 $\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$. Since $\bm{\Sigma}_t$ is positive semi-definite, the objective is convex in the
 weights, and the problem is a convex quadratic program, which standard solvers handle efficiently
-\cite{boyd2004convex}. If $\bm{\Sigma}_t$ is positive definite, the first-order conditions of its Lagrangian further give
+\cite{boyd2004convex}. If $\bm{\Sigma}_t$ is positive definite, the first-order conditions of the Lagrangian further give
 the unique solution in closed form
 \begin{equation*}
     \bm{x}_t^* = \frac{\bm{\Sigma}_t^{-1} \bm{1}_N}{\bm{1}_N^\top \bm{\Sigma}_t^{-1} \bm{1}_N},
 \end{equation*}
 which is known as the global minimum-variance portfolio. The closed form is a particularity of the variance, since the
 problems under the other risk measures we consider have no closed-form solution in general and must be solved
-numerically. It no longer applies once we add the leverage constraint and other penalties later in this chapter, although
+numerically. It no longer applies once we add the leverage constraint and the penalties later in this chapter, although
 the problem remains a convex quadratic program. The closed form also shows that the weights depend on the covariance
 matrix through its inverse, so that errors in an estimate of $\bm{\Sigma}_t$ carry over directly to the portfolio.
 
@@ -129,7 +136,7 @@ $\hat{\bm{\Sigma}}_t$ approaches the sample covariance matrix when many observat
 average correlations typical of stock returns, the target is positive definite, and $\hat{\bm{\Sigma}}_t$ is then
 positive definite whenever $\hat{\delta} > 0$, even when $N \ge q$.
 
-The variance program replaces $\bm{\Sigma}_t$ by the Ledoit--Wolf estimate,
+The variance program replaces $\bm{\Sigma}_t$ by the Ledoit--Wolf estimate
 \begin{equation*} \label{eq:variance-program}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \bm{x}_t^\top \hat{\bm{\Sigma}}_t \bm{x}_t, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation*}
@@ -234,7 +241,7 @@ linear program
     & \bm{x}_t^\top (\bm{y}_k - \bar{\bm{y}}) + u_k \ge 0, \quad u_k \ge 0, \quad k = 1, \dots, q.
 \end{aligned}
 \end{equation*}
-It has the same constraints as the semi-variance program, with the auxiliary variables in the objective in linear form. We write it in the standard form of a linear program in Appendix~\ref{app:mad_representation}.
+It has the same constraints as the semi-variance program, but its objective is linear in the auxiliary variables. We write it in the standard form of a linear program in Appendix~\ref{app:mad_representation}.
 
 The linear program is computationally efficient, but its solution is sensitive to estimation error. Kondor et
 al.~\cite{kondor2007noise} show that portfolios optimized under the mean absolute deviation are even more sensitive to
@@ -249,12 +256,12 @@ Shortfall, which we consider next, instead measures the size of the largest loss
 Expected Shortfall measures the risk of a portfolio by the average of its largest losses. Let
 $L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$ denote the loss of the portfolio at time $t+1$ and $\mathbb{P}_t(\cdot)$
 the probability conditional on the information available at time $t$. The Value-at-Risk (VaR) at confidence level
-$\beta \in (0, 1)$ is the $\beta$-quantile of the loss distribution,
+$\beta \in (0, 1)$ is the $\beta$-quantile of the loss distribution
 \begin{equation*}
     \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha \mid \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
 \end{equation*}
 VaR does not take into account how large the losses beyond it are. Expected Shortfall is the expected loss given that
-the loss exceeds VaR,
+the loss exceeds VaR
 \begin{equation*}
     \text{ES}_\beta(\bm{x}_t) = \mathbb{E}_t\bigl[ L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t) \bigr],
 \end{equation*}
@@ -272,7 +279,7 @@ that Expected Shortfall is the minimum over $\alpha \in \R$ of the auxiliary fun
     F_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta}\, \mathbb{E}_t\bigl[ (L(\bm{x}_t) - \alpha)^+ \bigr],
 \end{equation*}
 and that the minimizing $\alpha$ is $\text{VaR}_\beta(\bm{x}_t)$. Minimizing Expected Shortfall over the portfolio weights $\bm{x}_t$ is
-therefore equivalent to minimizing $F_\beta$ jointly over $\bm{x}_t$ and $\alpha$,
+therefore equivalent to minimizing $F_\beta$ jointly over $\bm{x}_t$ and $\alpha$
 \begin{equation*}
     \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} F_\beta(\bm{x}_t, \alpha),
 \end{equation*}
@@ -296,7 +303,7 @@ Since Expected Shortfall measures losses rather than deviations from the mean, t
 $\bm{y}_k$ themselves instead of their deviations from the sample mean. We write the program in the standard form of a
 linear program in Appendix~\ref{app:lp_es}.
 
-At the optimum, only the realizations whose loss exceeds $\alpha^*$, which are $(1-\beta) q$ realizations with
+At the optimum, only the realizations whose loss exceeds $\alpha^*$, which are the $(1-\beta) q$ realizations with
 the largest losses, contribute to the objective. The estimate of Expected Shortfall is therefore based on a fraction of the
 sample, and Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under Expected Shortfall are more
 sensitive to estimation error than those optimized under the variance and the mean absolute deviation. Goldberg et
@@ -311,7 +318,7 @@ Furthermore, Ciliberti et
 al.~\cite{ciliberti2007feasibility} show that, without bounds on the portfolio weights, the program is unbounded in some samples. 
 For large portfolios, it
 has no finite solution once $N/q$ exceeds a critical value, which is about $0.5$ for high confidence levels, and the weights fluctuate from sample to sample as $N/q$ approaches this value. In the large
-universe of the empirical analysis, which contains up to $1{,}400$ stocks, $N/q$ can come close to it. The leverage
+universe of the empirical analysis, which contains up to $1{,}400$ stocks, $N/q$ can exceed this value. The leverage
 constraint that we add later in this chapter bounds the positions and thereby ensures that the program has a solution.
 
 Expected Shortfall weighs all losses beyond VaR equally, so that the largest losses in the tail count no more
@@ -322,13 +329,13 @@ the largest losses.
 
 Second-order Expected Shortfall belongs to the family of higher-moment coherent risk measures of Krokhmal
 \cite{Krokhmal2007}, which measure the risk in the tail of the loss distribution through its higher moments and also contain
-Expected Shortfall. The second-order formulation replaces the expected excess loss in the auxiliary
-function $F_\beta$ of \Cref{sec:risk-es} by its $L^2$ norm $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$, which gives the
+Expected Shortfall. The second-order formulation replaces the expectation of the excess loss in the auxiliary
+function $F_\beta$ of \Cref{sec:risk-es} by the $L^2$ norm $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$ of the excess loss, which gives the
 auxiliary function
 \begin{equation*}
     G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta}\, \bigl\| (L(\bm{x}_t) - \alpha)^+ \bigr\|_{L^2},
 \end{equation*}
-and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$,
+and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
 \begin{equation*}
     \text{SOES}_\beta(\bm{x}_t) = \min_{\alpha \in \R} G_\beta(\bm{x}_t, \alpha).
 \end{equation*}
@@ -416,7 +423,7 @@ regularized mean-variance optimization, with the currency positions chosen eithe
 them. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} apply the same representation to
 Expected Shortfall portfolios, and we follow their derivation and notation.
 
-\subsection{Unhedged Portfolio Returns}
+\subsection{Unhedged Portfolio Returns}\label{sec:unhedged-returns}
 
 We consider an international investor who allocates their wealth across $N$ assets denominated in up to $M+1$ currencies. Let the investor's domestic currency be indexed by $0$ and let the remaining $M$ foreign currencies be indexed by $\mathcal{C} = \{1,2,\dots,M\}$.
 
@@ -446,22 +453,22 @@ R_{i,t+1} + e_{c_i,t+1} + R_{i,t+1}\,e_{c_i,t+1}.
 \label{eq:unhedged-asset-return}
 \end{align}
 
-Again, as in the previous section, we denote the portfolio weights at time $t$ by $\bm{x}_t = [x_{1,t}, \dots, x_{N,t}]^\top$, with $x_{i,t}$ the fraction of total portfolio value invested in asset $i$. 
-And we impose the budget constraint $\bm{1}_N^\top \bm{x}_t = 1$.
+As in the previous section, we denote the portfolio weights at time $t$ by $\bm{x}_t = [x_{1,t}, \dots, x_{N,t}]^\top$, with $x_{i,t}$ the fraction of total portfolio value invested in asset $i$,
+and impose the budget constraint $\bm{x}_t^\top \bm{1}_N = 1$.
 
 Assuming no rebalancing between times $t$ and $t+1$, the unhedged portfolio return in the domestic currency is given by
 \begin{equation*}
 R^{u}_{\mathcal{P},t+1} = \sum_{i=1}^N x_{i,t}\,R^{u}_{i,t+1}.
 \end{equation*}
 
-\subsection{Hedged Portfolio Returns}
+\subsection{Hedged Portfolio Returns}\label{sec:hedged-returns}
 
 To manage currency risk, the investor can take positions in one-period currency forward contracts. For each foreign currency $c\in\mathcal{C}$, let $F_{c,t}$ be the forward rate quoted at time $t$ for settlement at $t+1$, in units of domestic currency per unit of foreign currency $c$. We define the forward premium by
 \begin{equation*}
 f_{c,t} = \frac{F_{c,t}-S_{c,t}}{S_{c,t}}.
 \end{equation*}
 
-The investor hedges by selling foreign currency forward. Let $\upphi_{c,t}$ denote the relative notional of the short forward position in currency $c$ at time $t$, expressed as a fraction of total portfolio value, with the convention that $\upphi_{c,t}>0$ corresponds to hedging. Per unit of notional, the short position pays $f_{c,t}-e_{c,t+1}$ in domestic currency over the period. Adding these forward payoffs to the unhedged asset returns, the hedged portfolio return is
+The investor hedges by selling foreign currency forward. Let $\upphi_{c,t}$ denote the relative notional of the short forward position in currency $c$ at time $t$, expressed as a fraction of total portfolio value, with the convention that $\upphi_{c,t}>0$ corresponds to hedging. Per unit of notional, the short position pays $f_{c,t}-e_{c,t+1}$ in domestic currency over the period. Adding these forward payoffs to the unhedged portfolio return gives the hedged portfolio return
 \begin{equation}
 R^{h}_{\mathcal{P},t+1}
 =
@@ -487,9 +494,9 @@ Each row of $\bm{C}$ has at most one nonzero entry, and the rows corresponding t
 \qquad
 w_{c,t} = \sum_{i:\,c_i=c} x_{i,t},
 \end{equation*}
-such that $w_{c,t}$ is the total portfolio weight invested in assets denominated in currency $c$. The implicit domestic exposure follows residually as $w_{0,t} = 1 - \bm{1}_M^\top \bm{w}_t$, since the asset weights sum to one.
+so that $w_{c,t}$ is the total portfolio weight invested in assets denominated in currency $c$. The implicit domestic exposure follows residually as $w_{0,t} = 1 - \bm{1}_M^\top \bm{w}_t$, since the asset weights sum to one.
 
-We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premia as $\bm{f}_t \in \R^M$. The product $\bm{C}\bm{e}_{t+1}\in\R^N$ aligns currency returns to assets, with $i$-th component $e_{c_i,t+1}$ for foreign assets and $0$ for domestic ones. Using \eqref{eq:unhedged-asset-return}, the vector of unhedged asset returns in the domestic currency can be written as
+We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^M$, and the forward premia as $\bm{f}_t \in \R^M$. The product $\bm{C}\bm{e}_{t+1}\in\R^N$ aligns currency returns to assets, and its $i$-th component is $e_{c_i,t+1}$ for foreign assets and $0$ for domestic ones. Using \eqref{eq:unhedged-asset-return}, the vector of unhedged asset returns in the domestic currency can be written as
 \begin{equation*}
 \bm{R}^{u}_{t+1}
 =
@@ -501,13 +508,13 @@ We express returns in vector form $\bm{R}_{t+1} \in \R^N$, $\bm{e}_{t+1} \in \R^
 \end{equation*}
 where $\had$ denotes the Hadamard product. 
 
-Expressing the forward positions in vector form as $\bm{\upphi}_t\in\R^M$, the hedged portfolio return \eqref{eq:hedged-portfolio-return} can be written as
+With the forward positions collected in $\bm{\upphi}_t\in\R^M$, the hedged portfolio return \eqref{eq:hedged-portfolio-return} can be written as
 \begin{equation}
 R^{h}_{\mathcal{P},t+1} = \bm{x}_t^\top \bm{R}^{u}_{t+1} + \bm{\upphi}_t^\top(\bm{f}_t-\bm{e}_{t+1}).
 \label{eq:hedged-vector}
 \end{equation}
 
-Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\top\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this together with the unhedged return vector into \eqref{eq:hedged-vector}, the fully hedged portfolio return is
+Setting $\bm{\upphi}_t=\bm{w}_t=\bm{C}^\top\bm{x}_t$ neutralizes the implicit currency exposure. Substituting this and the unhedged return vector into \eqref{eq:hedged-vector} gives the fully hedged portfolio return
 \begin{align*}
 R^{fh}_{\mathcal{P},t+1}
 &= \bm{x}_t^\top\bm{R}^{u}_{t+1} + \big(\bm{C}^\top\bm{x}_t\big)^\top(\bm{f}_t-\bm{e}_{t+1})\\[2pt]
@@ -527,7 +534,7 @@ The first-order currency terms $\pm\,\bm{x}_t^\top\bm{C}\bm{e}_{t+1}$ cancel, le
 (\bm{R}_{t+1}\had\bm{C}\bm{e}_{t+1}).
 \end{equation*}
 
-More generally, define the net currency exposure $\bm{\psi}_t = \bm{w}_t-\bm{\upphi}_t$. Since a forward position in the domestic currency has no payoff, we can set the domestic position to $\upphi_{0,t} = 1 - \bm{1}_M^\top \bm{\upphi}_t$. The domestic net exposure is then $\psi_{0,t} = w_{0,t} - \upphi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$, so the net currency exposures sum to zero and form a zero-investment portfolio, the currency overlay. Substituting $\bm{\upphi}_t=\bm{w}_t-\bm{\psi}_t$ into \eqref{eq:hedged-vector} expresses the hedged return in terms of net exposures,
+More generally, define the net currency exposure $\bm{\psi}_t = \bm{w}_t-\bm{\upphi}_t$. Since a forward position in the domestic currency has no payoff, we can set the domestic position to $\upphi_{0,t} = 1 - \bm{1}_M^\top \bm{\upphi}_t$. The domestic net exposure is then $\psi_{0,t} = w_{0,t} - \upphi_{0,t} = -\bm{1}_M^\top \bm{\psi}_t$, so the net currency exposures sum to zero and form a zero-investment portfolio, the currency overlay. Substituting $\bm{\upphi}_t=\bm{w}_t-\bm{\psi}_t$ into \eqref{eq:hedged-vector} expresses the hedged return in terms of net exposures
 \begin{align}
 R^{h}_{\mathcal{P},t+1}
 &= \bm{x}_t^\top \bm{R}^{u}_{t+1} + (\bm{w}_t-\bm{\psi}_t)^\top(\bm{f}_t-\bm{e}_{t+1})\nonumber \\[2pt]
@@ -539,10 +546,280 @@ where $\bm{e}_{t+1} - \bm{f}_t$ is the vector of excess currency returns. We ado
 
 \section{Regularized Multi-Currency Portfolio Optimization}\label{sec:regularized-multi-currency}
 
+In practice, international investors often manage currency risk with a currency overlay. The asset portfolio is
+constructed first, without regard to its currency exposure, and a portfolio of currency positions is then laid over it,
+often by a specialized overlay manager \cite{SparseAndStableInternationalPortfolioOptimization}. Jorion
+\cite{Jorion1994} argues that this structure is inherently suboptimal, since it ignores the interactions between the
+assets in the underlying portfolio and the exchange rates. In his simulations, a currency overlay adds value to global
+equity and bond portfolios, but improves their performance less than an integrated approach to currency management.
+Burkhardt and Ulrych \cite{SparseAndStableInternationalPortfolioOptimization} find that regularized joint
+mean-variance optimization of assets and currencies also outperforms its currency overlay counterpart out of sample. For Expected Shortfall, Lucescu and Ulrych
+\cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} report that joint optimization performs better in the
+smaller of their two investable universes. 
+
+We formulate both approaches for the five risk measures introduced earlier in this chapter, applied to the hedged
+portfolio return of the previous section. In sequential optimization, the asset weights $\bm{x}_t$ are chosen first by
+minimizing the risk of the fully hedged asset portfolio, and the currency overlay $\bm{\psi}_t$ is then chosen by
+minimizing the risk of the hedged portfolio return with the asset weights held fixed. In joint optimization,
+$\bm{x}_t$ and $\bm{\psi}_t$ are chosen together in a single program. The joint program can therefore exploit the
+dependence between the individual assets and the currencies, whereas the overlay program takes the currencies into
+account only through their dependence on the return of the fixed asset portfolio, which Burkhardt and Ulrych
+\cite{SparseAndStableInternationalPortfolioOptimization} regard as a form of dimensionality reduction. 
 \subsection{Regularization}\label{sec:regularization}
+
+Due to estimation error, the optimal weights of these programs fluctuate from one sample to the next. Kondor
+et al.~\cite{kondor2007noise} find that the weights are even more sensitive to estimation error than the risk of the
+optimized portfolio, and that close to a critical value of the ratio of the number of assets to the number of
+observations, their fluctuations become so strong that the optimization loses its meaning. Bounding the weights, for
+example with a long-only constraint, prevents them from diverging, but Ciliberti et
+al.~\cite{ciliberti2007feasibility} note that large fluctuations remain and that many weights stick to the bounds.
+
+Regularization reduces these fluctuations at the cost of introducing bias in the optimization. A penalty on the size of the weights pulls the solution
+toward the portfolios that the penalty favors.
+Empirically it tends to improve out-of-sample performance. DeMiguel et
+al.~\cite{DeMiguelGarlappiNogalesUppal2009} find that minimum-variance portfolios with a constraint on the norm of the
+weights often have higher out-of-sample Sharpe ratios than portfolios based on shrinkage estimators. 
+Brodie et al.~\cite{BrodieDaubechiesDeMolGiannoneLoris2009} find that mean-variance
+portfolios with an $L^1$ penalty consistently outperform the equally weighted portfolio out of sample, and Li
+\cite{Li2015} finds that portfolios with constraints that induce sparsity and stability have better
+out-of-sample performance and lower turnover than many other strategies. In the multi-currency setting, Burkhardt and
+Ulrych \cite{SparseAndStableInternationalPortfolioOptimization} find that their regularized joint mean-variance programs
+outperform unregularized benchmarks, and Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}
+find that regularization lowers the realized risk and raises the risk-adjusted returns of both the sequential and the
+joint optimization approach under Expected Shortfall.
+
+Following Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we regularize the programs with
+an $L^1$ penalty, an $L^2$ penalty, and a leverage constraint. The $L^1$ penalty
+$\lambda_1 \|\bm{x}_t\|_1 = \lambda_1 \sum_{i=1}^N |x_{i,t}|$, with $\lambda_1 \ge 0$, penalizes the absolute size of the
+weights. Brodie et al.~\cite{BrodieDaubechiesDeMolGiannoneLoris2009}
+show that the penalty is effective in portfolio selection, where it yields portfolios with few active positions.
+Under the budget constraint, the long positions exceed the short positions by one, so that
+\begin{equation*}
+    \|\bm{x}_t\|_1 = 1 + 2 \sum_{i=1}^N (-x_{i,t})^+.
+\end{equation*}
+The $L^1$ penalty therefore acts only on the short positions. Once $\lambda_1$ is large enough to remove them, the
+penalty becomes constant, and the solution is the long-only minimizer of the risk measure
+\cite{BrodieDaubechiesDeMolGiannoneLoris2009}. For Expected Shortfall, Papp et al.~\cite{PappKondorCaccioli2021} show
+that removing short positions tends to remove the most volatile assets from the portfolio.
+
+The $L^2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2 = \lambda_2 \sum_{i=1}^N x_{i,t}^2$, with $\lambda_2 \ge 0$, penalizes large
+weights more than small ones and spreads the portfolio more evenly over many assets. Under the budget constraint,
+$\|\bm{x}_t\|_2^2$ is smallest for the equally weighted portfolio, so the penalty shrinks the weights toward it. 
+
+The leverage constraint $\|\bm{x}_t\|_1 \le \ell^a$, with $\ell^a \ge 1$, bounds the gross exposure of the asset
+portfolio. Setting $\ell^a = 1$ rules out short positions, and the value $\ell^a = 2$ that we
+use in the empirical analysis limits the total short position to half of the portfolio value. Ammann et
+al.~\cite{AmmannCoqueretSchade2016} find that a leverage constraint improves the implementation of
+portfolios, since it lowers their transaction costs, the number of negative weights, and their volatility, and makes them
+less sensitive to the choice of their parameters. Together with the budget constraint, the leverage constraint
+defines the set of feasible asset weights
+\begin{equation*}
+    \mathcal{X} = \bigl\{ \bm{x} \in \R^N : \bm{x}^\top \bm{1}_N = 1, \ \|\bm{x}\|_1 \le \ell^a \bigr\}.
+\end{equation*}
+
+In the multi-currency programs that follow, the asset weights and the currency exposures have separate penalty weights,
+$\lambda_1^a$ and $\lambda_2^a$ for the assets and $\lambda_1^c$ and $\lambda_2^c$ for the currencies, since the two
+differ in their constraints and transaction costs \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}. The
+currency exposures carry neither a budget constraint nor a leverage constraint, so both penalties shrink them toward
+zero, that is, toward the fully hedged portfolio, and the $L^1$ penalty sets the exposures to some currencies exactly to
+zero. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} note that the sparsity that the
+$L^1$ penalty promotes may be desirable for the selection of assets but less so for the currencies. The penalty weights
+are selected at every rebalancing date by the grid search described in \Cref{sec:backtest-configuration}.
+
 
 \subsection{Sequential Optimization}\label{sec:sequential-optimization}
 
+In sequential optimization, the asset weights and the currency exposures are chosen in two steps. The asset step chooses
+the asset weights by minimizing the risk of the fully hedged asset portfolio
+\begin{equation}\label{eq:sequential-asset}
+    \bm{x}_t^* = \argmin_{\bm{x}_t \in \mathcal{X}} \Bigl\{ \rho\bigl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \bigr)
+    + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \Bigr\}.
+\end{equation}
+This is the regularized version of the single-currency problem \eqref{eq:risk-based-problem}, with the fully hedged
+return vector $\bm{R}^{fh}_{t+1}$ in place of $\bm{R}_{t+1}$.
+The currency step then chooses the currency overlay by minimizing the risk of the hedged portfolio return
+\eqref{eq:hedged-net}, with the asset weights held fixed
+\begin{equation}\label{eq:sequential-currency}
+    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t \in \R^M} \Bigl\{ \rho\bigl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1}
+    + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \bigr) + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2
+    \Bigr\}.
+\end{equation}
+We derive the programs of both steps for the five risk measures in
+Appendices~\ref{app:separate-optimization}, \ref{app:mv_separate}, and~\ref{app:mad_separate}.
+
+With $\bm{\psi}_t = \bm{0}_M$, the implicit currency
+exposure of the asset portfolio is fully hedged, and with $\bm{\psi}_t = \bm{w}_t = \bm{C}^\top \bm{x}_t^*$, the
+portfolio holds no forward positions and is unhedged. The two resulting asset-only portfolios serve as the benchmarks
+Full and Zero in \Cref{sec:backtest-configuration}.
+
 \subsection{Joint Optimization}\label{sec:joint-optimization}
 
+The joint program chooses the asset weights and the currency exposures together. We stack them into the combined
+decision vector $\bm{\theta}_t = [\bm{x}_t^\top, \bm{\psi}_t^\top]^\top \in \R^{N+M}$ and the fully hedged and excess
+currency returns into the combined return vector
+$\bm{R}^{\text{all}}_{t+1} = [\bm{R}^{fh\top}_{t+1}, (\bm{e}_{t+1} - \bm{f}_t)^\top]^\top \in \R^{N+M}$, so that
+$\bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1}$ is the hedged portfolio return \eqref{eq:hedged-net}. The joint program is then written as
+\begin{equation}\label{eq:joint}
+\begin{gathered}
+    \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \Bigl\{ \rho\bigl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \bigr)
+    + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \Bigr\} \\[4pt]
+    \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L}^a \bm{\theta}_t\|_1 \le \ell^a,
+\end{gathered}
+\end{equation}
+where the vector $\bm{q}_{N,M} \in \R^{N+M}$ has ones in the $N$ asset positions and zeros in the $M$ currency
+positions, and the matrix $\bm{L}^a \in \R^{(N+M) \times (N+M)}$ is diagonal with ones in the asset positions and zeros
+in the currency positions. The budget and the leverage constraint thus apply to the asset weights only, and the currency exposures remain unconstrained. The regularization matrix
+$\bm{S}_1 \in \R^{(N+M) \times (N+M)}$ is diagonal with $\lambda_1^a$ in the asset positions and $\lambda_1^c$ in the
+currency positions, and $\bm{S}_2 \in \R^{(N+M) \times (N+M)}$ is diagonal with $\sqrt{\lambda_2^a}$ and
+$\sqrt{\lambda_2^c}$ in the same positions, so that
+$\|\bm{S}_1 \bm{\theta}_t\|_1 = \lambda_1^a \|\bm{x}_t\|_1 + \lambda_1^c \|\bm{\psi}_t\|_1$ and
+$\|\bm{S}_2 \bm{\theta}_t\|_2^2 = \lambda_2^a \|\bm{x}_t\|_2^2 + \lambda_2^c \|\bm{\psi}_t\|_2^2$. This formulation allows us to treat
+the asset and the currency penalties of \Cref{sec:regularization} separately within a single objective. We give the
+explicit matrices and derive the joint programs for the five risk measures in
+Appendices~\ref{app:joint-optimization}, \ref{app:mv_joint}, and~\ref{app:mad_joint}.
+
+All programs of this section are convex. Since the $L^1$ penalties and the leverage constraint can be written with
+linear constraints, the regularized programs are quadratic programs under the variance, the semi-variance, the mean
+absolute deviation, and Expected Shortfall, and second-order cone programs with a convex quadratic objective under
+second-order Expected Shortfall. Without the $L^2$ penalties, the programs under the mean absolute deviation and Expected
+Shortfall are linear programs. Standard solvers handle all of these programs efficiently~\cite{boyd2004convex}.
+
 \section{Mean-Risk Portfolio Optimization} \label{sec:mean-risk-portfolio-optimization}
+
+The programs of the previous section minimize a measure of risk without an explicit estimate of the expected returns,
+since such estimates are imprecise. The resulting portfolios,
+however, may give up excess returns that a moderately riskier allocation would earn. A mean term in the objective lets
+the programs trade off expected return against risk explicitly. With it, the joint program can also weigh the expected
+returns of the assets and the currencies against each other, whereas the overlay program considers the expected
+currency returns only once the asset weights are fixed.
+
+Mean-risk optimization goes back to Markowitz \cite{Markowitz1952}, and the works on which our programs for the other
+four risk measures are based also trade off risk against expected return. Markowitz et al.~\cite{Markowitz1993} compute
+the portfolios that are efficient with respect to the expected return and the semi-variance, and Konno and Yamazaki
+\cite{KonnoYamazaki1991}, Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and Krokhmal \cite{Krokhmal2007}
+minimize the mean absolute deviation, Expected Shortfall, and the higher-moment coherent risk measures, respectively,
+subject to a required expected return. In the multi-currency setting, Burkhardt and Ulrych
+\cite{SparseAndStableInternationalPortfolioOptimization} use a mean-variance objective with a risk aversion coefficient
+of $3$ and estimate the expected returns with the Bayes--Stein estimator of Jorion \cite{Jorion1986BayesStein}.
+Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} formulate their programs with an objective
+that trades off the expected return against Expected Shortfall but evaluate them out of sample under infinite risk
+aversion, which removes the expected return from the objective, since estimates of expected returns are highly
+sensitive to estimation error \cite{Merton1980, DeMiguelGarlappiUppal2009}. We add the mean term back to the programs
+of the previous section and specify the expected returns so that they are less affected by estimation error.
+
+\subsection{Mean-Risk Programs}\label{sec:mean-risk-programs}
+
+To add a mean term to the sequential and joint programs, let
+$\bm{\mu}^{fh}_t = \mathbb{E}_t[\bm{R}^{fh}_{t+1}] \in \R^N$ and
+$\bm{\mu}^c_t = \mathbb{E}_t[\bm{e}_{t+1} - \bm{f}_t] \in \R^M$ denote the expected fully hedged asset returns and the
+expected excess currency returns, and let
+$\bm{\mu}^{\text{all}}_t = [(\bm{\mu}^{fh}_t)^\top, (\bm{\mu}^c_t)^\top]^\top \in \R^{N+M}$, so that
+$\bm{\theta}_t^\top \bm{\mu}^{\text{all}}_t$ is the expected hedged portfolio return. Each program subtracts the
+expected return from the objective. We scale the expected return by $1/\gamma$, where $\gamma > 0$ is the risk
+aversion coefficient. The asset step \eqref{eq:sequential-asset} becomes
+\begin{equation}\label{eq:mean-sequential-asset}
+    \bm{x}_t^* = \argmin_{\bm{x}_t \in \mathcal{X}} \Bigl\{ \rho\bigl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \bigr)
+    - \frac{1}{\gamma}\, \bm{x}_t^\top \bm{\mu}^{fh}_t
+    + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \Bigr\},
+\end{equation}
+and the currency step \eqref{eq:sequential-currency} becomes
+\begin{equation}\label{eq:mean-sequential-currency}
+\begin{gathered}
+    \begin{aligned}
+    \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t \in \R^M} \Bigl\{ &
+    \rho\bigl( \bm{x}_t^{*\top} \bm{R}^{fh}_{t+1} + \bm{\psi}_t^\top (\bm{e}_{t+1} - \bm{f}_t) \bigr)
+    - \frac{1}{\gamma}\, \bm{\psi}_t^\top \bm{\mu}^c_t \\
+    & + \lambda_1^c \|\bm{\psi}_t\|_1 + \lambda_2^c \|\bm{\psi}_t\|_2^2 \Bigr\}
+    \end{aligned} \\[4pt]
+    \text{s.t. } \|\bm{\psi}_t\|_1 \le \ell^c,
+\end{gathered}
+\end{equation}
+where the expected return of the fixed asset portfolio is a constant and is removed from the objective. The joint program
+\eqref{eq:joint} becomes
+\begin{equation}\label{eq:mean-joint}
+\begin{gathered}
+    \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \Bigl\{ \rho\bigl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \bigr)
+    - \frac{1}{\gamma}\, \bm{\theta}_t^\top \bm{\mu}^{\text{all}}_t
+    + \|\bm{S}_1 \bm{\theta}_t\|_1 + \|\bm{S}_2 \bm{\theta}_t\|_2^2 \Bigr\} \\[4pt]
+    \text{s.t. } \bm{\theta}_t^\top \bm{q}_{N,M} = 1, \quad \|\bm{L}^a \bm{\theta}_t\|_1 \le \ell^a, \quad
+    \|\bm{L}^c \bm{\theta}_t\|_1 \le \ell^c,
+\end{gathered}
+\end{equation}
+where the matrix $\bm{L}^c \in \R^{(N+M) \times (N+M)}$ is diagonal with zeros in the asset positions and ones in the
+currency positions. Both the currency step and the joint program thus contain a currency leverage constraint, which
+the programs of \Cref{sec:regularized-multi-currency} do not have. We give the mean-risk programs for the five risk
+measures in Appendices~\ref{app:mean-risk}, \ref{app:mv_mean_risk}, and~\ref{app:mad_mean_risk}.
+
+We use the same risk aversion coefficient in the asset step, the currency step, and the joint program. It determines
+the weight of the expected return relative to the risk measure and the penalties. As $\gamma \to \infty$, the mean
+term vanishes, and the programs reduce to the risk-minimization programs
+\eqref{eq:sequential-asset}--\eqref{eq:joint} with the additional currency leverage constraint. As $\gamma \to 0$, the mean
+term dominates, and the programs maximize the expected portfolio return subject to the constraints. More details on the 
+calibration of the risk aversion coefficient are given in Appendix~\ref{app:risk-aversion-calibration}.
+
+The currency leverage constraint bounds the currency exposures, which otherwise carry neither a budget constraint nor a
+leverage constraint. Without it, the mean term can push the currency exposures toward very large positions. The asset
+weights are already bounded by the
+leverage constraint of \Cref{sec:regularization}, and for the currency exposures we set $\ell^c = 2$ as well.
+
+\subsection{Expected Asset Returns}\label{sec:expected-asset-returns}
+
+The natural estimate of $\bm{\mu}^{fh}_t$ is the vector of sample means of the historical realizations of
+$\bm{R}^{fh}_{t+1}$. As discussed at the beginning of this chapter, however, the precision of an estimated expected
+return depends only on the length of the sample period \cite{Merton1980}. For example, if the returns of a stock with an annual volatility of $30\%$ are independent and normally distributed, 
+the standard error of its sample mean over ten years is $30\% / \sqrt{10} \approx 9.5\%$ per year, and a
+$95\%$ confidence interval for its expected return is about $37$ percentage points wide. 
+
+To reduce the noise in the expected returns, we pool the stocks of each economy and estimate one expected return per economy. Each of the $14$ economies
+of the empirical analysis has its own currency, so we index the economies by their currencies
+$c \in \mathcal{C} \cup \{0\}$, and asset $i$ belongs to the economy of its local currency $c_i$. As in
+\Cref{sec:risk-variance}, we suppress the dependence on $t$ of the scalar quantities that follow. Let $y^{fh}_{k,i}$
+denote the fully hedged return of asset $i$ in the $k$-th historical realization. The return of economy $c$ in
+realization $k$ is the equally weighted return of its $N_c$ assets
+\begin{equation*}
+    z_{k,c} = \frac{1}{N_c} \sum_{i \,:\, c_i = c} y^{fh}_{k,i},
+\end{equation*}
+with the sample mean $\bar{z}_c = \frac{1}{q} \sum_{k=1}^q z_{k,c}$. Pooling reduces the number of estimated means
+from $N$ to the number of economies $M + 1$, while the number of realizations stays the same. The equally weighted economy
+return also diversifies part of the volatility of its assets, so its mean is estimated more precisely than the means of
+the individual assets. Every asset then uses the expected return of its economy, so the mean term depends on the
+asset weights only through the total weight of each economy. 
+
+The economy means are still imprecise, since the length of the sample period is unchanged, so we further shrink them with the estimator of James and Stein \cite{JamesStein1961}. Let $\bar{\bm{z}} = \left[\bar{z}_0, \bar{z}_1, \ldots, \bar{z}_M\right]^\top \in \R^{M+1}$ be the vector of the
+sample means, and let $\bar{s}^2$ denote the average of the sample variances
+$s_c^2 = \frac{1}{q-1} \sum_{k=1}^q (z_{k,c} - \bar{z}_c)^2$ of the economy returns. The shrunk economy means are
+\begin{equation*}
+    \hat{m}_c = (1 - \hat{\eta})\, \bar{z}_c,
+    \qquad
+    \hat{\eta} = \min\Bigl\{ 1, \frac{(M - 1)\, \bar{s}^2}{q\, \|\bar{\bm{z}}\|_2^2} \Bigr\},
+\end{equation*}
+and the estimate $\hat{\bm{\mu}}^{fh}_t$, whose $i$-th entry is $\hat{m}_{c_i}$, replaces $\bm{\mu}^{fh}_t$ in the
+programs. James and Stein show that, for three or more independent normal means with a common variance, shrinking the
+sample means toward zero by such a factor lowers their total expected squared error below that of the sample means,
+whatever the true means are. 
+
+\subsection{Expected Currency Returns}\label{sec:expected-currency-returns}
+
+Unlike the expected asset returns, the expected excess currency returns are not estimated from the realizations but
+derived from the forward premia. By covered interest parity, the forward rate of currency $c$ is
+$F_{c,t} = S_{c,t} (1 + r_{0,t}) / (1 + r_{c,t})$, where $r_{0,t}$ and $r_{c,t}$ denote the domestic and the foreign
+interest rate from $t$ to $t+1$, so that the forward premium
+\begin{equation*}
+    f_{c,t} = \frac{r_{0,t} - r_{c,t}}{1 + r_{c,t}} \approx r_{0,t} - r_{c,t}
+\end{equation*}
+is approximately the difference between the domestic and the foreign interest rate. A net exposure to currency $c$ 
+therefore earns the spot return $e_{c,t+1}$ plus approximately the interest rate differential $r_{c,t} - r_{0,t}$,
+which is known as the carry. Since $f_{c,t}$ is known at time $t$, the expected excess return of currency $c$ is
+\begin{equation*}
+    \mathbb{E}_t[e_{c,t+1} - f_{c,t}] = \mathbb{E}_t[e_{c,t+1}] - f_{c,t}.
+\end{equation*}
+Under uncovered interest parity, the expected change of the spot rate offsets the interest rate differential,
+$\mathbb{E}_t[e_{c,t+1}] = f_{c,t}$, and the expected excess return is zero, in which case the currency exposures would
+not enter the mean term. We instead set the expected excess currency returns to the negative forward premia
+\begin{equation*}
+    \bm{\mu}^c_t = -\bm{f}_t,
+\end{equation*}
+which approximate the carry, so that the mean term rewards long exposures to currencies with a higher interest rate
+than the domestic currency and short exposures to currencies with a lower one. Since the forward
+premia are observed at time $t$, nothing has to be estimated, and the expected currency returns change over time with
+the interest rate differentials.

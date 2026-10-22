@@ -5,6 +5,11 @@ C.~Acerbi and D.~Tasche.
 \newblock On the coherence of expected shortfall.
 \newblock arXiv preprint arXiv:cond-mat/0104295, 2002.
 
+\bibitem{AmmannCoqueretSchade2016}
+M.~Ammann, G.~Coqueret, and J.-P. Schade.
+\newblock Characteristics-based portfolio choice with leverage constraints.
+\newblock {\em Journal of Banking \& Finance}, 70:23--37, 2016.
+
 \bibitem{CoherentMeasuresOfRisk}
 P.~Artzner, F.~Delbaen, J.-M. Eber, and D.~Heath.
 \newblock Coherent measures of risk.
@@ -19,6 +24,12 @@ P.~Artzner, F.~Delbaen, J.-M. Eber, and D.~Heath.
 S.~Boyd and L.~Vandenberghe.
 \newblock {\em Convex Optimization}.
 \newblock Cambridge University Press, Cambridge, 2004.
+
+\bibitem{BrodieDaubechiesDeMolGiannoneLoris2009}
+J.~Brodie, I.~Daubechies, C.~De~Mol, D.~Giannone, and I.~Loris.
+\newblock Sparse and stable {M}arkowitz portfolios.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  106(30):12267--12272, 2009.
 
 \bibitem{SparseAndStableInternationalPortfolioOptimization}
 R.~Burkhardt and U.~Ulrych.
@@ -46,6 +57,12 @@ S.~Ciliberti, I.~Kondor, and M.~M{\'e}zard.
 {CVXPY} documentation.
 \newblock \url{https://www.cvxpy.org}, 2026.
 \newblock Accessed: 2026-10-16.
+
+\bibitem{DeMiguelGarlappiNogalesUppal2009}
+V.~DeMiguel, L.~Garlappi, F.~J. Nogales, and R.~Uppal.
+\newblock A generalized approach to portfolio optimization: Improving
+  performance by constraining portfolio norms.
+\newblock {\em Management Science}, 55(5):798--812, 2009.
 
 \bibitem{DeMiguelGarlappiUppal2009}
 V.~DeMiguel, L.~Garlappi, and R.~Uppal.
@@ -87,10 +104,28 @@ T.~Hastie, R.~Tibshirani, and J.~Friedman.
 \newblock Springer Series in Statistics. Springer, New York, second edition,
   2009.
 
+\bibitem{JamesStein1961}
+W.~James and C.~Stein.
+\newblock Estimation with quadratic loss.
+\newblock In {\em Proceedings of the Fourth {B}erkeley Symposium on
+  Mathematical Statistics and Probability}, volume~1, pages 361--379, Berkeley,
+  CA, 1961. University of California Press.
+
 \bibitem{Jones2002}
 C.~M. Jones.
 \newblock A century of stock market liquidity and trading costs.
 \newblock Working paper, Columbia University, 2002.
+
+\bibitem{Jorion1986BayesStein}
+P.~Jorion.
+\newblock {B}ayes-{S}tein estimation for portfolio analysis.
+\newblock {\em Journal of Financial and Quantitative Analysis}, 21(3):279--292,
+  1986.
+
+\bibitem{Jorion1994}
+P.~Jorion.
+\newblock Mean/variance analysis of currency overlays.
+\newblock {\em Financial Analysts Journal}, 50(3):48--56, 1994.
 
 \bibitem{kondor2007noise}
 I.~Kondor, S.~Pafka, and G.~Nagy.
@@ -185,6 +220,12 @@ W.~Ogryczak and A.~Ruszczy{\'n}ski.
 \newblock From stochastic dominance to mean-risk models: Semideviations as risk
   measures.
 \newblock {\em European Journal of Operational Research}, 116(1):33--50, 1999.
+
+\bibitem{PappKondorCaccioli2021}
+G.~Papp, I.~Kondor, and F.~Caccioli.
+\newblock Optimizing expected shortfall under an {$\ell_1$} constraint---an
+  analytic approach.
+\newblock {\em Entropy}, 23(5):523, 2021.
 
 \bibitem{safe_haven_currencies}
 A.~Ranaldo and P.~S{\"o}derlind.
