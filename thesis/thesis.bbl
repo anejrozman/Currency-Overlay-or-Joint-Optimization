@@ -20,6 +20,11 @@ P.~Artzner, F.~Delbaen, J.-M. Eber, and D.~Heath.
 \newblock Minimum capital requirements for market risk.
 \newblock Standard, Bank for International Settlements, 2019.
 
+\bibitem{BoudoukhRichardsonThaparWang2019}
+J.~Boudoukh, M.~Richardson, A.~Thapar, and F.~Wang.
+\newblock Optimal currency hedging for international equity portfolios.
+\newblock {\em Financial Analysts Journal}, 75(4):65--83, 2019.
+
 \bibitem{boyd2004convex}
 S.~Boyd and L.~Vandenberghe.
 \newblock {\em Convex Optimization}.
@@ -36,6 +41,12 @@ R.~Burkhardt and U.~Ulrych.
 \newblock Sparse and stable international portfolio optimization and currency
   risk management.
 \newblock {\em Journal of International Money and Finance}, 139:102949, 2023.
+
+\bibitem{CaccioliKondorMarsiliStill2016}
+F.~Caccioli, I.~Kondor, M.~Marsili, and S.~Still.
+\newblock Liquidity risk and instabilities in portfolio optimization.
+\newblock {\em International Journal of Theoretical and Applied Finance},
+  19(5):1650035, 2016.
 
 \bibitem{global_currency_hedging}
 J.~Y. Campbell, K.~Serfaty-de Medeiros, and L.~M. Viceira.
@@ -92,6 +103,11 @@ A.~Frazzini, R.~Israel, and T.~J. Moskowitz.
 \newblock Trading costs.
 \newblock Working paper, AQR Capital Management and Yale University, 2018.
 
+\bibitem{GlenJorion1993}
+J.~Glen and P.~Jorion.
+\newblock Currency hedging for international portfolios.
+\newblock {\em The Journal of Finance}, 48(5):1865--1886, 1993.
+
 \bibitem{goldberg2013minimizingshortfall}
 L.~R. Goldberg, M.~Y. Hayes, and O.~Mahmoud.
 \newblock Minimizing shortfall.
@@ -103,6 +119,12 @@ T.~Hastie, R.~Tibshirani, and J.~Friedman.
   and Prediction}.
 \newblock Springer Series in Statistics. Springer, New York, second edition,
   2009.
+
+\bibitem{JagannathanMa2003}
+R.~Jagannathan and T.~Ma.
+\newblock Risk reduction in large portfolios: Why imposing the wrong
+  constraints helps.
+\newblock {\em The Journal of Finance}, 58(4):1651--1683, 2003.
 
 \bibitem{JamesStein1961}
 W.~James and C.~Stein.
@@ -131,6 +153,24 @@ P.~Jorion.
 I.~Kondor, S.~Pafka, and G.~Nagy.
 \newblock Noise sensitivity of portfolio selection under various risk measures.
 \newblock {\em Journal of Banking \& Finance}, 31(5):1545--1573, 2007.
+
+\bibitem{KondorVargaHaszonits2010}
+I.~Kondor and I.~Varga-Haszonits.
+\newblock Instability of portfolio optimization under coherent risk measures.
+\newblock {\em Advances in Complex Systems}, 13(3):425--437, 2010.
+
+\bibitem{KonnoLi1998}
+H.~Konno and J.~Li.
+\newblock Internationally diversified investment using an integrated portfolio
+  model.
+\newblock {\em International Journal of Theoretical and Applied Finance},
+  1(1):145--160, 1998.
+
+\bibitem{KonnoLi2000}
+H.~Konno and J.~Li.
+\newblock Applications of the integrated approach to international portfolio
+  optimization.
+\newblock {\em Asia-Pacific Financial Markets}, 7(2):121--144, 2000.
 
 \bibitem{KonnoYamazaki1991}
 H.~Konno and H.~Yamazaki.
@@ -175,6 +215,11 @@ H.~Markowitz.
 \newblock Portfolio selection.
 \newblock {\em The Journal of Finance}, 7(1):77--91, 1952.
 
+\bibitem{Markowitz1959}
+H.~Markowitz.
+\newblock {\em Portfolio Selection: Efficient Diversification of Investments}.
+\newblock John Wiley \& Sons, New York, 1959.
+
 \bibitem{Markowitz1993}
 H.~Markowitz, P.~Todd, G.~Xu, and Y.~Yamane.
 \newblock Computation of mean-semivariance efficient sets by the {Critical Line
@@ -203,6 +248,12 @@ R.~C. Merton.
   investigation.
 \newblock {\em Journal of Financial Economics}, 8(4):323--361, 1980.
 
+\bibitem{MhiriPrigent2010}
+M.~Mhiri and J.-L. Prigent.
+\newblock International portfolio optimization with higher moments.
+\newblock {\em International Journal of Economics and Finance}, 2(5):157--169,
+  2010.
+
 \bibitem{Michaud1989}
 R.~Michaud.
 \newblock The {M}arkowitz optimization enigma: Is `optimized' optimal?
@@ -221,11 +272,22 @@ W.~Ogryczak and A.~Ruszczy{\'n}ski.
   measures.
 \newblock {\em European Journal of Operational Research}, 116(1):33--50, 1999.
 
+\bibitem{OpieRiddiough2020}
+W.~Opie and S.~J. Riddiough.
+\newblock Global currency hedging with common risk factors.
+\newblock {\em Journal of Financial Economics}, 136(3):780--805, 2020.
+
 \bibitem{PappKondorCaccioli2021}
 G.~Papp, I.~Kondor, and F.~Caccioli.
 \newblock Optimizing expected shortfall under an {$\ell_1$} constraint---an
   analytic approach.
 \newblock {\em Entropy}, 23(5):523, 2021.
+
+\bibitem{PeroldSchulman1988}
+A.~F. Perold and E.~C. Schulman.
+\newblock The free lunch in currency hedging: Implications for investment
+  policy and performance standards.
+\newblock {\em Financial Analysts Journal}, 44(3):45--50, 1988.
 
 \bibitem{safe_haven_currencies}
 A.~Ranaldo and P.~S{\"o}derlind.
@@ -253,9 +315,37 @@ T.~Roncalli.
 \newblock Chapman \& Hall/CRC Financial Mathematics Series. Chapman \&
   Hall/CRC, Boca Raton, FL, 2013.
 
+\bibitem{Solnik1974}
+B.~H. Solnik.
+\newblock An equilibrium model of the international capital market.
+\newblock {\em Journal of Economic Theory}, 8(4):500--524, 1974.
+
 \bibitem{Speranza1993}
 M.~G. Speranza.
 \newblock Linear programming models for portfolio optimization.
 \newblock {\em Finance}, 14:107--123, 1993.
+
+\bibitem{StillKondor2010}
+S.~Still and I.~Kondor.
+\newblock Regularizing portfolio optimization.
+\newblock {\em New Journal of Physics}, 12(7):075034, 2010.
+
+\bibitem{SuzukiKonnoMorjiri1997}
+K.-I. Suzuki, H.~Konno, and M.~Morjiri.
+\newblock An international portfolio optimization model hedged with forward
+  currency contracts.
+\newblock {\em Financial Engineering and the {J}apanese Markets},
+  4(3):275--286, 1997.
+
+\bibitem{TopaloglouVladimirouZenios2002}
+N.~Topaloglou, H.~Vladimirou, and S.~A. Zenios.
+\newblock {CVaR} models with selective hedging for international asset
+  allocation.
+\newblock {\em Journal of Banking \& Finance}, 26(7):1535--1561, 2002.
+
+\bibitem{VanBinsbergenBrandtKoijen2008}
+J.~H. van Binsbergen, M.~W. Brandt, and R.~S.~J. Koijen.
+\newblock Optimal decentralized investment management.
+\newblock {\em The Journal of Finance}, 63(4):1849--1895, 2008.
 
 \end{thebibliography}
