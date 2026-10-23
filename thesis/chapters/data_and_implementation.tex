@@ -31,7 +31,7 @@ each economy and restrict the following year's investments to that set. To study
 universe size affects the optimization approaches considered, we form three cross-sections, comprising the
 top 10, top 50, and top 100 stocks per economy. We refer to these as the small, medium, and large universes. Because the constituents change each
 year, each universe spans more distinct stocks over the full sample than are held on any
-single date, 407 for the top 10, 1705 for the top 50, and 3189 for the top 100, respectively.
+single date, $407$ for the top 10, $1{,}705$ for the top 50, and $3{,}189$ for the top 100, respectively.
 
 The US dollar serves as the base currency throughout our analysis. For each stock we compute fully hedged
 returns, and for each currency the excess currency return, following the model-free return
@@ -335,8 +335,8 @@ configuration with the lowest validation risk is then re-fitted on both the esti
 also use the most recent year of data. More details on the grid search and the hyperparameter range analysis are given in
 \Cref{app:hyperparameter-sensitivity}.
 
-The mean-risk optimizers also require expected asset and currency returns, which are estimated at each
-rebalancing date on the lookback window. Since individual stock means are hard to estimate accurately, we combine them by economy, as derived in \Cref{chap:optimization-framework}. That is, the means of the equally weighted 
+The mean-risk optimizers also require expected asset and currency returns, which are obtained at each
+rebalancing date from the lookback window. Since individual stock means are hard to estimate accurately, we combine them by economy, as derived in \Cref{chap:optimization-framework}. That is, the means of the equally weighted 
 economy returns are shrunk toward zero with a
 James--Stein estimator, and every asset inherits the shrunk mean of its economy. The expected excess currency returns are
 not estimated from returns but set to the negative forward premium at the end of the lookback window. 

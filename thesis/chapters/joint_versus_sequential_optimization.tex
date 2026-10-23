@@ -19,7 +19,7 @@ feasible set defined by the budget and leverage constraints as in \Cref{chap:opt
 For a rebalancing period $t \in \{1, \dots, T\}$, let $\rho_t^{\text{IS}}$ be the in-sample risk over the 
 lookback window and $\rho_t^{\text{OOS}}$ the out-of-sample realized risk over the next holding period. Let $\hat{\bm{\theta}}_t$ denote
 the weight vector an 
-optimizer returns on the lookback window, and $\rho_t^{\text{OOS}}(\hat{\bm{\theta}}_t)$ and $\rho_t^{\text{IS}}(\hat{\bm{\theta}}_t)$ are the risk these weight vectors realize. The two optimization programs are written as
+optimizer returns on the lookback window, so that $\rho_t^{\text{IS}}(\hat{\bm{\theta}}_t)$ and $\rho_t^{\text{OOS}}(\hat{\bm{\theta}}_t)$ are the in-sample and out-of-sample risks it realizes. The two optimization programs are written as
 \begin{equation*}
 \hat{\bm{\theta}}_{J,t} \in \argmin_{\bm{\theta} \in \Theta} \rho_t^{\text{IS}}(\bm{\theta}),
 \end{equation*}
@@ -191,7 +191,7 @@ reasoning as for Expected Shortfall applies, and the realized advantage does not
 and is only present in the small universe.
  
 \subsection{De-meaning the Tail Measures}\label{sec:mechanism-level-demeaning}
-As discussed in \Cref{chap:optimization-framework}, Expected Shortfall and second-order Expected Shortfall are coherent (strictly expectation bounded) risk measures rather than deviation 
+As discussed in \Cref{sec:coherent-and-deviation-measures}, Expected Shortfall and second-order Expected Shortfall are coherent (strictly expectation bounded) risk measures rather than deviation 
 measures. Unlike variance, mean absolute deviation, and semi-variance, they are not invariant to translation, so
 a portfolio with a higher mean return is scored more favorably than one with a lower mean return, everything else being equal. The objectives
 therefore carry an implicit risk-return tradeoff that the three deviation measures do not. We can transform a coherent strictly 

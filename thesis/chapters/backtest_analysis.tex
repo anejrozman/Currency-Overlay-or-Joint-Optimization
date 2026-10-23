@@ -12,9 +12,9 @@ programs and analyze how it changes their performance.
 
 We first report the baseline backtests of the 
 unregularized joint and overlay optimizers across the five 
-risk measures and three universe sizes considered in the thesis. For Expected Shortfall and second-order Expected
-Shortfall, we use the $80\%$ confidence level throughout the chapter.
-We compare them against the equally weighted portfolio, which serves as the no-optimization benchmark.
+risk measures and three universe sizes considered in the thesis. We compare them against the equally weighted portfolio,
+which serves as the no-optimization benchmark. For Expected Shortfall and second-order Expected Shortfall, we use the
+$80\%$ confidence level throughout the chapter.
 
 For the small, medium, and large universes, we report in \Cref{tab:baseline} the out-of-sample annualized excess return over the risk-free rate,
 annualized volatility, maximum drawdown, Sharpe ratio, Sortino ratio, average asset
@@ -137,7 +137,7 @@ Sortino ratios follow the same pattern, so accounting only
 for downside risk does not change the comparison. 
 
 Both the overlay and joint optimizers have higher asset and currency turnover than the equally weighted portfolio. This is expected since the equally weighted portfolio has fixed target weights and only trades to undo the price drift.
-Comparing the asset turnover of the joint and overlay optimizers, we see that it is very similar, differing at most by $7\%$. This tells us that the asset weights are determined primarily by the risk measure being optimized and not by the optimization approach itself. The difference between the two optimizers is in currency 
+Comparing the asset turnover of the joint and overlay optimizers, we see that it is very similar, differing at most by $7\%$. This suggests that the asset weights are determined primarily by the risk measure being optimized and not by the optimization approach itself. The difference between the two optimizers is in currency 
 turnover, where that of the joint optimizer is higher than that of the overlay optimizer in every measure-universe combination, by 
 between $11\%$ and $82\%$.  Since returns are reported net of transaction costs, the comparisons above already incorporate these differences. The extra currency turnover does not reduce the risk-adjusted returns of the joint optimizer relative to the overlay optimizer, and the higher turnover of both optimizers does not change their advantage over the equally weighted portfolio.
 
