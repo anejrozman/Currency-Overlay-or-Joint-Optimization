@@ -42,12 +42,6 @@ R.~Burkhardt and U.~Ulrych.
   risk management.
 \newblock {\em Journal of International Money and Finance}, 139:102949, 2023.
 
-\bibitem{CaccioliKondorMarsiliStill2016}
-F.~Caccioli, I.~Kondor, M.~Marsili, and S.~Still.
-\newblock Liquidity risk and instabilities in portfolio optimization.
-\newblock {\em International Journal of Theoretical and Applied Finance},
-  19(5):1650035, 2016.
-
 \bibitem{global_currency_hedging}
 J.~Y. Campbell, K.~Serfaty-de Medeiros, and L.~M. Viceira.
 \newblock Global currency hedging.
@@ -324,11 +318,6 @@ B.~H. Solnik.
 M.~G. Speranza.
 \newblock Linear programming models for portfolio optimization.
 \newblock {\em Finance}, 14:107--123, 1993.
-
-\bibitem{StillKondor2010}
-S.~Still and I.~Kondor.
-\newblock Regularizing portfolio optimization.
-\newblock {\em New Journal of Physics}, 12(7):075034, 2010.
 
 \bibitem{SuzukiKonnoMorjiri1997}
 K.-I. Suzuki, H.~Konno, and M.~Morjiri.

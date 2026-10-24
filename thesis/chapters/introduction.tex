@@ -1,14 +1,94 @@
 
 \chapter{Introduction}\label{ch:introduction}
 
-\section{Motivation: International Diversification, Currency Risk, and Tail Risk}
+\section{Background and Motivation}
+
+Portfolio optimization studies how an investor should divide their wealth among different assets. Markowitz
+\cite{Markowitz1952} proposes to choose the portfolio weights by trading off the expected return of the portfolio
+against its risk, which he measures by the variance of the portfolio return. A central insight of his work is that
+combining assets whose returns do not move together lowers the risk of the portfolio. Since then, portfolio
+optimization has become a standard tool in asset management. An important difficulty in practice is that the expected
+returns and the risks of the assets are unknown and have to be estimated from historical data.
+
+Investing abroad gives an investor access to more assets and therefore more diversification. At the same time, it
+exposes the portfolio to changes in exchange rates. If a foreign currency loses value against the domestic currency,
+the investor loses money on the assets in that currency, even if the assets themselves do well. The investor can manage
+this currency risk with currency forward contracts. An international portfolio is therefore described by two sets of decisions,
+how to allocate the assets and the currency exposures. In practice, many investors make these decisions in two steps. They first
+choose the asset portfolio and then add a portfolio of currency positions, called a currency overlay, to manage its
+currency risk, often through a separate overlay manager \cite{SparseAndStableInternationalPortfolioOptimization}.
+
+The alternative to this sequential approach is joint optimization, which chooses the asset weights and the currency
+exposures together in one step. Jorion \cite{Jorion1994} argues that the two-step approach is suboptimal, since it
+ignores how the individual assets and the exchange rates move together. On the historical data used to choose the
+portfolio, joint optimization can never do worse than the overlay, since it can always choose the
+same portfolio. However, what matters for an investor is how the portfolio performs in the future, out of sample.
+Because joint optimization fits all weights to the same data at once, it can also adapt more closely to random noise in
+this data, and its advantage can disappear out of sample \cite{SparseAndStableInternationalPortfolioOptimization}.
+Regularization, which keeps the portfolio weights from becoming too extreme, is a common way to reduce this problem.
+
+Many investors use a currency overlay, often run by a separate manager. If joint optimization works better out of
+sample, these investors could improve their portfolios by making the asset and the currency decisions together. The
+existing evidence, however, does not give a clear answer. Burkhardt and Ulrych
+\cite{SparseAndStableInternationalPortfolioOptimization} study regularized mean-variance portfolios, which include the
+expected returns in the objective, and find that joint optimization achieves on average higher risk-adjusted returns
+out of sample than the overlay. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} minimize
+Expected Shortfall instead, which measures the average of the largest losses of a portfolio, and find that joint
+optimization performs better in the smaller of their two investable universes. The two studies differ in the risk
+measure and in whether expected returns are used in the optimization, and the second study shows that the answer can also depend
+on the number of assets that make up the investable universe. This thesis builds on their frameworks and studies whether optimizing the asset weights and
+the currency exposures jointly improves on the sequential currency overlay out of sample, and how the answer depends on
+the risk measure, the size of the investable universe, regularization, and a mean term in the objective.
 
 \section{Contributions}
 
-a systematic comaprison across different risk measures, universe sizes, which the exsititng literature covers only partially. 
+This thesis makes four contributions. First, we compare joint and sequential optimization under five risk
+measures, in three investable universes of increasing size, with and without regularization. Without a mean term,
+the joint and the overlay optimizers achieve very similar risk-adjusted returns, and the main difference is that the
+joint optimizers achieve a lower risk. Their advantage in the risk measure they minimize is realized out of sample only
+in the smallest universe, where the currency exposures make up a larger share of the decision variables. In the larger
+universes, the asset step of the overlay program has enough weights to fit the objective on its own, and the advantage
+drops to zero.
 
-the mechanism analysis of the tail measures
+Second, we add a mean term to the programs of all five risk measures, with expected asset returns that are pooled by
+economy and expected currency returns that are derived from the forward premia. The mean term raises the
+risk-adjusted returns of almost all optimizers, and most for the variance, the semi-variance, and the mean absolute
+deviation, which are unaffected by a shift of the portfolio return, whereas Expected Shortfall and second-order Expected
+Shortfall already reward a higher mean. Once a mean term is added to the unregularized programs, the joint optimizers
+achieve higher Sharpe ratios than the overlay optimizers for every risk measure in the two larger universes, since the
+joint program can weigh the expected returns of the assets and the currencies against each other.
 
-the universe size results. The joint advantage depends on the currency share of the decision variables.. dimensionality effect. 
+Third, we show that the joint program has an advantage over the overlay program in sample by construction, and we
+measure how much of this advantage is realized out of sample. For the variance, the semi-variance, and the mean
+absolute deviation, the in-sample advantage is small, and most of it is realized out of sample. For Expected Shortfall
+and second-order Expected Shortfall, it is larger but mostly not realized. By varying the confidence level and by
+de-meaning the two measures, we trace their in-sample advantage to two mechanisms, the fitting of the currency positions
+to the specific worst days of the lookback window and an implicit risk-return tradeoff that rewards a high realized
+mean, and neither of them generalizes out of sample.
+
+Finally, we analyze how much the optimizers improve on the equally weighted portfolio and on two asset-only benchmarks,
+which fully hedge or leave unhedged the currency exposure of their assets. All optimizers achieve a much lower
+volatility and smaller drawdowns than the equally weighted portfolio. Without a mean term, they also earn lower excess
+returns, but they outperform it on a risk-adjusted basis in the two larger universes, which offer more low-risk stocks
+to choose from, though not consistently in the smallest universe. Regularization improves the risk-adjusted returns,
+most in the largest universe, since it limits the extreme positions that the programs fit to noise. The regularized
+joint and overlay optimizers, which manage the currencies actively, realize a lower value of the risk measure they
+minimize than the fully hedged benchmark at similar risk-adjusted returns, and they outperform the unhedged benchmark in
+the two larger universes. Overall, the
+mean-variance joint optimizer performs best.
 
 \section{Thesis Structure}
+
+The remainder of the thesis is organized as follows. In \Cref{chap:literature-review} we review the literature on
+currency risk management, on the joint optimization of assets and currencies, and on the risk measures and estimation
+methods on which our programs build. In \Cref{chap:optimization-framework} we introduce the five risk measures, derive
+the return of an international portfolio, and formulate the regularized and the mean-risk programs for sequential and
+joint optimization. In \Cref{chap:data-and-implementation} we describe the dataset used and the implementation of the
+backtests. In \Cref{chap:backtest-analysis} we analyze the out-of-sample performance of the joint and the overlay
+optimizers and compare them with the benchmarks. In \Cref{chap:joint-vs-sequential} we compare how well the joint and
+the overlay programs minimize their risk measure in sample and out of sample. In \Cref{chap:conclusion} we summarize our
+findings and discuss the limitations of the analysis and directions for future research. Appendices~\ref{app:es_derivation},
+\ref{app:mv_derivation}, and~\ref{app:mad_derivation} derive the optimization programs for the five risk measures considered in our analysis.
+Appendix~\ref{app:demeaning} contains the results on coherent risk measures and deviation measures.
+Appendices~\ref{app:optimization-implementation} and~\ref{app:transaction_costs} describe the numerical implementation of the optimizers
+and the modelling of transaction costs, and Appendix~\ref{app:additional-results} reports additional results and findings not included in the main text.
