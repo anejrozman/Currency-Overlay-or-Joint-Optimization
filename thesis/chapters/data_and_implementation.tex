@@ -325,7 +325,8 @@ trading day of each quarter. The first portfolio is formed
 on 30 June 2000, and the last on 30 December 2022, which gives $91$
 rebalancing dates. The lookback window covers the ten years
 before each rebalancing date, approximately $2{,}500$ daily observations. All strategies invest in the constituents of the current year's universe that have a
-complete return history over the lookback window.
+complete return history over the lookback window. Stocks with missing returns in the lookback window are therefore
+excluded, so on a given rebalancing date a universe can contain fewer than 10, 50, or 100 stocks per economy.
 
 The penalty weights of the regularized optimizers are selected at every rebalancing date by a grid search, for which the
 lookback window is partitioned into a nine-year estimation window and a one-year validation window. Each configuration is
