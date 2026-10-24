@@ -56,7 +56,7 @@ approaches.
 The estimation error also depends on the risk measure one chooses to optimize. Markowitz
 \cite{Markowitz1952} measures the risk of a portfolio by the variance of its return, which penalizes returns above the
 mean as much as returns below it, and in his later book \cite{Markowitz1959} he proposes the semi-variance as a downside
-alternative, whose efficient sets Markowitz et al.~\cite{Markowitz1993} compute. Konno and Yamazaki
+alternative. Konno and Yamazaki
 \cite{KonnoYamazaki1991} propose the mean absolute deviation, which turns portfolio optimization into a linear program.
 Artzner et al.~\cite{CoherentMeasuresOfRisk} define coherent risk measures, a class to which Expected Shortfall belongs
 \cite{acerbi2002coherenceexpectedshortfall}, and Rockafellar and Uryasev \cite{RockafellarUryasev2000,
@@ -70,8 +70,7 @@ more sensitive to estimation error than those optimized under the variance, and 
 al.~\cite{ciliberti2007feasibility} show that, without bounds on the weights, the optimization has no finite solution in
 some samples, and that for large portfolios a solution ceases to exist once the ratio of the number of assets to the
 number of observations exceeds a critical value. Kondor and Varga-Haszonits \cite{KondorVargaHaszonits2010} show that
-this instability affects all coherent risk measures, since no optimal portfolio exists in a sample in which one
-portfolio dominates another. Each of the multi-currency studies above relies on a single risk measure, which leaves
+this instability affects all coherent risk measures. Each of the multi-currency studies above relies on a single risk measure, which leaves
 open how much the comparison of the two approaches depends on that choice.
 
 One approach to reducing the estimation error is to shrink the estimates. James and Stein \cite{JamesStein1961} show
@@ -81,12 +80,7 @@ structured target. Jagannathan and Ma \cite{JagannathanMa2003} show that a no-sh
 shrinking the large entries of the sample covariance matrix and reduces the risk of the optimized portfolio. Another
 approach is to regularize the weights directly. DeMiguel et al.~\cite{DeMiguelGarlappiNogalesUppal2009} bound the norm
 of the weights of minimum-variance portfolios, Brodie et al.~\cite{BrodieDaubechiesDeMolGiannoneLoris2009} add an $L^1$
-penalty, which yields sparse and stable portfolios, and Li \cite{Li2015} combines the $L^1$ and the $L^2$ penalty. For
-coherent risk measures, Still and Kondor \cite{StillKondor2010} relate regularized Expected Shortfall optimization to
-support vector regression and show that an $L^2$ penalty acts as a diversification pressure that stabilizes the
-solution, and Caccioli et al.~\cite{CaccioliKondorMarsiliStill2016} show that any $L^p$ penalty with $p > 1$ removes the
-instability, whereas the $L^1$ norm removes it only as a hard constraint, such as a ban on short sales. Papp et
-al.~\cite{PappKondorCaccioli2021} analyze the effect of an $L^1$ constraint on Expected Shortfall analytically. These
+penalty, which yields sparse and stable portfolios, and Li \cite{Li2015} combines the $L^1$ and the $L^2$ penalty. These
 methods are developed for portfolios of assets in a single currency. Burkhardt and Ulrych
 \cite{SparseAndStableInternationalPortfolioOptimization} carry them over to the mean-variance optimization of assets and
 currencies, and Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to Expected Shortfall.
@@ -97,4 +91,4 @@ Expected Shortfall, in the same out-of-sample framework with and without regular
 comparison depends on the size of the investable universe. Third,
 we add a mean term to the programs of all five risk measures, with expected asset returns that are pooled by economy and
 shrunk and expected currency returns that are derived from the forward premia. Finally, we distinguish the advantage that
-joint optimization has in sample by construction from the advantage that it realizes out of sample.
+joint optimization has in sample from what is realized out of sample.
