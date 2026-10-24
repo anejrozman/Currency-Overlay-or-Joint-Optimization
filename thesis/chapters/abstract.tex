@@ -1,4 +1,22 @@
 \begin{abstract}
+Investors with assets in several currencies often first choose the asset portfolio and then manage its currency risk
+with a currency overlay, a portfolio of currency positions. Choosing the asset and currency positions together in one
+step can never do worse in sample, but it may fit noise in the data. This thesis studies whether such joint
+optimization improves on the sequential currency overlay out of sample. We compare the two approaches under five risk
+measures, the variance, semi-variance, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall.
+We backtest them in three investable universes of increasing size, with and without regularization, and with a mean
+term added to the unregularized programs. We find that, without a mean term, the joint and overlay optimizers achieve
+very similar risk-adjusted returns. The in-sample advantage of joint optimization in the minimized risk measure is realized out of sample only in the smallest universe.
+For Expected Shortfall and second-order Expected Shortfall, this advantage comes from fitting the currency positions to
+the worst days in the data and from an implicit reward for a high realized mean, and neither generalizes. With a mean
+term, the joint optimizers achieve higher Sharpe ratios than the overlay optimizers for every risk measure in the two
+larger universes. All optimizers have much lower volatility and smaller drawdowns than the equally weighted portfolio,
+and higher risk-adjusted returns in the two larger universes. Regularization and the mean term improve their
+risk-adjusted returns further. Managing the currencies actively lowers risk relative to full hedging at similar
+risk-adjusted returns and outperforms leaving them unhedged in the two larger universes. These results suggest that
+investors who only minimize risk can keep their currency overlay unless their universe is small, while those who also
+use expected returns can benefit from joint optimization.
+
     % Multi-currency portfolio construction requires managing asset and currency exposures together, yet it 
     % remains unclear whether these decisions are best made simultaneously or sequentially as the investable universe grows. 
     % In this thesis, we build on the work of \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios,SparseAndStableInternationalPortfolioOptimization}. 
