@@ -6,10 +6,30 @@ build-backend = "setuptools.build_meta"
 name = "portfolio-backtest"
 version = "0.1.0"
 requires-python = ">=3.12"
-dependencies = ["numpy", "pandas", "cvxpy", "scipy", "matplotlib", "polars"]
+dependencies = [
+    "cvxpy",
+    "gurobipy",
+    "matplotlib",
+    "numpy",
+    "pandas",
+    "polars",
+    "scipy",
+]
+
+[project.optional-dependencies]
+notebooks = ["jupyter"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 "portfolio_backtest" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = false
+
+# Third-party libraries without stubs
+[[tool.mypy.overrides]]
+module = ["pandas.*", "numpy.*", "cvxpy.*", "polars.*", "scipy.*", "matplotlib.*"]
+ignore_missing_imports = true
