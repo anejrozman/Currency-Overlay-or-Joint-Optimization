@@ -103,7 +103,9 @@ smaller than the in-sample gap for almost  all risk measures and universe sizes,
 semi-variance measures in the small universe. Out of sample, we see a negative dependence on the size of the investable 
 universe. In the small universe the realized out-of-sample advantage of joint optimization is in the range between $1.78\%$ and $3.67\%$, with second-order Expected Shortfall having the smallest benefit and semi-variance having the largest. In the medium universe, the 
 advantage drops to zero for second-order Expected Shortfall and remains around $1\%$ for the other measures, and in the large universe the 
-advantage for Expected Shortfall drops slightly below zero while the remaining measures stay below $1\%$. 
+advantage for Expected Shortfall drops slightly below zero while the remaining measures stay below $1\%$.
+The realized risk measures over the whole out-of-sample period in \Cref{app:additional-backtest-results} show the same
+pattern, with the advantage of the joint optimizers falling as the universe grows. 
 
 
 The in-sample series separates 
@@ -163,7 +165,9 @@ The joint program chooses the asset and currency weights together, so it can sel
 positions can offset. The overlay program fixes the asset weights of the fully hedged portfolio, 
 and its currency step can adjust $M$ weights against a largely fixed set of the worst-performing days. As we increase the confidence level, the number of observations in the tail shrinks, so the joint program's currency weights can cover a larger share of the worst-performing days, and the in-sample advantage grows. 
 The growth is largest in the small universe, where the currency weights represent a larger
-share of all the decision variables. In larger universes, the overlay program's asset step has more weights to diversify, so the joint program's advantage decreases. 
+share of all the decision variables. In larger universes, the overlay program's asset step has more weights to diversify, so the joint program's advantage decreases.
+Consistent with this, the unregularized overlay optimizers of mean absolute deviation and the two tail measures hold
+almost no currency exposure in the medium and large universes (see \Cref{app:portfolio-sparsity}). 
 Since the weights are fitted to specific worst-performing days of the lookback window that do not necessarily occur in the next period, the mechanism generalizes poorly out of sample. 
 
 

@@ -133,7 +133,7 @@ $0.41$ and $0.56$ against $0.33$, and between $0.51$ and $0.76$ against $0.37$, 
 In the small universe, the optimizers lose more excess return than they reduce
 volatility, while in larger universes they can diversify across more low-risk stocks,
 and the reduction in volatility outweighs the lost return.
-Sortino ratios follow the same pattern, so accounting only
+Sortino ratios follow the same pattern, as do the Expected Shortfall ratios in \Cref{app:additional-backtest-results}, so accounting only
 for downside risk does not change the comparison. 
 
 Both the overlay and joint optimizers have higher asset and currency turnover than the equally weighted portfolio. This is expected since the equally weighted portfolio has fixed target weights and only trades to undo the price drift.
@@ -219,6 +219,8 @@ in the medium universe. The penalties stabilize the weights by limiting the extr
 lookback window, which becomes more important when the number of assets increases relative to the length of the lookback
 window. The unregularized second-order Expected Shortfall optimizers are the least stable, since the measure is driven by
 the squared losses of the few most extreme observations in the lookback window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
+\Cref{app:portfolio-sparsity} shows how many of the available assets and currencies the optimizers hold with and
+without regularization.
 
 \begin{table}[tbp]
   \centering
@@ -358,7 +360,8 @@ only $4\%$ to $46\%$ higher than that of Full, so their currency positions devia
 whereas in the small universe it is $1.5$ to $2.3$ times as high. 
 On the other hand, the Zero optimizer keeps the full currency 
 exposure and with it the excess currency returns that the
-risk-minimizing optimizers give up, and earns a higher excess return at a much higher volatility. In the small universe
+risk-minimizing optimizers give up, and earns a higher excess return at a much higher volatility. \Cref{app:drawdown-analysis} shows that Zero also loses more than
+the overlay and joint optimizers in the global financial crisis, when most foreign currencies fell against the US dollar. In the small universe
 this gives Zero the higher Sharpe ratio for every risk measure, while in the medium and large universes the overlay and
 joint optimizers outperform it for every risk measure, by up to 70\%. This performance advantage of the risk-minimizing optimizers over Zero shows the
 benefits of active currency management in larger universes, where equity risk is
@@ -396,7 +399,7 @@ it is reflective of this period rather than a persistent difference. The bottom 
 \Cref{fig:regularized-top50,fig:regularized-top100} show that the cumulative return differences in the medium and large
 universes remain small for all risk measures throughout the sample. The main effect of regularization on the comparison is on currency
 turnover. Without regularization, the currency turnover of the joint optimizer exceeds that of the overlay optimizer by $11\%$ to $82\%$, while with
-regularization the two differ by at most $7\%$. The penalties on the currency weights thus shrink the larger currency
+regularization the two differ by at most $7\%$ (see also \Cref{fig:turnover-asset,fig:turnover-currency}). The penalties on the currency weights thus shrink the larger currency
 positions of the joint program to about the size of those of the overlay program. This does not have an effect on their
 risk-adjusted returns, which remain very similar, with no optimizer consistently outperforming the other. 
 
@@ -554,7 +557,7 @@ the tail measures. This comes at the cost of an increase in volatility, which ri
 variance and semi-variance optimizers, while for mean absolute deviation
 and the tail measures it changes by less than half a percentage point. Even with the increase, the volatility of the variance and
 semi-variance optimizers remains at $50\%$ to $70\%$ of that of the equally weighted portfolio, and the
-maximum drawdowns of all mean-risk optimizers stay below $75\%$ of that of the equally weighted portfolio. The mean
+maximum drawdowns of all mean-risk optimizers stay below $75\%$ of that of the equally weighted portfolio (see also \Cref{app:drawdown-analysis}). The mean
 term thus raises returns without giving up the lower volatility and drawdowns that distinguish the optimizers from the equally
 weighted portfolio. As a result, every mean-risk optimizer outperforms the equally weighted portfolio on a risk-adjusted
 basis in the medium and large universes. In the small universe, the deviation measures reach Sharpe ratios of $0.34$ to
