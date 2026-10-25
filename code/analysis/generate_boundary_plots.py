@@ -1,7 +1,7 @@
 """
 Penalty boundary diagnostics, one figure pair per universe size.
 
-Reads the sweep written by code/scripts/hyperparameter_boundary_analysis.py and
+Reads the sweep written by code/analysis/hyperparameter_boundary_analysis.py and
 draws, for each penalty, how far the affected weight block still moves as the
 penalty approaches and passes its configured grid bound. Lambda is shown relative
 to that bound, so the bound sits at 1.0 in every panel.
@@ -266,7 +266,7 @@ def main() -> None:
     if not universes:
         raise SystemExit(
             f"No sweep found for '{measure}' in {DATA_DIR}. Run "
-            f"code/scripts/hyperparameter_boundary_analysis.py {measure} first."
+            f"code/analysis/hyperparameter_boundary_analysis.py {measure} first."
         )
 
     for universe in universes:

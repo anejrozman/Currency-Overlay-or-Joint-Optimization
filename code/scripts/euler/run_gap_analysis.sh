@@ -1,7 +1,7 @@
 #!/bin/bash
 # Submit the joint-vs-overlay gap experiment to the Euler cluster.
 #
-# Runs code/scripts/in_sample_vs_out_of_sample.py for one arm. The arm that needs
+# Runs code/analysis/in_sample_vs_out_of_sample.py for one arm. The arm that needs
 # the cluster is the currency-count arm, which re-solves the joint and overlay
 # programs at every rebalancing date for each tradable-currency count:
 #
@@ -25,7 +25,7 @@
 # --out-dir and merge afterwards.
 #
 # The tables and figure are built separately, once the arms have landed:
-#   python code/scripts/in_sample_vs_out_of_sample.py --plot-only
+#   python code/analysis/in_sample_vs_out_of_sample.py --plot-only
 #
 # --family regularized reuses the penalties each production run selected, read via
 # results/runs/top_runs.csv.  reg_soes_joint and reg_soes_curr_overlay have finished
@@ -110,11 +110,11 @@ fi
 
 # Directory paths
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-SCRIPTS_DIR="$ROOT_DIR/code/scripts"
+ANALYSIS_DIR="$ROOT_DIR/code/analysis"
 LOGS_DIR="$ROOT_DIR/logs"
 mkdir -p "$LOGS_DIR"
 
-# run_in_sample_analysis.sh expects code/.venv, submit_job.sh expects .venv;
+# run_backtest.sh expects code/.venv, submit_job.sh expects .venv;
 # take whichever is actually present so this works in either layout.
 if [[ -f "$ROOT_DIR/code/.venv/bin/activate" ]]; then
     VENV="$ROOT_DIR/code/.venv/bin/activate"
@@ -126,8 +126,8 @@ fi
 # observations) as well as top-10, so size memory for the larger of the two.
 MEM_PER_CPU="${MEM_PER_CPU:-8G}"
 
-# The job runs with --chdir code/scripts, so a relative --out-dir would land in
-# code/scripts/<dir>.  Resolve it against the repo root instead.
+# The job runs with --chdir code/analysis, so a relative --out-dir would land in
+# code/analysis/<dir>.  Resolve it against the repo root instead.
 if [[ -n "$OUT_DIR" ]]; then
     [[ "$OUT_DIR" = /* ]] || OUT_DIR="$ROOT_DIR/$OUT_DIR"
     PASSTHROUGH+=("--out-dir" "$OUT_DIR")
@@ -147,7 +147,7 @@ sbatch <<EOF
 #SBATCH --mem-per-cpu=${MEM_PER_CPU}
 #SBATCH --output=${LOGS_DIR}/${JOB_NAME}_%j.out
 #SBATCH --error=${LOGS_DIR}/${JOB_NAME}_%j.err
-#SBATCH --chdir=${SCRIPTS_DIR}
+#SBATCH --chdir=${ANALYSIS_DIR}
 
 module load stack/2024-06 gcc/12.2.0 python/3.12.8
 module load gurobi/13.0.0
@@ -161,4 +161,4 @@ exit \${status}
 EOF
 
 echo "Check status with: squeue --me"
-echo "Once it has finished: python code/scripts/in_sample_vs_out_of_sample.py --plot-only"
+echo "Once it has finished: python code/analysis/in_sample_vs_out_of_sample.py --plot-only"

@@ -63,14 +63,14 @@ skipped whole, since regressions() contrasts a measure's universes against each
 other and a single-universe cell has nothing to regress on.
 
 Usage:
-    python code/scripts/in_sample_vs_out_of_sample_demeaned.py
-    python code/scripts/in_sample_vs_out_of_sample_demeaned.py --family regularized
-    python code/scripts/in_sample_vs_out_of_sample_demeaned.py --measures soes --universes 10
-    python code/scripts/in_sample_vs_out_of_sample_demeaned.py --plot-only
+    python code/analysis/in_sample_vs_out_of_sample_demeaned.py
+    python code/analysis/in_sample_vs_out_of_sample_demeaned.py --family regularized
+    python code/analysis/in_sample_vs_out_of_sample_demeaned.py --measures soes --universes 10
+    python code/analysis/in_sample_vs_out_of_sample_demeaned.py --plot-only
 
 One cell per job on the cluster, then the tables and figure once they land:
     code/scripts/euler/run_gap_analysis_demeaned.sh --family unregularized
-    python code/scripts/in_sample_vs_out_of_sample_demeaned.py --plot-only
+    python code/analysis/in_sample_vs_out_of_sample_demeaned.py --plot-only
 
 Author: Anej Rozman
 """

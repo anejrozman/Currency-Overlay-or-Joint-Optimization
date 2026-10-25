@@ -73,10 +73,10 @@ spans every risk measure, so it is drawn from every CSV present in the output
 directory rather than from the measure this invocation swept.
 
 Usage:
-    python code/scripts/in_sample_analysis.py es
-    python code/scripts/in_sample_analysis.py mv --universes 10 50
-    python code/scripts/in_sample_analysis.py soes --universes 10 50 100
-    python code/scripts/in_sample_analysis.py mad --plot-only
+    python code/analysis/in_sample_analysis.py es
+    python code/analysis/in_sample_analysis.py mv --universes 10 50
+    python code/analysis/in_sample_analysis.py soes --universes 10 50 100
+    python code/analysis/in_sample_analysis.py mad --plot-only
 
 Author: Anej Rozman
 """

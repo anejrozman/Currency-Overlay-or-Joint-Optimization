@@ -4,7 +4,7 @@
 # --es or --soes picks the measure; there is no default, because the two write to
 # separate shard directories and a silent default would fill the wrong one.
 #
-# Runs code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py as one job per
+# Runs code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py as one job per
 # cell: 14 confidence levels (50/60/70, then 2.5-point steps from 72.5 to 97.5)
 # x three universes (10, 50, 100) = 42 independent jobs, each solving the
 # unregularized ES joint and overlay programs plus the 1/N control at ~91 quarterly
@@ -57,7 +57,7 @@
 # are in gap_summary.csv, with the median realized tail count of each.
 #
 # The tables and figures are built separately, once the cells have landed:
-#   python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --es --plot-only
+#   python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --es --plot-only
 #
 # Usage:
 #   ./run_gap_analysis_levels.sh --es|--soes [options]
@@ -186,11 +186,11 @@ fi
 
 # Directory paths
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-SCRIPTS_DIR="$ROOT_DIR/code/scripts"
+ANALYSIS_DIR="$ROOT_DIR/code/analysis"
 LOGS_DIR="$ROOT_DIR/logs"
 mkdir -p "$LOGS_DIR"
 
-# run_in_sample_analysis.sh expects code/.venv, submit_job.sh expects .venv;
+# run_backtest.sh expects code/.venv, submit_job.sh expects .venv;
 # take whichever is actually present so this works in either layout.
 if [[ -f "$ROOT_DIR/code/.venv/bin/activate" ]]; then
     VENV="$ROOT_DIR/code/.venv/bin/activate"
@@ -198,8 +198,8 @@ else
     VENV="$ROOT_DIR/.venv/bin/activate"
 fi
 
-# The job runs with --chdir code/scripts, so a relative --out-dir would land in
-# code/scripts/<dir>. Resolve it against the repo root instead.
+# The job runs with --chdir code/analysis, so a relative --out-dir would land in
+# code/analysis/<dir>. Resolve it against the repo root instead.
 if [[ -n "$OUT_DIR" ]]; then
     [[ "$OUT_DIR" = /* ]] || OUT_DIR="$ROOT_DIR/$OUT_DIR"
     PASSTHROUGH+=("--out-dir" "$OUT_DIR")
@@ -259,7 +259,7 @@ sbatch <<EOF
 #SBATCH --mem-per-cpu=${job_mem}
 #SBATCH --output=${LOGS_DIR}/${JOB_NAME}_%j.out
 #SBATCH --error=${LOGS_DIR}/${JOB_NAME}_%j.err
-#SBATCH --chdir=${SCRIPTS_DIR}
+#SBATCH --chdir=${ANALYSIS_DIR}
 
 module load stack/2024-06 gcc/12.2.0 python/3.12.8
 module load gurobi/13.0.0
@@ -285,4 +285,4 @@ else
     echo "${count} jobs submitted. Check status with: squeue --me"
 fi
 echo "Once they have finished:"
-echo "  python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --${MEASURE} --plot-only"
+echo "  python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --${MEASURE} --plot-only"

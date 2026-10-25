@@ -11,11 +11,11 @@ Figure 3 of Lucescu & Ulrych (2026) with 5 bootstrap replicates instead of 100,
 on the first estimation window of the top-10 universe.
 
 Usage:
-    python code/scripts/hyperparameter_boundary_analysis.py es
-    python code/scripts/hyperparameter_boundary_analysis.py mv
-    python code/scripts/hyperparameter_boundary_analysis.py mad
-    python code/scripts/hyperparameter_boundary_analysis.py smv
-    python code/scripts/hyperparameter_boundary_analysis.py soes
+    python code/analysis/hyperparameter_boundary_analysis.py es
+    python code/analysis/hyperparameter_boundary_analysis.py mv
+    python code/analysis/hyperparameter_boundary_analysis.py mad
+    python code/analysis/hyperparameter_boundary_analysis.py smv
+    python code/analysis/hyperparameter_boundary_analysis.py soes
 """
 
 from __future__ import annotations

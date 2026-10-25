@@ -121,13 +121,13 @@ tabulated in both.  Level 50 is excluded from both figures and kept in the table
 (PLOT_EXCLUDE_LEVELS).
 
 Usage:
-    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --es
-    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --soes --levels 72.5 --universes 10
-    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --soes --plot-only
+    python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --es
+    python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --soes --levels 72.5 --universes 10
+    python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --soes --plot-only
 
 One cell per job on the cluster, then the tables and figures once they land:
     code/scripts/euler/run_gap_analysis_levels.sh --soes
-    python code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py --soes --plot-only
+    python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --soes --plot-only
 
 Author: Anej Rozman
 """

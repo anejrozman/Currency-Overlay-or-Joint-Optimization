@@ -4,7 +4,7 @@ The confidence levels swept by the level experiment, and how they are spelled.
 One source of truth for four consumers that must agree exactly: the cluster
 submitter (code/scripts/euler/run_levels.sh), the run collector
 (code/scripts/collect_level_runs.py), the gap analysis
-(code/scripts/in_sample_vs_out_of_sample_at_diff_levels.py) and its own
+(code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py) and its own
 submitter.  A level that is spelled one way in a CSV row and another in a shard
 filename silently splits one cell into two, so the spelling lives here rather
 than in an f-string in each caller.

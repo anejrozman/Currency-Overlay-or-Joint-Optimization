@@ -31,10 +31,10 @@ finished on top-10 alone, so their top-50 and top-100 cells are blank and the
 regularized arm covers soes only once those cluster runs land.
 
 Usage:
-    python code/scripts/in_sample_vs_out_of_sample.py
-    python code/scripts/in_sample_vs_out_of_sample.py --arms grid
-    python code/scripts/in_sample_vs_out_of_sample.py --arms currency
-    python code/scripts/in_sample_vs_out_of_sample.py --plot-only
+    python code/analysis/in_sample_vs_out_of_sample.py
+    python code/analysis/in_sample_vs_out_of_sample.py --arms grid
+    python code/analysis/in_sample_vs_out_of_sample.py --arms currency
+    python code/analysis/in_sample_vs_out_of_sample.py --plot-only
 
 Author: Anej Rozman
 """
