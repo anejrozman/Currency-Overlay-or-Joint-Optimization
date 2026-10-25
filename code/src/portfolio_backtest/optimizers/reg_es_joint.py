@@ -1,27 +1,9 @@
-"""
-Joint Regularized Expected Shortfall optimizer over asset and currency weights.
+"""Regularized joint asset and currency optimizer minimizing Expected Shortfall.
 
-Minimizes regularized ES of the combined portfolio return (R_fh @ x + R_c @ psi)
-jointly over asset weights x and currency overlay weights psi in a single program.
-Penalties follow the paper's S1, S2 diagonal structure: lambda^a on the first N
-entries (assets) and lambda^c on the remaining M entries (currencies), so the four
-coefficients lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr are
-tuned independently.
-
-Convention: gamma = infinity, so the mean term drops and the ES coefficient is
-normalized to one. The Table 3 penalty bounds are read as already normalized.
-
-With ``demean`` set, both return matrices are centered columnwise before the
-program is solved, so ES is measured on deviations from the sample mean rather
-than on raw returns and is comparable to the deviation measures (mean-variance,
-MAD, semi-variance), all of which demean by construction. :meth:`score` holds the
-trained weights fixed and re-centers only the validation portfolio return, by its
-own mean. The flag enters the problem cache key because it is baked into the
-compiled program through Y_fh and Y_c, exactly like alpha and the leverage limit.
-Off by default; the switch is ``DEMEAN`` in backtest_config.py, mirrored into the
-parameter grid there as ``DEMEAN_GRID``.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). psi is otherwise unconstrained, the base-currency weight included. ES is
+taken at confidence level alpha. With demean, returns are centered columnwise before solving and when scoring.
 """
 
 from __future__ import annotations
@@ -39,9 +21,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -49,44 +29,12 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
-    """
-    Joint regularized ES optimizer over asset and currency overlay weights.
-
-    Minimizes ES of (R_fh @ x + R_c @ psi) plus separate L1/L2 penalties on the
-    asset and currency blocks, subject to full investment and a leverage cap on
-    x. psi carries no budget or leverage constraint.
-
-    The compiled problem is cached at class level and keyed on the estimation
-    window, alpha and the leverage limit. The four penalties are DPP-compliant
-    cp.Parameter objects, so a window is canonicalized once and reused across
-    every grid point the backtester evaluates on it. Nothing factorizes in the
-    joint program, so all grid points still require a full-size solve.
-    """
-
-    # window signature -> compiled problem bundle. Held at class level because
-    # the backtester constructs a fresh optimizer instance per grid point.
+    # window signature -> compiled problems, shared by the per-grid-point instances
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
-    # Per date the backtester touches two windows: train (every grid point) and
-    # train+val (final refit). Two entries covers both; more risks holding
-    # several dense 2520-by-(N+M) canonicalizations at top-100.
+    # two entries: the training window and the full estimation window of a date
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``            (float) — ES confidence level, default 0.80
-                * ``lambda_l1_asset``  (float) — L1 penalty on x, default 0.0
-                * ``lambda_l2_asset``  (float) — L2 penalty on x, default 0.0
-                * ``lambda_l1_curr``   (float) — L1 penalty on psi, default 0.0
-                * ``lambda_l2_curr``   (float) — L2 penalty on psi, default 0.0
-                * ``leverage_limit``   (float) — ||x||_1 cap, default 2.0
-                * ``demean``           (bool)  — center R_fh and R_c columnwise
-                                                 before solving, default
-                                                 ``backtest_config.DEMEAN``
-                * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -149,12 +97,7 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -176,10 +119,7 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
-        # demean belongs in the key for the same reason alpha and the leverage limit
-        # do: it is baked into the compiled program as a constant, here through the
-        # centered Y_fh and Y_c. Without it a demeaned and a raw run in the same
-        # process would silently share a compiled problem.
+        # demean is compiled in through the centered returns, so it is part of the key
         self._cache_key = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -259,11 +199,8 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         return bundle
 
     def _solve(self, problem: cp.Problem) -> None:
-        """
-        Solve with crossover left on. psi_USD is unidentified (the USD column of
-        R_c is identically zero and psi carries no constraints), so the optimal
-        face contains a line. Crossover picks a vertex; with Crossover=0 Gurobi
-        hits its barrier iteration limit and returns status=user_limit.
+        """Solve with Gurobi crossover on: psi_USD is unidentified, and without crossover the barrier stops
+        at its iteration limit.
         """
         try:
             if self.solver == cp.GUROBI:
@@ -289,17 +226,7 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized optimization on the fitted training window.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"``
-            (currency overlay weights, shape M).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run the joint regularized optimization on the fitted training window."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -335,8 +262,7 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -352,28 +278,7 @@ class RegularizedExpectedShortfallJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve. Refitting on validation and then measuring the in-sample ES
-        of that fit drives selection to the weakest penalty in the grid. The
-        paper (p.25) specifies weights computed on training data and ES evaluated
-        on the validation sample.
-
-        The ES estimator matches the backtester's compute_performance_metrics:
-        the mean of returns at or below the (1-alpha) quantile.
-
-        Under ``demean`` the validation portfolio return is centered by its own
-        mean, not the training one: the score has to be the deviation ES of this
-        window, so the location it deviates from is this window's mean.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Negative mean of the worst ``(1-alpha)`` fraction of combined returns.
-        """
+        """Validation ES of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

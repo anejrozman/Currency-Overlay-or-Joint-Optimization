@@ -1,41 +1,10 @@
-"""
-Two-step regularized Expected Shortfall optimizer with currency overlay.
+"""Regularized two-step currency overlay optimizer minimizing Expected Shortfall.
 
-Step 1: Minimizes regularized ES over fully hedged asset returns (R_fh), subject to
-        full investment and a leverage cap on asset weights.
-Step 2: With asset weights fixed, minimizes regularized ES of the combined portfolio
-        return (R_fh @ x_opt + R_c @ psi) over the currency overlay weights psi.
-
-Following Appendix A.3 of Lucescu & Ulrych (2026), psi carries neither a budget
-constraint nor a leverage constraint. Forward contracts are zero-investment
-instruments, so no slack weight is needed to fund the overlay.
-
-The ES coefficient is normalized to one, which is the gamma -> infinity limit of the
-paper's objective after dividing through by gamma / 2. The mean term vanishes and the
-penalties are read as the already-normalized quantities 2 * lambda / gamma, so the
-Table 3 bounds apply directly to lambda_*_asset and lambda_*_curr as used here.
-
-With ``demean`` set, both return matrices are centered columnwise before either
-step is solved, so ES is measured on deviations from the sample mean rather than
-on raw returns and is comparable to the deviation measures (mean-variance, MAD,
-semi-variance), all of which demean by construction. :meth:`score` holds the
-trained weights fixed and re-centers only the validation portfolio return, by its
-own mean. The flag enters the cache key because it is baked into the compiled
-problems through Y_fh and Y_c, exactly like alpha and the leverage limit. Off by
-default; the switch is ``DEMEAN`` in backtest_config.py, mirrored into the
-parameter grid there as ``DEMEAN_GRID``.
-
-Performance notes:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problems and the step-1 solutions are cached at class
-  level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per window
-  rather than once per grid point (DPP).
-* Step 1 does not depend on the currency penalties, so it is solved once per
-  (lambda_l1_asset, lambda_l2_asset) pair rather than once per grid point.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. Separate L1 and L2
+penalties on x and psi (lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr). psi is otherwise
+unconstrained, the base-currency weight included. ES is taken at confidence level alpha. With demean, returns
+are centered columnwise before solving and when scoring.
 """
 
 from __future__ import annotations
@@ -55,43 +24,13 @@ logger = logging.getLogger(__name__)
 
 
 class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Two-step regularized ES optimizer with sequential currency overlay.
-
-    Step 1 minimizes regularized ES on R_fh subject to full investment and leverage
-    constraints. Step 2 fixes the asset weights and minimizes regularized ES of the
-    combined portfolio return.
-    """
-
-    # Shared across the per-grid-point instances the Backtester creates. Reset by
-    # fit() whenever the estimation window, alpha or leverage_limit changes.
+    # class-level, shared by the per-grid-point instances; fit() resets it when the window changes
     _cache_key: str | None = None
     _asset_prob: dict | None = None
     _overlay_prob: dict | None = None
     _asset_solutions: dict[tuple[float, float], np.ndarray] = {}
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``            (float) — ES confidence level, default 0.80
-                * ``lambda_l1_asset``  (float) — L1 penalty on asset weights, default 0.0
-                * ``lambda_l2_asset``  (float) — L2 penalty on asset weights, default 0.0
-                * ``lambda_l1_curr``   (float) — L1 penalty on the overlay, default 0.0
-                * ``lambda_l2_curr``   (float) — L2 penalty on the overlay, default 0.0
-                * ``leverage_limit``   (float) — ||x||_1 cap for step 1, default 2.0
-                * ``demean``           (bool)  — center R_fh and R_c columnwise
-                                                 before solving, default
-                                                 ``backtest_config.DEMEAN``
-                * ``crossover``        (bool)  — run Gurobi crossover after the barrier
-                                                 solve, default ``False``. Off is faster;
-                                                 on returns vertex solutions with exact
-                                                 zeros under an L1 penalty.
-                * ``threads``          (int)   — Gurobi thread count, default from
-                                                 ``SLURM_CPUS_PER_TASK`` or 4
-                * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 0.0)
@@ -126,17 +65,7 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         )
 
     def _refresh_cache(self, R_fh, R_c) -> None:
-        """
-        Drop the compiled problems and cached step-1 solutions if the estimation
-        window has changed.
-
-        ``alpha``, ``leverage_limit`` and ``demean`` enter the key because they are
-        baked into the compiled problems as constants rather than as parameters
-        (``demean`` through the centered Y_fh and Y_c). If any of them is ever added
-        to the grid, the cache invalidates instead of silently reusing the wrong
-        problem — or, for ``demean``, letting a demeaned and a raw run in the same
-        process share problems and cached step-1 solutions.
-        """
+        """Drop the compiled problems and cached step-1 solutions if the estimation window has changed."""
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -155,12 +84,7 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
             logger.debug("Problem cache invalidated for new estimation window.")
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -227,12 +151,7 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         return {"prob": problem, "x": x, "lam1": lam1, "lam2": lam2}
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """
-        Step 1: regularized ES on R_fh with a leverage constraint and full investment.
-
-        The solution depends only on the asset penalties, so it is cached on
-        (lambda_l1_asset, lambda_l2_asset) for the current estimation window.
-        """
+        """Step 1: regularized ES on R_fh with a leverage constraint and full investment."""
         cls = type(self)
         cache_id = (float(self.lambda_l1_asset), float(self.lambda_l2_asset))
         if cache_id in cls._asset_solutions:
@@ -254,9 +173,8 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
     # Step 2: currency overlay
 
     def _build_overlay_problem(self, Y_c: np.ndarray) -> dict:
-        """
-        Compile the step-2 problem once, with the penalties and the fixed asset return
-        contribution left as parameters.
+        """Compile the step-2 problem once, with the penalties and the fixed asset return contribution left
+        as parameters.
         """
         q, K = Y_c.shape
         tail_prob = 1.0 - self.alpha
@@ -298,17 +216,7 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         return p["psi"].value.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay,
-            shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -333,25 +241,7 @@ class RegularizedExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate validation Expected Shortfall of train-fitted candidate weights.
-
-        Both the asset weights and the currency overlay are taken as given from
-        :meth:`optimize` on the training window and held fixed. Nothing is re-solved on
-        the validation sample.
-
-        Under ``demean`` the validation portfolio return is centered by its own mean,
-        not the training one: the score has to be the deviation ES of this window, so
-        the location it deviates from is this window's mean.
-
-        Args:
-            weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Negative mean of the worst ``(1-alpha)`` fraction of combined portfolio
-            returns on the validation sample.
-        """
+        """Validation ES of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("weights must be a dict with keys 'x' and 'psi'.")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

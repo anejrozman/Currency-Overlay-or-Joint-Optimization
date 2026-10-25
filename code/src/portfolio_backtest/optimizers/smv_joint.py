@@ -1,61 +1,8 @@
-"""
-Unregularized Joint Semi-Variance optimizer over asset and currency weights
-(Markowitz, Todd, Xu & Yamane 1993, in the framework of Ulrych & Lucescu 2026, Section 3).
+"""Joint asset and currency optimizer minimizing semi-variance.
 
-Minimizes the semi-variance of the combined portfolio return (R_fh @ x + R_c @ psi)
-jointly over both asset weights x and currency overlay weights psi in a single
-optimization scheme.  Leverage cap and budget on the asset block only; psi is
-unconstrained apart from the base-currency pin.
-
-The risk measure is Markowitz et al.'s S_E, eq. (3.1a), with the target E set to the
-portfolio's own expected return rather than an exogenous benchmark:
-
-    SMV(w) = (1/T) * sum_t [ max(0, -A_t w) ]^2,
-
-where A is the columnwise demeaned return matrix, so only deviations below the
-portfolio's own mean are counted.  The program uses their eqs. (3.4)-(3.7)
-reformulation, lifting the positive part into auxiliary variables to make the
-objective quadratic.  The paper introduces 2T of them — Y for the signed deviation
-and Z = Y^- for its negative part, tied by BX - Y + Z = 0 — because the Critical Line
-Algorithm needs the constraints in equality form.  Only the downside half is needed
-here: minimizing sum z_t^2 subject to z >= -A w and z >= 0 drives each z_t to
-max(0, -A_t w) on its own, so the equality and the free variables Y drop out and the
-program is a QP with T auxiliary variables rather than 2T.  It is solved directly by
-an interior-point solver rather than by the Critical Line Algorithm: CLA traces the
-whole E-S frontier, whereas one point of it is wanted per rebalancing date, and the
-leverage cap is not in CLA's form to begin with.  The 1/sqrt(T) that eq. (3.8) folds
-into B is carried as an explicit 1/T on the objective instead, which leaves A on the
-scale of the raw returns and keeps the risk term numerically better conditioned.
-
-Demeaning covers both blocks.  Since mean(x' R_fh + psi' R_c) = x' mean(R_fh) +
-psi' mean(R_c), the deviation about the portfolio's own mean is
-
-    SMV(x, psi) = (1/T) * sum_t [ max(0, -(A_fh x + A_c psi)_t) ]^2,
-
-where A_fh and A_c are the columnwise demeaned return matrices.  Note that no part of
-the objective separates into an asset-only and a currency-only term the way the
-mean-variance quadratic form does: the positive part is taken of the combined return,
-so the two blocks interact inside it.
-
-That demeaning also keeps the program well posed.  The residual A_fh x + A_c psi sums
-to exactly zero over the window for every (x, psi), so it can be non-negative
-throughout only if it vanishes identically — which needs a null vector of the stacked
-demeaned matrix, impossible for T ~ 2500 against N + K ~ 145 columns of full rank.
-The objective is therefore strictly positive at the optimum, and it grows without
-bound as ||psi|| does, so psi is pinned down by the data rather than by a constraint.
-
-The objective carries no mean term, mirroring the MV, MAD and ES joint optimizers,
-which likewise minimize a risk measure alone, and removing the need for a shrinkage
-estimator of the mean (Bayes-Stein, Jorion 1986).  Unlike mean-variance, nothing
-beyond the demeaning is estimated: the semi-variance is read off the empirical
-distribution directly, with no joint covariance matrix and so no shrinkage target
-(contrast Ledoit-Wolf on the stacked returns in mv_joint).
-
-The base currency's excess return is identically zero, so its overlay weight never
-enters the objective and would be left unidentified.  It is pinned to zero, as in
-mv_joint and mad_joint, rather than left free.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. psi is unconstrained apart from a zero base-currency weight. Semi-variance is
+measured below the portfolio's own mean (Markowitz, Todd, Xu & Yamane 1993).
 """
 
 from __future__ import annotations
@@ -67,8 +14,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -77,31 +23,13 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
 
 class SemiVarianceJointOptimizer(BaseOptimizer):
-    """
-    Joint unregularized semi-variance optimizer over asset and currency overlay weights.
-
-    Solves a single CVXPY problem minimizing the semi-variance of
-    (R_fh @ x + R_c @ psi) about its own sample mean, subject to full investment and
-    leverage constraints on x.  psi is unconstrained apart from the base-currency pin.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
@@ -118,12 +46,7 @@ class SemiVarianceJointOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -167,11 +90,7 @@ class SemiVarianceJointOptimizer(BaseOptimizer):
     def _optimize_joint(
         self, Y_fh: np.ndarray, Y_c: np.ndarray
     ) -> dict[str, np.ndarray]:
-        """Jointly minimize the semi-variance of (R_fh @ x + R_c @ psi) over x and psi.
-
-        Both return blocks are demeaned columnwise, so the objective is the downside
-        deviation of the combined portfolio return about its own sample mean (see
-        module docstring)."""
+        """Jointly minimize the semi-variance of (R_fh @ x + R_c @ psi) over x and psi."""
         T, N = Y_fh.shape
         K = Y_c.shape[1]
         A_fh = Y_fh - Y_fh.mean(axis=0)
@@ -188,8 +107,7 @@ class SemiVarianceJointOptimizer(BaseOptimizer):
             cp.sum(x) == 1,                  # budget on the asset block only
             l1_norm <= self.leverage_limit,  # leverage on the asset block only
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -207,8 +125,7 @@ class SemiVarianceJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -220,15 +137,7 @@ class SemiVarianceJointOptimizer(BaseOptimizer):
         return {"x": weights, "psi": overlay}
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Run the joint optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -243,25 +152,7 @@ class SemiVarianceJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the semi-variance by rerunning the joint optimization on validation data.
-
-        Mirrors the unregularized ES, MV and MAD joint optimizers, which likewise
-        re-solve on the validation window. (The regularized variants instead hold the
-        training fit fixed, because re-solving would drive penalty selection to the
-        weakest point in the grid; with no penalties to select there is nothing for
-        that to bias here.)
-
-        The deviation is taken about the validation window's own mean, matching the
-        asset-level and overlay SMV optimizers.
-
-        Args:
-            weights: Not used, joint optimization is rerun on val data.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Semi-variance of the combined portfolio return (lower is better).
-        """
+        """Validation semi-variance, after re-solving the joint program on the validation window."""
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh' and 'R_c'.")
         R_fh_val = val_bundle["R_fh"]

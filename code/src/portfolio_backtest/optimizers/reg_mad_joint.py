@@ -1,47 +1,9 @@
-"""
-Regularized Joint Mean Absolute Deviation optimizer over asset and currency weights.
+"""Regularized joint asset and currency optimizer minimizing mean absolute deviation.
 
-Minimizes a regularized MAD objective of the combined portfolio return
-(R_fh @ x + R_c @ psi) jointly over both asset weights x and currency overlay weights
-psi in a single optimization problem. Separate L1 and L2 penalties are applied to x
-and psi, following the paper's S1, S2 diagonal structure. Leverage cap and budget on
-the asset block only; psi is unconstrained apart from the base-currency pin.
-
-The program uses Konno & Yamazaki's lower semi-absolute deviation form: for a sample
-with zero mean the mass below the mean equals the mass above it, so mean|z| =
-2 * mean(max(0, -z)), and the right-hand side is linear once the positive part is
-lifted into a T-vector of auxiliary variables. The factor of two is carried explicitly
-so the objective is reported on the MAD scale, which matters because the penalty grids
-are calibrated against the size of the risk term.
-
-Demeaning covers both blocks. Since mean(x' R_fh + psi' R_c) = x' mean(R_fh) +
-psi' mean(R_c), the deviation about the portfolio's own mean is
-
-    MAD(x, psi) = mean| A_fh x + A_c psi |,
-
-where A_fh and A_c are the columnwise demeaned return matrices. The objective carries
-no mean term, mirroring the MV and ES joint optimizers, which likewise penalize a risk
-measure alone. Unlike mean-variance, nothing beyond the demeaning is estimated: MAD is
-read off the empirical distribution directly, with no joint covariance matrix and so
-no shrinkage target (contrast Ledoit-Wolf in reg_mv_joint).
-
-The base currency's excess return is identically zero, so its overlay weight never
-enters the objective and would be left unidentified by the LP. It is pinned to zero,
-as in reg_mv_joint, rather than left free: an unidentified variable would take an
-arbitrary solver-dependent value, be charged the L1 penalty, and land in the saved
-weight records.
-
-Performance notes:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problem is cached at class level and keyed on the
-  estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per window
-  rather than once per grid point (DPP).
-* Nothing factorizes in the joint program, so every grid point still needs a
-  full-size solve; only the demeaned matrices and the canonicalization are shared.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). psi is unconstrained apart from a zero base-currency weight. MAD is written
+in the lower semi-absolute deviation form of Konno & Yamazaki (1991).
 """
 
 from __future__ import annotations
@@ -56,8 +18,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -66,9 +27,7 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -76,39 +35,12 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
-    """
-    Joint regularized MAD optimizer over asset and currency overlay weights.
-
-    Solves a single CVXPY problem minimizing the regularized MAD of
-    (R_fh @ x + R_c @ psi) subject to full investment and leverage constraints on x.
-    psi is unconstrained apart from the base-currency pin.
-
-    The compiled problem is cached at class level and keyed on the estimation window
-    and the leverage limit. The four penalties are DPP-compliant cp.Parameter objects,
-    so a window is canonicalized once and reused across every grid point the
-    backtester evaluates on it.
-    """
-
-    # window signature -> compiled problem bundle. Held at class level because
-    # the backtester constructs a fresh optimizer instance per grid point.
+    # window signature -> compiled problems, shared by the per-grid-point instances
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
-    # Per date the backtester touches two windows: train (every grid point) and
-    # train+val (final refit). Two entries covers both.
+    # two entries: the training window and the full estimation window of a date
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 2.5e-4
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 0.01
-                * ``lambda_l1_curr``  (float) — L1 penalty for currency overlay, default 1.5e-5
-                * ``lambda_l2_curr``  (float) — L2 penalty for currency overlay, default 2.5e-3
-                * ``leverage_limit``  (float) — ||x||_1 cap, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -169,12 +101,7 @@ class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -226,13 +153,7 @@ class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
     # Problem construction
 
     def _build_problem(self) -> dict:
-        """
-        Compile the joint program with the four penalties as DPP parameters.
-
-        The demeaned return matrices are baked in as constants, so the compiled problem
-        is valid only for the window it was built from; the cache is keyed on that
-        window, and :meth:`score` never re-solves on validation data.
-        """
+        """Compile the joint program with the four penalties as DPP parameters."""
         A_fh = self.Y_fh - self.Y_fh.mean(axis=0)
         A_c = self.Y_c - self.Y_c.mean(axis=0)
 
@@ -260,8 +181,7 @@ class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
             cp.sum(x) == 1,                    # budget on the asset block only
             l1_norm_x <= self.leverage_limit,  # leverage on the asset block only
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(self.Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -301,16 +221,7 @@ class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         return bundle
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized optimization on the fitted training window.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay,
-            shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Run the joint regularized optimization on the fitted training window."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -342,8 +253,7 @@ class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -359,25 +269,7 @@ class RegularizedMeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve. Refitting on validation and then measuring the in-sample MAD of
-        that fit drives selection to the weakest penalty in the grid. The paper (p.25)
-        specifies weights computed on training data and the risk measure evaluated on
-        the validation sample.
-
-        The deviation is taken about the validation window's own mean, matching the
-        asset-level and overlay MAD optimizers.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Mean absolute deviation of the combined portfolio return on the validation
-            sample (lower is better).
-        """
+        """Validation MAD of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

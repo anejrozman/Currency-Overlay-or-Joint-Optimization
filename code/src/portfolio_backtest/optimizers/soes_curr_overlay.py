@@ -1,48 +1,9 @@
-"""
-Two-step unregularized Second-Order Expected Shortfall optimizer with currency
-overlay (Krokhmal 2007, in the framework of Ulrych & Lucescu 2026, Section 3).
+"""Two-step currency overlay optimizer minimizing second-order Expected Shortfall.
 
-Step 1: Minimizes HMCR_2 over fully hedged asset returns (R_fh), with a leverage
-        cap on asset weights and full investment.
-Step 2: With asset weights fixed, minimizes HMCR_2 of the combined portfolio
-        return (R_fh @ x_opt + R_c @ psi) by optimizing the currency overlay
-        weights psi.  psi is unconstrained: forward contracts are zero-investment
-        instruments, so no slack weight is needed to fund the overlay.
-
-The risk measure, the unsquared L2 tail norm, and the sqrt(q) normalization are
-identical to reg_soes_asset_full.py; see that module's docstring for why the
-norm is not squared and why the normalization differs from ES.  Each step here
-minimizes the same functional
-
-    eta + ||u||_2 / ((1 - alpha) * sqrt(q)),   u = max(0, -(loss) - eta),
-
-over its own decision variable (x in step 1, psi in step 2) with the other
-fixed, exactly mirroring how es_curr_overlay.py sequences its two ES solves.
-Both steps are SOCPs rather than LPs, for the same reason reg_soes_asset_full.py
-is an SOCP rather than an LP: the epigraph of ||u||_2 is a second-order cone
-constraint. ``optimal_inaccurate`` is correspondingly more likely here than for
-the ES overlay's two LPs.
-
-Base currency: R_c's base-currency column is identically zero (its excess
-return over itself is zero by construction), so psi_base never appears in
-either the SOC constraint or the objective of step 2, in either step's problem.
-That is exactly the situation in es_curr_overlay.py's step 2 (a zero column in
-an LP), not the one in mv/mad/smv_curr_overlay.py, where psi_base sits in a
-quadratic term and an explicit pin is needed to keep the QP's Hessian
-nonsingular in that direction. Step 2 here has no quadratic term in psi at all,
-so the same non-issue applies as for ES: psi_base is left free rather than
-pinned to zero.
-
-With ``demean`` set, both return matrices are centered columnwise before either
-step is solved, and the validation window is centered by its own column means
-before step 2 is re-solved there. HMCR_2 is then measured on deviations from the
-sample mean rather than on raw returns, which puts it on the same footing as the
-deviation measures (mean-variance, MAD, semi-variance), all of which demean by
-construction. The flag and its treatment are identical to es_curr_overlay.py's;
-the switch is ``DEMEAN`` in backtest_config.py, off by default, mirrored into the
-parameter grid there as ``DEMEAN_GRID`` and shared with the ES optimizers.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. psi is otherwise
+unconstrained, the base-currency weight included. The risk measure is HMCR_2 of Krokhmal (2007) at confidence
+level alpha. With demean, returns are centered columnwise before solving and when scoring.
 """
 
 from __future__ import annotations
@@ -58,8 +19,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -70,28 +30,7 @@ _warned_fallback = False
 
 
 class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Two-step unregularized second-order ES optimizer with sequential currency
-    overlay.
-
-    Step 1 minimizes HMCR_2 on R_fh subject to full investment and leverage
-    constraints. Step 2 fixes the asset weights and minimizes HMCR_2 of the
-    combined portfolio return.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — confidence level, default 0.80
-                * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
-                * ``demean``         (bool)  — center R_fh and R_c columnwise before
-                                               solving, default
-                                               ``backtest_config.DEMEAN``
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
@@ -111,12 +50,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         self.x_opt: np.ndarray | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -138,9 +72,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
                     solver=cp.GUROBI,
                     verbose=False,
                     BarConvTol=1e-8,
-                    # BarConvTol does not govern the conic path; this is its
-                    # QCP counterpart, and the SOC epigraph of ||u||_2 makes
-                    # both steps SOCPs rather than the LPs the ES overlay solves.
+                    # the conic counterpart of BarConvTol, as the ||u||_2 epigraph makes this an SOCP
                     BarQCPConvTol=1e-8,
                     Method=2,
                     ScaleFlag=0,
@@ -160,8 +92,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """Step 1: unregularized HMCR_2 on R_fh with a leverage constraint and
-        full investment."""
+        """Step 1: unregularized HMCR_2 on R_fh with a leverage constraint and full investment."""
         q, N = Y_fh.shape
         tail_prob = 1.0 - self.alpha
 
@@ -190,8 +121,9 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray
     ) -> np.ndarray:
-        """Step 2: minimize HMCR_2 of (R_fh @ x_fixed + R_c @ psi) over
-        unconstrained psi. psi_base is left free; see module docstring."""
+        """Step 2: minimize HMCR_2 of (R_fh @ x_fixed + R_c @ psi) over unconstrained psi. psi_base is left
+        free; see module docstring.
+        """
         q, K = Y_c.shape
         tail_prob = 1.0 - self.alpha
 
@@ -217,17 +149,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -252,44 +174,7 @@ class SecondOrderExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate validation second-order ES of the candidate weights.
-
-        Uses ``self.x_opt`` (asset weights from :meth:`optimize`) as fixed,
-        re-runs step 2 on the validation returns to get psi_val — mirroring the
-        unregularized ES and SMV overlays, which likewise re-solve step 2 on the
-        validation window — then evaluates the combined HMCR_2 independently of
-        the eta the step-2 solve produced.
-
-        That independent re-derivation is necessary, not merely mirrored: at
-        p = 1 (the ES overlay) the empirical VaR of the realized returns is
-        exactly the minimizing threshold regardless of how psi was obtained, so
-        reading the score off a quantile is always exact. At p = 2 the
-        minimizing eta is only exactly recovered by the step-2 solve itself
-        (see reg_soes_asset_full.py for why VaR is not a valid substitute), and
-        this SOCP is more prone to ``optimal_inaccurate`` than the ES overlay's
-        LPs. Recomputing zeta with a bounded 1-D search over the realized
-        combined returns — the same numerical approach used in
-        reg_soes_asset_full.py / reg_soes_asset_zero.py's score() — verifies the
-        score against the realized data directly rather than trusting the
-        solver's eta.value under a status that may be inexact.
-
-        Under ``demean`` the validation matrices are centered by their own column
-        means, not the training ones: the score has to be the deviation HMCR_2 of
-        this window, so the location it deviates from is this window's mean. The
-        zeta search then runs on the centered losses, and its bracket
-        (losses.min(), losses.max()) still contains the minimizer — HMCR_2 is
-        translation-equivariant, so centering shifts both zeta and the score by
-        the same constant.
-
-        Args:
-            weights: Not used; asset weights are taken from ``self.x_opt``.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Second-order ES of the combined portfolio return on the validation
-            window (lower is better).
-        """
+        """Validation HMCR_2, after re-solving step 2 on the validation window with x fixed."""
         if self.x_opt is None:
             raise RuntimeError("optimize() must be called before score().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

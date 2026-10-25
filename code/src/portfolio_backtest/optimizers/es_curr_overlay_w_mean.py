@@ -1,76 +1,10 @@
-"""
-Two-step mean-Expected Shortfall optimizer with currency overlay.
+"""Two-step currency overlay optimizer minimizing Expected Shortfall with a mean term.
 
-The mean-bearing counterpart of es_curr_overlay.py.  Both steps minimize the
-same mean-risk functional
-
-    ES_alpha(portfolio loss) - (1 / gamma) * mu' (decision variable),
-
-so gamma is a risk-aversion coefficient in the conventional direction: large
-gamma starves the mean term and the program collapses onto the pure-ES overlay,
-gamma = 1 gives the mean its full weight.  The normalization is by 1 / gamma
-rather than gamma multiplying the risk term so that the objective stays on the
-ES scale for every gamma, which matters for the validation score (see
-:meth:`score`); the two are identical up to a positive rescaling and give the
-same weights, since this program is unregularized and its constraints do not
-scale with the objective.
-
-Step 1: minimizes ES(R_fh @ x) - (1/gamma) * mu_a' x over fully hedged asset
-        returns, with full investment and a leverage cap on x.
-Step 2: with asset weights fixed, minimizes
-        ES(R_fh @ x* + R_c @ psi) - (1/gamma) * (mu_a' x* + mu_c' psi)
-        over the currency overlay psi, subject to an L1 cap on the overlay.
-        The mu_a' x* term is a constant there and does not move the argmin; it
-        is carried so the reported objective is the full one.
-
-Selection.  The objective is gamma-scaled but :meth:`score` is not: candidates
-are compared on a common reference yardstick, ES minus the realized mean of the
-validation window.  Scoring each candidate at its own gamma makes the search run
-to whichever gamma is smallest in the grid, for reasons and with measurements
-recorded in :meth:`score`.
-
-Means.  The two mean vectors are estimated very differently, because the two
-estimation problems are not comparable in difficulty.
-
-  * Assets.  N is 100-130 in the top-10 universe against q ~ 2500 daily
-    observations, and a per-asset sample mean at that signal-to-noise ratio is
-    almost pure noise -- which is exactly why every other optimizer in this
-    package dropped the mean term outright (see the gamma = 3 blow-ups recorded
-    in backtest_config.py).  The mean here is therefore pooled onto the 14
-    economies before it is used: each economy's series is the equal-weighted
-    average of its constituents, that panel is James-Stein shrunk toward zero,
-    and every asset inherits its economy's shrunk mean
-    (:func:`~portfolio_backtest.utils.estimation.pooled_asset_mean`).  Expected
-    returns then vary only between economies, not within them.
-  * Currencies.  Not estimated from returns at all: the mean is conditional on
-    the forward premium, mu_c = -f_t, which is the carry (see
-    ``_conditional_currency_mean``).  An unconditional sample mean was tried
-    first and shrank to exactly zero in five of six test windows, since 13
-    currency means over a 2500-day window carry almost no signal -- leaving step
-    2 with no mean term whatsoever.  The forward premium is observed rather than
-    estimated and is a genuine predictor here (pooled slope -0.83 against -1
-    under random-walk spot, 0 under UIP; cross-currency correlation between mean
-    -f and mean R_c of +0.72).  The base currency is held at zero.
-
-Economy mapping.  Taken from the ``"C"`` bundle entry, the asset-to-currency
-indicator matrix the Backtester already assembles and restricts to the window's
-valid assets.  Its columns are R_c's columns in order, so economy k and currency
-k are the same object and no separate mapping has to be plumbed through.
-
-Base currency.  Unlike es_curr_overlay.py, where psi_base is genuinely absent
-from step 2 (a zero column in an unconstrained LP) and can be left free, the
-overlay cap here puts |psi_base| into cp.norm(psi, 1).  A nonzero base weight
-would then consume overlay budget while contributing nothing to either the
-return (its R_c column is zero) or the mean term (its mu_c entry is zero), so it
-is pinned to zero, exactly as mv/mad/smv_curr_overlay.py pin theirs.
-
-No demeaning.  The ``demean`` switch the other ES overlays carry is deliberately
-absent: centering the return matrices would zero the very sample means this
-program is built around, and the explicit mu terms already give the mean a
-controlled, shrunk, dimensionality-reduced channel into the objective rather
-than the raw one that centering was introduced to suppress.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. The objective
+subtracts (1 / gamma) times the expected return; asset means are pooled by economy and James-Stein shrunk,
+currency means are the carry implied by the forward premium. psi has an L1 cap (overlay_limit) and a zero
+base-currency weight. ES is taken at confidence level alpha.
 """
 
 from __future__ import annotations
@@ -89,8 +23,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -101,28 +34,7 @@ _warned_fallback = False
 
 
 class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
-    """
-    Two-step mean-ES optimizer with sequential currency overlay.
-
-    Step 1 minimizes ES minus the pooled asset mean on R_fh subject to full
-    investment and a leverage cap.  Step 2 fixes the asset weights and minimizes
-    ES minus the currency mean of the combined portfolio return, subject to an
-    L1 cap on the overlay.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``gamma``          (float) — risk aversion; the mean term enters
-                                               with coefficient 1 / gamma, default 2
-                * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
-                * ``overlay_limit``  (float) — ||psi||_1 cap for step 2, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.gamma: float = self.hyperparams.get("gamma", 2)
@@ -146,12 +58,7 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         self.x_opt: np.ndarray | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices and estimate both mean vectors.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-        """
+        """Extract the return matrices and estimate both mean vectors."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -230,10 +137,7 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         mu_a: np.ndarray,
         mu_c: np.ndarray,
     ) -> np.ndarray:
-        """Step 2: mean-ES of (R_fh @ x_fixed + R_c @ psi) over psi, capped in L1.
-
-        The base-currency weight is pinned to zero so it cannot consume overlay
-        budget for no return; see the module docstring."""
+        """Step 2: mean-ES of (R_fh @ x_fixed + R_c @ psi) over psi, capped in L1."""
         q, K = Y_c.shape
         tail_prob = 1.0 - self.alpha
 
@@ -264,17 +168,7 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-            ValueError: If ``alpha`` is outside *(0, 1)* or ``gamma`` is not positive.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -303,45 +197,7 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the candidate weights on a common, gamma-free yardstick.
-
-        Uses ``self.x_opt`` (asset weights from :meth:`optimize`) as fixed,
-        re-runs step 2 on the validation returns to get psi_val -- mirroring
-        es_curr_overlay.py and the other unregularized overlays -- then returns
-
-            ES_alpha(combined loss) - 1.0 * mean(realized combined returns),
-
-        the realized risk-return tradeoff of this window at a reference risk
-        aversion of one, identical for every candidate.
-
-        The realized mean is used directly rather than reconstructed from the
-        estimators: mean(Y_fh @ x + Y_c @ psi) equals mu_a' x + mu_c' psi exactly
-        when mu is the raw sample mean, so this *is* the reference-gamma form,
-        with the estimator noise removed.  A score is a measure of what the
-        weights actually earned on the window; re-applying a shrunk or
-        conditional forecast there would let a candidate score well on a mean it
-        never realized.
-
-        Scoring each candidate at its own gamma -- the previous behaviour -- is
-        what this replaces, and the reason is measured rather than theoretical.
-        The mean credit mu' w / gamma grows without bound as gamma falls while
-        the risk term does not, so the search ran to whichever gamma was smallest
-        in the grid: 61.5% of dates at the bottom of the old [100 ... 1] grid, and
-        54.9% at the bottom of the recentered [10 ... 0.1] one, in both cases
-        overshooting the gamma that was actually best out of sample.  On the
-        recentered grid that cost roughly a third of the available Sharpe (0.115
-        selected against 0.154 at a fixed gamma of 0.2) and raised drawdown from
-        29.3% to 32.8%.  A gamma-free score removes that channel: gamma now has
-        to earn its selection through the weights it produces.
-
-        Args:
-            weights: Not used directly; asset weights are taken from ``self.x_opt``.
-            val_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-
-        Returns:
-            Validation ES minus realized mean return, lower is better.
-        """
+        """Validation ES minus mean return, after re-solving step 2 on the validation window with x fixed."""
         if self.x_opt is None:
             raise RuntimeError("optimize() must be called before score().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
@@ -354,9 +210,7 @@ class ExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         Y_fh_val = np.asarray(R_fh_val.values, dtype=float)
         Y_c_val = np.asarray(R_c_val.values, dtype=float)
 
-        # Step 2 is re-solved here, so it still needs this window's own mean
-        # vectors -- the objective it minimizes is the gamma-scaled one.  Only the
-        # score returned below is gamma-free.
+        # step 2 is re-solved with the gamma-scaled objective, so it needs this window's means
         economy_ids = economy_ids_from_indicator(val_bundle.get("C"), Y_fh_val.shape[1])
         mu_a_val, _ = pooled_asset_mean(Y_fh_val, economy_ids)
         mu_c_val = conditional_currency_mean(val_bundle.get("F"), Y_c_val)

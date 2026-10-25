@@ -1,38 +1,9 @@
-"""
-Regularized Mean-Variance optimizer with currency overlay.
+"""Regularized two-step currency overlay optimizer minimizing variance.
 
-Step 1: Minimizes the regularized variance of fully hedged asset returns (R_fh),
-        with L1/L2 penalties, full investment and a leverage cap.
-Step 2: With asset weights fixed, minimizes the regularized variance of the combined
-        portfolio return (R_fh @ x_opt + R_c @ psi) over unconstrained psi.
-
-Following Appendix A.3 of Lucescu & Ulrych (2026), psi carries neither a budget
-constraint nor a leverage constraint. Forward contracts are zero-investment
-instruments, so no slack weight is needed to fund the overlay.
-
-The objective carries no mean term.  The variance coefficient is normalized to one,
-which is the gamma -> infinity limit of the paper's objective after dividing through
-by gamma / 2: the mean term vanishes, the cross-covariance term picks up its factor
-of two directly from the expansion of Var(x' R_fh + psi' R_c), and the penalties are
-read as the already-normalized quantities 2 * lambda / gamma.  This mirrors the ES
-optimizers, which likewise penalize a risk measure alone, and removes the need for a
-shrinkage estimator of the mean (Bayes-Stein, Jorion 1986).
-
-Keeping the mean makes the overlay wildly unstable: at gamma = 3 the unpenalized
-gross overlay reaches 20-70x the portfolio notional against roughly 1x once the mean
-is dropped (see results/runs/reg_mv_curr_overlay/run_1).
-
-Performance notes:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problems and the step-1 solutions are cached at class
-  level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per window
-  rather than once per grid point (DPP).
-* Step 1 does not depend on the currency penalties, so it is solved once per
-  (lambda_l1_asset, lambda_l2_asset) pair rather than once per grid point.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. Separate L1 and L2
+penalties on x and psi (lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr). psi is
+unconstrained apart from a zero base-currency weight. Covariances are Ledoit-Wolf shrunk.
 """
 
 from __future__ import annotations
@@ -46,8 +17,7 @@ from ..utils.estimation import ledoit_wolf_cc, sample_cross_cov
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -58,34 +28,13 @@ _warned_fallback = False
 
 
 class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Two-step regularized mean-variance optimizer with sequential currency overlay.
-
-    Step 1 minimizes the regularized variance of R_fh subject to full investment and
-    leverage constraints. Step 2 fixes the asset weights and minimizes the regularized
-    variance of the combined portfolio return.
-    """
-
-    # Shared across the per-grid-point instances the Backtester creates. Reset by
-    # fit() whenever the estimation window or leverage_limit changes.
+    # class-level, shared by the per-grid-point instances; fit() resets it when the window changes
     _cache_key: str | None = None
     _asset_prob: dict | None = None
     _overlay_prob: dict | None = None
     _asset_solutions: dict[tuple[float, float], np.ndarray] = {}
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 5e-6
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 1e-3
-                * ``lambda_l1_curr``  (float) — L1 penalty for the overlay, default 5e-6
-                * ``lambda_l2_curr``  (float) — L2 penalty for the overlay, default 1e-4
-                * ``leverage_limit``  (float) — ||x||_1 cap for step 1, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 5e-6)
         self.lambda_l2_asset: float = self.hyperparams.get("lambda_l2_asset", 1e-3)
@@ -119,14 +68,7 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         )
 
     def _refresh_cache(self, R_fh, R_c) -> None:
-        """
-        Drop the compiled problems and cached step-1 solutions if the estimation
-        window has changed.
-
-        ``leverage_limit`` enters the key because it is baked into the compiled problem
-        as a constant rather than as a parameter. If it is ever added to the grid, the
-        cache invalidates instead of silently reusing the wrong problem.
-        """
+        """Drop the compiled problems and cached step-1 solutions if the estimation window has changed."""
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -143,12 +85,7 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
             logger.debug("Problem cache invalidated for new estimation window.")
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -216,12 +153,8 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         return {"prob": problem, "x": x, "lam1": lam1, "lam2": lam2}
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """
-        Step 1: regularized minimum variance on R_fh with Ledoit-Wolf covariance,
-        a leverage constraint and full investment.
-
-        The solution depends only on the asset penalties, so it is cached on
-        (lambda_l1_asset, lambda_l2_asset) for the current estimation window.
+        """Step 1: regularized minimum variance on R_fh with Ledoit-Wolf covariance, a leverage constraint
+        and full investment.
         """
         cls = type(self)
         cache_id = (float(self.lambda_l1_asset), float(self.lambda_l2_asset))
@@ -244,14 +177,8 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
     # Step 2: currency overlay
 
     def _build_overlay_problem(self, Y_fh: np.ndarray, Y_c: np.ndarray) -> dict:
-        """
-        Compile the step-2 problem once, with the penalties and the fixed asset
-        cross-covariance contribution left as parameters.
-
-        The moment estimates are baked in as constants, so the compiled problem is
-        valid only for the window it was built from.  ``_refresh_cache`` drops it
-        whenever the window changes, and :meth:`score` never re-solves on validation
-        data, so no other window ever reaches this problem.
+        """Compile the step-2 problem once, with the penalties and the fixed asset cross-covariance
+        contribution left as parameters.
         """
         K = Y_c.shape[1]
         Sigma_c = ledoit_wolf_cc(Y_c)
@@ -268,8 +195,7 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
             + lam1 * cp.norm(psi, 1)
             + lam2 * cp.sum_squares(psi)
         )
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         constraints = []
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
@@ -283,13 +209,7 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray
     ) -> np.ndarray:
-        """Step 2: regularized minimum-variance currency overlay over unconstrained psi.
-
-        Minimizes psi' Sigma_c psi + 2 x*' Sigma_ac psi + penalties, the expansion of
-        Var(x*' R_fh + psi' R_c) with the constant asset-only term dropped
-        (appendix B, eq:mv_curr_expanded). Sigma_c is Ledoit-Wolf shrunk; the
-        cross-covariance Sigma_ac is the un-shrunk sample estimate.
-        """
+        """Step 2: regularized minimum-variance currency overlay over unconstrained psi."""
         cls = type(self)
         if cls._overlay_prob is None:
             cls._overlay_prob = self._build_overlay_problem(Y_fh, Y_c)
@@ -303,15 +223,7 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         return p["psi"].value.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -332,21 +244,7 @@ class RegularizedMeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the validation variance of train-fitted candidate weights.
-
-        Both the asset weights and the currency overlay are taken as given from
-        :meth:`optimize` on the training window and held fixed. Nothing is re-solved on
-        the validation sample, mirroring the regularized ES overlay.
-
-        Args:
-            weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Variance of the combined portfolio return on the validation sample
-            (lower is better).
-        """
+        """Validation variance of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("weights must be a dict with keys 'x' and 'psi'.")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

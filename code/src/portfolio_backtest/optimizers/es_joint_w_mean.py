@@ -1,48 +1,9 @@
-"""
-Unregularized joint mean-Expected Shortfall optimizer over asset and currency weights.
+"""Joint asset and currency optimizer minimizing Expected Shortfall with a mean term.
 
-The mean-bearing counterpart of es_joint.py, and the joint counterpart of
-es_curr_overlay_w_mean.py.  Minimizes
-
-    ES_alpha(-(R_fh @ x + R_c @ psi)) - (1 / gamma) * (mu_a' x + mu_c' psi)
-
-jointly over x and psi in a single program, subject to full investment and a
-leverage cap on x and an L1 cap on psi.  gamma is a risk-aversion coefficient in
-the conventional direction: large gamma starves the mean term and the program
-collapses onto es_joint, small gamma gives the mean its full weight.  As in the
-overlay, the 1 / gamma normalization keeps the objective on the ES scale for
-every gamma rather than rescaling the risk term; the two are identical up to a
-positive rescaling and give the same weights, since this program is unregularized
-and its constraints do not scale with the objective.
-
-The difference from es_curr_overlay_w_mean.py is only the sequencing.  There, x
-is fixed by an asset-only program and psi is then fitted against it; here both
-are chosen together, so the mean tilt on the asset book and the carry tilt on the
-overlay are traded off against a single tail rather than in sequence.  Everything
-else -- the estimators, the caps, the base-currency pin, the absence of a demean
-switch, and the gamma-free validation score -- is shared with the overlay, and
-the two shared estimators live in utils/estimation.py.
-
-Means.  Identical to the overlay's, and for the same reasons:
-
-  * Assets.  mu_a is pooled onto the 14 economies and James-Stein shrunk toward
-    zero (:func:`~portfolio_backtest.utils.estimation.pooled_asset_mean`), which
-    cuts the estimated dimension from N ~ 100-130 to at most 14 and restricts the
-    cross-sectional spread of expected returns to the between-economy dimension.
-  * Currencies.  mu_c is not estimated from returns at all but conditioned on the
-    forward premium, mu_c = -f_t
-    (:func:`~portfolio_backtest.utils.estimation.conditional_currency_mean`).
-
-Overlay cap.  ES is positively homogeneous, so along psi = t * d the objective
-behaves like t * [ES(R_c d) - mu_c' d / gamma].  Any direction d with
-ES(R_c d) < mu_c' d / gamma would make the program unbounded below, and nothing
-in es_joint's constraint set rules that out -- es_joint is safe only because it
-carries no mean term at all.  The L1 cap on psi closes that off, and at the same
-time matches the overlay optimizer.  The base-currency weight is pinned to zero
-so it cannot consume the cap while contributing nothing: its R_c column is
-identically zero and its forward premium likewise.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. The objective subtracts (1 / gamma) times the expected return; asset means are
+pooled by economy and James-Stein shrunk, currency means are the carry implied by the forward premium. psi has
+an L1 cap (overlay_limit) and a zero base-currency weight. ES is taken at confidence level alpha.
 """
 
 from __future__ import annotations
@@ -61,8 +22,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -73,27 +33,7 @@ _warned_fallback = False
 
 
 class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
-    """
-    Joint unregularized mean-ES optimizer over asset and currency overlay weights.
-
-    Solves one CVXPY problem minimizing ES of (R_fh @ x + R_c @ psi) minus the
-    gamma-scaled mean of the same combination, subject to full investment and a
-    leverage cap on x and an L1 cap on psi.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``gamma``          (float) — risk aversion; the mean term enters
-                                               with coefficient 1 / gamma, default 2
-                * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
-                * ``overlay_limit``  (float) — ||psi||_1 cap, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.gamma: float = self.hyperparams.get("gamma", 2)
@@ -116,12 +56,7 @@ class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices and estimate both mean vectors.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-        """
+        """Extract the return matrices and estimate both mean vectors."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -212,17 +147,7 @@ class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         }
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)* or ``gamma`` is not positive.
-        """
+        """Run the joint optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -243,34 +168,7 @@ class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the candidate on a common, gamma-free yardstick.
-
-        Re-runs the joint optimization on the validation window at this
-        candidate's gamma -- mirroring es_joint, which likewise re-solves rather
-        than carrying the trained weights over -- and then scores the result as
-
-            ES_alpha(combined loss) - 1.0 * mean(realized combined returns),
-
-        the realized risk-return tradeoff of this window at a reference risk
-        aversion of one, identical for every candidate.
-
-        The realized mean is used directly rather than reconstructed from the
-        estimators: mean(Y_fh @ x + Y_c @ psi) equals mu_a' x + mu_c' psi exactly
-        when mu is the raw sample mean, so this is the reference-gamma form with
-        the estimator noise removed.  Scoring each candidate at its own gamma --
-        the natural-looking alternative -- makes the mean credit mu' w / gamma
-        grow without bound as gamma falls while the risk term does not, so the
-        search runs to whichever gamma is smallest in the grid; that failure was
-        measured on the overlay optimizer and is documented in its ``score``.
-
-        Args:
-            weights: Not used; the joint program is re-solved on validation data.
-            val_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-
-        Returns:
-            Validation ES minus realized mean return, lower is better.
-        """
+        """Validation ES minus mean return, after re-solving the joint program on the validation window."""
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh' and 'R_c'.")
         R_fh_val = val_bundle["R_fh"]
@@ -281,8 +179,7 @@ class ExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         Y_fh_val = np.asarray(R_fh_val.values, dtype=float)
         Y_c_val = np.asarray(R_c_val.values, dtype=float)
 
-        # The re-solve minimizes the gamma-scaled objective, so it needs this
-        # window's own mean vectors. Only the score returned below is gamma-free.
+        # the re-solve minimizes the gamma-scaled objective, so it needs this window's means
         economy_ids = economy_ids_from_indicator(val_bundle.get("C"), Y_fh_val.shape[1])
         mu_a_val, _ = pooled_asset_mean(Y_fh_val, economy_ids)
         mu_c_val = conditional_currency_mean(val_bundle.get("F"), Y_c_val)

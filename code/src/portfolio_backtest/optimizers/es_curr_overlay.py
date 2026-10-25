@@ -1,20 +1,9 @@
-"""
-Two-step Expected Shortfall optimizer with currency overlay.
+"""Two-step currency overlay optimizer minimizing Expected Shortfall.
 
-Step 1: Minimizes ES over fully hedged asset returns (R_fh), with a leverage cap on asset weights.
-Step 2: With asset weights fixed, minimizes ES of the combined portfolio return
-        (R_fh @ x_opt + R_c @ psi) by optimizing the currency overlay weights psi.
-        psi is unconstrained, psi_USD acts as a free weight that makes the overlay a zero investment hedge.
-
-With ``demean`` set, both return matrices are centered columnwise before either
-step is solved, and the validation window is centered by its own column means
-before step 2 is re-solved there. ES is then measured on deviations from the
-sample mean rather than on raw returns, which puts it on the same footing as the
-deviation measures (mean-variance, MAD, semi-variance), all of which demean by
-construction. Off by default; the switch is ``DEMEAN`` in backtest_config.py,
-mirrored into the parameter grid there as ``DEMEAN_GRID``.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. psi is otherwise
+unconstrained, the base-currency weight included. ES is taken at confidence level alpha. With demean, returns
+are centered columnwise before solving and when scoring.
 """
 
 from __future__ import annotations
@@ -31,25 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Two-step unregularized ES optimizer with sequential currency overlay.
-
-    Step 1 minimizes ES on R_fh subject to full investment and leverage constraints.
-    Step 2 fixes the asset weights and minimizes ES of the combined portfolio return..
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
-                * ``demean``         (bool)  — center R_fh and R_c columnwise before
-                                               solving, default
-                                               ``backtest_config.DEMEAN``
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
@@ -64,12 +35,7 @@ class ExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         self.x_opt: np.ndarray | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -160,16 +126,7 @@ class ExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -194,23 +151,7 @@ class ExpectedShortfallCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate validation Expected Shortfall of the candidate weights.
-
-        Uses ``self.x_opt`` (asset weights from :meth:`optimize`) as fixed, re-runs
-        step 2 on the validation returns to get psi_val, then evaluates combined ES.
-
-        Under ``demean`` the validation matrices are centered by their own column
-        means, not the training ones: the score has to be the deviation ES of this
-        window, so the location it deviates from is this window's mean.
-
-        Args:
-            weights: Not used directly, asset weights are taken from ``self.x_opt``.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Negative mean of the worst ``(1-alpha)`` fraction of combined portfolio returns.
-        """
+        """Validation ES, after re-solving step 2 on the validation window with x fixed."""
         if self.x_opt is None:
             raise RuntimeError("optimize() must be called before score().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

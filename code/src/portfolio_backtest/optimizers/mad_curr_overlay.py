@@ -1,33 +1,9 @@
-"""
-Unregularized Mean Absolute Deviation optimizer with currency overlay.
+"""Two-step currency overlay optimizer minimizing mean absolute deviation.
 
-Step 1: Minimizes the MAD of fully hedged asset returns (R_fh), subject to full
-        investment and a leverage cap on asset weights.
-Step 2: With asset weights fixed, minimizes the MAD of the combined portfolio
-        return (R_fh @ x_opt + R_c @ psi) by optimizing the currency overlay
-        weights psi.  psi is unconstrained; forward contracts are zero-investment
-        instruments, so no slack weight is needed to fund the overlay.
-
-Both steps use Konno & Yamazaki's lower semi-absolute deviation form: for a
-sample with zero mean the mass below the mean equals the mass above it, so
-mean|z| = 2 * mean(max(0, -z)), and the right-hand side is linear once the
-positive part is lifted into auxiliary variables.  The factor of two is carried
-explicitly so both objectives are reported on the MAD scale.
-
-Demeaning in step 2 covers both terms.  Writing c = R_fh @ x_opt for the fixed
-asset contribution, mean(c + R_c psi) = mean(c) + mean(R_c) psi, so
-
-    MAD(x_opt, psi) = mean| (c - mean c) + (R_c - mean R_c) psi |,
-
-i.e. the fixed contribution and the currency matrix are each demeaned before the
-program is formed.  The objective carries no mean term, mirroring the MV and ES
-overlays, which likewise minimize a risk measure alone.
-
-The base currency's excess return is identically zero, so its overlay weight
-never enters the objective and would be left unidentified by the LP.  It is
-pinned to zero, as in the MV overlays, rather than left free.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. psi is unconstrained
+apart from a zero base-currency weight. MAD is written in the lower semi-absolute deviation form of Konno &
+Yamazaki (1991).
 """
 
 from __future__ import annotations
@@ -39,8 +15,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -51,23 +26,7 @@ _warned_fallback = False
 
 
 class MeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Two-step unregularized MAD optimizer with sequential currency overlay.
-
-    Step 1 minimizes the MAD of R_fh subject to full investment and leverage
-    constraints.  Step 2 fixes the asset weights and minimizes the MAD of the
-    combined portfolio return.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
@@ -85,12 +44,7 @@ class MeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         self.x_opt: np.ndarray | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -156,7 +110,7 @@ class MeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         """Step 2: minimize the MAD of (R_fh @ x_fixed + R_c @ psi) over unconstrained psi."""
         T, K = Y_c.shape
         c = Y_fh @ x_fixed                  # fixed asset contribution, shape (T,)
-        c_dm = c - c.mean()                 # demeaned; see module docstring
+        c_dm = c - c.mean()  # demeaned
         A_c = Y_c - Y_c.mean(axis=0)
 
         psi = cp.Variable(K)
@@ -166,8 +120,7 @@ class MeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
             u >= 0,
             -(c_dm + A_c @ psi) <= u,
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -181,15 +134,7 @@ class MeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -210,24 +155,7 @@ class MeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the MAD of the combined portfolio on validation data.
-
-        Uses ``self.x_opt`` (fixed from :meth:`optimize`), re-runs step 2 on the
-        validation returns to get psi_val, then evaluates the MAD of the combined
-        return.  Mirrors the unregularized ES and MV overlays, which likewise
-        re-solve step 2 on the validation window.
-
-        The deviation is taken about the validation window's own mean, matching
-        the asset-level MAD optimizers.
-
-        Args:
-            weights: Not used; asset weights are taken from ``self.x_opt``.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Mean absolute deviation of the combined portfolio return (lower is better).
-        """
+        """Validation MAD, after re-solving step 2 on the validation window with x fixed."""
         if self.x_opt is None:
             raise RuntimeError("optimize() must be called before score().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

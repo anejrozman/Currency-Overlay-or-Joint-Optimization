@@ -1,60 +1,10 @@
-"""
-Joint regularized mean-Expected Shortfall optimizer over asset and currency weights.
+"""Regularized joint asset and currency optimizer minimizing Expected Shortfall with a mean term.
 
-The mean-bearing counterpart of reg_es_joint.py, and the regularized counterpart
-of es_joint_w_mean.py.  Minimizes
-
-    ES_alpha(-(R_fh @ x + R_c @ psi)) - (1/gamma) * (mu_a' x + mu_c' psi)
-      + lambda_l1_asset ||x||_1 + lambda_l2_asset ||x||^2
-      + lambda_l1_curr  ||psi||_1 + lambda_l2_curr  ||psi||^2
-
-jointly over x and psi in a single program, subject to full investment and a
-leverage cap on x and an L1 cap on psi.  Penalties follow the paper's S1, S2
-diagonal structure: lambda^a on the first N entries (assets) and lambda^c on the
-remaining M entries (currencies), so the four coefficients are tuned
-independently.
-
-gamma is fixed at 2 rather than searched.  The penalty grid already has 256
-combinations per rebalancing date and nothing factorizes in the joint program,
-so every one of them is a full-size solve; multiplying that by a seven-point
-gamma grid is not affordable at the universe sizes this is run on.  It remains
-readable from ``hyperparams`` so it can be swept deliberately later without
-touching this file, but it is deliberately absent from
-``REG_ES_MEAN_JOINT_CONFIG``'s grid.  gamma = 2 was not calibrated for this
-program -- the unregularized joint's selection favoured 1.0 with no penalties
-competing against the mean term -- so it is a conservative choice rather than an
-optimized one.
-
-Means.  Identical to the unregularized joint's:
-
-  * ``mu_a`` is pooled onto the 14 economies and James-Stein shrunk toward zero
-    (:func:`~portfolio_backtest.utils.estimation.pooled_asset_mean`).
-  * ``mu_c`` is conditioned on the forward premium, mu_c = -f_t
-    (:func:`~portfolio_backtest.utils.estimation.conditional_currency_mean`).
-
-Both are constants for a given estimation window, so they are compiled into the
-program rather than passed as parameters; the window is already part of the
-problem cache key, so nothing can go stale.  ``gamma`` and ``overlay_limit`` are
-added to that key for the same reason ``alpha`` and the leverage limit are in
-it: they are compiled in.
-
-Overlay cap and base currency.  ES is positively homogeneous, so along psi = t*d
-the objective behaves like t * [ES(R_c d) - mu_c' d / gamma] once the penalties
-are zero -- which the grid does include, at lambda_l1_curr = lambda_l2_curr = 0.
-Any direction d with ES(R_c d) < mu_c' d / gamma would then make the program
-unbounded below.  At gamma = 2 that is comfortably out of reach, but the L1 cap
-on psi closes it off by construction rather than by luck, and matches the
-unregularized mean optimizers.  psi_base is pinned to zero: its R_c column is
-identically zero and its forward premium likewise, so it would consume overlay
-budget for nothing.  That pin also removes the unidentified direction that
-reg_es_joint.py's ``_solve`` docstring works around -- there psi_USD is free and
-the optimal face contains a line, which is why crossover has to stay on there.
-
-No demeaning.  The ``demean`` switch reg_es_joint.py carries is deliberately
-absent: centering would zero the very sample means this program is built around.
-It is correspondingly gone from the cache key.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). The objective subtracts (1 / gamma) times the expected return; asset means
+are pooled by economy and James-Stein shrunk, currency means are the carry implied by the forward premium. psi
+has an L1 cap (overlay_limit) and a zero base-currency weight. ES is taken at confidence level alpha.
 """
 
 from __future__ import annotations
@@ -76,10 +26,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6. This mirrors every
-# other regularized optimizer in the package (reg_mv/mad/smv/soes) — only the
-# original ES pair hard-defaults to Gurobi, which makes them unrunnable locally.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -88,9 +35,7 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -98,49 +43,12 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
-    """
-    Joint regularized mean-ES optimizer over asset and currency overlay weights.
-
-    Minimizes ES of (R_fh @ x + R_c @ psi) minus the gamma-scaled mean of the same
-    combination, plus separate L1/L2 penalties on the asset and currency blocks,
-    subject to full investment and a leverage cap on x and an L1 cap on psi.
-
-    The compiled problem is cached at class level and keyed on the estimation
-    window and every constant compiled into it.  The four penalties are
-    DPP-compliant ``cp.Parameter`` objects, so a window is canonicalized once and
-    reused across every grid point the backtester evaluates on it.  Nothing
-    factorizes in the joint program, so all grid points still require a
-    full-size solve.
-    """
-
-    # window signature -> compiled problem bundle. Held at class level because
-    # the backtester constructs a fresh optimizer instance per grid point.
+    # window signature -> compiled problems, shared by the per-grid-point instances
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
-    # Per date the backtester touches two windows: train (every grid point) and
-    # train+val (final refit). Two entries covers both; more risks holding
-    # several dense 2520-by-(N+M) canonicalizations at top-100.
+    # two entries: the training window and the full estimation window of a date
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``            (float) — ES confidence level, default 0.80
-                * ``gamma``            (float) — risk aversion; the mean term enters
-                                                 with coefficient 1 / gamma, default 2.
-                                                 Fixed rather than searched; see the
-                                                 module docstring.
-                * ``lambda_l1_asset``  (float) — L1 penalty on x, default 0.0
-                * ``lambda_l2_asset``  (float) — L2 penalty on x, default 0.0
-                * ``lambda_l1_curr``   (float) — L1 penalty on psi, default 0.0
-                * ``lambda_l2_curr``   (float) — L2 penalty on psi, default 0.0
-                * ``leverage_limit``   (float) — ||x||_1 cap, default 2.0
-                * ``overlay_limit``    (float) — ||psi||_1 cap, default 2.0
-                * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
-                                                 (``cp.CLARABEL`` when gurobipy
-                                                 is unavailable)
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -214,12 +122,7 @@ class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices and estimate both mean vectors.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-        """
+        """Extract the return matrices and estimate both mean vectors."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -246,10 +149,7 @@ class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
             w_a, len(np.unique(self.economy_ids)), np.abs(self.mu_c).sum(),
         )
 
-        # gamma and overlay_limit belong in the key for the same reason alpha and
-        # the leverage limit do: they are compiled into the program as constants.
-        # The mean vectors are compiled in too, but they are functions of the
-        # window alone, which the frame signatures already identify.
+        # gamma and overlay_limit are compiled in as constants, so they are part of the key
         self._cache_key = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -335,15 +235,7 @@ class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         return bundle
 
     def _solve(self, problem: cp.Problem) -> None:
-        """
-        Solve with Gurobi's default crossover.
-
-        Unlike reg_es_joint.py, psi_base is pinned and psi is L1-capped here, so
-        the unidentified direction that forces crossover on there is gone.  The
-        settings are nonetheless left identical to that optimizer's so the two
-        are numerically comparable; there is no need to trade that off for speed
-        when the penalties, not the solve, dominate the grid cost.
-        """
+        """Solve with Gurobi's default crossover."""
         try:
             if self.solver == cp.GUROBI:
                 problem.solve(
@@ -368,17 +260,7 @@ class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized mean-ES optimization on the fitted window.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"``
-            (currency overlay weights, shape M).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run the joint regularized mean-ES optimization on the fitted window."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -414,8 +296,7 @@ class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -431,37 +312,7 @@ class RegularizedExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve, exactly as in reg_es_joint.py.  Refitting on validation and
-        then measuring the in-sample ES of that fit drives selection to the
-        weakest penalty in the grid; the paper (p.25) specifies weights computed
-        on training data and evaluated on the validation sample.  The score is
-
-            ES_alpha(combined loss) - 1.0 * mean(realized combined returns),
-
-        the realized risk-return tradeoff of this window at a reference risk
-        aversion of one.  The ES estimator matches the backtester's
-        ``compute_performance_metrics``: the mean of returns at or below the
-        (1-alpha) quantile.
-
-        The reference coefficient is 1.0 rather than 1 / gamma so the number is
-        directly comparable with the unregularized mean optimizers.  Either is
-        unbiased here, since gamma is fixed across the whole grid: no candidate
-        can earn a larger mean credit than another simply by carrying a smaller
-        gamma, which is the failure the unregularized optimizers had to be
-        protected from.  The realized mean is used rather than
-        mu_a' x + mu_c' psi because a score should measure what the weights
-        actually earned, not re-apply a forecast to them.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Validation ES minus realized mean return, lower is better.
-        """
+        """Validation ES minus mean return of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

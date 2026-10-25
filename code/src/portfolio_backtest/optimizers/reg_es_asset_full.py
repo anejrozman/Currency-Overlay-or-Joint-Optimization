@@ -1,10 +1,8 @@
-"""
-Asset-only Regularized Expected Shortfall optimizer — ASSETS-FULL strategy (Ulrych & Lucescu 2026, Section 3).
+"""Regularized ASSETS-FULL optimizer minimizing Expected Shortfall.
 
-Uses fully hedged asset returns R_fh: the investor hedges all
-currency risk via forward contracts and optimizes only the asset allocation.
-
-Author: Anej Rozman
+The asset weights x are optimized on fully hedged returns, with all currency risk hedged. x is fully invested
+with a leverage cap on ||x||_1. L1 and L2 penalties on x (lambda_l1, lambda_l2). ES is taken at confidence
+level alpha.
 """
 
 from __future__ import annotations
@@ -16,8 +14,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -28,26 +25,7 @@ _warned_fallback = False
 
 
 class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
-    """
-    Asset-only Regularized Expected Shortfall optimizer (ASSETS-FULL strategy).
-
-    Minimizes Expected Shortfall at a given confidence level with L1 and L2
-    regularization penalties, subject to a leverage limit and a full-investment constraint.  
-    Uses only fully hedged asset returns (R_fh) for optimization.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``lambda_l1``      (float) — L1 penalty weight, default 0.3
-                * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
-                * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
-                * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
@@ -65,12 +43,7 @@ class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store the fully hedged return matrix for optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` mapped to a non-empty DataFrame.
-        """
+        """Extract and store the fully hedged return matrix for optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         R_fh = train_bundle["R_fh"]
@@ -80,16 +53,7 @@ class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
         self.q, self.N = self.Y.shape
 
     def optimize(self) -> np.ndarray:
-        """
-        Solve the regularized ES minimization problem.
-
-        Returns:
-            1-D numpy array of shape *(N,)* summing to 1.
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Solve the regularized ES minimization problem."""
         if self.Y is None or self.N == 0:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -151,16 +115,7 @@ class RegularizedExpectedShortfallAssetFullOptimizer(BaseOptimizer):
         weights: np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate validation Expected Shortfall of the candidate weights.
-
-        Args:
-            weights: 1-D array of portfolio weights from :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"``.
-
-        Returns:
-            Negative mean of the worst ``(1-alpha)`` fraction of portfolio returns.
-        """
+        """Validation ES of the training-fitted weights."""
         if "R_fh" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh'.")
         R_fh_val = val_bundle["R_fh"]

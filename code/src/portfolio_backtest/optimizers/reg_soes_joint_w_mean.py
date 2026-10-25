@@ -1,114 +1,11 @@
-"""
-Regularized joint mean-Second-Order Expected Shortfall optimizer over asset and
-currency weights (Krokhmal 2007, in the framework of Lucescu & Ulrych 2026, Appendix A.3).
+"""Regularized joint asset and currency optimizer minimizing second-order Expected Shortfall with a mean term.
 
-The mean-bearing counterpart of reg_soes_joint.py, and the regularized counterpart
-of soes_joint_w_mean.py.  Minimizes
-
-    HMCR_2(-(R_fh @ x + R_c @ psi)) - (1 / gamma) (mu_a' x + mu_c' psi)
-    + lambda_l1_asset ||x||_1 + lambda_l2_asset ||x||^2
-    + lambda_l1_curr  ||psi||_1 + lambda_l2_curr  ||psi||^2
-
-jointly over x and psi in a single program, subject to full investment and a
-leverage cap on x and an L1 cap on psi.
-
-The risk measure -- the unsquared L2 tail norm and its sqrt(q) normalization -- is
-unchanged from reg_soes_joint.py; see reg_soes_asset_full.py for the derivation.
-This is an SOCP, so ``optimal_inaccurate`` is more likely here than for the ES
-joint's LP.
-
-The intended difference from reg_soes_curr_overlay_w_mean.py is the sequencing:
-there x is fixed by an asset-only program and psi is fitted against it afterwards,
-here both blocks enter the same second-order cone constraint.  Unlike the
-overlay's step 2, mu_a' x is a live term rather than a droppable constant.
-
-No demeaning.  The ``demean`` switch reg_soes_joint.py carries is deliberately
-absent, matching soes_joint_w_mean.py and reg_es_joint_w_mean.py: centering would
-zero the very sample means this program is built around -- ``pooled_asset_mean`` on
-a demeaned R_fh returns identically zero, James-Stein shrinking to w = 1.000.  So
-mu_a and mu_c are estimated from the raw matrices, and the risk term sees those
-same raw matrices.
-
-HMCR_2 is translation-equivariant, so an undemeaned HMCR_2 decomposes as
-HMCR_2(-r) = HMCR_2_deviation(-r) - mean(r): the risk term already rewards a high
-mean at fixed weight one on top of the explicit 1/gamma term.  gamma -> infinity
-therefore gives reg_soes_joint.py with ``demean=False``, not that module's default.
-This mirrors the ES pair exactly, which is the point -- ES and SOES are the two
-non-deviation measures in the suite and are treated identically.
-
-gamma is fixed rather than searched, at 0.5.  This config already carries
-4 x 4 x 4 x 4 = 256 penalty combinations per rebalancing date, and crossing that
-with SOES_GAMMA_GRID's seven points is not affordable at SOES's solve cost.  0.5 is
-a conservative choice rather than the swept optimum: on the fixed-gamma sweep of
-the unregularized SOES joint it earns a Sharpe of 0.118 against 0.056 for the
-mean-free program run under the same 2.0 cap, while the peak sits further out at
-gamma = 0.05 (Sharpe 0.234).  Note this program's drawdown worsens monotonically
-across most of the band -- 36.3% at the capped mean-free end to 39.3% at gamma =
-0.1 -- so unlike the MV, SMV and MAD joints there is no gamma that improves both
-axes, and 0.5 is chosen for caution rather than because it dominates.  The full
-curve is tabulated at SOES_GAMMA_GRID in backtest_config.py.  gamma is still read
-from hyperparams, so it can be swept deliberately later.  gamma is not comparable
-across risk measures: HMCR_2 is degree-one, so its band sits two to three decades
-below the MV and SMV ones.
-
-Fixing gamma also removes the bias the unregularized pair had to reason about in
-its score, and sidesteps a second problem specific to the unregularized joint:
-there :meth:`score` re-solves on the validation window and so re-estimates mu_a on
-one year of data, where James-Stein shrinks it to exactly zero on 41% of
-rebalancing dates.  Here nothing is re-solved on validation, so the scored weights
-are exactly the trained ones and mu_a is never re-estimated.  That also saves a
-full SOCP solve per grid point, which matters at this program's cost.
-
-Overlay cap.  Required, and doing more work here than in any other program in the
-suite.  HMCR_2 is degree-one and x is confined to a compact set by sum(x) = 1 and
-the L1 leverage cap, so psi is the only runaway direction, and along psi = t * d
-the objective behaves like t * [HMCR_2(-(R_c d)) - mu_c' d / gamma], giving
-
-    gamma_crit = max_d [ mu_c' d / HMCR_2(-(R_c d)) ],
-
-measured at 0.0155, 0.0224 and 0.0264 -- identical to the overlay's, as that
-argument predicts.  The shipped gamma of 0.5 clears the worst by nineteen times.
-
-That asymptotic margin badly understates the case here.  At finite scale the asset
-block partially offsets the carry direction, and the mean-free undemeaned joint
-already runs a gross psi near 3, so the objective keeps falling far past where the
-overlay's would stop.  Measured uncapped, the unregularized joint is reported
-unbounded by the solver at EVERY gamma tested down from 1 -- 38x above gamma_crit,
-and twice the shipped value -- where the uncapped overlay stayed bounded to 0.02.
-For this program the cap is what makes the shipped configuration solvable at all.
-The penalties do not substitute for it: lambda_l1_curr = lambda_l2_curr = 0 is a
-corner of the grid.
-
-The cap is set at 2.0, matching every other mean-bearing program.  That is not free:
-the mean-free undemeaned SOES joint runs a gross psi of 1.61, 3.08 and 3.90 across
-three estimation windows, so the cap binds on two of the three with the mean term
-switched off entirely -- the largest overshoot of any program in the suite.  This
-is therefore not a strict superset of reg_soes_joint.py.
-
-Base currency.  Pinned to zero, which reg_soes_joint.py does not do.  There
-psi_base is genuinely absent from an unconstrained SOCP; the overlay cap changes
-that, since |psi_base| enters cp.norm(psi, 1) and would consume budget while
-contributing nothing to the risk term or to the mean.
-
-Budget.  sum(x) == 1 is imposed and the solution is checked rather than
-renormalized, following reg_soes_joint.py.  That matters most in an SOCP, where
-``optimal_inaccurate`` is the likeliest status in the family and a silent
-rescaling could push ||x||_1 past the leverage cap.
-
-Means.  Estimated exactly as in soes_joint_w_mean.py: mu_a pooled onto the 14
-economies and James-Stein shrunk toward zero, mu_c conditioned on the forward
-premium as the carry -f_t.
-
-Performance notes, inherited from reg_soes_joint.py:
-
-* The compiled problem is cached at class level in a small LRU keyed on the
-  estimation window; the four penalties are DPP ``cp.Parameter`` objects, so the
-  window canonicalizes once rather than once per grid point.  The mean vectors and
-  gamma are compiled in as constants, which is why gamma joins the cache key.
-* Unlike the overlay there is no asset-only sub-problem to cache, so all 256 grid
-  points are full SOCP solves.  This is the most expensive program in the suite.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). The objective subtracts (1 / gamma) times the expected return; asset means
+are pooled by economy and James-Stein shrunk, currency means are the carry implied by the forward premium. psi
+has an L1 cap (overlay_limit) and a zero base-currency weight. The risk measure is HMCR_2 of Krokhmal (2007)
+at confidence level alpha.
 """
 
 from __future__ import annotations
@@ -131,8 +28,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -141,8 +37,7 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -150,37 +45,10 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimizer):
-    """
-    Joint regularized mean-HMCR_2 optimizer over asset and currency overlay weights.
-
-    Solves one CVXPY problem minimizing the penalized HMCR_2 of
-    (R_fh @ x + R_c @ psi) minus the gamma-scaled mean of the same combination,
-    subject to full investment and a leverage cap on x and an L1 cap on psi --
-    which this program requires to be solvable at the shipped gamma.
-    """
-
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``            (float) — confidence level, default 0.80
-                * ``gamma``            (float) — risk aversion; the mean term enters
-                                                 with coefficient 1 / gamma, default 0.5
-                * ``lambda_l1_asset``  (float) — L1 penalty for asset weights, default 0.0
-                * ``lambda_l2_asset``  (float) — L2 penalty for asset weights, default 0.0
-                * ``lambda_l1_curr``   (float) — L1 penalty for the overlay, default 0.0
-                * ``lambda_l2_curr``   (float) — L2 penalty for the overlay, default 0.0
-                * ``leverage_limit``   (float) — ||x||_1 cap, default 2.0
-                * ``overlay_limit``    (float) — ||psi||_1 cap, default 2.0
-                * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
-                                                 (``cp.CLARABEL`` when gurobipy is unavailable)
-
-        Note there is deliberately no ``demean`` key; see the module docstring.
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -255,14 +123,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices and estimate both mean vectors.
-
-        The matrices are kept raw -- not centered; see the module docstring.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-        """
+        """Extract the return matrices and estimate both mean vectors."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -287,9 +148,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
             w_a, len(np.unique(self.economy_ids)), np.abs(self.mu_c).sum(),
         )
 
-        # alpha, gamma, the leverage limit and the overlay cap join the key because,
-        # unlike the penalties, they are compiled in as constants rather than passed
-        # as DPP parameters.
+        # alpha, gamma, the leverage limit and the overlay cap are compiled in as constants, so they are part of the key
         self._cache_key = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -327,14 +186,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
     # Problem construction
 
     def _build_problem(self) -> dict:
-        """
-        Compile the joint program with the four penalties as DPP parameters.
-
-        The return matrices, the two mean vectors, alpha, gamma and the overlay cap
-        are baked in as constants, so the compiled problem is valid only for the
-        window it was built from; the cache is keyed on that window and on gamma,
-        and :meth:`score` never re-solves on validation data.
-        """
+        """Compile the joint program with the four penalties as DPP parameters."""
         tail_prob = 1.0 - self.alpha
 
         x = cp.Variable(self.N, name="x")
@@ -363,7 +215,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
             -combined_return - eta <= u,
             cp.sum(x) == 1,                            # budget on the asset block only
             l1_norm_x <= self.leverage_limit,          # leverage on the asset block only
-            cp.norm(psi, 1) <= self.overlay_limit,     # overlay cap; see module docstring
+            cp.norm(psi, 1) <= self.overlay_limit,  # overlay cap
         ]
         base = np.where(self.Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
@@ -404,17 +256,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
         return bundle
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run the joint regularized optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -440,8 +282,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -457,42 +298,7 @@ class RegularizedSecondOrderExpectedShortfallJointWithMeanOptimizer(BaseOptimize
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve, mirroring reg_soes_joint.py and the rest of the regularized
-        family: refitting on validation and then measuring the in-sample objective
-        of that fit drives selection to the weakest penalty in the grid.  The score
-        is
-
-            HMCR_2(combined loss) - mean(realized combined returns),
-
-        the realized risk-return tradeoff of this window at a reference coefficient
-        of one.
-
-        HMCR_2 needs no transformation to reach a degree-one score, and it is
-        re-derived here with a bounded 1-D search: at p = 2 the minimizing zeta has
-        no VaR shortcut (see reg_soes_asset_full.py), and these SOCPs are the most
-        likely in the family to return ``optimal_inaccurate``.
-
-        Because the risk term is not demeaned, the reference coefficient is
-        effectively one half rather than one -- HMCR_2 already contains a -mean(r)
-        of its own -- so this score is HMCR_2_deviation - 2 * mean(r).  Stated
-        rather than corrected, so it stays comparable with the ES pair and with the
-        unregularized SOES pair.
-
-        The reference coefficient of 1.0 is unbiased here in a way it is not in the
-        unregularized pair: gamma is fixed across the whole grid, so the search
-        selects penalties alone.  Not re-solving also avoids the validation-window
-        mu_a degradation documented in soes_joint_w_mean.score.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Validation HMCR_2 minus realized mean return, lower is better.
-        """
+        """Validation HMCR_2 minus mean return of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

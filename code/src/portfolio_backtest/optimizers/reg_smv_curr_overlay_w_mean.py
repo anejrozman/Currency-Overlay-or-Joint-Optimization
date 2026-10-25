@@ -1,111 +1,12 @@
-"""
-Regularized mean-Semi-Variance optimizer with currency overlay
-(Markowitz, Todd, Xu & Yamane 1993, in the framework of Lucescu & Ulrych 2026, Appendix A.3).
+"""Regularized two-step currency overlay optimizer minimizing semi-variance with a mean term.
 
-The mean-bearing counterpart of reg_smv_curr_overlay.py, and the regularized
-counterpart of smv_curr_overlay_w_mean.py.  Both steps minimize the same penalized
-mean-risk functional
-
-    SMV(portfolio return) - (1 / gamma) mu' w
-    + lambda_l1 ||w||_1 + lambda_l2 ||w||^2,
-
-with gamma a risk-aversion coefficient in the conventional direction: large gamma
-starves the mean term and the program collapses onto reg_smv_curr_overlay, small
-gamma gives the mean its full weight.
-
-Step 1: minimizes (1/T) sum_t [max(0, -(A x)_t)]^2 - (1/gamma) mu_a' x plus the
-        asset penalties, with full investment and a leverage cap on x.
-Step 2: with asset weights fixed, minimizes
-
-            (1/T) sum_t [max(0, -(c_dm + A_c psi)_t)]^2 - (1/gamma) mu_c' psi
-            + lambda_l1_curr ||psi||_1 + lambda_l2_curr ||psi||^2,
-
-        subject to an L1 cap on the overlay.  The mu_a' x* term is a constant
-        there and cannot move the argmin, so it is dropped -- which is also what
-        lets :meth:`score` avoid estimating mu_a on the validation window.
-
-The risk measure and its reformulation are unchanged from reg_smv_curr_overlay.py:
-Markowitz et al.'s S_E, eq. (3.1a), with the target E set to the portfolio's own
-expected return, lifted into T auxiliary variables via their eqs. (3.4)-(3.7),
-keeping only the downside half so each step is a QP with T auxiliary variables
-rather than 2T.  The risk term is reported as the semi-variance itself, not
-doubled onto the variance scale, which matters because the penalty grids are
-calibrated against the size of the risk term.
-
-Location.  The demeaning is what makes the mean term well defined here.
-A = Y - Y.mean(axis=0) turns the semi-variance into a *deviation* measure,
-invariant to a location shift, so the mean reaches the objective only through the
-explicit, pooled and shrunk mu terms -- as a variance does in
-reg_mv_curr_overlay_w_mean.py, and why gamma -> infinity recovers
-reg_smv_curr_overlay.py up to the overlay cap.  Dropping the demeaning would turn
-the risk term into a lower partial moment about zero, not location-free, and it
-would then reward a high mean at fixed weight one on top of the explicit term --
-the double-counting reg_es_curr_overlay_w_mean.py carries because raw ES is not a
-deviation measure either.
-
-One inconsistency the deviation form leaves, stated rather than fixed: the
-demeaning subtracts the raw per-column sample mean while the mean term rewards
-the pooled and shrunk mu_a, so risk is measured about a noisy target and return
-forecast with a deliberately quiet one.
-
-gamma is fixed rather than searched, at 30.  This config already carries
-4 x 4 x 4 x 4 = 256 penalty combinations per rebalancing date, and crossing that
-with SMV_GAMMA_GRID's six points is not affordable at these universe sizes, still
-less at SMV's solve cost -- the same reasoning REG_MV_MEAN_OVERLAY_CONFIG records.
-30 is calibrated rather than conservative: on the fixed-gamma sweep of the
-unregularized SMV overlay it is the most aggressive grid point that still improves
-drawdown over the mean-free program (MDD 30.5% against 32.2%) while raising the
-Sharpe from 0.083 to 0.381.  The full curve is tabulated at SMV_GAMMA_GRID in
-backtest_config.py.  It is still read from hyperparams, so it can be swept
-deliberately later without touching this code.  Note that 30 sits closer to the
-SMV Sharpe peak (15-20) than the same number does on the MV curve (peak 10), so
-this pair is running a relatively more aggressive tilt than the MV pair at the
-same nominal gamma; gamma is not comparable across risk measures.
-
-Fixing gamma also removes the one bias the unregularized pair had to reason
-about.  There :meth:`score` had to be gamma-free because a candidate carrying a
-smaller gamma could earn an unboundedly larger mean credit; here every candidate
-carries the same gamma, so the reference coefficient of 1.0 below is unbiased by
-construction and the search is selecting penalties alone.
-
-Overlay cap.  Carried at 2.0, matching smv_curr_overlay_w_mean.py and the
-mean-bearing MV pair, so every mean-bearing program in the thesis shares one
-overlay budget.  Unlike the MV pair this is not free: the mean-free SMV overlay
-already runs gross psi of 0.40 to 2.54 across fourteen estimation windows (median
-1.40), so the cap binds on about one window in five *with the mean term switched
-off entirely*, and this program is therefore not a strict superset of
-reg_smv_curr_overlay.py.  Measured at the backtest level the effect is small:
-turning the cap on with the mean term off is worth +0.005 Sharpe on the
-unregularized overlay, against +0.053 for the mean term alone.  Where it binds,
-psi sits on a corner of the L1 ball with its size set by the budget rather than by
-the risk-return tradeoff.
-
-Means.  Estimated exactly as in smv_curr_overlay_w_mean.py: mu_a pooled onto the
-14 economies and James-Stein shrunk toward zero, mu_c conditioned on the forward
-premium as the carry -f_t.  What each channel actually forecasts over the
-following quarter is recorded in mv_curr_overlay_w_mean.py -- mu_c genuinely, mu_a
-not, cross-sectionally.
-
-Base currency.  Pinned to zero: its R_c column is identically zero so it never
-enters the risk term, its mu_c entry is zero, and the overlay cap would otherwise
-let it consume budget while contributing nothing.
-
-Performance notes, inherited from reg_smv_curr_overlay.py:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problems and the step-1 solutions are cached at
-  class level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per
-  window rather than once per grid point (DPP).  The mean vectors and gamma are
-  compiled in as constants instead, which is why gamma joins the cache key; the
-  mean vectors are functions of the window alone, so the frame signatures already
-  cover them.
-* Step 1 does not depend on the currency penalties, so it is solved once per
-  (lambda_l1_asset, lambda_l2_asset) pair -- 16 solves per window rather than 256.
-  That matters more here than for MV: each SMV solve carries T ~ 2600 auxiliary
-  variables and costs roughly fifty times a mean-variance one.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. Separate L1 and L2
+penalties on x and psi (lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr). The objective
+subtracts (1 / gamma) times the expected return; asset means are pooled by economy and James-Stein shrunk,
+currency means are the carry implied by the forward premium. psi has an L1 cap (overlay_limit) and a zero
+base-currency weight. Semi-variance is measured below the portfolio's own mean (Markowitz, Todd, Xu & Yamane
+1993).
 """
 
 from __future__ import annotations
@@ -125,8 +26,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -137,38 +37,13 @@ _warned_fallback = False
 
 
 class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
-    """
-    Two-step regularized mean-semi-variance optimizer with sequential currency overlay.
-
-    Step 1 minimizes the penalized semi-variance of R_fh minus the pooled asset
-    mean, subject to full investment and a leverage cap.  Step 2 fixes the asset
-    weights and minimizes the penalized semi-variance of the combined portfolio
-    return minus the carry mean of the overlay, subject to an L1 cap on psi.
-    """
-
-    # Shared across the per-grid-point instances the Backtester creates. Reset by
-    # fit() whenever anything compiled into the problems changes.
+    # class-level, shared by the per-grid-point instances; fit() resets it when the window changes
     _cache_key: str | None = None
     _asset_prob: dict | None = None
     _overlay_prob: dict | None = None
     _asset_solutions: dict[tuple[float, float], np.ndarray] = {}
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``gamma``           (float) — risk aversion; the mean term enters
-                                                with coefficient 1 / gamma, default 30
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 1e-5
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 1.5e-3
-                * ``lambda_l1_curr``  (float) — L1 penalty for the overlay, default 0.0
-                * ``lambda_l2_curr``  (float) — L2 penalty for the overlay, default 0.0
-                * ``leverage_limit``  (float) — ||x||_1 cap for step 1, default 2.0
-                * ``overlay_limit``   (float) — ||psi||_1 cap for step 2, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.gamma: float = self.hyperparams.get("gamma", 30)
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 1e-5)
@@ -218,16 +93,7 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         )
 
     def _refresh_cache(self, R_fh, R_c) -> None:
-        """
-        Drop the compiled problems and cached step-1 solutions if anything baked
-        into them has changed.
-
-        ``gamma``, ``leverage_limit`` and ``overlay_limit`` enter the key because
-        they are compiled in as constants rather than passed as parameters.  The
-        two mean vectors are compiled in as well, but they are functions of the
-        window alone (``mu_a`` of R_fh and the economy map, ``mu_c`` of the forward
-        premium aligned to R_c), so the frame signatures already cover them.
-        """
+        """Drop the compiled problems and cached step-1 solutions if anything baked into them has changed."""
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -254,12 +120,8 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         cls._asset_solutions = {}
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices, estimate both mean vectors, and refresh the
-        problem cache if anything baked into it changed.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
+        """Extract the return matrices, estimate both mean vectors, and refresh the problem cache if
+        anything baked into it changed.
         """
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
@@ -315,11 +177,7 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     # Step 1: assets
 
     def _build_asset_problem(self, Y_fh: np.ndarray, mu_a: np.ndarray) -> dict:
-        """Compile the step-1 problem once, with the penalties left as parameters.
-
-        The demeaned return matrix, mu_a and gamma are baked in as constants, so
-        the compiled problem is valid only for the window it was built from;
-        ``_refresh_cache`` drops it whenever the window or gamma changes."""
+        """Compile the step-1 problem once, with the penalties left as parameters."""
         T, N = Y_fh.shape
         A = Y_fh - Y_fh.mean(axis=0)
 
@@ -348,14 +206,7 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         return {"prob": problem, "x": x, "lam1": lam1, "lam2": lam2}
 
     def _optimize_assets(self, Y_fh: np.ndarray, mu_a: np.ndarray) -> np.ndarray:
-        """
-        Step 1: penalized mean-semi-variance on R_fh with a leverage constraint and
-        full investment.
-
-        The solution depends only on the asset penalties within a window, so it is
-        cached on (lambda_l1_asset, lambda_l2_asset); gamma is already part of the
-        window cache key.
-        """
+        """Step 1: penalized mean-semi-variance on R_fh with a leverage constraint and full investment."""
         cls = type(self)
         cache_id = (float(self.lambda_l1_asset), float(self.lambda_l2_asset))
         if cache_id in cls._asset_solutions:
@@ -379,14 +230,8 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     # Step 2: currency overlay
 
     def _build_overlay_problem(self, Y_c: np.ndarray, mu_c: np.ndarray) -> dict:
-        """
-        Compile the step-2 problem once, with the penalties and the demeaned fixed
-        asset contribution left as parameters.
-
-        The demeaned currency matrix, mu_c and gamma are baked in as constants, so
-        the compiled problem is valid only for the window it was built from.
-        ``_refresh_cache`` drops it whenever the window changes, and :meth:`score`
-        never re-solves on validation data, so no other window ever reaches it.
+        """Compile the step-2 problem once, with the penalties and the demeaned fixed asset contribution
+        left as parameters.
         """
         T, K = Y_c.shape
         A_c = Y_c - Y_c.mean(axis=0)
@@ -422,10 +267,7 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray, mu_c: np.ndarray
     ) -> np.ndarray:
-        """Step 2: penalized mean-semi-variance of (R_fh @ x_fixed + R_c @ psi)
-        over psi, capped in L1.
-
-        The constant mu_a' x* is dropped: it cannot move the argmin."""
+        """Step 2: penalized mean-semi-variance of (R_fh @ x_fixed + R_c @ psi) over psi, capped in L1."""
         cls = type(self)
         if cls._overlay_prob is None:
             cls._overlay_prob = self._build_overlay_problem(Y_c, mu_c)
@@ -443,16 +285,7 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -473,48 +306,7 @@ class RegularizedSemiVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate train-fitted candidate weights on the validation window.
-
-        Both the asset weights and the currency overlay are taken as given from
-        :meth:`optimize` on the training window and held fixed; nothing is
-        re-solved on the validation sample, matching reg_smv_curr_overlay.py and
-        the rest of the regularized family.  Refitting on validation and then
-        measuring the in-sample objective of that fit drives selection to the
-        weakest penalty in the grid.  The score is
-
-            semideviation(combined return) - mean(combined return),
-
-        the realized risk-return tradeoff of this window at a reference risk
-        aversion of one.
-
-        The risk is the semi-deviation, not the semi-variance
-        reg_smv_curr_overlay.py scores on.  Both have the same minimizer when no
-        mean is subtracted, so the choice is free there; with a mean term it is
-        not.  A daily semi-variance on this data is on the order of 1e-5 against a
-        daily portfolio mean near 2.7e-4, so ``semivariance - mean`` would be a
-        mean maximization dressed up as a tradeoff.  The semi-deviation is on the
-        order of 3e-3, and it is the degree-one convention
-        ``in_sample_analysis.evaluate_risk`` already uses for ``"smv"`` -- the
-        functional in_sample_vs_out_of_sample_w_mean.py scores these weights with,
-        and the one the other three mean-bearing SMV and MV programs use, so the
-        numbers are directly comparable across all of them.
-
-        The reference coefficient of 1.0 is unbiased here in a way it is not in
-        the unregularized pair.  gamma is fixed across the whole grid, so no
-        candidate can earn a larger mean credit than another simply by carrying a
-        smaller gamma; the search is selecting penalties alone.  The realized mean
-        is used rather than mu_a' x + mu_c' psi because a score should measure what
-        the weights actually earned on the window, not re-apply a shrunk or
-        conditional forecast to them.
-
-        Args:
-            weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Validation semi-deviation minus realized mean return, lower is better.
-        """
+        """Validation semi-deviation minus mean return of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("weights must be a dict with keys 'x' and 'psi'.")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

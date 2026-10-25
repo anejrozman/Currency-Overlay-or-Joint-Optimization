@@ -1,19 +1,8 @@
-"""
-Unregularized Joint Mean-Variance optimizer over asset and currency weights.
+"""Joint asset and currency optimizer minimizing variance.
 
-Minimizes the variance of the combined portfolio return (R_fh @ x + R_c @ psi) jointly
-over both asset weights x and currency overlay weights psi in a single optimization
-scheme. Leverage cap and budget on the asset block only; psi is unconstrained apart
-from the base-currency pin.
-
-The objective carries no mean term.  The variance coefficient is normalized to one,
-which is the gamma -> infinity limit of the paper's objective after dividing through
-by gamma / 2: the mean term vanishes and the quadratic form is exactly
-Var(x' R_fh + psi' R_c) under the joint covariance.  This mirrors the ES optimizers,
-which likewise minimize a risk measure alone, and removes the need for a shrinkage
-estimator of the mean (Bayes-Stein, Jorion 1986).
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. psi is unconstrained apart from a zero base-currency weight. Covariances are
+Ledoit-Wolf shrunk.
 """
 
 from __future__ import annotations
@@ -26,8 +15,7 @@ from ..utils.estimation import ledoit_wolf_cc
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -36,30 +24,13 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
 
 class MeanVarianceJointOptimizer(BaseOptimizer):
-    """
-    Joint unregularized mean-variance optimizer over asset and currency overlay weights.
-
-    Solves a single CVXPY problem minimizing the variance of (R_fh @ x + R_c @ psi)
-    subject to full investment and leverage constraints on x. psi is unconstrained.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
@@ -76,12 +47,7 @@ class MeanVarianceJointOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -125,11 +91,7 @@ class MeanVarianceJointOptimizer(BaseOptimizer):
     def _optimize_joint(
         self, Y_fh: np.ndarray, Y_c: np.ndarray
     ) -> dict[str, np.ndarray]:
-        """Jointly minimize the variance of (R_fh @ x + R_c @ psi) over x and psi.
-
-        The joint covariance (Ledoit-Wolf) is estimated on the stacked return vector
-        [R_fh, R_c], so the asset-currency cross-covariance is shrunk together with the
-        asset and currency blocks (appendix B, eq:mv_joint_obj)."""
+        """Jointly minimize the variance of (R_fh @ x + R_c @ psi) over x and psi."""
         N = Y_fh.shape[1]
         K = Y_c.shape[1]
         Y = np.hstack([Y_fh, Y_c])  # q x (N + K) combined return matrix
@@ -145,8 +107,7 @@ class MeanVarianceJointOptimizer(BaseOptimizer):
             cp.sum(x) == 1,                  # budget on the asset block only
             l1_norm <= self.leverage_limit,  # leverage on the asset block only
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -163,8 +124,7 @@ class MeanVarianceJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -176,15 +136,7 @@ class MeanVarianceJointOptimizer(BaseOptimizer):
         return {"x": weights, "psi": overlay}
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Run the joint optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -199,21 +151,7 @@ class MeanVarianceJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the variance by rerunning the joint optimization on validation data.
-
-        Mirrors the unregularized ES joint, which likewise re-solves on the validation
-        window. (The regularized variants instead hold the training fit fixed, because
-        re-solving would drive penalty selection to the weakest point in the grid;
-        with no penalties to select there is nothing for that to bias here.)
-
-        Args:
-            weights: Not used, joint optimization is rerun on val data.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Variance of the combined portfolio return (lower is better).
-        """
+        """Validation variance, after re-solving the joint program on the validation window."""
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh' and 'R_c'.")
         R_fh_val = val_bundle["R_fh"]

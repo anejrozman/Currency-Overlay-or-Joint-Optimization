@@ -1,34 +1,8 @@
-"""
-Unregularized Joint Mean Absolute Deviation optimizer over asset and currency weights.
+"""Joint asset and currency optimizer minimizing mean absolute deviation.
 
-Minimizes the MAD of the combined portfolio return (R_fh @ x + R_c @ psi) jointly over
-both asset weights x and currency overlay weights psi in a single optimization scheme.
-Leverage cap and budget on the asset block only; psi is unconstrained apart from the
-base-currency pin.
-
-The program uses Konno & Yamazaki's lower semi-absolute deviation form: for a sample
-with zero mean the mass below the mean equals the mass above it, so mean|z| =
-2 * mean(max(0, -z)), and the right-hand side is linear once the positive part is
-lifted into a T-vector of auxiliary variables.  The factor of two is carried
-explicitly so the objective is reported on the MAD scale.
-
-Demeaning covers both blocks.  Since mean(x' R_fh + psi' R_c) = x' mean(R_fh) +
-psi' mean(R_c), the deviation about the portfolio's own mean is
-
-    MAD(x, psi) = mean| A_fh x + A_c psi |,
-
-where A_fh and A_c are the columnwise demeaned return matrices.  The objective carries
-no mean term, mirroring the MV and ES joint optimizers, which likewise minimize a risk
-measure alone, and removing the need for a shrinkage estimator of the mean
-(Bayes-Stein, Jorion 1986).  Unlike mean-variance, nothing beyond the demeaning is
-estimated: MAD is read off the empirical distribution directly, with no joint
-covariance matrix and so no shrinkage target (contrast Ledoit-Wolf in mv_joint).
-
-The base currency's excess return is identically zero, so its overlay weight never
-enters the objective and would be left unidentified by the LP.  It is pinned to zero,
-as in mv_joint, rather than left free.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. psi is unconstrained apart from a zero base-currency weight. MAD is written in the
+lower semi-absolute deviation form of Konno & Yamazaki (1991).
 """
 
 from __future__ import annotations
@@ -40,8 +14,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -50,31 +23,13 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
 
 class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
-    """
-    Joint unregularized MAD optimizer over asset and currency overlay weights.
-
-    Solves a single CVXPY problem minimizing the MAD of (R_fh @ x + R_c @ psi)
-    subject to full investment and leverage constraints on x. psi is unconstrained
-    apart from the base-currency pin.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
@@ -91,12 +46,7 @@ class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -140,11 +90,7 @@ class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
     def _optimize_joint(
         self, Y_fh: np.ndarray, Y_c: np.ndarray
     ) -> dict[str, np.ndarray]:
-        """Jointly minimize the MAD of (R_fh @ x + R_c @ psi) over x and psi.
-
-        Both return blocks are demeaned columnwise, so the objective is the deviation
-        of the combined portfolio return about its own sample mean (see module
-        docstring)."""
+        """Jointly minimize the MAD of (R_fh @ x + R_c @ psi) over x and psi."""
         T, N = Y_fh.shape
         K = Y_c.shape[1]
         A_fh = Y_fh - Y_fh.mean(axis=0)
@@ -161,8 +107,7 @@ class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
             cp.sum(x) == 1,                  # budget on the asset block only
             l1_norm <= self.leverage_limit,  # leverage on the asset block only
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -180,8 +125,7 @@ class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -193,15 +137,7 @@ class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         return {"x": weights, "psi": overlay}
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Run the joint optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -216,25 +152,7 @@ class MeanAbsoluteDeviationJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the MAD by rerunning the joint optimization on validation data.
-
-        Mirrors the unregularized ES and MV joint optimizers, which likewise re-solve
-        on the validation window. (The regularized variants instead hold the training
-        fit fixed, because re-solving would drive penalty selection to the weakest
-        point in the grid; with no penalties to select there is nothing for that to
-        bias here.)
-
-        The deviation is taken about the validation window's own mean, matching the
-        asset-level and overlay MAD optimizers.
-
-        Args:
-            weights: Not used, joint optimization is rerun on val data.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Mean absolute deviation of the combined portfolio return (lower is better).
-        """
+        """Validation MAD, after re-solving the joint program on the validation window."""
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh' and 'R_c'.")
         R_fh_val = val_bundle["R_fh"]

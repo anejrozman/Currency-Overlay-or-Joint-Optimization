@@ -1,74 +1,9 @@
-"""
-Regularized Joint Semi-Variance optimizer over asset and currency weights
-(Markowitz, Todd, Xu & Yamane 1993, in the framework of Lucescu & Ulrych 2026, Appendix A.3).
+"""Regularized joint asset and currency optimizer minimizing semi-variance.
 
-Minimizes a regularized semi-variance objective of the combined portfolio return
-(R_fh @ x + R_c @ psi) jointly over both asset weights x and currency overlay weights
-psi in a single optimization problem. Separate L1 and L2 penalties are applied to x
-and psi, following the paper's S1, S2 diagonal structure. Leverage cap and budget on
-the asset block only; psi is unconstrained apart from the base-currency pin.
-
-The risk measure is Markowitz et al.'s S_E, eq. (3.1a), with the target E set to the
-portfolio's own expected return rather than an exogenous benchmark:
-
-    SMV(w) = (1/T) * sum_t [ max(0, -A_t w) ]^2,
-
-where A is the columnwise demeaned return matrix, so only deviations below the
-portfolio's own mean are counted. The program uses their eqs. (3.4)-(3.7)
-reformulation, lifting the positive part into auxiliary variables to make the
-objective quadratic. The paper introduces 2T of them — Y for the signed deviation and
-Z = Y^- for its negative part, tied by BX - Y + Z = 0 — because the Critical Line
-Algorithm needs the constraints in equality form. Only the downside half is needed
-here: minimizing sum z_t^2 subject to z >= -A w and z >= 0 drives each z_t to
-max(0, -A_t w) on its own, so the equality and the free variables Y drop out and the
-program is a QP with T auxiliary variables rather than 2T. The 1/sqrt(T) that eq.
-(3.8) folds into B is carried as an explicit 1/T on the objective instead, which
-leaves A on the scale of the raw returns and keeps the risk term numerically better
-conditioned. The risk term is reported as the semi-variance itself, not doubled onto
-the variance scale, which matters because the penalty grids are calibrated against
-the size of the risk term.
-
-Demeaning covers both blocks. Since mean(x' R_fh + psi' R_c) = x' mean(R_fh) +
-psi' mean(R_c), the deviation about the portfolio's own mean is
-
-    SMV(x, psi) = (1/T) * sum_t [ max(0, -(A_fh x + A_c psi)_t) ]^2,
-
-where A_fh and A_c are the columnwise demeaned return matrices. Note that no part of
-the risk term separates into an asset-only and a currency-only term the way the
-mean-variance quadratic form does: the positive part is taken of the combined return,
-so the two blocks interact inside it. Only the penalties are block-separable.
-
-That demeaning also keeps the program well posed. The residual A_fh x + A_c psi sums
-to exactly zero over the window for every (x, psi), so it can be non-negative
-throughout only if it vanishes identically — which needs a null vector of the stacked
-demeaned matrix, impossible for T ~ 2500 against N + K ~ 145 columns of full rank.
-The risk term is therefore strictly positive at the optimum even before the penalties
-enter.
-
-The objective carries no mean term, mirroring the MV, MAD and ES joint optimizers,
-which likewise penalize a risk measure alone, and removing the need for a shrinkage
-estimator of the mean (Bayes-Stein, Jorion 1986). Unlike mean-variance, nothing
-beyond the demeaning is estimated: the semi-variance is read off the empirical
-distribution directly, with no joint covariance matrix and so no shrinkage target
-(contrast Ledoit-Wolf on the stacked returns in reg_mv_joint).
-
-The base currency's excess return is identically zero, so its overlay weight never
-enters the risk term and would be left unidentified. It is pinned to zero, as in
-reg_mv_joint and reg_mad_joint, rather than left free: an unidentified variable would
-take an arbitrary solver-dependent value, be charged the L1 penalty, and land in the
-saved weight records.
-
-Performance notes:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problem and the window's demeaned matrices are cached
-  at class level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per window
-  rather than once per grid point (DPP).
-* Nothing factorizes in the joint program, so every grid point still needs a
-  full-size solve; only the demeaning and the canonicalization are shared.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). psi is unconstrained apart from a zero base-currency weight. Semi-variance is
+measured below the portfolio's own mean (Markowitz, Todd, Xu & Yamane 1993).
 """
 
 from __future__ import annotations
@@ -83,8 +18,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -93,9 +27,7 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -103,39 +35,12 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
-    """
-    Joint regularized semi-variance optimizer over asset and currency overlay weights.
-
-    Solves a single CVXPY problem minimizing the regularized semi-variance of
-    (R_fh @ x + R_c @ psi) about its own sample mean, subject to full investment and
-    leverage constraints on x. psi is unconstrained apart from the base-currency pin.
-
-    The compiled problem and the window's demeaned return matrices are cached at class
-    level and keyed on the estimation window and the leverage limit. The four
-    penalties are DPP-compliant cp.Parameter objects, so a window is canonicalized
-    once and reused across every grid point the backtester evaluates on it.
-    """
-
-    # window signature -> compiled problem bundle. Held at class level because
-    # the backtester constructs a fresh optimizer instance per grid point.
+    # window signature -> compiled problems, shared by the per-grid-point instances
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
-    # Per date the backtester touches two windows: train (every grid point) and
-    # train+val (final refit). Two entries covers both.
+    # two entries: the training window and the full estimation window of a date
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 1e-5
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 1.5e-3
-                * ``lambda_l1_curr``  (float) — L1 penalty for currency overlay, default 2.5e-6
-                * ``lambda_l2_curr``  (float) — L2 penalty for currency overlay, default 1e-5
-                * ``leverage_limit``  (float) — ||x||_1 cap, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -147,8 +52,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
                 "lambda_l2_asset, lambda_l1_curr, lambda_l2_curr."
             )
 
-        # Defaults are the interior points of the calibrated grids, so a --no-grid
-        # run lands in the regularized regime rather than at an untested extreme.
+        # defaults are interior grid points, so a --no-grid run is regularized
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 1e-5)
         self.lambda_l2_asset: float = self.hyperparams.get("lambda_l2_asset", 1.5e-3)
         self.lambda_l1_curr: float = self.hyperparams.get("lambda_l1_curr", 2.5e-6)
@@ -198,12 +102,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -253,13 +152,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
     # Problem construction
 
     def _build_problem(self) -> dict:
-        """
-        Compile the joint program with the four penalties as DPP parameters.
-
-        The demeaned return matrices are baked in as constants, so the compiled problem
-        is valid only for the window it was built from; the cache is keyed on that
-        window, and :meth:`score` never re-solves on validation data.
-        """
+        """Compile the joint program with the four penalties as DPP parameters."""
         A_fh = self.Y_fh - self.Y_fh.mean(axis=0)
         A_c = self.Y_c - self.Y_c.mean(axis=0)
 
@@ -287,8 +180,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
             cp.sum(x) == 1,                    # budget on the asset block only
             l1_norm_x <= self.leverage_limit,  # leverage on the asset block only
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(self.Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -328,15 +220,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
         return bundle
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Run the joint regularized optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -363,8 +247,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -380,25 +263,7 @@ class RegularizedSemiVarianceJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve. Refitting on validation and then measuring the in-sample objective
-        of that fit drives selection to the weakest penalty in the grid. The paper
-        (p.25) specifies weights computed on training data and the risk measure
-        evaluated on the validation sample.
-
-        The deviation is taken about the validation window's own mean, matching the
-        asset-level and overlay SMV optimizers.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Semi-variance of the combined portfolio return on the validation window
-            (lower is better).
-        """
+        """Validation semi-variance of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

@@ -1,65 +1,8 @@
-"""
-Asset-only Regularized Semi-Variance optimizer — ASSETS-ZERO strategy
-(Markowitz, Todd, Xu & Yamane 1993, in the framework of Lucescu & Ulrych 2026, Section 4.2).
+"""Regularized ASSETS-ZERO optimizer minimizing semi-variance.
 
-ASSETS-ZERO is the *zero hedged* regularized asset portfolio: the asset weights
-are optimized on fully hedged returns (R_fh) — the same asset-level problem as
-ASSETS-FULL (Section 3.3 / Appendix A.3 of the paper, which defines the asset
-optimization exclusively on R_fh) — and the portfolio is then implemented
-WITHOUT currency hedging, so realized returns are unhedged (R_u).  The
-realization on R_u is handled by the Backtester via its ``training_return_key``
-/ ``asset_return_key`` split; this class only ever sees R_fh.
-
-The risk measure is the semi-variance of the portfolio return about its own
-sample mean — Markowitz et al.'s S_E, eq. (3.1a), with the target E set to the
-portfolio's own expected return rather than an exogenous benchmark:
-
-    SMV(w) = (1/T) * sum_t [ max(0, -A_t w) ]^2,
-
-where A is the columnwise demeaned return matrix, so A_t w is the portfolio's
-deviation from its own mean on day t and only the downside deviations are
-counted.  Semi-variance is variance's one-sided counterpart: for a symmetric
-return distribution the two coincide up to a factor of two, and they part
-company exactly to the extent the sample is skewed, which is the point of
-carrying it alongside the mean-variance program.
-
-Their eqs. (3.4)-(3.7) lift the positive part into auxiliary variables to make
-the objective quadratic.  The paper introduces 2T of them — Y for the signed
-deviation and Z = Y^- for its negative part, tied together by BX - Y + Z = 0 —
-because the Critical Line Algorithm needs the constraint set in equality form.
-Only the downside half is needed here: minimizing sum z_t^2 subject to
-z >= -A w and z >= 0 drives each z_t to max(0, -A_t w) on its own, so the
-equality and the free variables Y drop out and the program is a QP in
-(w, z) with T auxiliary variables rather than 2T.  It is solved directly by
-an interior-point solver rather than by the Critical Line Algorithm: CLA traces
-the whole E-S frontier, whereas one point of it is wanted per rebalancing date,
-and the L1 penalty and leverage cap below are not in CLA's form to begin with.
-
-The 1/sqrt(T) that eq. (3.8) folds into B is carried as an explicit 1/T on the
-objective instead, which leaves A on the scale of the raw returns and keeps the
-risk term numerically better conditioned.
-
-As in the mean-variance and MAD optimizers the objective carries no mean term.
-The sample mean is estimated far too imprecisely at these window lengths to be
-worth its variance cost; dropping it leaves a pure regularized minimum-risk
-problem and removes the need for a shrinkage estimator of the mean.  As with
-MAD, and unlike mean-variance, nothing beyond the demeaning has to be estimated:
-the semi-variance is read off the empirical distribution directly, with no
-covariance matrix and so no shrinkage target (contrast Ledoit-Wolf in
-reg_mv_asset_zero).  Note that this is what makes the mean-free objective
-coherent here — the demeaning still uses the sample mean, but only to locate the
-threshold that separates downside from upside, not as a quantity the optimizer
-trades risk against.
-
-The risk term is reported as the semi-variance itself, not doubled onto the
-variance scale, so :meth:`score` returns a number directly comparable with the
-semi-variance quoted elsewhere.  It runs about half the size of the mean-variance
-risk term on the same windows, which is why the penalties carry their own grids
-(LAMBDA_L1_SMV_ASSET_GRID / LAMBDA_L2_SMV_ASSET_GRID in backtest_config.py)
-rather than reusing the mean-variance ones.  Those grids were calibrated on R_fh
-estimation windows and apply here unchanged, since this is the same asset problem.
-
-Author: Anej Rozman
+The asset weights x are optimized on fully hedged returns and realized unhedged (R_u), which the Backtester
+handles. x is fully invested with a leverage cap on ||x||_1. L1 and L2 penalties on x (lambda_l1, lambda_l2).
+Semi-variance is measured below the portfolio's own mean (Markowitz, Todd, Xu & Yamane 1993).
 """
 
 from __future__ import annotations
@@ -71,8 +14,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -83,31 +25,9 @@ _warned_fallback = False
 
 
 class RegularizedSemiVarianceAssetZeroOptimizer(BaseOptimizer):
-    """
-    Regularized SMV asset optimizer for the ASSETS-ZERO strategy.
-
-    Minimizes the semi-variance of the fully hedged asset returns (R_fh) about
-    their own sample mean, with L1 and L2 regularization penalties, subject to a
-    leverage limit and a full investment constraint — identical to the
-    ASSETS-FULL asset problem.  The zero-hedging policy is applied at
-    realization: the Backtester evaluates the resulting weights on unhedged
-    returns (R_u) and the investor holds no forward positions.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``lambda_l1``      (float) — L1 penalty weight, default 1e-5
-                * ``lambda_l2``      (float) — L2 penalty weight, default 1.5e-3
-                * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
-        # Defaults are the interior points of the calibrated grids, so a --no-grid
-        # run lands in the regularized regime rather than at an untested extreme.
+        # defaults are interior grid points, so a --no-grid run is regularized
         self.lambda_l1: float = self.hyperparams.get("lambda_l1", 1e-5)
         self.lambda_l2: float = self.hyperparams.get("lambda_l2", 1.5e-3)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
@@ -124,12 +44,7 @@ class RegularizedSemiVarianceAssetZeroOptimizer(BaseOptimizer):
         self.T: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Demean the fully hedged return matrix for optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` mapped to a non-empty DataFrame.
-        """
+        """Demean the fully hedged return matrix for optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         R_fh = train_bundle["R_fh"]
@@ -141,15 +56,7 @@ class RegularizedSemiVarianceAssetZeroOptimizer(BaseOptimizer):
         self.A = Y - self.a_bar
 
     def optimize(self) -> np.ndarray:
-        """
-        Solve the regularized semi-variance minimization problem.
-
-        Returns:
-            1-D numpy array of shape *(N,)* summing to 1.
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Solve the regularized semi-variance minimization problem."""
         if self.A is None or self.N == 0:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -157,8 +64,7 @@ class RegularizedSemiVarianceAssetZeroOptimizer(BaseOptimizer):
         z = cp.Variable(self.T)
 
         l1_penalty = cp.norm(x, 1)
-        # z is driven to the downside deviation max(0, -A_t x) by the two
-        # constraints below (see module docstring), so this is the semi-variance.
+        # with the two constraints below, z is the downside deviation max(0, -A_t x)
         smv_term = cp.sum_squares(z) / self.T
         objective = cp.Minimize(
             smv_term
@@ -208,27 +114,7 @@ class RegularizedSemiVarianceAssetZeroOptimizer(BaseOptimizer):
         weights: np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the validation semi-variance of the candidate weights.
-
-        Scored on fully hedged returns, mirroring the training objective — the
-        risk measure alone, without the penalties — exactly as the ES, MV and MAD
-        asset-zero optimizers do.  Hyperparameter selection is part of the
-        asset-level problem and is therefore identical to ASSETS-FULL.
-
-        The deviation is taken about the validation window's own mean, as in the
-        MAD optimizer, so the downside/upside split is located by the same rule
-        in and out of sample and the score is on the same scale as the training
-        objective.
-
-        Args:
-            weights: 1-D array of portfolio weights from :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"``.
-
-        Returns:
-            Semi-variance of the realized portfolio return on the validation
-            window (lower is better).
-        """
+        """Validation semi-variance of the training-fitted weights."""
         if "R_fh" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh'.")
         R_fh_val = val_bundle["R_fh"]

@@ -1,61 +1,11 @@
-"""
-Two-step regularized mean-Expected Shortfall optimizer with currency overlay.
+"""Regularized two-step currency overlay optimizer minimizing Expected Shortfall with a mean term.
 
-The mean-bearing counterpart of reg_es_curr_overlay.py, and the regularized
-counterpart of es_curr_overlay_w_mean.py.
-
-Step 1: minimizes  ES(R_fh @ x) - (1/gamma) * mu_a' x  + lambda_l1_asset ||x||_1
-        + lambda_l2_asset ||x||^2, subject to full investment and a leverage cap.
-Step 2: with x fixed, minimizes
-        ES(R_fh @ x* + R_c @ psi) - (1/gamma) * (mu_a' x* + mu_c' psi)
-        + lambda_l1_curr ||psi||_1 + lambda_l2_curr ||psi||^2,
-        subject to an L1 cap on psi.  The mu_a' x* term is an additive constant
-        there and does not move the argmin; it is carried as a parameter so the
-        reported objective is the full one.
-
-gamma is fixed at 2 rather than searched.  The penalty grid already has 256
-combinations per rebalancing date, and multiplying that by a seven-point gamma
-grid is not affordable at the universe sizes this is run on.  It remains
-readable from ``hyperparams`` so it can be swept deliberately later without
-touching this file, but it is deliberately absent from
-``REG_ES_MEAN_OVERLAY_CONFIG``'s grid.  Note that gamma = 2 was not calibrated
-for this program: the unregularized overlay's sweep put its optimum near 0.2 on
-the top-10 universe, but that program had no penalties competing with the mean
-term, so the two are not comparable and 2 is a deliberately conservative choice.
-
-Means.  Identical to the unregularized overlay's:
-
-  * ``mu_a`` is pooled onto the 14 economies and James-Stein shrunk toward zero
-    (:func:`~portfolio_backtest.utils.estimation.pooled_asset_mean`).
-  * ``mu_c`` is conditioned on the forward premium, mu_c = -f_t
-    (:func:`~portfolio_backtest.utils.estimation.conditional_currency_mean`).
-
-Both are constants for a given estimation window, so they are baked into the
-compiled problems rather than passed as parameters; the window is already the
-problem cache key, so nothing can go stale.  ``gamma`` is added to that key for
-the same reason ``alpha`` and the leverage limit are in it: it is compiled in.
-
-Base currency.  psi_base is pinned to zero.  Its R_c column is identically zero
-and its forward premium likewise, so it would consume overlay budget while
-contributing nothing to either the return or the mean term.  The pin also
-removes the unidentified direction that makes the optimal face of the
-unpenalized program contain a line.
-
-No demeaning.  The ``demean`` switch reg_es_curr_overlay.py carries is
-deliberately absent: centering would zero the very sample means this program is
-built around.  It is correspondingly gone from the cache key.
-
-Performance notes, inherited from reg_es_curr_overlay.py:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problems and the step-1 solutions are cached at
-  class level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per
-  window rather than once per grid point (DPP).
-* Step 1 does not depend on the currency penalties, so it is solved once per
-  (lambda_l1_asset, lambda_l2_asset) pair rather than once per grid point.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. Separate L1 and L2
+penalties on x and psi (lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr). The objective
+subtracts (1 / gamma) times the expected return; asset means are pooled by economy and James-Stein shrunk,
+currency means are the carry implied by the forward premium. psi has an L1 cap (overlay_limit) and a zero
+base-currency weight. ES is taken at confidence level alpha.
 """
 
 from __future__ import annotations
@@ -77,10 +27,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6. This mirrors every
-# other regularized optimizer in the package (reg_mv/mad/smv/soes) — only the
-# original ES pair hard-defaults to Gurobi, which makes them unrunnable locally.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -91,47 +38,13 @@ _warned_fallback = False
 
 
 class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
-    """
-    Two-step regularized mean-ES optimizer with sequential currency overlay.
-
-    Step 1 minimizes penalized mean-ES on R_fh subject to full investment and a
-    leverage cap.  Step 2 fixes the asset weights and minimizes penalized mean-ES
-    of the combined portfolio return subject to an L1 cap on the overlay.
-    """
-
-    # Shared across the per-grid-point instances the Backtester creates. Reset by
-    # fit() whenever the estimation window or a compiled-in constant changes.
+    # class-level, shared by the per-grid-point instances; fit() resets it when the window changes
     _cache_key: str | None = None
     _asset_prob: dict | None = None
     _overlay_prob: dict | None = None
     _asset_solutions: dict[tuple[float, float], np.ndarray] = {}
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``            (float) — ES confidence level, default 0.80
-                * ``gamma``            (float) — risk aversion; the mean term enters
-                                                 with coefficient 1 / gamma, default 2.
-                                                 Fixed rather than searched; see the
-                                                 module docstring.
-                * ``lambda_l1_asset``  (float) — L1 penalty on asset weights, default 0.0
-                * ``lambda_l2_asset``  (float) — L2 penalty on asset weights, default 0.0
-                * ``lambda_l1_curr``   (float) — L1 penalty on the overlay, default 0.0
-                * ``lambda_l2_curr``   (float) — L2 penalty on the overlay, default 0.0
-                * ``leverage_limit``   (float) — ||x||_1 cap for step 1, default 2.0
-                * ``overlay_limit``    (float) — ||psi||_1 cap for step 2, default 2.0
-                * ``crossover``        (bool)  — run Gurobi crossover after the barrier
-                                                 solve, default ``False``. Off is faster;
-                                                 on returns vertex solutions with exact
-                                                 zeros under an L1 penalty.
-                * ``threads``          (int)   — Gurobi thread count, default from
-                                                 ``SLURM_CPUS_PER_TASK`` or 4
-                * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
-                                                 (``cp.CLARABEL`` when gurobipy
-                                                 is unavailable)
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.gamma: float = self.hyperparams.get("gamma", 2)
@@ -186,16 +99,7 @@ class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         )
 
     def _refresh_cache(self, R_fh, R_c) -> None:
-        """
-        Drop the compiled problems and cached step-1 solutions if anything baked
-        into them has changed.
-
-        ``alpha``, ``gamma``, ``leverage_limit`` and ``overlay_limit`` enter the key
-        because they are compiled in as constants rather than passed as parameters.
-        The two mean vectors are compiled in as well, but they are functions of the
-        window alone (``mu_a`` of R_fh and the economy map, ``mu_c`` of the forward
-        premium aligned to R_c), so the frame signatures already cover them.
-        """
+        """Drop the compiled problems and cached step-1 solutions if anything baked into them has changed."""
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -215,12 +119,7 @@ class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
             logger.debug("Problem cache invalidated for new estimation window.")
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices and estimate both mean vectors.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
-        """
+        """Extract the return matrices and estimate both mean vectors."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -293,13 +192,7 @@ class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         return {"prob": problem, "x": x, "lam1": lam1, "lam2": lam2}
 
     def _optimize_assets(self, Y_fh: np.ndarray, mu_a: np.ndarray) -> np.ndarray:
-        """
-        Step 1: penalized mean-ES on R_fh with a leverage constraint and full
-        investment.
-
-        The solution depends only on the asset penalties, so it is cached on
-        (lambda_l1_asset, lambda_l2_asset) for the current estimation window.
-        """
+        """Step 1: penalized mean-ES on R_fh with a leverage constraint and full investment."""
         cls = type(self)
         cache_id = (float(self.lambda_l1_asset), float(self.lambda_l2_asset))
         if cache_id in cls._asset_solutions:
@@ -323,9 +216,8 @@ class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
     # Step 2: currency overlay
 
     def _build_overlay_problem(self, Y_c: np.ndarray, mu_c: np.ndarray) -> dict:
-        """
-        Compile the step-2 problem once, with the penalties, the fixed asset return
-        contribution and the constant asset mean left as parameters.
+        """Compile the step-2 problem once, with the penalties, the fixed asset return contribution and the
+        constant asset mean left as parameters.
         """
         q, K = Y_c.shape
         tail_prob = 1.0 - self.alpha
@@ -395,17 +287,7 @@ class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -432,35 +314,7 @@ class RegularizedExpectedShortfallCurrencyOverlayWithMeanOptimizer(BaseOptimizer
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate train-fitted candidate weights on the validation window.
-
-        Both the asset weights and the currency overlay are taken as given from
-        :meth:`optimize` on the training window and held fixed; nothing is
-        re-solved on the validation sample, exactly as in
-        reg_es_curr_overlay.py.  The score is
-
-            ES_alpha(combined loss) - 1.0 * mean(realized combined returns),
-
-        the realized risk-return tradeoff of this window at a reference risk
-        aversion of one.
-
-        The reference coefficient is 1.0 rather than 1 / gamma so the number is
-        directly comparable with the unregularized mean optimizers, which use the
-        same yardstick.  Either is unbiased here: gamma is fixed across the whole
-        grid, so unlike the unregularized case there is no candidate that can
-        earn a larger mean credit than another simply by carrying a smaller
-        gamma.  The realized mean is used rather than mu_a' x + mu_c' psi because
-        a score should measure what the weights actually earned on the window,
-        not re-apply a shrunk or conditional forecast to them.
-
-        Args:
-            weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Validation ES minus realized mean return, lower is better.
-        """
+        """Validation ES minus mean return of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("weights must be a dict with keys 'x' and 'psi'.")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

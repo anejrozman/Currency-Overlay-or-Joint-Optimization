@@ -1,48 +1,10 @@
-"""
-Regularized Mean Absolute Deviation optimizer with currency overlay.
+"""Regularized two-step currency overlay optimizer minimizing mean absolute deviation.
 
-Step 1: Minimizes the regularized MAD of fully hedged asset returns (R_fh), with
-        L1/L2 penalties, full investment and a leverage cap.
-Step 2: With asset weights fixed, minimizes the regularized MAD of the combined
-        portfolio return (R_fh @ x_opt + R_c @ psi) over unconstrained psi.
-
-Following Appendix A.3 of Lucescu & Ulrych (2026), psi carries neither a budget
-constraint nor a leverage constraint. Forward contracts are zero-investment
-instruments, so no slack weight is needed to fund the overlay.
-
-Both steps use Konno & Yamazaki's lower semi-absolute deviation form: for a sample
-with zero mean the mass below the mean equals the mass above it, so mean|z| =
-2 * mean(max(0, -z)), and the right-hand side is linear once the positive part is
-lifted into auxiliary variables. The factor of two is carried explicitly so both
-objectives are reported on the MAD scale, which matters because the penalty grids
-are calibrated against the size of the risk term.
-
-Demeaning in step 2 covers both terms. Writing c = R_fh @ x_opt for the fixed asset
-contribution, mean(c + R_c psi) = mean(c) + mean(R_c) psi, so
-
-    MAD(x_opt, psi) = mean| (c - mean c) + (R_c - mean R_c) psi |,
-
-i.e. the fixed contribution and the currency matrix are each demeaned before the
-program is formed. The objective carries no mean term, mirroring the MV and ES
-overlays, which likewise penalize a risk measure alone.
-
-The base currency's excess return is identically zero, so its overlay weight never
-enters the objective and would be left unidentified by the LP. It is pinned to zero,
-as in the MV overlays, rather than left free: an unidentified variable would take an
-arbitrary solver-dependent value, be charged the L1 penalty, and land in the saved
-weight records.
-
-Performance notes:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problems and the step-1 solutions are cached at class
-  level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per window
-  rather than once per grid point (DPP).
-* Step 1 does not depend on the currency penalties, so it is solved once per
-  (lambda_l1_asset, lambda_l2_asset) pair rather than once per grid point.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. Separate L1 and L2
+penalties on x and psi (lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr). psi is
+unconstrained apart from a zero base-currency weight. MAD is written in the lower semi-absolute deviation form
+of Konno & Yamazaki (1991).
 """
 
 from __future__ import annotations
@@ -55,8 +17,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -67,34 +28,13 @@ _warned_fallback = False
 
 
 class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Two-step regularized MAD optimizer with sequential currency overlay.
-
-    Step 1 minimizes the regularized MAD of R_fh subject to full investment and
-    leverage constraints. Step 2 fixes the asset weights and minimizes the
-    regularized MAD of the combined portfolio return.
-    """
-
-    # Shared across the per-grid-point instances the Backtester creates. Reset by
-    # fit() whenever the estimation window or leverage_limit changes.
+    # class-level, shared by the per-grid-point instances; fit() resets it when the window changes
     _cache_key: str | None = None
     _asset_prob: dict | None = None
     _overlay_prob: dict | None = None
     _asset_solutions: dict[tuple[float, float], np.ndarray] = {}
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 2.5e-4
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 0.01
-                * ``lambda_l1_curr``  (float) — L1 penalty for the overlay, default 0.0
-                * ``lambda_l2_curr``  (float) — L2 penalty for the overlay, default 0.0
-                * ``leverage_limit``  (float) — ||x||_1 cap for step 1, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 2.5e-4)
         self.lambda_l2_asset: float = self.hyperparams.get("lambda_l2_asset", 0.01)
@@ -137,14 +77,7 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         )
 
     def _refresh_cache(self, R_fh, R_c) -> None:
-        """
-        Drop the compiled problems and cached step-1 solutions if the estimation
-        window has changed.
-
-        ``leverage_limit`` enters the key because it is baked into the compiled problem
-        as a constant rather than as a parameter. If it is ever added to the grid, the
-        cache invalidates instead of silently reusing the wrong problem.
-        """
+        """Drop the compiled problems and cached step-1 solutions if the estimation window has changed."""
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -169,12 +102,7 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         cls._asset_solutions = {}
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -242,12 +170,7 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         return {"prob": problem, "x": x, "lam1": lam1, "lam2": lam2}
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """
-        Step 1: regularized MAD on R_fh with a leverage constraint and full investment.
-
-        The solution depends only on the asset penalties, so it is cached on
-        (lambda_l1_asset, lambda_l2_asset) for the current estimation window.
-        """
+        """Step 1: regularized MAD on R_fh with a leverage constraint and full investment."""
         cls = type(self)
         cache_id = (float(self.lambda_l1_asset), float(self.lambda_l2_asset))
         if cache_id in cls._asset_solutions:
@@ -271,14 +194,8 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
     # Step 2: currency overlay
 
     def _build_overlay_problem(self, Y_c: np.ndarray) -> dict:
-        """
-        Compile the step-2 problem once, with the penalties and the demeaned fixed
-        asset contribution left as parameters.
-
-        The demeaned currency matrix is baked in as a constant, so the compiled problem
-        is valid only for the window it was built from.  ``_refresh_cache`` drops it
-        whenever the window changes, and :meth:`score` never re-solves on validation
-        data, so no other window ever reaches this problem.
+        """Compile the step-2 problem once, with the penalties and the demeaned fixed asset contribution
+        left as parameters.
         """
         T, K = Y_c.shape
         A_c = Y_c - Y_c.mean(axis=0)
@@ -293,8 +210,7 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
             u >= 0,
             -(c_dm + A_c @ psi) <= u,
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -332,15 +248,7 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -361,26 +269,7 @@ class RegularizedMeanAbsoluteDeviationCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the validation MAD of train-fitted candidate weights.
-
-        Both the asset weights and the currency overlay are taken as given from
-        :meth:`optimize` on the training window and held fixed. Nothing is re-solved on
-        the validation sample, matching the regularized ES and MV overlays: the paper
-        (p.25) specifies weights computed on training data and the risk measure
-        evaluated on the validation sample.
-
-        The deviation is taken about the validation window's own mean, matching the
-        asset-level MAD optimizers.
-
-        Args:
-            weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Mean absolute deviation of the combined portfolio return on the validation
-            sample (lower is better).
-        """
+        """Validation MAD of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("weights must be a dict with keys 'x' and 'psi'.")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

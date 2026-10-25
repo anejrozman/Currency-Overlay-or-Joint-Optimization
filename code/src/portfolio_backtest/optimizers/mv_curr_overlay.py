@@ -1,21 +1,8 @@
-"""
-Unregularized Mean-Variance optimizer with currency overlay.
+"""Two-step currency overlay optimizer minimizing variance.
 
-Step 1: Minimizes the variance of fully hedged asset returns (R_fh), subject to
-        full investment and a leverage cap on asset weights.
-Step 2: With asset weights fixed, minimizes the variance of the combined portfolio
-        return (R_fh @ x_opt + R_c @ psi) by optimizing the currency overlay weights psi.
-        psi is unconstrained; forward contracts are zero-investment instruments, so no
-        slack weight is needed to fund the overlay.
-
-The objective carries no mean term.  The variance coefficient is normalized to one,
-which is the gamma -> infinity limit of the paper's objective after dividing through
-by gamma / 2: the mean term vanishes and the cross-covariance term picks up its
-factor of two directly from the expansion of Var(x' R_fh + psi' R_c).  This mirrors
-the ES optimizers, which likewise minimize a risk measure alone, and removes the need
-for a shrinkage estimator of the mean (Bayes-Stein, Jorion 1986).
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. psi is unconstrained
+apart from a zero base-currency weight. Covariances are Ledoit-Wolf shrunk.
 """
 
 from __future__ import annotations
@@ -28,8 +15,7 @@ from ..utils.estimation import ledoit_wolf_cc, sample_cross_cov
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -40,23 +26,7 @@ _warned_fallback = False
 
 
 class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
-    """
-    Unregularized mean-variance optimizer with separate currency overlay.
-
-    Step 1 minimizes the variance of R_fh subject to full investment and leverage
-    constraints. Step 2 fixes the asset weights and minimizes the variance of the
-    combined portfolio return.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``leverage_limit`` (float) — ||x||_1 cap for step 1, default 2.0
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
         self.solver = self.hyperparams.get("solver", _DEFAULT_SOLVER)
@@ -74,12 +44,7 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         self.x_opt: np.ndarray | None = None
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for both optimization steps.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for both optimization steps."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -116,8 +81,9 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def _optimize_assets(self, Y_fh: np.ndarray) -> np.ndarray:
-        """Step 1 in optimization: minimum variance on R_fh with Ledoit-Wolf
-        covariance, leverage constraint, and full investment."""
+        """Step 1 in optimization: minimum variance on R_fh with Ledoit-Wolf covariance, leverage
+        constraint, and full investment.
+        """
         N = Y_fh.shape[1]
         Sigma_a = ledoit_wolf_cc(Y_fh)
 
@@ -137,14 +103,7 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray
     ) -> np.ndarray:
-        """Step 2 in optimization: minimum-variance currency overlay over
-        unconstrained psi.
-
-        Minimizes psi' Sigma_c psi + 2 x*' Sigma_ac psi, the expansion of
-        Var(x*' R_fh + psi' R_c) with the constant asset-only term dropped
-        (appendix B, eq:mv_curr_expanded). Sigma_c is Ledoit-Wolf shrunk; the
-        cross-covariance Sigma_ac is the un-shrunk sample estimate.
-        """
+        """Step 2 in optimization: minimum-variance currency overlay over unconstrained psi."""
         K = Y_c.shape[1]
         Sigma_c = ledoit_wolf_cc(Y_c)
         Sigma_ac = sample_cross_cov(Y_fh, Y_c)  # N x K, not shrunk
@@ -152,8 +111,7 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
 
         psi = cp.Variable(K)
         obj = cp.quad_form(psi, cp.psd_wrap(Sigma_c)) + cross @ psi
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         constraints = []
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
@@ -164,15 +122,7 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         return psi.value.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -193,21 +143,7 @@ class MeanVarianceCurrencyOverlayOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the variance of the combined portfolio on validation data.
-
-        Uses ``self.x_opt`` (fixed from :meth:`optimize`), re-runs step 2 on validation
-        returns to get psi_val, then evaluates ``var(r_val, ddof=1)``. Mirrors the
-        unregularized ES overlay, which likewise re-solves step 2 on the validation
-        window.
-
-        Args:
-            weights: Not used, asset weights are taken from ``self.x_opt``.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Variance of the combined portfolio return (lower is better).
-        """
+        """Validation variance, after re-solving step 2 on the validation window with x fixed."""
         if self.x_opt is None:
             raise RuntimeError("optimize() must be called before score().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

@@ -1,19 +1,8 @@
-"""
-Unregularized Joint Expected Shortfall optimizer over asset and currency weights.
+"""Joint asset and currency optimizer minimizing Expected Shortfall.
 
-Minimizes ES of the combined portfolio return (R_fh @ x + R_c @ psi) jointly over
-both asset weights x and currency overlay weights psi in a single optimization scheme.
-No regularization. Leverage cap on asset weights only, psi is unconstrained.
-
-With ``demean`` set, both return matrices are centered columnwise before the
-program is solved, and the validation window is centered by its own column means
-before the joint problem is re-solved there. ES is then measured on deviations
-from the sample mean rather than on raw returns, which puts it on the same
-footing as the deviation measures (mean-variance, MAD, semi-variance), all of
-which demean by construction. Off by default; the switch is ``DEMEAN`` in
-backtest_config.py, mirrored into the parameter grid there as ``DEMEAN_GRID``.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. psi is otherwise unconstrained, the base-currency weight included. ES is taken at
+confidence level alpha. With demean, returns are centered columnwise before solving and when scoring.
 """
 
 from __future__ import annotations
@@ -30,25 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExpectedShortfallJointOptimizer(BaseOptimizer):
-    """
-    Joint unregularized ES optimizer over asset and currency overlay weights.
-
-    Solves a CVXPY problem minimizing ES of (R_fh @ x + R_c @ psi) subject
-    to full investment and leverage constraints on x. psi is unconstrained.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``leverage_limit`` (float) — ||x||_1 cap, default 2.0
-                * ``demean``         (bool)  — center R_fh and R_c columnwise before
-                                               solving, default
-                                               ``backtest_config.DEMEAN``
-                * ``solver``                 — cvxpy solver, default ``cp.GUROBI``
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.leverage_limit: float = self.hyperparams.get("leverage_limit", 2.0)
@@ -62,12 +33,7 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -146,16 +112,7 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
         }
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run the joint optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -174,20 +131,7 @@ class ExpectedShortfallJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate validation Expected Shortfall by rerunning the joint optimization on val data.
-
-        Under ``demean`` the validation matrices are centered by their own column
-        means, not the training ones: the score has to be the deviation ES of this
-        window, so the location it deviates from is this window's mean.
-
-        Args:
-            weights: Not used, joint optimization is rerun on val data.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Negative mean of the worst ``(1-alpha)`` fraction of combined portfolio returns.
-        """
+        """Validation ES, after re-solving the joint program on the validation window."""
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh' and 'R_c'.")
         R_fh_val = val_bundle["R_fh"]

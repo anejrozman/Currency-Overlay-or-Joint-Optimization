@@ -1,67 +1,10 @@
-"""
-Joint Regularized Second-Order Expected Shortfall optimizer over asset and
-currency weights (Krokhmal 2007, in the framework of Ulrych & Lucescu 2026,
-Section 3).
+"""Regularized joint asset and currency optimizer minimizing second-order Expected Shortfall.
 
-Minimizes regularized HMCR_2 of the combined portfolio return
-(R_fh @ x + R_c @ psi) jointly over asset weights x and currency overlay
-weights psi in a single program. Penalties follow the paper's S1, S2 diagonal
-structure: lambda^a on the asset block, lambda^c on the currency block, so the
-four coefficients lambda_l1_asset, lambda_l2_asset, lambda_l1_curr,
-lambda_l2_curr are tuned independently — exactly the structure
-reg_es_joint.py and reg_smv_joint.py use.
-
-The risk measure — the unsquared L2 tail norm and its sqrt(q) normalization —
-and the reasoning for why this is an SOCP rather than an LP are identical to
-reg_soes_asset_full.py; see that module's docstring for the full derivation.
-Relative to soes_joint.py, this adds L1/L2 penalties on each block, exactly as
-reg_soes_curr_overlay.py adds them to soes_curr_overlay.py's two steps.
-
-Base currency: psi_base is left free rather than pinned to zero, as in
-soes_joint.py, soes_curr_overlay.py and reg_soes_curr_overlay.py (and unlike
-reg_mv_joint.py / reg_smv_joint.py, which pin it). R_c's base-currency column
-is identically zero, so psi_base never enters the SOC constraint or the risk
-term regardless of its value; whenever lambda_l1_curr or lambda_l2_curr is
-positive the penalty alone drives it to exactly zero (confirmed on
-reg_soes_curr_overlay.py's smoke tests), and at the (0, 0) grid corner it is
-genuinely unidentified but harmless, since its realized contribution to
-portfolio returns is zero regardless of the value a solver settles on.
-
-That said, the same free direction matters for the solver, not just the
-value: reg_es_joint.py's _solve() deliberately leaves Gurobi's Crossover at
-its default (on) rather than following reg_es_curr_overlay.py's
-Crossover=0-by-default convention, because turning crossover off on the full
-joint program (not the smaller step-2-only overlay problem) makes Gurobi hit
-its barrier iteration limit and return status=user_limit when psi_base is
-unidentified. The same precaution is taken here for the same reason.
-
-With ``demean`` set, both return matrices are centered columnwise before the
-program is solved, so HMCR_2 is measured on deviations from the sample mean
-rather than on raw returns and is comparable to the deviation measures
-(mean-variance, MAD, semi-variance), all of which demean by construction.
-:meth:`score` holds the trained weights fixed and re-centers only the validation
-portfolio return, by its own mean. The flag enters the problem cache key because
-it is baked into the compiled program through Y_fh and Y_c, exactly like alpha
-and the leverage limit. All of this is identical to reg_es_joint.py; the switch
-is ``DEMEAN`` in backtest_config.py, off by default, mirrored into the parameter
-grid there as ``DEMEAN_GRID`` and shared with the ES optimizers.
-
-Performance notes (identical rationale to reg_es_joint.py / reg_smv_joint.py):
-
-* The compiled problem is cached at class level, keyed on the estimation
-  window, alpha and the leverage limit, since those are baked in as
-  constants rather than as parameters.
-* The four penalties are DPP-compliant cp.Parameter objects, so a window is
-  canonicalized once and reused across every grid point.
-* Nothing factorizes in the joint program (unlike the two-step overlay, where
-  step 1 can be cached independently of the currency penalties): every grid
-  point still needs a full-size (x, psi, u, eta) solve.
-
-Unlike reg_es_joint.py (which hardcodes ``cp.GUROBI`` with no local fallback),
-this follows the convention already used by the other five SOES optimizers:
-fall back to Clarabel when gurobipy is unavailable.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). psi is otherwise unconstrained, the base-currency weight included. The risk
+measure is HMCR_2 of Krokhmal (2007) at confidence level alpha. With demean, returns are centered columnwise
+before solving and when scoring.
 """
 
 from __future__ import annotations
@@ -80,8 +23,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -90,9 +32,7 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -100,39 +40,12 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
-    """
-    Joint regularized second-order ES optimizer over asset and currency
-    overlay weights.
-
-    Minimizes HMCR_2 of (R_fh @ x + R_c @ psi) plus separate L1/L2 penalties on
-    the asset and currency blocks, subject to full investment and a leverage
-    cap on x. psi carries no budget or leverage constraint.
-    """
-
-    # window signature -> compiled problem bundle. Held at class level because
-    # the backtester constructs a fresh optimizer instance per grid point.
+    # window signature -> compiled problems, shared by the per-grid-point instances
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
-    # Per date the backtester touches two windows: train (every grid point) and
-    # train+val (final refit). Two entries covers both.
+    # two entries: the training window and the full estimation window of a date
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``            (float) — confidence level, default 0.80
-                * ``lambda_l1_asset``  (float) — L1 penalty on x, default 0.0
-                * ``lambda_l2_asset``  (float) — L2 penalty on x, default 0.0
-                * ``lambda_l1_curr``   (float) — L1 penalty on psi, default 0.0
-                * ``lambda_l2_curr``   (float) — L2 penalty on psi, default 0.0
-                * ``leverage_limit``   (float) — ||x||_1 cap, default 2.0
-                * ``demean``           (bool)  — center R_fh and R_c columnwise
-                                                 before solving, default
-                                                 ``backtest_config.DEMEAN``
-                * ``solver``                   — cvxpy solver, default ``cp.GUROBI``
-                                                 (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -200,12 +113,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -227,10 +135,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         self.q, self.N = self.Y_fh.shape
         self.K = self.Y_c.shape[1]
 
-        # demean belongs in the key for the same reason alpha and the leverage limit
-        # do: it is baked into the compiled program as a constant, here through the
-        # centered Y_fh and Y_c. Without it a demeaned and a raw run in the same
-        # process would silently share a compiled problem.
+        # demean is compiled in through the centered returns, so it is part of the key
         self._cache_key = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -310,13 +215,8 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         return bundle
 
     def _solve(self, problem: cp.Problem) -> None:
-        """
-        Solve with crossover left on. psi_base is unidentified whenever both
-        currency penalties are zero (the base-currency column of R_c is
-        identically zero and psi carries no other constraint), so the optimal
-        face contains a line. Crossover picks a vertex; with Crossover=0
-        Gurobi hits its barrier iteration limit and returns status=user_limit
-        — the same reasoning as reg_es_joint.py's _solve().
+        """Solve with Gurobi crossover on: psi_base is unidentified when both currency penalties are zero,
+        and without crossover the barrier stops at its iteration limit.
         """
         try:
             if self.solver == cp.GUROBI:
@@ -324,9 +224,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
                     solver=cp.GUROBI,
                     verbose=False,
                     BarConvTol=1e-8,
-                    # BarConvTol does not govern the conic path; this is its
-                    # QCP counterpart, and the SOC epigraph of ||u||_2 makes
-                    # this an SOCP rather than the LP the ES joint program solves.
+                    # the conic counterpart of BarConvTol, as the ||u||_2 epigraph makes this an SOCP
                     BarQCPConvTol=1e-8,
                     Method=2,
                     ScaleFlag=0,
@@ -346,17 +244,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
             raise RuntimeError(f"Optimization failed: status={problem.status}")
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized optimization on the fitted training window.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"``
-            (currency overlay weights, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Run the joint regularized optimization on the fitted training window."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -392,8 +280,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -409,36 +296,7 @@ class RegularizedSecondOrderExpectedShortfallJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray] | np.ndarray,
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve, mirroring reg_es_joint.py / reg_smv_joint.py: refitting on
-        validation and then measuring the in-sample risk of that fit would drive
-        penalty selection to the weakest point in the grid.
-
-        Unlike reg_es_joint.py's score(), the result cannot be read off a
-        quantile of the realized returns: the p = 1 VaR shortcut that makes
-        that exact for ES does not carry over to p = 2 (see
-        reg_soes_asset_full.py). The threshold zeta is instead solved for
-        numerically with the same bounded 1-D search used throughout the SOES
-        family.
-
-        Under ``demean`` the validation portfolio return is centered by its own
-        mean, not the training one: the score has to be the deviation HMCR_2 of
-        this window, so the location it deviates from is this window's mean. The
-        zeta search then runs on the centered losses, and its bracket
-        (losses.min(), losses.max()) still contains the minimizer — HMCR_2 is
-        translation-equivariant, so centering shifts both zeta and the score by
-        the same constant.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Second-order ES of the combined portfolio return on the validation
-            window (lower is better).
-        """
+        """Validation HMCR_2 of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

@@ -1,99 +1,11 @@
-"""
-Regularized mean-variance optimizer with currency overlay.
+"""Regularized two-step currency overlay optimizer minimizing variance with a mean term.
 
-The mean-bearing counterpart of reg_mv_curr_overlay.py, and the regularized
-counterpart of mv_curr_overlay_w_mean.py.  Both steps minimize the same penalized
-mean-risk functional
-
-    Var(portfolio return) - (1 / gamma) * mu' w + lambda_l1 ||w||_1 + lambda_l2 ||w||^2,
-
-with gamma a risk-aversion coefficient in the conventional direction: large gamma
-starves the mean term and the program collapses onto reg_mv_curr_overlay, small
-gamma gives the mean its full weight.
-
-Step 1: minimizes x' Sigma_a x - (1 / gamma) mu_a' x plus the asset penalties,
-        with full investment and a leverage cap on x.  Sigma_a is Ledoit-Wolf
-        shrunk toward constant correlation.
-Step 2: with asset weights fixed, minimizes
-
-            psi' Sigma_c psi + 2 x*' Sigma_ac psi - (1 / gamma) mu_c' psi
-            + lambda_l1_curr ||psi||_1 + lambda_l2_curr ||psi||^2,
-
-        subject to an L1 cap on the overlay.  As in the unregularized pair, the
-        two terms that are constant in psi are dropped rather than carried: the
-        asset-only variance x*' Sigma_a x*, and the asset mean mu_a' x*.
-
-gamma is fixed rather than searched.  This config already carries
-4 x 4 x 4 x 4 = 256 penalty combinations per rebalancing date, and crossing that
-with MV_GAMMA_GRID's five points is not affordable at these universe sizes -- the
-same reasoning REG_ES_MEAN_OVERLAY_CONFIG records.  The default of 30 is the
-centre point of MV_GAMMA_GRID, where the full curve is tabulated.  On the
-fixed-gamma sweep of the unregularized overlay it earns a Sharpe of 0.372 against
-0.140 mean-free, at a drawdown of 26.6% against 28.2% -- so it still improves both
-axes, one step more aggressive than the drawdown minimum at gamma = 50 (0.317 at
-25.4%) and one step short of where the caps saturate at gamma = 20.
-It is still read from hyperparams, so it can be swept deliberately later without
-touching this code.  Note the sweep that chose it had no penalties competing
-against the mean term, so the penalty that is optimal here may sit lower than it
-does in the mean-free program -- worth re-reading the selected-lambda series once
-these have run.
-
-Fixing gamma also removes the one bias the unregularized pair had to reason
-about.  There, :meth:`score` had to be gamma-free because a candidate carrying a
-smaller gamma could earn an unboundedly larger mean credit; here every candidate
-carries the same gamma, so no candidate can buy score that way and the reference
-coefficient of 1.0 below is unbiased by construction.
-
-Overlay cap.  reg_mv_curr_overlay.py leaves psi unconstrained and relies on the
-penalties alone.  The cap is carried here, matching mv_curr_overlay_w_mean.py and
-reg_es_curr_overlay_w_mean.py, but it is slack at the shipped
-gamma and becomes active below it.  Uncapped gross psi at the unpenalized corner,
-measured on three real estimation windows (2000-06, 2005-06, 2010-06):
-
-    gamma     100     50     30     20     10      5      2
-    overlay  0.6-1.1  0.9-1.5  1.5-2.5  2.2-3.8  4.4-7.6  9.0-15.0  22-38
-    joint    0.7-1.1  1.1-1.8  1.8-2.8  2.5-4.1  4.6-7.9  8.9-15.2  22-38
-
-gamma = 30 is where the cap stops being decorative, but only just.  Sweeping the
-full 256-point penalty grid on the three windows above, the overlay never reaches
-it outright (its widest solution grazes 1.9999) and the joint sits on it at 16 of
-256 points on the 2000-06 window, 9 of 256 on 2010-06 and none on 2005-06 -- 3.3%
-of grid points overall, all of them in the lightly-penalized corner where nothing
-else restrains psi.  By gamma = 10 the cap is the only thing between the overlay
-and the double-digit gross notional recorded for the discarded mean-bearing MV
-programs (74x - 98x).  Where it does bind, psi sits on a corner of the L1 ball
-with its direction set by the carry ranking and its size by the cap rather than by
-the variance-mean tradeoff, so those grid points are worth spotting in the
-selected-lambda series rather than read as an interior optimum.
-
-Means.  Estimated exactly as in mv_curr_overlay_w_mean.py: mu_a pooled onto the
-14 economies and James-Stein shrunk toward zero, mu_c conditioned on the forward
-premium as the carry -f_t.  That module records what each channel forecasts --
-mu_c genuinely (slope +0.75 on the realized next quarter, tercile spread
-+2.66 bp/day), mu_a not, cross-sectionally (slope -0.26, spread -0.82 bp/day).
-
-Base currency.  Pinned to zero: its R_c column is identically zero so Sigma_c is
-singular in that direction, its mu_c entry is zero, and the overlay cap would
-otherwise let it consume budget for nothing.
-
-No demeaning.  Variance is already location-free, so centering the return
-matrices would leave Sigma_a, Sigma_c and Sigma_ac unchanged and only zero the mu
-terms this program is built around.
-
-Performance notes, inherited from reg_mv_curr_overlay.py:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problems and the step-1 solutions are cached at
-  class level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per
-  window rather than once per grid point (DPP).  The mean vectors and gamma are
-  compiled in as constants instead, which is why gamma joins the cache key; the
-  mean vectors are functions of the window alone, so the frame signatures already
-  cover them.
-* Step 1 does not depend on the currency penalties, so it is solved once per
-  (lambda_l1_asset, lambda_l2_asset) pair rather than once per grid point.
-
-Author: Anej Rozman
+Step 1 solves for the asset weights x on the fully hedged returns R_fh; step 2 fixes x and solves for the
+overlay psi on R_fh @ x + R_c @ psi. x is fully invested with a leverage cap on ||x||_1. Separate L1 and L2
+penalties on x and psi (lambda_l1_asset, lambda_l2_asset, lambda_l1_curr, lambda_l2_curr). The objective
+subtracts (1 / gamma) times the expected return; asset means are pooled by economy and James-Stein shrunk,
+currency means are the carry implied by the forward premium. psi has an L1 cap (overlay_limit) and a zero
+base-currency weight. Covariances are Ledoit-Wolf shrunk.
 """
 
 from __future__ import annotations
@@ -115,8 +27,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -127,38 +38,13 @@ _warned_fallback = False
 
 
 class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
-    """
-    Two-step regularized mean-variance optimizer with sequential currency overlay.
-
-    Step 1 minimizes the penalized variance of R_fh minus the pooled asset mean,
-    subject to full investment and a leverage cap.  Step 2 fixes the asset weights
-    and minimizes the penalized variance of the combined portfolio return minus
-    the carry mean of the overlay, subject to an L1 cap on psi.
-    """
-
-    # Shared across the per-grid-point instances the Backtester creates. Reset by
-    # fit() whenever anything compiled into the problems changes.
+    # class-level, shared by the per-grid-point instances; fit() resets it when the window changes
     _cache_key: str | None = None
     _asset_prob: dict | None = None
     _overlay_prob: dict | None = None
     _asset_solutions: dict[tuple[float, float], np.ndarray] = {}
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``gamma``           (float) — risk aversion; the mean term enters
-                                                with coefficient 1 / gamma, default 30
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 5e-6
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 1e-3
-                * ``lambda_l1_curr``  (float) — L1 penalty for the overlay, default 5e-6
-                * ``lambda_l2_curr``  (float) — L2 penalty for the overlay, default 1e-4
-                * ``leverage_limit``  (float) — ||x||_1 cap for step 1, default 2.0
-                * ``overlay_limit``   (float) — ||psi||_1 cap for step 2, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.gamma: float = self.hyperparams.get("gamma", 30)
         self.lambda_l1_asset: float = self.hyperparams.get("lambda_l1_asset", 5e-6)
@@ -208,16 +94,7 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         )
 
     def _refresh_cache(self, R_fh, R_c) -> None:
-        """
-        Drop the compiled problems and cached step-1 solutions if anything baked
-        into them has changed.
-
-        ``gamma``, ``leverage_limit`` and ``overlay_limit`` enter the key because
-        they are compiled in as constants rather than passed as parameters.  The
-        two mean vectors are compiled in as well, but they are functions of the
-        window alone (``mu_a`` of R_fh and the economy map, ``mu_c`` of the forward
-        premium aligned to R_c), so the frame signatures already cover them.
-        """
+        """Drop the compiled problems and cached step-1 solutions if anything baked into them has changed."""
         parts = (
             self._frame_signature(R_fh),
             self._frame_signature(R_c),
@@ -236,12 +113,8 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
             logger.debug("Problem cache invalidated for new estimation window.")
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract the return matrices, estimate both mean vectors, and refresh the
-        problem cache if the window changed.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"``, ``"R_c"``, ``"C"`` and ``"F"``.
+        """Extract the return matrices, estimate both mean vectors, and refresh the problem cache if the
+        window changed.
         """
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
@@ -297,11 +170,7 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     # Step 1: asset weights
 
     def _build_asset_problem(self, Y_fh: np.ndarray, mu_a: np.ndarray) -> dict:
-        """Compile step 1 once, with the two asset penalties left as parameters.
-
-        Sigma_a, mu_a and gamma are baked in as constants, so the compiled problem
-        is valid only for the window it was built from; ``_refresh_cache`` drops it
-        whenever the window or gamma changes."""
+        """Compile step 1 once, with the two asset penalties left as parameters."""
         N = Y_fh.shape[1]
         Sigma_a = ledoit_wolf_cc(Y_fh)
 
@@ -328,13 +197,8 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         return {"prob": problem, "x": x, "lam1": lam1, "lam2": lam2}
 
     def _optimize_assets(self, Y_fh: np.ndarray, mu_a: np.ndarray) -> np.ndarray:
-        """
-        Step 1: penalized mean-variance on R_fh with a Ledoit-Wolf covariance, a
-        leverage constraint and full investment.
-
-        The solution depends only on the asset penalties within a window, so it is
-        cached on (lambda_l1_asset, lambda_l2_asset); gamma is already part of the
-        window cache key.
+        """Step 1: penalized mean-variance on R_fh with a Ledoit-Wolf covariance, a leverage constraint and
+        full investment.
         """
         cls = type(self)
         cache_id = (float(self.lambda_l1_asset), float(self.lambda_l2_asset))
@@ -361,14 +225,8 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     def _build_overlay_problem(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, mu_c: np.ndarray
     ) -> dict:
-        """
-        Compile step 2 once, with the penalties and the fixed asset
-        cross-covariance contribution left as parameters.
-
-        The moment estimates, mu_c and gamma are baked in as constants, so the
-        compiled problem is valid only for the window it was built from.
-        ``_refresh_cache`` drops it whenever the window changes, and :meth:`score`
-        never re-solves on validation data, so no other window ever reaches it.
+        """Compile step 2 once, with the penalties and the fixed asset cross-covariance contribution left
+        as parameters.
         """
         K = Y_c.shape[1]
         Sigma_c = ledoit_wolf_cc(Y_c)
@@ -386,8 +244,7 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
             + lam1 * cp.norm(psi, 1)
             + lam2 * cp.sum_squares(psi)
         )
-        # The cap is load-bearing here, unlike in the mean-free program: the grid
-        # contains lambda_l1_curr = lambda_l2_curr = 0. See the module docstring.
+        # the cap binds here, since the grid includes zero currency penalties
         constraints = [cp.norm(psi, 1) <= self.overlay_limit]
         base = np.where(Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
@@ -402,12 +259,7 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
     def _optimize_overlay(
         self, Y_fh: np.ndarray, Y_c: np.ndarray, x_fixed: np.ndarray, mu_c: np.ndarray
     ) -> np.ndarray:
-        """Step 2: penalized mean-variance currency overlay, capped in L1.
-
-        Minimizes psi' Sigma_c psi + 2 x*' Sigma_ac psi - mu_c' psi / gamma plus
-        the overlay penalties, the expansion of Var(x*' R_fh + psi' R_c) less the
-        mean term, with both terms that are constant in psi dropped -- the
-        asset-only variance and the asset mean mu_a' x*."""
+        """Step 2: penalized mean-variance currency overlay, capped in L1."""
         cls = type(self)
         if cls._overlay_prob is None:
             cls._overlay_prob = self._build_overlay_problem(Y_fh, Y_c, mu_c)
@@ -424,16 +276,7 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         return overlay.flatten()
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run both optimization steps sequentially.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency
-            overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or any solver step fails.
-        """
+        """Run both optimization steps sequentially."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -454,47 +297,7 @@ class RegularizedMeanVarianceCurrencyOverlayWithMeanOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate train-fitted candidate weights on the validation window.
-
-        Both the asset weights and the currency overlay are taken as given from
-        :meth:`optimize` on the training window and held fixed; nothing is
-        re-solved on the validation sample, exactly as in
-        reg_mv_curr_overlay.py.  Refitting on validation and then measuring the
-        in-sample objective of that fit drives selection to the weakest penalty in
-        the grid.  The score is
-
-            std(combined return) - mean(combined return),
-
-        the realized risk-return tradeoff of this window at a reference risk
-        aversion of one.
-
-        The risk is the standard deviation, not the variance reg_mv_curr_overlay
-        scores on.  Both have the same minimizer when no mean is subtracted, so
-        the choice is free there; with a mean term it is not.  A daily variance on
-        this data is about 2.6e-5 against a daily portfolio mean near 2.7e-4, so
-        ``var - mean`` would be a ten-to-one mean maximization dressed up as a
-        tradeoff.  The standard deviation is about 2.9e-3, and it is the
-        degree-one convention ``in_sample_analysis.evaluate_risk`` already uses for
-        ``"mv"`` -- the functional in_sample_vs_out_of_sample_w_mean.py scores
-        these weights with, and the one the unregularized mean-bearing MV pair
-        uses, so the numbers are directly comparable across all four.
-
-        The reference coefficient of 1.0 is unbiased here in a way it is not in
-        the unregularized pair.  gamma is fixed across the whole grid, so unlike
-        there, no candidate can earn a larger mean credit than another simply by
-        carrying a smaller gamma; the search is selecting penalties alone.  The
-        realized mean is used rather than mu_a' x + mu_c' psi because a score
-        should measure what the weights actually earned on the window, not
-        re-apply a shrunk or conditional forecast to them.
-
-        Args:
-            weights: Dict with ``"x"`` and ``"psi"`` as returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Validation standard deviation minus realized mean return, lower is better.
-        """
+        """Validation standard deviation minus mean return of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("weights must be a dict with keys 'x' and 'psi'.")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:

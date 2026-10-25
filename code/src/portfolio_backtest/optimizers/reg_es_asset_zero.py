@@ -1,16 +1,8 @@
-"""
-Asset-only Regularized Expected Shortfall optimizer — ASSETS-ZERO strategy (Lucescu & Ulrych 2026, Section 4.2).
+"""Regularized ASSETS-ZERO optimizer minimizing Expected Shortfall.
 
-ASSETS-ZERO is the *zero hedged* regularized asset portfolio: the asset
-weights are optimized on fully hedged returns (R_fh) — the same asset-level
-problem as ASSETS-FULL (Section 3.3 / Appendix A.3 of the paper, which
-defines the asset optimization exclusively on R_fh) — and the portfolio is
-then implemented WITHOUT currency hedging, so realized returns are unhedged
-(R_u).  The realization on R_u is handled by the Backtester via its
-``training_return_key`` / ``asset_return_key`` split; this class only ever
-sees R_fh.
-
-Author: Anej Rozman
+The asset weights x are optimized on fully hedged returns and realized unhedged (R_u), which the Backtester
+handles. x is fully invested with a leverage cap on ||x||_1. L1 and L2 penalties on x (lambda_l1, lambda_l2).
+ES is taken at confidence level alpha.
 """
 
 from __future__ import annotations
@@ -22,8 +14,7 @@ from .base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -34,29 +25,7 @@ _warned_fallback = False
 
 
 class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
-    """
-    Regularized ES asset optimizer for the ASSETS-ZERO strategy.
-
-    Minimizes Expected Shortfall of the fully hedged asset returns (R_fh) at
-    a given confidence level with L1 and L2 regularization penalties, subject
-    to a leverage limit and a full investment constraint — identical to the
-    ASSETS-FULL asset problem.  The zero-hedging policy is applied at
-    realization: the Backtester evaluates the resulting weights on unhedged
-    returns (R_u) and the investor holds no forward positions.
-    """
-
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``alpha``          (float) — ES confidence level, default 0.80
-                * ``lambda_l1``      (float) — L1 penalty weight, default 0.3
-                * ``lambda_l2``      (float) — L2 penalty weight, default 0.3
-                * ``leverage_limit`` (float) — L1 norm constraint, default 2.0
-                * ``solver``                 — cvxpy solver constant, default ``cp.GUROBI``
-                                               (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
         self.alpha: float = self.hyperparams.get("alpha", 0.80)
         self.lambda_l1: float = self.hyperparams.get("lambda_l1", 0.3)
@@ -74,12 +43,7 @@ class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
         self.q: int = 0
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store the fully hedged return matrix for optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` mapped to a non-empty DataFrame.
-        """
+        """Extract and store the fully hedged return matrix for optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         R_fh = train_bundle["R_fh"]
@@ -89,16 +53,7 @@ class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
         self.q, self.N = self.Y.shape
 
     def optimize(self) -> np.ndarray:
-        """
-        Solve the regularized ES minimization problem.
-
-        Returns:
-            1-D numpy array of shape *(N,)* summing to 1.
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-            ValueError: If ``alpha`` is outside *(0, 1)*.
-        """
+        """Solve the regularized ES minimization problem."""
         if self.Y is None or self.N == 0:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -156,21 +111,7 @@ class RegularizedExpectedShortfallAssetZeroOptimizer(BaseOptimizer):
         return (weights / weights.sum()).flatten()
 
     def score(self, weights: np.ndarray, val_bundle: dict[str, object]) -> float:
-        """
-        Evaluate validation Expected Shortfall of the candidate weights.
-
-        Scored on fully hedged returns, mirroring the training objective
-        (hyperparameter selection is part of the asset-level problem and is
-        therefore identical to ASSETS-FULL).
-
-        Args:
-            weights: 1-D array of portfolio weights from :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"``.
-
-        Returns:
-            Negative mean of the worst ``(1-alpha)`` fraction of portfolio
-            returns.
-        """
+        """Validation ES of the training-fitted weights."""
         if "R_fh" not in val_bundle:
             raise ValueError("val_bundle must contain 'R_fh'.")
         R_fh_val = val_bundle["R_fh"]

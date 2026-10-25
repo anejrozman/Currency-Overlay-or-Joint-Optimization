@@ -1,36 +1,9 @@
-"""
-Regularized Joint Mean-Variance optimizer over asset and currency weights.
+"""Regularized joint asset and currency optimizer minimizing variance.
 
-Minimizes a regularized variance objective of the combined portfolio return
-(R_fh @ x + R_c @ psi) jointly over both asset weights x and currency overlay weights
-psi in a single optimization problem. Separate L1 and L2 penalties are applied to x
-and psi, following the paper's S1, S2 diagonal structure. Leverage cap and budget on
-the asset block only; psi is unconstrained apart from the base-currency pin.
-
-The objective carries no mean term.  The variance coefficient is normalized to one,
-which is the gamma -> infinity limit of the paper's objective after dividing through
-by gamma / 2: the mean term vanishes, the quadratic form is exactly
-Var(x' R_fh + psi' R_c) under the joint covariance, and the penalties are read as the
-already-normalized quantities 2 * lambda / gamma.  This mirrors the ES optimizers,
-which likewise penalize a risk measure alone, and removes the need for a shrinkage
-estimator of the mean (Bayes-Stein, Jorion 1986).
-
-Keeping the mean makes the joint program wildly unstable: at gamma = 3 the unpenalized
-gross overlay reaches 18-75x the portfolio notional and the asset block collapses onto
-16-29 names at the leverage bound, against roughly 1x gross overlay and a fully
-diversified asset block once the mean is dropped (see results/runs/reg_mv_joint/run_1).
-
-Performance notes:
-
-* The Backtester constructs a fresh optimizer instance for every hyperparameter
-  combination, so the compiled problem and the window's moment estimates are cached
-  at class level and keyed on the estimation window.
-* Penalties enter as ``cp.Parameter``, so each problem canonicalizes once per window
-  rather than once per grid point (DPP).
-* Nothing factorizes in the joint program, so every grid point still needs a
-  full-size solve; only the moments and the canonicalization are shared.
-
-Author: Anej Rozman
+The asset weights x and the overlay psi are solved together on R_fh @ x + R_c @ psi. x is fully invested with
+a leverage cap on ||x||_1. Separate L1 and L2 penalties on x and psi (lambda_l1_asset, lambda_l2_asset,
+lambda_l1_curr, lambda_l2_curr). psi is unconstrained apart from a zero base-currency weight. Covariances are
+Ledoit-Wolf shrunk.
 """
 
 from __future__ import annotations
@@ -46,8 +19,7 @@ from ..utils.estimation import ledoit_wolf_cc
 
 logger = logging.getLogger(__name__)
 
-# Production runs use Gurobi (cluster). Fall back to Clarabel locally, where
-# gurobipy is not installed; weight differences are ~1e-6.
+# Gurobi on the cluster, Clarabel where gurobipy is not installed
 try:
     import gurobipy  # noqa: F401
     _DEFAULT_SOLVER = cp.GUROBI
@@ -56,9 +28,7 @@ except ImportError:
 
 _warned_fallback = False
 
-# Budget-violation tolerances on sum(x). Warn above the first, abort above the
-# second. Both are loose relative to FeasibilityTol=1e-9; tripping either means
-# the solve is not trustworthy rather than merely imprecise.
+# tolerances on |sum(x) - 1|: warn above the first, abort above the second
 _BUDGET_WARN_TOL = 1e-6
 _BUDGET_FAIL_TOL = 1e-4
 
@@ -66,39 +36,12 @@ _LEGACY_KEYS = ("lambda_l1", "lambda_l2")
 
 
 class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
-    """
-    Joint regularized mean-variance optimizer over asset and currency overlay weights.
-
-    Solves a single CVXPY problem minimizing the regularized variance of
-    (R_fh @ x + R_c @ psi) subject to full investment and leverage constraints on x.
-    psi is unconstrained.
-
-    The compiled problem and the window's covariance estimate are cached at class
-    level and keyed on the estimation window and the leverage limit. The four
-    penalties are DPP-compliant cp.Parameter objects, so a window is canonicalized
-    once and reused across every grid point the backtester evaluates on it.
-    """
-
-    # window signature -> compiled problem bundle. Held at class level because
-    # the backtester constructs a fresh optimizer instance per grid point.
+    # window signature -> compiled problems, shared by the per-grid-point instances
     _PROBLEM_CACHE: "OrderedDict[tuple, dict]" = OrderedDict()
-    # Per date the backtester touches two windows: train (every grid point) and
-    # train+val (final refit). Two entries covers both.
+    # two entries: the training window and the full estimation window of a date
     _CACHE_MAXSIZE = 2
 
     def __init__(self, hyperparams: dict | None = None) -> None:
-        """
-        Args:
-            hyperparams: Optional dict with keys:
-
-                * ``lambda_l1_asset`` (float) — L1 penalty for asset weights, default 5e-6
-                * ``lambda_l2_asset`` (float) — L2 penalty for asset weights, default 1e-3
-                * ``lambda_l1_curr``  (float) — L1 penalty for currency overlay, default 5e-6
-                * ``lambda_l2_curr``  (float) — L2 penalty for currency overlay, default 1e-4
-                * ``leverage_limit``  (float) — ||x||_1 cap, default 2.0
-                * ``solver``                  — cvxpy solver, default ``cp.GUROBI``
-                                                (``cp.CLARABEL`` when gurobipy is unavailable)
-        """
         super().__init__(hyperparams)
 
         legacy = [k for k in _LEGACY_KEYS if k in self.hyperparams]
@@ -159,12 +102,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
         cls._PROBLEM_CACHE.clear()
 
     def fit(self, train_bundle: dict[str, object]) -> None:
-        """
-        Extract and store return matrices for joint optimization.
-
-        Args:
-            train_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-        """
+        """Extract and store return matrices for joint optimization."""
         if "R_fh" not in train_bundle:
             raise ValueError("train_bundle must contain 'R_fh'.")
         if "R_c" not in train_bundle:
@@ -214,15 +152,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
     # Problem construction
 
     def _build_problem(self) -> dict:
-        """
-        Compile the joint program with the four penalties as DPP parameters.
-
-        The joint covariance (Ledoit-Wolf) is estimated on the stacked return vector
-        [R_fh, R_c], so the asset-currency cross-covariance is shrunk together with the
-        asset and currency blocks (appendix B, eq:mv_joint_obj). It is baked in as a
-        constant, so the compiled problem is valid only for the window it was built
-        from; the cache is keyed on that window.
-        """
+        """Compile the joint program with the four penalties as DPP parameters."""
         Y = np.hstack([self.Y_fh, self.Y_c])  # q x (N + K) combined return matrix
         Sigma_joint = ledoit_wolf_cc(Y)
 
@@ -248,8 +178,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
             cp.sum(x) == 1,                    # budget on the asset block only
             l1_norm_x <= self.leverage_limit,  # leverage on the asset block only
         ]
-        # Base currency (zero-variance excess return) is the residual numeraire,
-        # not an overlay decision variable; pin its weight to zero.
+        # the base currency has a zero excess return, so its weight is pinned to zero
         base = np.where(self.Y_c.var(axis=0) <= 0.0)[0]
         if base.size:
             constraints.append(psi[base] == 0)
@@ -289,15 +218,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
         return bundle
 
     def optimize(self) -> dict[str, np.ndarray]:
-        """
-        Run the joint regularized optimization over training data.
-
-        Returns:
-            Dict with ``"x"`` (asset weights, shape N) and ``"psi"`` (currency overlay, shape K).
-
-        Raises:
-            RuntimeError: If :meth:`fit` was not called, or the solver fails.
-        """
+        """Run the joint regularized optimization over training data."""
         if self.Y_fh is None or self.Y_c is None:
             raise RuntimeError("fit() must be called before optimize().")
 
@@ -324,8 +245,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
         weights = np.asarray(weights, dtype=float).flatten()
         overlay = np.asarray(overlay, dtype=float).flatten()
 
-        # sum(x) == 1 is imposed, so no renormalization. Renormalizing would mask
-        # solver drift and silently break the leverage cap; check instead.
+        # sum(x) == 1 is a constraint; renormalizing would hide solver drift past the leverage cap
         budget_error = abs(weights.sum() - 1.0)
         if budget_error > _BUDGET_FAIL_TOL:
             raise RuntimeError(
@@ -341,22 +261,7 @@ class RegularizedMeanVarianceJointOptimizer(BaseOptimizer):
         weights: dict[str, np.ndarray],
         val_bundle: dict[str, object],
     ) -> float:
-        """
-        Evaluate the training-fitted weights on the validation window.
-
-        No re-solve. Refitting on validation and then measuring the in-sample objective
-        of that fit drives selection to the weakest penalty in the grid. The paper
-        (p.25) specifies weights computed on training data and the risk measure
-        evaluated on the validation sample.
-
-        Args:
-            weights: The dict returned by :meth:`optimize`.
-            val_bundle: Must contain ``"R_fh"`` and ``"R_c"``.
-
-        Returns:
-            Variance of the combined portfolio return on the validation window
-            (lower is better).
-        """
+        """Validation variance of the training-fitted weights."""
         if not isinstance(weights, dict) or "x" not in weights or "psi" not in weights:
             raise ValueError("score() expects the dict with keys 'x' and 'psi' from optimize().")
         if "R_fh" not in val_bundle or "R_c" not in val_bundle:
