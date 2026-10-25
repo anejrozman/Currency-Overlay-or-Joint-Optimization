@@ -101,4 +101,4 @@
 \contentsline {section}{\numberline {G.3}Risk Aversion Calibration}{107}{section.G.3}%
 \contentsline {section}{\numberline {G.4}Drawdown Analysis}{108}{section.G.4}%
 \contentsline {section}{\numberline {G.5}Additional Backtest Performance Results}{111}{section.G.5}%
-\contentsline {chapter}{Bibliography}{118}{appendix*.5}%
+\contentsline {chapter}{Bibliography}{117}{appendix*.5}%
