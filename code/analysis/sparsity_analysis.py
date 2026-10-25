@@ -14,8 +14,8 @@ row per risk measure and a column per universe, as used in the thesis. With
 --optimizer, one figure per block is drawn for that measure alone.
 
 Usage:
-    python results/sparsity_analysis.py --optimizer-family normal
-    python results/sparsity_analysis.py --optimizer-family normal --optimizer es
+    python code/analysis/sparsity_analysis.py --optimizer-family normal
+    python code/analysis/sparsity_analysis.py --optimizer-family normal --optimizer es
 
 Author: Anej Rozman
 """
@@ -32,7 +32,7 @@ import matplotlib.ticker as mticker
 import pandas as pd
 from matplotlib.lines import Line2D
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "sparsity_analysis"
 

@@ -15,7 +15,7 @@ June runs of the asset program used the old script name assets_full) and the uni
 from its "Universe:" line.
 
 Usage:
-    python results/generate_runtime_plots.py
+    python code/analysis/generate_runtime_plots.py
 
 Author: Anej Rozman
 """
@@ -32,7 +32,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 LOGS_DIR: Path = RESULTS_DIR.parent / "logs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "runtime"

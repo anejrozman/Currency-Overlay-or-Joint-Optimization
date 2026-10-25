@@ -4,7 +4,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2] / "results"
 MEASURES = {"mv": ("Variance", "tab:blue"), "smv": ("Semi-Variance", "tab:green"), "mad": ("MAD", "tab:orange"),
             "es": ("ES", "tab:red"), "soes": ("SOES", "tab:purple")}
 TYPES = {

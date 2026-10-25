@@ -4,7 +4,7 @@ import pandas as pd
 
 from portfolio_backtest import config
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2] / "results"
 OUT = ROOT / "excess_returns"
 
 rf = pd.read_csv(config.RAW_DIR / config.RF_FILE, index_col=0)

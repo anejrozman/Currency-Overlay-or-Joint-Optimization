@@ -7,11 +7,11 @@ penalty approaches and passes its configured grid bound. Lambda is shown relativ
 to that bound, so the bound sits at 1.0 in every panel.
 
 Usage:
-    python results/generate_boundary_plots.py es
-    python results/generate_boundary_plots.py mv
-    python results/generate_boundary_plots.py mad
-    python results/generate_boundary_plots.py smv
-    python results/generate_boundary_plots.py soes
+    python code/analysis/generate_boundary_plots.py es
+    python code/analysis/generate_boundary_plots.py mv
+    python code/analysis/generate_boundary_plots.py mad
+    python code/analysis/generate_boundary_plots.py smv
+    python code/analysis/generate_boundary_plots.py soes
 
 Author: Anej Rozman
 """
@@ -28,7 +28,7 @@ import numpy as np
 import pandas as pd
 from matplotlib.transforms import blended_transform_factory
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 DATA_DIR: Path = RESULTS_DIR / "hyperparameter_boundary_analysis"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "boundary_plots"
 

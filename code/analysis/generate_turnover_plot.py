@@ -13,8 +13,8 @@ unregularized, regularized and mean-risk overlay and joint optimizers. With
 --optimizer, the same two figures are drawn for that measure alone.
 
 Usage:
-    python results/generate_turnover_plot.py
-    python results/generate_turnover_plot.py --optimizer es
+    python code/analysis/generate_turnover_plot.py
+    python code/analysis/generate_turnover_plot.py --optimizer es
 
 Author: Anej Rozman
 """
@@ -37,7 +37,7 @@ from portfolio_backtest.utils.returns import (
     compute_fully_hedged_returns,
 )
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "turnover"
 

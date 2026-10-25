@@ -18,7 +18,7 @@ metrics. Each measure is evaluated on the empirical distribution of the full
 out-of-sample series, the sample mean taking the place of the expected return.
 
 Usage:
-    python results/additional_performance_metrics.py
+    python code/analysis/additional_performance_metrics.py
 
 Author: Anej Rozman
 """
@@ -32,7 +32,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import minimize_scalar
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 RF_PATH: Path = RESULTS_DIR.parent / "data" / "raw" / "us_risk_free_rates.csv"
 OUT_DIR: Path = RESULTS_DIR / "additional_performance_metrics"

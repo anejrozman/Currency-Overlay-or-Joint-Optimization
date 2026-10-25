@@ -16,7 +16,7 @@ the thesis figure style to figures/currency_exposure/<group>/<currency>.pdf, wit
 the shown measures appended to the name when some are hidden.
 
 Usage:
-    python results/analyze_currency_exposure.py
+    python code/analysis/analyze_currency_exposure.py
 
 Author: Anej Rozman
 """
@@ -32,7 +32,7 @@ import pandas as pd
 from matplotlib.figure import Figure
 from matplotlib.widgets import Button, CheckButtons, RadioButtons
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "currency_exposure"
 

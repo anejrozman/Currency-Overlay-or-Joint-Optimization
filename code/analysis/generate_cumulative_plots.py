@@ -2,9 +2,9 @@
 Cumulative out-of-sample wealth plots, one figure per universe size.
 
 Usage:
-    python results/generate_cumulative_plots.py es
-    python results/generate_cumulative_plots.py soes --variant w_mean
-    python results/generate_cumulative_plots.py smv --variant demeaned
+    python code/analysis/generate_cumulative_plots.py es
+    python code/analysis/generate_cumulative_plots.py soes --variant w_mean
+    python code/analysis/generate_cumulative_plots.py smv --variant demeaned
 
 The --variant flag selects which top-runs table to read and where the
 figures are written:
@@ -32,7 +32,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "cumulative_returns"
 

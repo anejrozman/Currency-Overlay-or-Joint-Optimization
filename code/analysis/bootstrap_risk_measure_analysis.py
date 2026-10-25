@@ -5,8 +5,8 @@ days, one figure per universe size.  Both strategies are evaluated on the same
 time indices, so the per-block differences are paired.
 
 Usage:
-    python results/bootstrap_risk_measure_analysis.py es
-    python results/bootstrap_risk_measure_analysis.py mv
+    python code/analysis/bootstrap_risk_measure_analysis.py es
+    python code/analysis/bootstrap_risk_measure_analysis.py mv
 
 Author: Anej Rozman
 """
@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import binomtest
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 TOP_RUNS_FILE: Path = RUNS_DIR / "top_runs.csv"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "bootstrap_risk_measure_analysis"

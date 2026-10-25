@@ -10,9 +10,9 @@ per universe, as used in the thesis. With --optimizer, one figure is drawn for t
 measure alone, with a panel per universe.
 
 Usage:
-    python results/generate_drawdown_plot.py --optimizer-family normal
-    python results/generate_drawdown_plot.py --optimizer-family with-mean-term
-    python results/generate_drawdown_plot.py --optimizer-family normal --optimizer es
+    python code/analysis/generate_drawdown_plot.py --optimizer-family normal
+    python code/analysis/generate_drawdown_plot.py --optimizer-family with-mean-term
+    python code/analysis/generate_drawdown_plot.py --optimizer-family normal --optimizer es
 
 Author: Anej Rozman
 """
@@ -28,7 +28,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import pandas as pd
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "drawdowns"
 

@@ -3,8 +3,8 @@ Difference between the regularized joint and the regularized currency overlay
 out-of-sample return series, one figure per universe size.
 
 Usage:
-    python results/difference_analysis.py es
-    python results/difference_analysis.py mv
+    python code/analysis/difference_analysis.py es
+    python code/analysis/difference_analysis.py mv
 
 Author: Anej Rozman
 """
@@ -17,7 +17,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 TOP_RUNS_FILE: Path = RUNS_DIR / "top_runs.csv"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "difference_analysis"

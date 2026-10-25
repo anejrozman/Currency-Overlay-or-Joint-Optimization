@@ -6,9 +6,9 @@ held long.  The short share is one minus it, so a single line carries both.  The
 top row uses the asset weights, the bottom row the currency overlay psi.
 
 Usage:
-    python results/generate_weight_fraction_plot.py --optimizer-family normal --optimizer es
-    python results/generate_weight_fraction_plot.py --optimizer-family demeaned --optimizer soes
-    python results/generate_weight_fraction_plot.py --optimizer-family with-mean-term --optimizer mv
+    python code/analysis/generate_weight_fraction_plot.py --optimizer-family normal --optimizer es
+    python code/analysis/generate_weight_fraction_plot.py --optimizer-family demeaned --optimizer soes
+    python code/analysis/generate_weight_fraction_plot.py --optimizer-family with-mean-term --optimizer mv
 
 Author: Anej Rozman
 """
@@ -21,7 +21,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 OUT_DIR: Path = RESULTS_DIR / "figures" / "long_short_split"
 

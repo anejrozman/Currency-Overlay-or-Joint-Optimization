@@ -12,7 +12,7 @@ the CAGR of the portfolio minus 252 times the mean daily risk-free rate over the
 volatility, and are not rounded before taking the differences.
 
 Usage:
-    python results/sharpe_change_tables.py
+    python code/analysis/sharpe_change_tables.py
 
 Author: Anej Rozman
 """
@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pandas as pd
 
-RESULTS_DIR: Path = Path(__file__).resolve().parent
+RESULTS_DIR: Path = Path(__file__).resolve().parents[2] / "results"
 RUNS_DIR: Path = RESULTS_DIR / "runs"
 RF_PATH: Path = RESULTS_DIR.parent / "data" / "raw" / "us_risk_free_rates.csv"
 OUT_DIR: Path = RESULTS_DIR / "sharpe_change"
