@@ -23,8 +23,8 @@ exposures together in one step. Jorion \cite{Jorion1994} argues that the two-ste
 ignores how the individual assets and the exchange rates move together. On the historical data used to choose the
 portfolio, joint optimization can never do worse than the overlay, since it can always choose the
 same portfolio. However, what matters for an investor is how the portfolio performs in the future, out of sample.
-Because joint optimization fits all weights to the same data at once, it can also adapt more closely to random noise in
-this data, and its advantage can disappear out of sample \cite{SparseAndStableInternationalPortfolioOptimization}.
+Because joint optimization fits all weights to the same data at once, it can also adapt more closely to random noise, 
+and its advantage can disappear out of sample \cite{SparseAndStableInternationalPortfolioOptimization}.
 Regularization, which keeps the portfolio weights from becoming too extreme, is a common way to reduce this problem.
 
 Many investors use a currency overlay, often run by a separate manager. If joint optimization works better out of
@@ -42,7 +42,7 @@ the risk measure, the size of the investable universe, regularization, and a mea
 
 \section{Contributions}
 
-This thesis makes four contributions. First, we compare joint and sequential optimization under five risk
+In this thesis, we make four contributions. First, we compare joint and sequential optimization under five risk
 measures, in three investable universes of increasing size, with and without regularization. Without a mean term,
 the joint and the overlay optimizers achieve very similar risk-adjusted returns, and the main difference is that the
 joint optimizers achieve a lower risk. Their advantage in the risk measure they minimize is realized out of sample only
@@ -54,7 +54,7 @@ Second, we add a mean term to the programs of all five risk measures, with expec
 economy and expected currency returns that are derived from the forward premia. The mean term raises the
 risk-adjusted returns of almost all optimizers, and most for the variance, the semi-variance, and the mean absolute
 deviation, which are unaffected by a shift of the portfolio return, whereas Expected Shortfall and second-order Expected
-Shortfall already reward a higher mean. Once a mean term is added to the unregularized programs, the joint optimizers
+Shortfall already reward a higher mean return implicitly. Once a mean term is added to the unregularized programs, the joint optimizers
 achieve higher Sharpe ratios than the overlay optimizers for every risk measure in the two larger universes, since the
 joint program can weigh the expected returns of the assets and the currencies against each other.
 
@@ -62,7 +62,7 @@ Third, we show that the joint program has an advantage over the overlay program 
 measure how much of this advantage is realized out of sample. For the variance, the semi-variance, and the mean
 absolute deviation, the in-sample advantage is small, and most of it is realized out of sample. For Expected Shortfall
 and second-order Expected Shortfall, it is larger but mostly not realized. By varying the confidence level and by
-de-meaning the two measures, we trace their in-sample advantage to two mechanisms, the fitting of the currency positions
+de-meaning the two measures, we explain their in-sample advantage with two mechanisms, the fitting of the currency positions
 to the specific worst days of the lookback window and an implicit risk-return tradeoff that rewards a high realized
 mean, and neither of them generalizes out of sample.
 
@@ -70,7 +70,7 @@ Finally, we analyze how much the optimizers improve on the equally weighted port
 which fully hedge or leave unhedged the currency exposure of their assets. All optimizers achieve a much lower
 volatility and smaller drawdowns than the equally weighted portfolio. Without a mean term, they also earn lower excess
 returns, but they outperform it on a risk-adjusted basis in the two larger universes, which offer more low-risk stocks
-to choose from, though not consistently in the smallest universe. Regularization improves the risk-adjusted returns,
+to choose from. Regularization improves the risk-adjusted returns,
 most in the largest universe, since it limits the extreme positions that the programs fit to noise. The regularized
 joint and overlay optimizers, which manage the currencies actively, realize a lower value of the risk measure they
 minimize than the fully hedged benchmark at similar risk-adjusted returns, and they outperform the unhedged benchmark in
