@@ -1,9 +1,4 @@
-"""
-DataHandler: loads the investment universe, fully hedged returns, and excess
-currency returns for use with the Backtester framework.
-
-Author: Anej Rozman
-"""
+"""Loads the universe, the asset and currency returns and the daily universe mask for the Backtester."""
 
 from __future__ import annotations
 
@@ -15,24 +10,12 @@ from portfolio_backtest.utils.io import build_asset_to_currency, load_csv
 
 
 class DataHandler:
-    """
-    Loads and processes the data sources required by ``Backtester.run()``.
-
-    The handler:
-
-    * Builds a static RIC to currency mapping from the investment universe CSV.
-    * Loads the pre-computed asset return DataFrame (fully hedged or unhedged).
-    * Constructs a forward-filled daily universe mask for filtering.
-    * Loads the excess currency returns DataFrame.
-    """
-
     def __init__(
         self,
         universe_file: Path | str,
         hedged_returns_file: Path | str,
         excess_currency_returns_file: Path | str,
     ) -> None:
-        
         self.universe_file = Path(universe_file)
         self.hedged_returns_file = Path(hedged_returns_file)
         self.excess_currency_returns_file = Path(excess_currency_returns_file)
@@ -41,18 +24,7 @@ class DataHandler:
     def load_and_process(
         self,
     ) -> tuple[pd.DataFrame, dict[str, str], pd.DataFrame, pd.DataFrame]:
-        """
-        Load and process all data sources.
-
-        Returns:
-            Four-tuple of:
-
-            * ``asset_returns``            (pd.DataFrame) daily asset returns
-              with NaN for dates outside each asset's history.
-            * ``asset_to_currency``        (dict[str, str]) RIC to currency mapping.
-            * ``excess_currency_returns``  (pd.DataFrame) daily excess currency returns.
-            * ``daily_mask``               (pd.DataFrame) investment universe mask
-        """
+        """Load and process all data sources."""
 
         # Investment universe 
         self.asset_to_currency = build_asset_to_currency(self.universe_file)

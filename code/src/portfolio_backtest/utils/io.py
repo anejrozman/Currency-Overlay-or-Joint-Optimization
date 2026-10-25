@@ -1,8 +1,4 @@
-"""
-I/O utilities: CSV loading that strips angle brackets from column names,
-auto incrementing run directory function, and RIC to currency mapping function.
-
-"""
+"""CSV loading, run directories and the asset-to-currency mapping."""
 
 from __future__ import annotations
 
@@ -15,10 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def load_csv(path: Path | str, *, date_col: str = "date") -> pd.DataFrame:
-    """
-    Load a CSV, parse the date column as the index, and strip
-    angle brackets from column names.
-    """
+    """Load a CSV indexed by its date column, with angle brackets stripped from the column names."""
     df = pd.read_csv(path)
     df[date_col] = pd.to_datetime(df[date_col])
     df = df.set_index(date_col)
@@ -31,11 +24,7 @@ def load_csv(path: Path | str, *, date_col: str = "date") -> pd.DataFrame:
 
 
 def next_run_dir(optimizer_cls: type) -> Path:
-    """
-    Return a new incremented run directory for *optimizer_cls*.
-
-    Directory structure: RUNS_DIR / <optimizer_filename> / run_<N>
-    """
+    """Claim the next free results/runs/<optimizer file>/run_<N> directory."""
     from portfolio_backtest.config import RUNS_DIR
 
     optimizer_stem = Path(inspect.getfile(optimizer_cls)).stem
@@ -48,9 +37,7 @@ def next_run_dir(optimizer_cls: type) -> Path:
         for d in optimizer_dir.iterdir()
         if d.is_dir() and d.name.startswith(prefix) and d.name[len(prefix):].isdigit()
     ]
-    # Atomically claim the next free run number. mkdir(exist_ok=False) is the
-    # lock: if a concurrent job already took this number the create fails and we
-    # try the next one, so parallel runs never share a directory.
+    # mkdir is the lock: concurrent jobs never claim the same number
     run_number = max(existing, default=0) + 1
     while True:
         run_dir = optimizer_dir / f"{prefix}{run_number}"
@@ -64,9 +51,7 @@ def next_run_dir(optimizer_cls: type) -> Path:
 
 
 def build_asset_to_currency(universe_path: Path | str) -> dict[str, str]:
-    """
-    Build a RIC to currency mapping from the universe CSV. Angle brackets are stripped from RIC codes.
-    """
+    """RIC -> currency from a universe file, the latest assignment of each RIC winning."""
     universe_df = pd.read_csv(universe_path)
     ric_col = "ric_code" if "ric_code" in universe_df.columns else "riccode"
     universe_df["clean_ric"] = (

@@ -1,22 +1,7 @@
-"""
-Gurobi solve with a two-stage fallback, for the conic optimizers whose production
-Gurobi settings do not always converge.
+"""Gurobi solve with fallbacks to robust Gurobi settings and then Clarabel, for the conic optimizers.
 
-The production settings -- FeasibilityTol and OptimalityTol at Gurobi's floor of
-1e-9, BarQCPConvTol at 1e-8 and scaling switched off -- ask for more accuracy than
-Gurobi's barrier can always deliver on the mean-bearing SOES programs.  When it
-stalls short of them it stops with SUBOPTIMAL or ITERATION_LIMIT, which cvxpy 1.5
-reports as ``user_limit`` rather than ``optimal_inaccurate``, so a single stalled
-solve used to abort the whole backtest.
-
-:func:`solve_with_fallback` keeps the production solve as the first attempt,
-unchanged, so every solve that converges gives exactly the weights it gave before.
-Only when that attempt fails does it retry Gurobi with :data:`GUROBI_ROBUST_PARAMS`,
-and then Clarabel.  Every fallback is logged as a warning and recorded in the
-caller's event list, which ``run_strategy.py`` writes to ``solver_fallbacks.csv`` in
-the run directory.
-
-Author: Anej Rozman
+The first attempt uses the caller's settings unchanged, so a solve that converges gives the same weights as
+without the fallback.
 """
 
 from __future__ import annotations
@@ -28,10 +13,7 @@ import numpy as np
 
 logger = logging.getLogger(__name__)
 
-# Second attempt.  Gurobi's default tolerances (1e-6) and automatic scaling replace
-# the production settings, and the homogeneous barrier is switched on: it is built
-# for programs close to infeasible or unbounded, and the mean-bearing SOES programs
-# are reported unbounded without their overlay cap.
+# default tolerances and scaling, with the homogeneous barrier for nearly unbounded programs
 GUROBI_ROBUST_PARAMS = {
     "Method": 2,
     "BarHomogeneous": 1,
@@ -39,13 +21,11 @@ GUROBI_ROBUST_PARAMS = {
     "Threads": 3,
 }
 
-# The attempts in order, as recorded in solver_fallbacks.csv.
 ATTEMPTS = ("gurobi", "gurobi_robust", "clarabel")
 
 _ACCEPTED_STATUSES = ("optimal", "optimal_inaccurate")
 
-# Gurobi's own termination codes, for the log.  cvxpy folds most of these into
-# ``user_limit``, which hides why the barrier stopped.
+# Gurobi termination codes, which cvxpy reports as user_limit
 _GUROBI_STATUS = {
     2: "OPTIMAL",
     3: "INFEASIBLE",
@@ -62,7 +42,7 @@ _GUROBI_STATUS = {
 
 
 def _describe(problem: cp.Problem, solver: str) -> str:
-    """Status of the solve just finished, with Gurobi's own code where available."""
+    """Solve status, with Gurobi's own code and the objective where available."""
     text = str(problem.status)
     if solver == cp.GUROBI:
         model = getattr(problem.solver_stats, "extra_stats", None)
@@ -79,7 +59,7 @@ def _describe(problem: cp.Problem, solver: str) -> str:
 
 
 def _attempt(problem: cp.Problem, solver: str, params: dict) -> tuple[bool, str]:
-    """Run one solve.  Returns whether it was accepted and a description of it."""
+    """Run one solve; returns whether it was accepted and a description."""
     try:
         problem.solve(solver=solver, verbose=False, **params)
     except cp.error.SolverError as exc:
@@ -95,27 +75,9 @@ def solve_with_fallback(
     events: list[dict],
     log: logging.Logger = logger,
 ) -> str:
-    """
-    Solve with Gurobi at ``gurobi_params``; if that does not end ``optimal`` or
-    ``optimal_inaccurate``, retry Gurobi with :data:`GUROBI_ROBUST_PARAMS`, then
-    Clarabel.
+    """Solve with gurobi_params, then GUROBI_ROBUST_PARAMS, then Clarabel; returns the accepted attempt.
 
-    Args:
-        problem: The cvxpy problem.  Its variables hold the accepted solution on return.
-        gurobi_params: The caller's production Gurobi parameters, tried first and
-            unchanged.
-        context: Identifies the solve in the log and in ``events``, e.g. the window
-            dates and hyperparameters.
-        events: Receives one record per solve that needed a fallback, including the
-            one that failed outright.
-        log: Logger to report through, so the warning carries the caller's module.
-
-    Returns:
-        The attempt that was accepted: ``"gurobi"``, ``"gurobi_robust"`` or
-        ``"clarabel"``.
-
-    Raises:
-        RuntimeError: If all three attempts fail.
+    Every solve that needed a fallback is logged and appended to events. Raises RuntimeError if all fail.
     """
     plan = {
         "gurobi": (cp.GUROBI, gurobi_params),

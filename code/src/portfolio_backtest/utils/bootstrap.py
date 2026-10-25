@@ -1,12 +1,4 @@
-"""
-Circular block bootstrap with an automatic block length.
-
-Both diagnostic scripts form one value per quarterly rebalancing date and need a
-confidence interval for its mean.  Those series are serially dependent — ten-year
-estimation windows overlap by a single quarter — so an iid bootstrap understates
-the spread.  The block length is chosen per series by the Politis-White rule
-rather than by hand, and returned alongside the interval so it can be reported.
-"""
+"""Circular block bootstrap of a mean, with the Politis-White block length."""
 
 from __future__ import annotations
 
@@ -17,14 +9,8 @@ SEED = 0
 
 
 def politis_white(x: np.ndarray) -> int:
-    """
-    Optimal circular-block length, b* = (2 G^2 / D)^(1/3) n^(1/3).
-
-    G and D are formed from the sample autocorrelations under a flat-top lag
-    window; the bandwidth is twice the smallest lag beyond which the
-    autocorrelations stay inside the white-noise band for several consecutive
-    lags.  Politis & White (2004), with the correction in Patton, Politis &
-    White (2009).
+    """Optimal circular block length, (2 G^2 / D)^(1/3) n^(1/3) (Politis & White 2004; Patton, Politis &
+    White 2009).
     """
     x = np.asarray(x, dtype=float)
     x = x - x.mean()
@@ -55,13 +41,8 @@ def politis_white(x: np.ndarray) -> int:
 
 
 def circular_index(n: int, block: int, n_boot: int, rng) -> np.ndarray:
-    """
-    Row of resampled positions per replication.
-
-    Draws ceil(n / block) uniform start points, takes `block` consecutive
-    positions from each while wrapping past the end of the series, and truncates
-    the concatenation back to length n.  Wrapping keeps every observation equally
-    likely to be drawn, which the non-circular block bootstrap does not.
+    """Resampled positions per replication: blocks of consecutive positions from uniform starts, wrapping
+    past the end of the series.
     """
     n_blocks = int(np.ceil(n / block))
     starts = rng.integers(0, n, size=(n_boot, n_blocks))
@@ -71,15 +52,9 @@ def circular_index(n: int, block: int, n_boot: int, rng) -> np.ndarray:
 def block_bootstrap_mean(
     x: np.ndarray, seed: int = SEED, n_boot: int = N_BOOT
 ) -> tuple[float, float, float, float, int]:
-    """
-    Mean of *x* with a percentile confidence interval from the circular block
-    bootstrap.
+    """(mean, 2.5th and 97.5th percentiles, standard error, block length) of the bootstrapped mean.
 
-    Returns:
-        ``(mean, lo, hi, se, block)`` — the sample mean, the 2.5th and 97.5th
-        percentiles of the resampled means, their standard deviation, and the
-        block length the Politis-White rule selected.  Series shorter than eight
-        observations return the mean with NaN interval.
+    With fewer than eight observations the interval is NaN.
     """
     x = np.asarray(x, dtype=float)
     x = x[np.isfinite(x)]

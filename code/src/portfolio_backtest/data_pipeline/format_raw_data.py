@@ -1,12 +1,7 @@
-"""
-Format raw equity and currency data files from Refinitiv Datastream.
-
-Converts long-format Datastream exports into wide-format interim CSVs
+"""Datastream exports in long format to wide interim CSVs.
 
 Usage:
     python -m portfolio_backtest.data_pipeline.format_raw_data
-
-Author: Anej Rozman
 """
 
 from __future__ import annotations
@@ -66,7 +61,7 @@ def main() -> None:
         .collect()
     )
 
-    # Rename usd_gbp → GBP etc., add USD = 1.0
+    # usd_gbp -> GBP etc., with USD = 1
     rename_mapping = {col: col.split("_")[1].upper() for col in df_spot.columns if col.startswith("usd_")}
     df_spot = df_spot.rename(rename_mapping)
     df_spot = df_spot.with_columns(pl.lit(1.0).alias("USD"))

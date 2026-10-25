@@ -1,65 +1,47 @@
-"""
-Walk-forward backtester implementing Ulrych & Lucescu (2026), Section 4 and Appendix B.
-
-Author: Anej Rozman
-"""
+"""Walk-forward backtester of Ulrych & Lucescu (2026), Section 4 and Appendix B."""
 
 from __future__ import annotations
 
 import logging
 import math
-import pandas as pd
-import numpy as np
 from itertools import product
-from typing import Optional, Type
+
+import numpy as np
+import pandas as pd
 
 from portfolio_backtest.config import ASSET_COST_BPS, FX_COST_BPS
 from portfolio_backtest.optimizers.base_optimizer import BaseOptimizer
 
 logger = logging.getLogger(__name__)
 
+PERIODS = {"weekly": "W-FRI", "monthly": "M", "quarterly": "Q", "annually": "Y"}
+
+
+def cost_rate(bps: float) -> float:
+    """Log-linear cost per unit traded, tau = log((1 + chi) / (1 - chi)) (Appendix C)."""
+    chi = bps / 10_000.0
+    return math.log((1 + chi) / (1 - chi))
+
 
 class Backtester:
+    """Each rebalancing date: grid search on the validation window, refit on the full estimation window, then
+    hold the weights, net of transaction costs, until the next rebalancing date.
+
+    asset_return_key "R_u" marks an unhedged strategy, which holds no forwards. training_return_key, by default
+    the asset returns, is the frame used for estimation; ASSETS-ZERO trains on "R_fh" and realizes "R_u".
+    """
 
     def __init__(
         self,
-        optimizer: Type[BaseOptimizer],
-        param_grid: Optional[dict[str, list]] = None,
+        optimizer: type[BaseOptimizer],
+        param_grid: dict[str, list] | None = None,
         window_years: int = 10,
         val_years: int = 1,
         rebalancing_frequency: str = "quarterly",
         asset_return_key: str = "R_fh",
-        training_return_key: Optional[str] = None,
+        training_return_key: str | None = None,
         logging: bool = False,
     ) -> None:
-        """
-        Args:
-            optimizer: Optimizer class to instantiate at each step.
-            param_grid: Grid of hyperparameters for model selection.  Each key
-                        maps to a list of candidate values.  Pass ``None`` or
-                        ``{}`` to skip grid search (use optimizer defaults).
-            window_years: Total rolling lookback window length in years used for model
-                          estimation, validation and selection at each rebalancing date.
-            val_years: Validation window length in years.  Must be less than ``window_years``. 
-            rebalancing_frequency: One of ``"daily"``, ``"weekly"``,
-                                   ``"monthly"``, ``"quarterly"``,
-                                   ``"semi-annually"`` or ``"annually"``.
-            asset_return_key: Key used to look up the asset return DataFrame
-                              inside ``data_bundle``.  Use ``"R_fh"`` for
-                              fully-hedged returns  or ``"R_u"`` for unhedged returns.
-                              With ``"R_u"`` the strategy is treated as unhedged:
-                              no forward positions are held, and currency
-                              transaction costs consist only of the spot
-                              conversions implied by changes in currency
-                              allocations at each rebalance.
-            training_return_key: Bundle key holding the return DataFrame used
-                              for estimation, validation, and universe
-                              filtering.  Defaults to ``asset_return_key``.
-                              Set to ``"R_fh"`` with ``asset_return_key="R_u"``
-                              for the paper's ASSETS-ZERO: weights optimized
-                              on fully hedged returns, realized unhedged.
-            logging: Emit progress messages via the logging module.
-        """
         self.optimizer = optimizer
         self.param_grid = param_grid if param_grid else {}
         self.window_years = window_years
@@ -70,188 +52,79 @@ class Backtester:
         self._is_unhedged = asset_return_key == "R_u"
         self._logging = logging
 
-
-    # Helper functions
-
     def _get_rebalance_dates(self, dates: pd.DatetimeIndex) -> list[pd.Timestamp]:
-        """
-        Build the rebalancing dates from a trading day index.
-        For non daily frequencies, the rebalance date is the last available
-        trading day in each calendar period.
-
-        Args:
-            dates: Trading day index of the return dataframe.
-
-        Returns:
-            List of rebalancing timestamps.
-        """
+        """The last trading day of each period of the rebalancing frequency."""
         if dates is None or len(dates) == 0:
             return []
-
         trading_dates = pd.DatetimeIndex(dates).sort_values().unique()
         freq = self.rebalancing_frequency.strip().lower()
-
         if freq == "daily":
             return list(trading_dates)
-        if freq == "weekly":
-            period_key = trading_dates.to_period("W-FRI")
-        elif freq == "monthly":
-            period_key = trading_dates.to_period("M")
-        elif freq == "quarterly":
-            period_key = trading_dates.to_period("Q")
-        elif freq == "semi-annually":
-            period_key = pd.Index(
-                [(d.year, 1 if d.month <= 6 else 2) for d in trading_dates],
-                dtype="object",
-            )
-        elif freq == "annually":
-            period_key = trading_dates.to_period("Y")
+        if freq == "semi-annually":
+            period = pd.Index([(d.year, 1 if d.month <= 6 else 2) for d in trading_dates], dtype="object")
+        elif freq in PERIODS:
+            period = trading_dates.to_period(PERIODS[freq])
         else:
-            raise ValueError(
-                "Unsupported rebalancing_frequency. "
-            )
-
-        helper = pd.DataFrame({"date": trading_dates, "period": period_key})
-        return (
-            helper.groupby("period", sort=False)["date"]
-            .max()
-            .sort_values()
-            .tolist()
-        )
+            raise ValueError("Unsupported rebalancing_frequency. ")
+        helper = pd.DataFrame({"date": trading_dates, "period": period})
+        return helper.groupby("period", sort=False)["date"].max().sort_values().tolist()
 
     def _get_estimation_and_validation_splits(
-        self,
-        dates: pd.DatetimeIndex,
-        rebalancing_date: pd.Timestamp,
-        next_rebalancing_date: pd.Timestamp,
+        self, dates: pd.DatetimeIndex, rebalancing_date: pd.Timestamp, next_rebalancing_date: pd.Timestamp
     ) -> dict[str, pd.Timestamp]:
-        """
-        Compute period boundaries for one rebalancing cycle.
+        """Train, validation, full estimation and holding window boundaries of one rebalancing date.
 
-        Args:
-            dates: Trading day index of the return dataframe.
-            rebalancing_date: Current rebalancing date *t*.
-            next_rebalancing_date: Next rebalancing date *t_next*.
-
-        Returns:
-            Dictionary with keys:
-            ``train_start``, ``train_end``,
-            ``validation_start``, ``validation_end``,
-            ``full_estimation_start``, ``full_estimation_end``,
-            ``holding_start``, ``holding_end``.
-
-        Raises:
-            ValueError: If either date is absent from *dates*, dates are
-                        out of order, or the holding window falls outside
-                        the available index.
+        Weights are computed at the close of t and traded at the close of t+1, so the holding window runs
+        from t+2 to t_next+1. Raises ValueError where a boundary falls outside the dates.
         """
         trading_dates = pd.DatetimeIndex(dates).sort_values().unique()
         t = pd.Timestamp(rebalancing_date)
         t_next = pd.Timestamp(next_rebalancing_date)
-        estimation_anchor = t - pd.DateOffset(years=self.window_years)
-        validation_anchor = t - pd.DateOffset(years=self.val_years)
 
-        def first_on_or_after(ts: pd.Timestamp) -> pd.Timestamp:
-            idx = trading_dates.searchsorted(ts, side="left")
-            if idx >= len(trading_dates):
-                raise ValueError("Cannot align start boundary: anchor is after available dates.")
-            return pd.Timestamp(trading_dates[idx])
+        start = trading_dates.searchsorted(t - pd.DateOffset(years=self.window_years), side="left")
+        if start >= len(trading_dates):
+            raise ValueError("Cannot align start boundary: anchor is after available dates.")
+        end = trading_dates.searchsorted(t - pd.DateOffset(years=self.val_years), side="right") - 1
+        if end < 0:
+            raise ValueError("Cannot align end boundary: anchor is before available dates.")
+        train_start = pd.Timestamp(trading_dates[start])
+        train_end = pd.Timestamp(trading_dates[end])
+        validation_start = pd.Timestamp(trading_dates[trading_dates.get_loc(train_end) + 1])
 
-        def last_on_or_before(ts: pd.Timestamp) -> pd.Timestamp:
-            idx = trading_dates.searchsorted(ts, side="right") - 1
-            if idx < 0:
-                raise ValueError("Cannot align end boundary: anchor is before available dates.")
-            return pd.Timestamp(trading_dates[idx])
-
-        train_start = first_on_or_after(estimation_anchor)
-        train_end = last_on_or_before(validation_anchor)
-        train_end_idx = trading_dates.get_loc(train_end)
-        validation_start = pd.Timestamp(trading_dates[train_end_idx + 1])
-        validation_end = t
-
-        full_estimation_start = train_start
-        full_estimation_end = t
-
-        # Execution lag assumptions
-        # - Weights computed at close of t
-        # - Orders executed at close of t+1
-        # - OOS returns start at t+2 and end at t_next+1
-        t_idx = trading_dates.get_loc(t)
-        t_next_idx = trading_dates.get_loc(t_next)
-
+        t_idx, t_next_idx = trading_dates.get_loc(t), trading_dates.get_loc(t_next)
         if isinstance(t_idx, slice) or isinstance(t_next_idx, slice):
             raise ValueError("Duplicate rebalancing dates in trading index.")
-
-        holding_start_idx = int(t_idx) + 2
-        holding_end_idx = int(t_next_idx) + 1
-
+        holding_start_idx, holding_end_idx = int(t_idx) + 2, int(t_next_idx) + 1
         if holding_start_idx >= len(trading_dates):
             raise ValueError("Cannot compute holding start (t+2): not enough future dates.")
         if holding_end_idx >= len(trading_dates):
             raise ValueError("Cannot compute holding end (t_next+1): not enough future dates.")
 
         return {
-            "train_start": train_start,
-            "train_end": train_end,
-            "validation_start": validation_start,
-            "validation_end": validation_end,
-            "full_estimation_start": full_estimation_start,
-            "full_estimation_end": full_estimation_end,
+            "train_start": train_start, "train_end": train_end,
+            "validation_start": validation_start, "validation_end": t,
+            "full_estimation_start": train_start, "full_estimation_end": t,
             "holding_start": pd.Timestamp(trading_dates[holding_start_idx]),
             "holding_end": pd.Timestamp(trading_dates[holding_end_idx]),
         }
 
     def _filter_universe(self, data_slice: pd.DataFrame) -> list[str]:
-        """
-        Args:
-            data_slice: Sliced return DataFrame for the estimation window.
-
-        Returns:
-            List of column names (asset RICs) with a complete price history.
-
-        Raises:
-            ValueError: If no assets have a complete history.
-        """
+        """Assets with a complete return history in the window."""
         valid_assets = data_slice.columns[data_slice.notna().all()].tolist()
         if not valid_assets:
             raise ValueError("No assets have a complete price history for this window.")
         return valid_assets
 
     def _generate_grid(self) -> list[dict]:
-        """
-        Generate all hyperparameter combinations from ``self.param_grid``.
-
-        Returns:
-            List of dictionaries. Returns ``[{}]`` if no grid is defined.
-        """
         if not self.param_grid:
             return [{}]
         keys, values = zip(*self.param_grid.items())
         return [dict(zip(keys, v)) for v in product(*values)]
 
     def _compute_asset_transaction_costs(
-        self,
-        drifted_weights: pd.Series,
-        new_weights: pd.Series,
-        asset_cost_bps: float = ASSET_COST_BPS,
+        self, drifted_weights: pd.Series, new_weights: pd.Series, asset_cost_bps: float = ASSET_COST_BPS
     ) -> float:
-        """
-        Calculate transaction costs from rebalancing individual asset holdings.
-
-        Uses the log-linear cost model from Appendix C of Ulrych & Lucescu (2026):
-        ``tau = log((1 + chi) / (1 - chi))`` where ``chi = cost_bps / 10_000``.
-
-        Args:
-            drifted_weights: Drifted asset weights carried over from last period.
-            new_weights: Target asset weights after rebalancing.
-            asset_cost_bps: Cost in basis points per unit traded. ``ASSET_COST_BPS`` from ``config.py``.
-
-        Returns:
-            Total asset transaction cost as a fraction of portfolio value.
-        """
-        chi = asset_cost_bps / 10_000.0
-        tau = math.log((1 + chi) / (1 - chi))
-        return float((tau * (new_weights - drifted_weights).abs()).sum())
+        return float((cost_rate(asset_cost_bps) * (new_weights - drifted_weights).abs()).sum())
 
     def _compute_currency_transaction_costs(
         self,
@@ -263,452 +136,216 @@ class Backtester:
         base_currency: str = "USD",
         fx_cost_bps: float = FX_COST_BPS,
     ) -> float:
+        """Cost of the forward hedges and the spot conversions, the base currency excluded.
+
+        With full_forward_turnover the forwards expire each period and the whole new position is traded.
         """
-        Calculate transaction costs from currency spot conversions and forward hedges.
+        tau = cost_rate(fx_cost_bps)
 
-        Args:
-            drifted_forward_weights: Drifted forward hedge weights from last period.
-            new_forward_weights: Target forward hedge weights after rebalancing.
-            drifted_currency_weights: Drifted implied currency weights.
-            new_currency_weights: New implied currency weights.
-            full_forward_turnover: If ``True``, assume contracts expire and the
-                                   full new position is traded (no daily rebalancing).
-                                   If ``False``, only incremental adjustments are traded.
-            base_currency: Base currency (no transaction costs for spot conversions in this currency)
-            fx_cost_bps: Cost in basis points per unit traded. ``FX_COST_BPS`` from ``config.py``.
+        def exclude_base(s: pd.Series) -> pd.Series:
+            s = s.copy()
+            if base_currency in s.index:
+                s[base_currency] = 0.0
+            return s
 
-        Returns:
-            Total currency transaction cost as a fraction of portfolio value.
-        """
-        chi = fx_cost_bps / 10_000.0
-        tau = math.log((1 + chi) / (1 - chi))
-
-        def _exclude_base(s: pd.Series) -> pd.Series:
-            s_out = s.copy()
-            if base_currency in s_out.index:
-                s_out[base_currency] = 0.0
-            return s_out
-
-        new_fwds = _exclude_base(new_forward_weights)
-        drifted_fwds = _exclude_base(drifted_forward_weights)
-        new_spot = _exclude_base(new_currency_weights)
-        drifted_spot = _exclude_base(drifted_currency_weights)
-
-        if full_forward_turnover:
-            fwd_volume = new_fwds.abs()
-        else:
-            fwd_volume = (new_fwds - drifted_fwds).abs()
-
-        fwd_costs = (tau * fwd_volume).sum()
-        spot_costs = (tau * (new_spot - drifted_spot).abs()).sum()
-        return float(fwd_costs + spot_costs)
+        new_fwds, drifted_fwds = exclude_base(new_forward_weights), exclude_base(drifted_forward_weights)
+        new_spot, drifted_spot = exclude_base(new_currency_weights), exclude_base(drifted_currency_weights)
+        fwd_volume = new_fwds.abs() if full_forward_turnover else (new_fwds - drifted_fwds).abs()
+        return float((tau * fwd_volume).sum() + (tau * (new_spot - drifted_spot).abs()).sum())
 
     def compute_performance_metrics(
-        self,
-        oos_returns: pd.Series,
-        rf_series: pd.Series,
-        label: str = "Strategy",
-        trading_days: int = 252,
+        self, oos_returns: pd.Series, rf_series: pd.Series, label: str = "Strategy", trading_days: int = 252
     ) -> dict:
-        """
-        Calculate and print the backtest performace metrics.
+        """Daily ES_80 and ES_95, annualized volatility and MAD, maximum drawdown, Sharpe, Sortino and ES ratios
+        and average turnovers; printed as a table and returned.
 
-        * **ES_80** — Daily Expected Shortfall at 80 % confidence level
-        * **ES_95** — Daily Expected Shortfall at 95 % confidence level
-        * **VOL**   — Annualized volatility
-        * **MAD**   — Annualized mean absolute deviation, taken about the realized
-          out-of-sample mean of the full evaluation series
-        * **MD**    — Maximum drawdown
-        * **SR**    — Sharpe Ratio = annualized excess mean / annualized volatility
-        * **SOR**   — Sortino Ratio = annualized excess mean / downside deviation
-        * **ESR**   — Expected Shortfall Ratio = annualized excess mean / annualized ES_80
-
-        Args:
-            oos_returns: Daily out-of-sample portfolio returns.
-            label: Strategy name printed in the output table.
-            trading_days: Number of trading days per year for annualisation.
-            rf_series: Daily risk-free rate seriesaligned to *oos_returns*.
-
-        Returns:
-            Dictionary of metrics.
+        The excess return is the CAGR minus the annualized mean risk-free rate. MAD is taken about the
+        out-of-sample mean and annualized with sqrt(trading_days), like the volatility.
         """
         r = oos_returns.dropna()
         rf_daily = rf_series.reindex(r.index).ffill()
         r_excess = r - rf_daily
-
-        # Annualized excess mean 
         cagr = (1.0 + r).prod() ** (trading_days / len(r)) - 1.0
-        rf_ann = float(rf_daily.mean() if hasattr(rf_daily, "mean") else rf_daily) * trading_days
-        ann_excess_mean = cagr - rf_ann
-
-        # Annualized volatility
+        ann_excess_mean = cagr - float(rf_daily.mean()) * trading_days
         ann_vol = r.std(ddof=1) * math.sqrt(trading_days)
 
-        # Daily Expected Shortfall: mean of the worst tail returns.
-        # ES_80 averages the worst 20% of days, ES_95 the worst 5%.
-        es_threshold_80 = r.quantile(0.20)
-        daily_es_80 = -r[r <= es_threshold_80].mean()
+        daily_es_80 = -r[r <= r.quantile(0.20)].mean()
+        daily_es_95 = -r[r <= r.quantile(0.05)].mean()
         ann_es_80 = daily_es_80 * math.sqrt(trading_days)
-
-        es_threshold_95 = r.quantile(0.05)
-        daily_es_95 = -r[r <= es_threshold_95].mean()
-
-        # Mean Absolute Deviation about the realized out-of-sample mean of the full
-        # evaluation series. Annualized with sqrt(trading_days) rather than
-        # trading_days: MAD is a scale measure, so under iid returns it aggregates
-        # like a standard deviation, not like a mean. This matches ann_vol above and
-        # ann_es_80, and keeps the MAD/volatility ratio (0.7979 under normality)
-        # intact after annualisation.
-        daily_mad = float((r - r.mean()).abs().mean())
-        ann_mad = daily_mad * math.sqrt(trading_days)
-
-        # Maximum Drawdown
+        ann_mad = float((r - r.mean()).abs().mean()) * math.sqrt(trading_days)
         cum = (1.0 + r).cumprod()
-        drawdown = (cum - cum.cummax()) / cum.cummax()
-        max_drawdown = float(abs(drawdown.min()))
+        max_drawdown = float(abs(((cum - cum.cummax()) / cum.cummax()).min()))
 
-        # Sharpe Ratio
         sr = ann_excess_mean / ann_vol if ann_vol > 0 else float("nan")
-
-        # Sortino Ratio
         downside_sq = (r_excess.clip(upper=0.0) ** 2).mean()
+        sor = float("nan")
         if downside_sq > 0:
             downside_vol = math.sqrt(downside_sq) * math.sqrt(trading_days)
             sor = ann_excess_mean / downside_vol if downside_vol > 0 else float("nan")
-        else:
-            sor = float("nan")
-
-        # Expected Shortfall Ratio (based on ES_80)
         esr = ann_excess_mean / ann_es_80 if ann_es_80 > 0 else float("nan")
 
-        asset_to = (
-            round(float(np.mean(self._asset_turnovers)), 4)
-            if getattr(self, "_asset_turnovers", None)
-            else float("nan")
-        )
-        currency_to = (
-            round(float(np.mean(self._currency_turnovers)), 4)
-            if getattr(self, "_currency_turnovers", None)
-            else float("nan")
-        )
+        def average(turnovers):
+            return round(float(np.mean(turnovers)), 4) if turnovers else float("nan")
 
         metrics = {
-            "ES_80 (daily, %)":              round(daily_es_80 * 100, 4),
-            "ES_95 (daily, %)":              round(daily_es_95 * 100, 4),
-            "Volatility (ann., %)":          round(ann_vol * 100, 4),
-            "MAD (ann., %)":                 round(ann_mad * 100, 4),
-            "Max Drawdown (%)":              round(max_drawdown * 100, 4),
-            "Sharpe Ratio":                  round(sr, 4),
-            "Sortino Ratio":                 round(sor, 4),
-            "ESR":                           round(esr, 4),
-            "Avg Asset Turnover (per rebal.)":    asset_to,
-            "Avg Currency Turnover (per rebal.)": currency_to,
+            "ES_80 (daily, %)": round(daily_es_80 * 100, 4),
+            "ES_95 (daily, %)": round(daily_es_95 * 100, 4),
+            "Volatility (ann., %)": round(ann_vol * 100, 4),
+            "MAD (ann., %)": round(ann_mad * 100, 4),
+            "Max Drawdown (%)": round(max_drawdown * 100, 4),
+            "Sharpe Ratio": round(sr, 4),
+            "Sortino Ratio": round(sor, 4),
+            "ESR": round(esr, 4),
+            "Avg Asset Turnover (per rebal.)": average(getattr(self, "_asset_turnovers", None)),
+            "Avg Currency Turnover (per rebal.)": average(getattr(self, "_currency_turnovers", None)),
         }
-
-        # Print metrics in a table at the end of the backtest
         width = max(len(k) for k in metrics) + 2
-        print(f"\n{'─' * (width + 12)}")
-        print(f"  {label}")
-        print(f"{'─' * (width + 12)}")
+        rule = "─" * (width + 12)
+        print(f"\n{rule}\n  {label}\n{rule}")
         for k, v in metrics.items():
             print(f"  {k:<{width}} {v:>8}")
-        print(f"{'─' * (width + 12)}\n")
-
+        print(f"{rule}\n")
         return metrics
 
     def get_weight_records(self) -> tuple[pd.DataFrame, pd.DataFrame]:
-        """
-        Return the portfolio weights recorded at each rebalancing date.
-        """
-        asset_weights = pd.DataFrame(
-            self._asset_weight_records, columns=["date", "asset", "weight"]
-        )
-        currency_weights = pd.DataFrame(
-            self._currency_weight_records, columns=["date", "currency", "psi"]
-        )
-        return asset_weights, currency_weights
+        """Asset and currency overlay weights as solved at each rebalancing date."""
+        return (pd.DataFrame(self._asset_weight_records, columns=["date", "asset", "weight"]),
+                pd.DataFrame(self._currency_weight_records, columns=["date", "currency", "psi"]))
+
+    def _bundle(self, R_train: pd.DataFrame, R_c, F, assets: list[str], C: np.ndarray, start, end) -> dict:
+        def window(frame):
+            return frame.loc[start:end] if frame is not None else pd.DataFrame()
+        return {self.training_return_key: R_train.loc[start:end, assets], "R_c": window(R_c), "F": window(F), "C": C}
 
     def run(self, data_bundle: dict) -> pd.Series:
+        """Daily out-of-sample portfolio returns.
+
+        data_bundle holds the asset returns under asset_return_key (and the training returns under
+        training_return_key, if different), "asset_to_currency", and optionally "R_c" (excess currency
+        returns), "F" (forward premiums, used by the mean-risk optimizers) and "universe_mask".
         """
-        Execute the backtest.
-
-        Algorithm following Ulrych & Lucescu 2026, Section 4 and Appendix B.
-
-        1. Determine all rebalancing dates from the data's trading-day index.
-        2. For each rebalancing date *t* with a full ``window_years`` of history:
-
-           a. Grid-search hyperparameters on the validation window.
-           b. Refit the best optimizer on the full estimation window.
-           c. Compute asset weights (and currency overlay).
-           d. Apply transaction costs at rebalancing.
-           e. Accumulate returns over the holding period unitl next rebalance date.
-
-        Args:
-            data_bundle: Dictionary with keys:
-
-                * ``asset_return_key`` (pd.DataFrame) daily asset returns
-                  (``R_fh`` or ``R_u`` depending on ``self.asset_return_key``).
-                * ``"R_c"`` (pd.DataFrame, optional) excess currency returns.
-                * ``"F"`` (pd.DataFrame, optional) daily forward premiums aligned
-                  to ``R_c``; consumed only by mean-bearing optimizers.
-                * ``"asset_to_currency"`` (dict) RIC to currency mapping.
-                * ``"universe_mask"`` (pd.DataFrame, optional) universe mask.
-
-        Returns:
-            pd.Series of daily out of sample portfolio returns.
-        """
-
-        R_fh: pd.DataFrame = data_bundle[self.asset_return_key]
-        R_train_frame: pd.DataFrame = (
-            data_bundle[self.training_return_key]
-            if self.training_return_key != self.asset_return_key
-            else R_fh
-        )
-        R_c: Optional[pd.DataFrame] = data_bundle.get("R_c")
-        # Daily forward premiums, aligned to R_c. Optional: only the mean-bearing
-        # optimizers condition on it, every other optimizer ignores the key.
-        F: Optional[pd.DataFrame] = data_bundle.get("F")
-        asset_to_currency: dict = data_bundle["asset_to_currency"]
-        universe_mask: Optional[pd.DataFrame] = data_bundle.get("universe_mask", None)
+        R_fh = data_bundle[self.asset_return_key]
+        R_train = data_bundle[self.training_return_key] if self.training_return_key != self.asset_return_key else R_fh
+        R_c = data_bundle.get("R_c")
+        F = data_bundle.get("F")
+        asset_to_currency = data_bundle["asset_to_currency"]
+        universe_mask = data_bundle.get("universe_mask", None)
 
         all_assets = R_fh.columns.tolist()
-        if R_c is not None:
-            all_currencies = R_c.columns.tolist()
-        else:
-            # No excess-currency data (unhedged strategies): build the currency
-            # universe from the asset mapping so spot conversion costs can be
-            # computed from the implied currency allocations.
-            all_currencies = sorted(set(asset_to_currency.values()))
-        n_currencies = len(all_currencies)
-
-        # Build asset-to-currency indicator matrix C
+        # unhedged strategies have no currency returns, so the currencies come from the asset mapping
+        all_currencies = R_c.columns.tolist() if R_c is not None else sorted(set(asset_to_currency.values()))
         C = pd.DataFrame(0.0, index=all_assets, columns=all_currencies)
         for asset, ccy in asset_to_currency.items():
             if asset in C.index and ccy in C.columns:
                 C.loc[asset, ccy] = 1.0
 
-        full_date_index = R_fh.index
-        rebalance_dates = self._get_rebalance_dates(full_date_index)
+        dates = R_fh.index
+        rebalance_dates = self._get_rebalance_dates(dates)
         full_forward_turnover = self.rebalancing_frequency.strip().lower() != "daily"
-
-        # State carried across periods
         drifted_x = pd.Series(0.0, index=all_assets)
         drifted_w = pd.Series(0.0, index=all_currencies)
         drifted_phi = pd.Series(0.0, index=all_currencies)
         is_first_period = True
-
-        period_returns: list[pd.Series] = []
-        self._asset_turnovers: list[float] = []
-        self._currency_turnovers: list[float] = []
-        self._selected_params: list[dict] = []
-        self._asset_weight_records: list[dict] = []
-        self._currency_weight_records: list[dict] = []
-        data_start = full_date_index[0]
+        period_returns = []
+        self._asset_turnovers, self._currency_turnovers = [], []
+        self._selected_params, self._asset_weight_records, self._currency_weight_records = [], [], []
         n_periods = len(rebalance_dates) - 1
 
         for i in range(n_periods):
             if self._logging:
                 done = int(40 * (i + 1) / n_periods)
-                logger.info(
-                    "Backtest progress: |%s%s| %.1f%% (%d/%d)",
-                    "█" * done,
-                    "-" * (40 - done),
-                    (i + 1) / n_periods * 100,
-                    i + 1,
-                    n_periods,
-                )
-
-            t = rebalance_dates[i]
-            t_next = rebalance_dates[i + 1]
-
-            # Require a full window_years of history
-            if pd.Timestamp(t) - pd.DateOffset(years=self.window_years) < data_start:
+                logger.info("Backtest progress: |%s%s| %.1f%% (%d/%d)", "█" * done, "-" * (40 - done),
+                            (i + 1) / n_periods * 100, i + 1, n_periods)
+            t, t_next = rebalance_dates[i], rebalance_dates[i + 1]
+            if pd.Timestamp(t) - pd.DateOffset(years=self.window_years) < dates[0]:
                 continue
-
             try:
-                splits = self._get_estimation_and_validation_splits(full_date_index, t, t_next)
+                s = self._get_estimation_and_validation_splits(dates, t, t_next)
             except ValueError:
                 continue
 
-            train_start = splits["train_start"]
-            train_end = splits["train_end"]
-            validation_start = splits["validation_start"]
-            validation_end = splits["validation_end"]
-            full_est_start = splits["full_estimation_start"]
-            full_est_end = splits["full_estimation_end"]
-            holding_start = splits["holding_start"]
-            holding_end = splits["holding_end"]
-
-            # Filter investable universe. First mask then completeness check
+            # the investable universe: in the mask at t, with a complete history over the estimation window
+            full_window = slice(s["full_estimation_start"], s["full_estimation_end"])
             if universe_mask is not None:
-                mask_row = (
-                    universe_mask.loc[t]
-                    if t in universe_mask.index
-                    else pd.Series(dtype=float)
-                )
-                current_universe = [a for a in mask_row[mask_row.notna()].index if a in R_train_frame.columns]
-                if not current_universe:
+                mask_row = universe_mask.loc[t] if t in universe_mask.index else pd.Series(dtype=float)
+                current = [a for a in mask_row[mask_row.notna()].index if a in R_train.columns]
+                if not current:
                     continue
-                full_est_slice = R_train_frame.loc[full_est_start:full_est_end, current_universe]
+                full_slice = R_train.loc[full_window, current]
             else:
-                full_est_slice = R_train_frame.loc[full_est_start:full_est_end]
-
+                full_slice = R_train.loc[full_window]
             try:
-                valid_assets = self._filter_universe(full_est_slice)
+                assets = self._filter_universe(full_slice)
             except ValueError:
                 continue
+            C_sub = C.loc[assets].values
 
-            R_c_train = R_c.loc[train_start:train_end] if R_c is not None else pd.DataFrame()
-            R_c_val = R_c.loc[validation_start:validation_end] if R_c is not None else pd.DataFrame()
-            R_c_full = R_c.loc[full_est_start:full_est_end] if R_c is not None else pd.DataFrame()
-            F_train = F.loc[train_start:train_end] if F is not None else pd.DataFrame()
-            F_val = F.loc[validation_start:validation_end] if F is not None else pd.DataFrame()
-            F_full = F.loc[full_est_start:full_est_end] if F is not None else pd.DataFrame()
-            C_sub = C.loc[valid_assets].values 
-
-            # Hyperparameter grid search 
-            param_combinations = self._generate_grid()
-            best_params = param_combinations[0]
-            best_score = float("inf")
-
+            grid = self._generate_grid()
+            best_params, best_score = grid[0], float("inf")
             if self.param_grid:
-                for params in param_combinations:
+                for params in grid:
                     opt = self.optimizer(hyperparams=params)
-                    train_bundle_inner = {
-                        self.training_return_key: R_train_frame.loc[train_start:train_end, valid_assets],
-                        "R_c": R_c_train,
-                        "F": F_train,
-                        "C": C_sub,
-                    }
-                    opt.fit(train_bundle_inner)
-                    candidate_weights = opt.optimize()
+                    opt.fit(self._bundle(R_train, R_c, F, assets, C_sub, s["train_start"], s["train_end"]))
+                    candidate = opt.optimize()
+                    score = opt.score(candidate, self._bundle(R_train, R_c, F, assets, C_sub,
+                                                              s["validation_start"], s["validation_end"]))
+                    if score < best_score:
+                        best_score, best_params = score, params
+            self._selected_params.append({"date": t, "n_assets": len(assets), "val_score": best_score, **best_params})
 
-                    val_bundle_inner = {
-                        self.training_return_key: R_train_frame.loc[validation_start:validation_end, valid_assets],
-                        "R_c": R_c_val,
-                        "F": F_val,
-                        "C": C_sub,
-                    }
-                    s = opt.score(candidate_weights, val_bundle_inner)
-                    if s < best_score:
-                        best_score = s
-                        best_params = params
-
-            self._selected_params.append({
-                    "date": t,
-                    "n_assets": len(valid_assets),
-                    "val_score": best_score,
-                    **best_params,
-                })
-
-            # Refit on full estimation window with best hyperparameters
-            opt_final = self.optimizer(hyperparams=best_params)
-            full_train_bundle = {
-                self.training_return_key: R_train_frame.loc[full_est_start:full_est_end, valid_assets],
-                "R_c": R_c_full,
-                "F": F_full,
-                "C": C_sub,
-            }
-            opt_final.fit(full_train_bundle)
-            raw_weights = opt_final.optimize()
-
-            # Parse optimizer output into asset weights x_t and forward hedge weights psi_t
-            if isinstance(raw_weights, dict):
-                x_sub = np.asarray(raw_weights["x"], dtype=float)
-                psi_sub = np.asarray(raw_weights["psi"], dtype=float)
+            opt = self.optimizer(hyperparams=best_params)
+            opt.fit(self._bundle(R_train, R_c, F, assets, C_sub, s["full_estimation_start"], s["full_estimation_end"]))
+            raw = opt.optimize()
+            if isinstance(raw, dict):
+                x_sub, psi_sub = np.asarray(raw["x"], dtype=float), np.asarray(raw["psi"], dtype=float)
             else:
-                x_sub = np.asarray(raw_weights, dtype=float)
-                psi_sub = np.zeros(n_currencies, dtype=float)
-
-            # Align to full universe
+                x_sub, psi_sub = np.asarray(raw, dtype=float), np.zeros(len(all_currencies), dtype=float)
             x_t = pd.Series(0.0, index=all_assets)
-            x_t[valid_assets] = x_sub
+            x_t[assets] = x_sub
             psi_t = pd.Series(psi_sub, index=all_currencies)
+            self._asset_weight_records += [{"date": t, "asset": a, "weight": float(w)} for a, w in zip(assets, x_sub)]
+            self._currency_weight_records += [{"date": t, "currency": c, "psi": float(p)}
+                                              for c, p in zip(all_currencies, psi_sub)]
 
-            # Record the solver output for the weights, before any cost or drift adjustment.
-            for asset, weight in zip(valid_assets, x_sub):
-                self._asset_weight_records.append(
-                    {"date": t, "asset": asset, "weight": float(weight)}
-                )
-            for currency, overlay in zip(all_currencies, psi_sub):
-                self._currency_weight_records.append(
-                    {"date": t, "currency": currency, "psi": float(overlay)}
-                )
-
-            # Implied currency exposure and forward hedge positions.
-            # Unhedged strategies hold no forward contracts: phi stays zero,
-            # so the currency cost below reduces to spot conversions on the
-            # change in currency allocations.
+            # currency exposure w and forward positions phi; unhedged strategies hold no forwards
             w_t = C.T @ x_t
-            if self._is_unhedged:
-                phi_t = pd.Series(0.0, index=all_currencies)
-            else:
-                phi_t = w_t - psi_t
+            phi_t = pd.Series(0.0, index=all_currencies) if self._is_unhedged else w_t - psi_t
 
-            #Transaction costs
             if is_first_period:
-                asset_tc = 0.0
-                currency_tc = 0.0
+                tc_total = 0.0
                 is_first_period = False
             else:
                 asset_tc = self._compute_asset_transaction_costs(drifted_x, x_t)
                 currency_tc = self._compute_currency_transaction_costs(
-                    drifted_forward_weights=drifted_phi,
-                    new_forward_weights=phi_t,
-                    drifted_currency_weights=drifted_w,
-                    new_currency_weights=w_t,
-                    full_forward_turnover=full_forward_turnover,
-                )
-                # Track raw turnover (no cost scaling) for performance metrics.
-                # Hedged: forward notional traded. Unhedged: spot conversion
-                # volume implied by the change in currency allocations.
+                    drifted_forward_weights=drifted_phi, new_forward_weights=phi_t,
+                    drifted_currency_weights=drifted_w, new_currency_weights=w_t,
+                    full_forward_turnover=full_forward_turnover)
+                tc_total = asset_tc + currency_tc
+                # turnover: forward notional when hedged, spot conversions when unhedged
                 self._asset_turnovers.append(float((x_t - drifted_x).abs().sum()))
-                if self._is_unhedged:
-                    spot_delta = (w_t - drifted_w).drop("USD", errors="ignore")
-                    self._currency_turnovers.append(float(spot_delta.abs().sum()))
-                else:
-                    phi_t_non_base = phi_t.drop("USD", errors="ignore")
-                    self._currency_turnovers.append(float(phi_t_non_base.abs().sum()))
-            tc_total = asset_tc + currency_tc
+                traded = (w_t - drifted_w) if self._is_unhedged else phi_t
+                self._currency_turnovers.append(float(traded.drop("USD", errors="ignore").abs().sum()))
 
-            # Returns during holding period 
-            R_fh_hold = R_fh.loc[holding_start:holding_end, valid_assets].fillna(0.0)
-            R_c_hold = (
-                R_c.loc[holding_start:holding_end].fillna(0.0)
-                if R_c is not None
-                else pd.DataFrame(0.0, index=R_fh_hold.index, columns=all_currencies)
-            )
-
-            x_vec = x_t[valid_assets].values     
-            psi_vec = psi_t.values         
-
-            asset_cum_growth = (1.0 + R_fh_hold).cumprod(axis=0)
-            asset_wealth = asset_cum_growth.to_numpy() @ x_vec  
-            currency_cum_pnl = (R_c_hold.to_numpy() @ psi_vec).cumsum() 
-            total_wealth = asset_wealth + currency_cum_pnl 
-
+            R_fh_hold = R_fh.loc[s["holding_start"]:s["holding_end"], assets].fillna(0.0)
+            R_c_hold = (R_c.loc[s["holding_start"]:s["holding_end"]].fillna(0.0) if R_c is not None
+                        else pd.DataFrame(0.0, index=R_fh_hold.index, columns=all_currencies))
+            x_vec, psi_vec = x_t[assets].values, psi_t.values
+            asset_growth = (1.0 + R_fh_hold).cumprod(axis=0)
+            wealth = asset_growth.to_numpy() @ x_vec + (R_c_hold.to_numpy() @ psi_vec).cumsum()
             period_ret = pd.Series(0.0, index=R_fh_hold.index, dtype=float)
-            period_ret.iloc[0] = total_wealth[0] - 1.0 - tc_total
+            period_ret.iloc[0] = wealth[0] - 1.0 - tc_total
             if len(period_ret) > 1:
-                period_ret.iloc[1:] = total_wealth[1:] / total_wealth[:-1] - 1.0
-
-            # Update drifted weights for next period
-            end_growth = asset_cum_growth.iloc[-1].to_numpy()
-            unnorm_x = end_growth * x_vec
-            total_asset_value = unnorm_x.sum()
-            drifted_x_values = unnorm_x / total_asset_value if total_asset_value > 0 else x_vec
-
-            drifted_x = pd.Series(0.0, index=all_assets)
-            drifted_x[valid_assets] = drifted_x_values
-            drifted_w = C.T @ drifted_x
-            if self._is_unhedged:
-                drifted_phi = pd.Series(0.0, index=all_currencies)
-            else:
-                drifted_phi = drifted_w - psi_t  #psi_t does not drift. #TODO: Reset it each period
-
+                period_ret.iloc[1:] = wealth[1:] / wealth[:-1] - 1.0
             period_returns.append(period_ret)
+
+            # the assets drift with their returns over the holding period, the overlay psi does not
+            unnorm_x = asset_growth.iloc[-1].to_numpy() * x_vec
+            total = unnorm_x.sum()
+            drifted_x = pd.Series(0.0, index=all_assets)
+            drifted_x[assets] = unnorm_x / total if total > 0 else x_vec
+            drifted_w = C.T @ drifted_x
+            drifted_phi = pd.Series(0.0, index=all_currencies) if self._is_unhedged else drifted_w - psi_t
 
         if not period_returns:
             return pd.Series(dtype=float)
-
         return pd.concat(period_returns).sort_index()
