@@ -1,81 +1,9 @@
 #!/bin/bash
-# Submit the level-sweep joint-vs-overlay gap experiment to the Euler cluster.
-#
-# --es or --soes picks the measure; there is no default, because the two write to
-# separate shard directories and a silent default would fill the wrong one.
-#
-# Runs code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py as one job per
-# cell: 14 confidence levels (50/60/70, then 2.5-point steps from 72.5 to 97.5)
-# x three universes (10, 50, 100) = 42 independent jobs, each solving the
-# unregularized ES joint and overlay programs plus the 1/N control at ~91 quarterly
-# rebalancing dates.
-#
-#   ./run_gap_analysis_levels.sh --es --levels "72.5 75 77.5 82.5 85 87.5 92.5 97.5"
-#
-# is the submission that adds the dense grid to an existing coarse sweep: 24 jobs.
-# Cells whose shard already exists in the output directory are skipped unless
-# --force, so re-running after a partial sweep submits only what is missing.
-#
-# The cells are independent, so the jobs run concurrently and share one output
-# directory. Each writes gaps_unregularized_level<L>_top<N>.csv and touches no
-# other file, so there is no write race and nothing to merge afterwards. A cell
-# that finishes is durable: if a job hits its wall-clock limit the shards already
-# written survive, and resubmitting that one cell is enough.
-#
-# Every cell reuses the settings its production backtest held, read via
-# results/runs/top_runs_es_at_different_levels.csv. All 36 cells of that table are
-# filled and verified against the run configs, so every job here is submittable.
-# The Python script re-checks each run's recorded alpha against the level of the
-# cell claiming it, because the table's rows are named <strategy>_level_<L> while
-# the run directories are named after the optimizer file alone -- a transposed run
-# number is not otherwise detectable.
-#
-# Node allocation and tiers
-# -------------------------
-# Time and memory are tiered by universe, reusing the tiers measured for
-# run_gap_analysis_demeaned.sh: ES at top-10 took ~5 min under Clarabel, ~35 min
-# at top-50 and ~75 min extrapolated at top-100, with cost scaling about N^1.3 in
-# the asset count (medians 127 / 584 / 1051), and measured RSS of 1.3 GB at top-50
-# and 2.0 GB at top-100. Gurobi should beat those timings. The tiers carry roughly
-# 8x headroom.
-#
-# The level does not change the cost: the ES program is an LP with q + N + 1
-# variables and q constraints whatever alpha is, and only the 1/(q(1-alpha))
-# coefficient on the objective moves. So one tier per universe covers all six
-# levels, and the 18 jobs are 6 identical copies of the demeaned script's 3 ES
-# cells.
-#
-# A note on what the top-level cells mean
-# ---------------------------------------
-# f_out is scored on the one quarter actually held (65 trading days, measured), so
-# the tail it averages thins as the level rises: 32 observations at level 50, 13 at
-# level 80, 6 at level 90, 3 at level 95 and ~2 at level 97.5. Those intervals will
-# be wide for that reason alone. Each cell therefore also scores a second horizon,
-# the following year (~252 days), reported as gap_out_1y alongside gap_out; it
-# lifts the level-97.5 tail from ~2 observations to ~6 and is the arm to read when
-# the quarterly figure disagrees with the production backtests at the top end. Both
-# are in gap_summary.csv, with the median realized tail count of each.
-#
-# The tables and figures are built separately, once the cells have landed:
+# Submit code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py to the Euler cluster, one job per cell
+# (14 levels x top-10, 50, 100). Cells with a shard are skipped unless --force. Afterwards:
 #   python code/analysis/in_sample_vs_out_of_sample_at_diff_levels.py --es --plot-only
 #
-# Usage:
-#   ./run_gap_analysis_levels.sh --es|--soes [options]
-#
-# Options:
-#   --level N            Submit one level alone, e.g. 72.5 (default: all 14)
-#   --levels "A B C"     Submit this set of levels
-#   --force              Submit cells whose shard already exists
-#   --universe N         Submit top-10, 50 or 100 alone (default: all three)
-#   --time HH:MM:SS      Override the per-universe time limit (max 720:00:00)
-#   --cpus N             CPUs per task (default: 4 -> Gurobi runs 3 threads)
-#   --mem-per-cpu SIZE   Override the per-universe memory tier
-#   --log-level LEVEL    DEBUG|INFO|WARNING (passthrough). DEBUG logs one line
-#                        per rebalancing date, which is the only way to see
-#                        progress inside a cell.
-#   --out-dir DIR        Shared output directory. Relative paths resolve against
-#                        the repo root, not the job's working directory.
-#   --dry-run            Print what would be submitted and exit.
+# Usage: ./run_gap_analysis_levels.sh --es|--soes [options]; see --help.
 
 set -euo pipefail
 
@@ -135,9 +63,6 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# No default measure: an 84-cell sweep is too expensive to start on the wrong one
-# by omission, and the two measures write to separate directories, so a silent
-# default would quietly fill the other measure's.
 if [[ -z "$MEASURE" ]]; then
     echo "Error: one of --es or --soes is required."
     exit 1
@@ -184,28 +109,25 @@ if [[ -n "$TIME_LIMIT" ]]; then
     fi
 fi
 
-# Directory paths
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 ANALYSIS_DIR="$ROOT_DIR/code/analysis"
 LOGS_DIR="$ROOT_DIR/logs"
 mkdir -p "$LOGS_DIR"
 
-# run_backtest.sh expects code/.venv, submit_job.sh expects .venv;
-# take whichever is actually present so this works in either layout.
+# the virtual environment is code/.venv, or .venv at the repo root
 if [[ -f "$ROOT_DIR/code/.venv/bin/activate" ]]; then
     VENV="$ROOT_DIR/code/.venv/bin/activate"
 else
     VENV="$ROOT_DIR/.venv/bin/activate"
 fi
 
-# The job runs with --chdir code/analysis, so a relative --out-dir would land in
-# code/analysis/<dir>. Resolve it against the repo root instead.
+# the job runs in code/analysis, so a relative --out-dir is resolved against the repo root
 if [[ -n "$OUT_DIR" ]]; then
     [[ "$OUT_DIR" = /* ]] || OUT_DIR="$ROOT_DIR/$OUT_DIR"
     PASSTHROUGH+=("--out-dir" "$OUT_DIR")
 fi
 
-# Per-universe defaults, overridden by --time / --mem-per-cpu when given.
+# per-universe defaults, overridden by --time and --mem-per-cpu
 tier_time() {
     case "$1" in
         10)  echo "04:00:00" ;;
@@ -222,7 +144,7 @@ tier_mem() {
     esac
 }
 
-# Heaviest universe first, so the long poles start before the short jobs.
+# heaviest universe first
 IFS=$'\n' read -r -d '' -a UNIVERSES < <(printf '%s\n' "${UNIVERSES[@]}" | sort -rn && printf '\0')
 
 SHARD_DIR="${OUT_DIR:-$ROOT_DIR/results/in_sample_vs_out_of_sample_${MEASURE}_at_diff_levels}"

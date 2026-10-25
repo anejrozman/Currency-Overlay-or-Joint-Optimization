@@ -1,26 +1,7 @@
 #!/bin/bash
-# Submit one backtest to the Euler cluster.
+# Submit one backtest (code/scripts/run_strategy.py) to the Euler cluster.
 #
-# Runs a single strategy on a single universe over its parameter grid (defined in
-# code/src/portfolio_backtest/backtest_config.py), mirroring the local
-# code/scripts/run_strategy.py interface but wrapped in an sbatch submission.
-#
-# Usage:
-#   ./run_backtest.sh --strategy <name> --universe <10|50|100> [options]
-#
-# Options:
-#   --strategy NAME     Strategy in strategy_registry.py (required)
-#   --universe N        Top-N universe: 10, 50, or 100 (default: 10)
-#   --time HH:MM:SS     SLURM time limit (default: 24:00:00, max 720:00:00)
-#   --cpus N            CPUs per task (default: 4 -> Gurobi runs 3 threads)
-#   --mem-per-cpu SIZE  Memory per CPU, e.g. 4G (default: 4G)
-#   --no-grid           Skip grid search (passthrough to run_strategy.py)
-#   --alpha A           Pin the ES level in the strategy's grid, e.g. 0.95 (passthrough).
-#                       Also tags the job name and log files with the level.
-#   --no-demean         Pin demean=False in the strategy's grid (passthrough)
-#   --window-years N    Override estimation window (passthrough)
-#   --val-years N       Override validation window (passthrough)
-#   --log-level LEVEL   DEBUG|INFO|WARNING (passthrough)
+# Usage: ./run_backtest.sh --strategy <name> --universe <10|50|100> [options]; see --help.
 
 set -euo pipefail
 
@@ -89,17 +70,13 @@ if (( ${BASH_REMATCH[1]} > MAX_HOURS )); then
     exit 1
 fi
 
-# Directory paths
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 SCRIPTS_DIR="$ROOT_DIR/code/scripts"
 LOGS_DIR="$ROOT_DIR/logs"
 VENV="$ROOT_DIR/code/.venv/bin/activate" 
 mkdir -p "$LOGS_DIR"
 
-# Tag the job with the ES level when one is pinned (0.95 -> a95, 0.725 -> a72.5), so
-# squeue and the log filenames stay distinguishable while several levels of one
-# strategy are queued. %g rather than %d: truncating would collapse 0.725 and 0.72
-# onto the same tag, and both are levels this sweep can be asked to run.
+# tag the job with a pinned ES level (0.725 -> a72.5); %g keeps 0.725 and 0.72 apart
 if [[ -n "$ALPHA" ]]; then
     if [[ ! "$ALPHA" =~ ^0?\.[0-9]+$ ]]; then
         echo "Error: --alpha must be a decimal strictly between 0 and 1 (e.g. 0.95)."
