@@ -95,7 +95,7 @@ so that the portfolio optimization problem under semi-variance becomes
     \bm{x}_t^* = \argmin_{\bm{x}_t} \frac{1}{q} \sum_{k=1}^q \bigl( (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+ \bigr)^2,
     \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
 \end{equation}
-Each summand is only piecewise quadratic in $\bm{x}_t$. Following \cite{Markowitz1993}, and as for Expected Shortfall in \Cref{app:lp_es},
+Each summand is only piecewise quadratic in $\bm{x}_t$. Following Markowitz et al.~\cite{Markowitz1993}, and as for Expected Shortfall in \Cref{app:lp_es},
 we modify it by introducing, for each observation $k$, an auxiliary variable
 $u_k \ge 0$ subject to
 \begin{equation} \label{eq:svar_slack}

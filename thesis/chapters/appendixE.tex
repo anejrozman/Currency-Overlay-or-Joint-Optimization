@@ -39,7 +39,7 @@ $\bm{x} \in \mathbb{R}^n$. Line 12 states the objective with the atom \texttt{cp
 elementwise constraints, and line 14 combines them into a problem. Line 17 solves the problem with Gurobi set as the solver, and line 18 prints the 
 optimal solution stored in \texttt{x.value} as a NumPy array. 
 
-\begin{lstlisting}[style=python, caption={Least-squares problem with box constraints in CVXPY, adapted from \cite{CVXPYDocs}.}, label={lst:cvxpy-least-squares}]
+\begin{lstlisting}[style=python, caption={Least-squares problem with box constraints in CVXPY, adapted from the CVXPY documentation \cite{CVXPYDocs}.}, label={lst:cvxpy-least-squares}]
 import cvxpy as cp
 import numpy as np
 
