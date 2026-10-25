@@ -137,7 +137,7 @@ average correlations typical of stock returns, the target is positive definite, 
 positive definite whenever $\hat{\delta} > 0$, even when $N \ge q$.
 
 The variance program replaces $\bm{\Sigma}_t$ by the Ledoit--Wolf estimate
-\begin{equation*} \label{eq:variance-program}
+\begin{equation*}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \bm{x}_t^\top \hat{\bm{\Sigma}}_t \bm{x}_t, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation*}
 and we write it in the standard form of a quadratic program in Appendix~\ref{app:mv_var_qp}.
@@ -719,13 +719,13 @@ $\bm{\mu}^{\text{all}}_t = [(\bm{\mu}^{fh}_t)^\top, (\bm{\mu}^c_t)^\top]^\top \i
 $\bm{\theta}_t^\top \bm{\mu}^{\text{all}}_t$ is the expected hedged portfolio return. Each program subtracts the
 expected return from the objective. We scale the expected return by $1/\gamma$, where $\gamma > 0$ is the risk
 aversion coefficient. The asset step \eqref{eq:sequential-asset} becomes
-\begin{equation}\label{eq:mean-sequential-asset}
+\begin{equation}
     \bm{x}_t^* = \argmin_{\bm{x}_t \in \mathcal{X}} \Bigl\{ \rho\bigl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \bigr)
     - \frac{1}{\gamma}\, \bm{x}_t^\top \bm{\mu}^{fh}_t
     + \lambda_1^a \|\bm{x}_t\|_1 + \lambda_2^a \|\bm{x}_t\|_2^2 \Bigr\},
 \end{equation}
 and the currency step \eqref{eq:sequential-currency} becomes
-\begin{equation}\label{eq:mean-sequential-currency}
+\begin{equation}
 \begin{gathered}
     \begin{aligned}
     \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t \in \R^M} \Bigl\{ &
@@ -738,7 +738,7 @@ and the currency step \eqref{eq:sequential-currency} becomes
 \end{equation}
 where the expected return of the fixed asset portfolio is a constant and is removed from the objective. The joint program
 \eqref{eq:joint} becomes
-\begin{equation}\label{eq:mean-joint}
+\begin{equation}
 \begin{gathered}
     \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \Bigl\{ \rho\bigl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \bigr)
     - \frac{1}{\gamma}\, \bm{\theta}_t^\top \bm{\mu}^{\text{all}}_t

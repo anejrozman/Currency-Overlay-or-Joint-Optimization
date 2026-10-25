@@ -509,7 +509,7 @@ and the penalty matrix
 \end{equation*}
 The currency overlay optimization under second-order Expected Shortfall then becomes a second-order cone program with
 a convex quadratic objective
-\begin{equation} \label{eq:sep_curr_socp}
+\begin{equation}
 \begin{aligned}
     \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
      \tilde{\bm{c}}^\top \tilde{\bm{\psi}}_t + \tilde{\bm{\psi}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\psi}}_t, \\[2pt]
@@ -672,7 +672,7 @@ and the penalty matrix
 \end{equation*}
 The joint portfolio optimization problem under second-order Expected Shortfall then becomes a second-order cone
 program with a convex quadratic objective
-\begin{equation} \label{eq:joint_socp}
+\begin{equation}
 \begin{aligned}
     \tilde{\bm{\theta}}_t^* &= \argmin_{\tilde{\bm{\theta}}_t} \quad
     \tilde{\bm{c}}^\top \tilde{\bm{\theta}}_t + \tilde{\bm{\theta}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{\theta}}_t, \\[2pt]
@@ -699,7 +699,7 @@ added for the variable $s$.
 The programs of Sections~\ref{app:linear-program-representation}--\ref{app:joint-optimization} minimize the risk
 measure only. A mean-risk program subtracts the expected portfolio return, scaled by $1/\gamma$, from the risk measure, where
 $\gamma > 0$ is the risk aversion coefficient. For problem \eqref{eq:risk_min}, this gives
-\begin{equation} \label{eq:mean_es}
+\begin{equation}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr)
     - \frac{1}{\gamma}\, \bm{\mu}_t^\top \bm{x}_t \right\}, \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,
 \end{equation}
@@ -714,7 +714,7 @@ and the currency means are set to the negative forward premium $-\bm{f}_t$. Both
 \Cref{chap:optimization-framework}.
 
 In the sequential approach, the asset step and the currency step become
-\begin{equation} \label{eq:mean_sep_asset}
+\begin{equation}
 \begin{gathered}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \left\{ \rho_\beta\biggl( \bm{x}_t^\top \bm{R}^{fh}_{t+1} \biggr)
     - \frac{1}{\gamma}\, (\bm{\mu}^{fh}_t)^\top \bm{x}_t
@@ -722,7 +722,7 @@ In the sequential approach, the asset step and the currency step become
     \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1,\ \|\bm{x}_t\|_1 \le \ell^a,
 \end{gathered}
 \end{equation}
-\begin{equation} \label{eq:mean_sep_curr}
+\begin{equation}
 \begin{gathered}
     \begin{aligned}
     \bm{\psi}_t^* \mid \bm{x}_t^* = \argmin_{\bm{\psi}_t} \biggl\{ &
@@ -735,7 +735,7 @@ In the sequential approach, the asset step and the currency step become
 \end{equation}
 In the joint
 approach, problem \eqref{eq:joint_obj} becomes
-\begin{equation} \label{eq:mean_joint}
+\begin{equation}
 \begin{gathered}
     \bm{\theta}_t^* = \argmin_{\bm{\theta}_t} \left\{ \rho_\beta\biggl( \bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1} \biggr)
     - \frac{1}{\gamma}\, (\bm{\mu}^{\text{all}}_t)^\top \bm{\theta}_t

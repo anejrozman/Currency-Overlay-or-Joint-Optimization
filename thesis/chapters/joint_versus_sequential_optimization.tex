@@ -47,7 +47,6 @@ small numerical tolerance. The solver configuration is given in \Cref{sec:numeri
 We define the in-sample gap between the two optimizers as 
 \begin{equation*}
 g_t^{\text{IS}} \coloneqq \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}) - \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t}) \;\geq\; 0 .
-\label{eq:gap-in-sample}
 \end{equation*}
 The in-sample gap is non-negative and measures the advantage of joint optimization over sequential 
 optimization in the lookback window. Naturally, the question we are interested in is whether this advantage is 
@@ -64,7 +63,6 @@ Then the out-of-sample gap is defined as
 g_t^{\text{OOS}} &\coloneqq \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t}) - \rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{J,t}) \nonumber \\
         &= \underbrace{\big[\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t}) - \rho_t^{\text{IS}}(\hat{\bm{\theta}}_{J,t})\big]}_{g_t^{\text{IS}} \,\geq\, 0}
 \;-\; \underbrace{\big[\epsilon_t(\hat{\bm{\theta}}_{J,t}) - \epsilon_t(\hat{\bm{\theta}}_{O,t})\big]}_{\Delta\epsilon_t}.
-\label{eq:gap-decomposition}
 \end{align*}
 
 The difference between the out-of-sample errors $\Delta\epsilon_t$ can be either positive or negative. For the variance, the in-sample risk of an optimized portfolio is known to understate its true risk, and the more
@@ -86,7 +84,6 @@ gives $\rho_t^{\text{IS}}$ and $\rho_t^{\text{OOS}}$ for each of the two program
 \tilde g_t^{\text{IS}} \coloneqq \frac{g_t^{\text{IS}}}{\rho_t^{\text{IS}}(\hat{\bm{\theta}}_{O,t})}
 \qquad \text{and} \qquad
 \tilde g_t^{\text{OOS}} \coloneqq \frac{g_t^{\text{OOS}}}{\rho_t^{\text{OOS}}(\hat{\bm{\theta}}_{O,t})},
-\label{eq:gap-relative}
 \end{equation*}
 so they are to be interpreted as the risk reduction achieved by the joint optimizer over the overlay optimizer, expressed as a percentage of the latter's risk. For each risk measure and universe size we report the mean of the relative gaps across the rebalancing dates together with a 95\% bootstrap confidence interval based on $10{,}000$ resamples.
 
