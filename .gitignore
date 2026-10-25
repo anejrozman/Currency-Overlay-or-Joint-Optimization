@@ -33,3 +33,20 @@ code/scripts/compare_table1.py
 presentations/
 
 CLAUDE.md
+# LaTeX build artifacts (thesis.pdf is kept)
+thesis/**/*.aux
+thesis/**/*.bbl
+thesis/**/*.blg
+thesis/**/*.dvi
+thesis/**/*.fdb_latexmk
+thesis/**/*.fls
+thesis/**/*.lof
+thesis/**/*.log
+thesis/**/*.lot
+thesis/**/*.out
+thesis/**/*.synctex.gz
+thesis/**/*.thm
+thesis/**/*.toc
+thesis/thesis.ps
+thesis/build/
+texput.log
