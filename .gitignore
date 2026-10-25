@@ -33,6 +33,7 @@ code/scripts/compare_table1.py
 presentations/
 
 CLAUDE.md
+.claude/
 # LaTeX build artifacts (thesis.pdf is kept)
 thesis/**/*.aux
 thesis/**/*.bbl
