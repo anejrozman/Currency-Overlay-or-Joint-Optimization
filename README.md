@@ -1,39 +1,39 @@
 # Currency Overlay or Joint Optimization?
 
-Code, results and LaTeX sources of the MSc thesis *Currency Overlay or Joint Optimization? An Out-of-Sample Comparison across Risk Measures* (MSc Quantitative Finance, ETH Zürich and University of Zürich). Supervisor: Prof. Patrick Cheridito. Co-supervisor: Dr. Urban Ulrych.
+Code, results and LaTeX sources of the MSc thesis *Currency Overlay or Joint Optimization? An Out-of-Sample Comparison across Risk Measures* (MSc Quantitative Finance, ETH Zürich and University of Zürich).
 
 ## Overview
 
 An international investor can manage currency risk in two ways: choose the asset weights first and add a currency overlay on top (sequential optimization), or choose asset and currency weights together in one program (joint optimization). The thesis compares the two out of sample under five risk measures: variance, semi-variance, mean absolute deviation, Expected Shortfall and second-order Expected Shortfall.
 
-Each measure is implemented in an unregularized, a regularized (L1 and L2 penalties) and a mean-risk version, alongside an equally weighted portfolio and the fully hedged and unhedged asset-only benchmarks (ASSETS-FULL and ASSETS-ZERO). The portfolios are built from the 10, 50 or 100 largest stocks of 14 economies and are backtested walk-forward with quarterly rebalancing, a ten-year estimation window and transaction costs. A second analysis measures how much of the joint program's in-sample advantage survives out of sample.
+Each measure is implemented in an unregularized, a regularized, and a mean-risk version, alongside an equally weighted portfolio and the fully hedged and unhedged asset-only benchmarks. The portfolios are built from the 10, 50 or 100 largest stocks of 14 economies and are backtested walk-forward with quarterly rebalancing, a ten-year estimation window and transaction costs. A second analysis measures how much of the joint program's in-sample advantage survives out of sample.
 
 The framework follows Ulrych & Burkhardt (2023), [*Sparse and stable international portfolio optimization and currency risk management*](https://www.sciencedirect.com/science/article/pii/S026156062300150X), and Lucescu & Ulrych (2026), *Regularized Multi-Currency Expected Shortfall Portfolios*, and extends it from mean-variance and Expected Shortfall to the other risk measures.
 
 ## Repository structure
 
 - `code/`: the Python code, installed as the `portfolio_backtest` package.
-  - `src/portfolio_backtest/`: the package.
+  - `src/portfolio_backtest/`: 
     - `backtest/`: the walk-forward `Backtester` and the `DataHandler` that loads its inputs.
-    - `optimizers/`: one file per optimization program, such as `es_joint.py` or `reg_mv_curr_overlay.py`.
+    - `optimizers/`: one file per optimization program.
     - `strategy_registry.py`: the strategies that can be run, each linking an optimizer to its return series and backtest configuration.
     - `backtest_config.py`: the estimation window, rebalancing frequency and hyperparameter grid of every strategy.
-    - `data_pipeline/`: turns the raw Datastream exports into the processed return files.
-    - `utils/`: return formulas, estimators, the block bootstrap and file helpers.
-  - `scripts/`: `run_strategy.py` runs one backtest. `collect_level_runs.py` records the runs of the confidence-level sweep, and `euler/` holds the scripts that submit backtests and analyses to the ETH Euler cluster.
-  - `analysis/`: the scripts that produce the figures and tables of the thesis from the backtest results, plus two exploratory notebooks.
-- `data/`: empty in the repository, see [Data](#2-data).
-- `results/`: everything the code produced.
+    - `data_pipeline/`: turns the raw Datastream data into the processed return files.
+    - `utils/`: return formulas, estimators, and file helpers.
+  - `scripts/`: `run_strategy.py` runs one backtest. `euler/` holds the scripts that submit backtests and analyses to the ETH Euler Cluster.
+  - `analysis/`: the scripts that produce the figures and tables of the thesis from the backtest results, plus exploratory notebooks.
+- `data/`: see [Data](#2-data).
+- `results/`:
   - `runs/`: one directory per backtest, `runs/<optimizer>/run_<N>/`, and the `top_runs*.csv` files that record which run each analysis uses.
-  - `figures/` and the other folders: the outputs of the analysis scripts.
-- `logs/`: the Euler job logs of the backtests, from which the runtime figures are drawn.
+  - `figures/` the outputs of the analysis scripts.
+- `logs/`: the Euler Cluster job logs of the backtests.
 - `thesis/`: the LaTeX sources and the compiled `thesis.pdf`.
 
 ## Reproducing the results
 
 ### 1. Installation
 
-The code needs Python 3.12 and, to reproduce the results exactly, a [Gurobi](https://www.gurobi.com) license (free for academic use). Without Gurobi, some optimizers fall back to the open-source Clarabel solver, which gives slightly different weights, while others require Gurobi.
+The code needs Python 3.12 and a [Gurobi](https://www.gurobi.com) license (free for academic use). Without Gurobi, the optimizers fall back to the open-source Clarabel solver.
 
 ```bash
 git clone https://github.com/anejrozman/Currency-Overlay-or-Joint-Optimization.git
@@ -50,7 +50,7 @@ The commands below run from the repository root. `requirements.txt` pins the env
 
 The `data/` folder is empty in this repository, because the data are licensed and cannot be redistributed. They come from two sources:
 
-- **Refinitiv (LSEG) Datastream**: daily stock prices and local-currency returns, the constituents of the investable universes (the 10, 50 and 100 largest stocks of each economy) with the currency of each stock, and daily spot and 1-, 3- and 6-month forward exchange rates against the US dollar.
+- **Refinitiv Datastream**: daily stock prices and local-currency returns, the constituents of the investable universes (the 10, 50 and 100 largest stocks of each economy) with the currency of each stock, and daily spot and 1-, 3- and 6-month forward exchange rates against the US dollar.
 - **Kenneth R. French's [data library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html)**: the daily one-month US Treasury bill rate, used as the risk-free rate.
 
 Save the exports in `data/raw/`. The file names the code expects are set in `code/src/portfolio_backtest/config.py` and `code/src/portfolio_backtest/data_pipeline/format_raw_data.py`. Then build the interim and processed files:
@@ -69,14 +69,13 @@ Each backtest runs one strategy on one universe:
 python code/scripts/run_strategy.py --strategy es_joint --universe 10
 ```
 
-`--help` lists the strategies, which are the keys of `strategy_registry.py`. A run writes its configuration, out-of-sample returns, selected hyperparameters, weights and performance metrics (`metrics.json`) to a new directory `results/runs/<optimizer>/run_<N>/`. The backtests of the regularized programs on the larger universes take days.
+`--help` lists the strategies, which are the keys of `strategy_registry.py`. A run writes its configuration, out-of-sample returns, selected hyperparameters, weights and performance metrics (`metrics.json`) to a new directory `results/runs/<optimizer>/run_<N>/`. 
 
-The analyses read the run numbers from the `top_runs*.csv` files in `results/runs/`, so after each backtest enter its run number there by hand, in the row of its strategy and the column of its universe:
+The analyses read the run numbers from the `top_runs*.csv` files in `results/runs/`:
 
 - `top_runs.csv`: the unregularized and regularized strategies and the benchmarks.
 - `top_runs_w_mean.csv`: the mean-risk strategies (`*_w_mean`).
-- `top_demeaned_runs.csv`: the de-meaned ES and SOES programs. Set `DEMEAN = True` in `backtest_config.py`, rerun the ES and SOES overlay and joint strategies (unregularized and regularized), then set it back to `False`.
-- `top_runs_es_at_different_levels.csv` and `top_runs_soes_at_different_levels.csv`: the confidence-level sweep. Run the unregularized ES (or SOES) overlay and joint strategies with `--alpha 0.95 --no-demean` and similar for each level, then fill the table with `python code/scripts/collect_level_runs.py --es --write`.
+- `top_demeaned_runs.csv`: the de-meaned ES and SOES programs. Set `DEMEAN = True` in `backtest_config.py`, rerun the ES and SOES overlay and joint strategies (unregularized and regularized).
 
 On the Euler cluster, `code/scripts/euler/run_backtest.sh` submits one backtest and takes the same options as `run_strategy.py`; `run_all_backtests.sh` submits a batch of them and `run_levels.sh --es` (or `--soes`) the whole level sweep. Every job writes its log to `logs/`.
 
@@ -110,18 +109,7 @@ The gap analyses re-solve every program at every date. On Euler, the `run_gap_an
 - `generate_turnover_plot.py` draws the asset and currency turnover.
 - `additional_performance_metrics.py` writes the tables of realized risk measures and ES ratios (`results/additional_performance_metrics/`).
 
-The notebooks in `code/analysis/` are exploratory and are not needed for the thesis.
-
-### 5. Thesis
-
-With a LaTeX distribution installed:
-
-```bash
-cd thesis
-latexmk -pdf thesis.tex
-```
-
-The figures are read from `results/`, so the thesis compiles from the results in the repository without running any code.
+The notebooks in `code/analysis/` are exploratory.
 
 ## Author
 
