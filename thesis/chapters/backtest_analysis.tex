@@ -171,7 +171,7 @@ weights to the objective, following the regularization scheme of \Cref{chap:opti
 weights are selected at every rebalancing date by a grid search over the validation window described in
 \Cref{sec:backtest-configuration}. All other aspects of the backtests remain unchanged. We also compare the joint and overlay
 optimizers against the regularized Assets-Full (Full) and Assets-Zero (Zero) optimizers, which serve as 
-benchmarks for optimizing only the asset weights under the same risk measures, with the currency weights either fully hedged or set to zero, respectively.
+benchmarks for optimizing only the asset weights under the same risk measures, with the currency weights either fully hedged or unhedged, respectively.
 \Cref{tab:regularization-sharpe-change} reports the change in the Sharpe ratio between the unregularized and regularized optimizers,
 and \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} report 
 performance metrics of the regularized optimizers and the three benchmarks.
@@ -235,7 +235,7 @@ without regularization.
     \textbf{Metric}          &                  & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint}   & \textbf{Overlay} & \textbf{Joint} \\
     \midrule
     ER (\%)                  &                  & 1.29             & 1.24             & 1.05             & 0.84             & 1.60             & 1.64             & 1.07             & 1.31             & 0.98             & 0.03 \\
-    Vol (\%)                 &                  & 7.82             & 7.76             & 7.91             & 7.72             & 7.81             & 7.75             & 7.99             & 7.85             & 8.52             & 8.64 \\
+    Vol (\%)                 &                  & 7.82             & 7.76             & 7.91             & 7.72             & 7.81             & 7.75             & 7.99             & 7.85             & 8.52             & 8.34 \\
     MD (\%)                  &                  & 27.81            & 27.80            & 30.63            & 30.43            & 27.83            & 26.01            & 29.96            & 28.89            & 36.02            & 36.22 \\
     SR                       &                  & 0.16             & 0.16             & 0.13             & 0.11             & 0.20             & 0.21             & 0.13             & 0.17             & 0.11             & 0.00 \\
     SOR                      &                  & 0.22             & 0.22             & 0.18             & 0.15             & 0.28             & 0.29             & 0.18             & 0.23             & 0.16             & 0.00 \\
@@ -392,10 +392,7 @@ total risk.
 After regularization, the performance of the joint and overlay optimizers remains very similar. Their Sharpe ratios in
 \Cref{tab:regularized-top10,tab:regularized-top50,tab:regularized-top100} differ only marginally for every risk measure
 and universe size, with the sign of the difference changing across risk measures within each universe. The joint optimizers again
-achieve a lower volatility in every measure-universe combination, the only exception being
-second-order Expected Shortfall in the small universe, where the overlay optimizer beats the joint optimizer on every metric. The bottom panel of
-\Cref{fig:regularized-top10} shows that this happens almost entirely after the onset of the COVID-19 crisis in 2020, so
-it is reflective of this period rather than a persistent difference. The bottom panels of
+achieve a lower volatility in every measure-universe combination. The bottom panels of
 \Cref{fig:regularized-top50,fig:regularized-top100} show that the cumulative return differences in the medium and large
 universes remain small for all risk measures throughout the sample. The main effect of regularization on the comparison is on currency
 turnover. Without regularization, the currency turnover of the joint optimizer exceeds that of the overlay optimizer by $11\%$ to $82\%$, while with
@@ -411,6 +408,7 @@ A risk-return objective is also where joint optimization could be more beneficia
 can account for the dependence structure between asset and currency returns when choosing positions that raise the expected
 return.
 
+\newpage
 \section{Mean-Risk Optimization} \label{sec:effects-of-adding-a-mean-term}
 
 In this section, we add a mean term to the objective of the unregularized joint and overlay programs of
@@ -424,7 +422,7 @@ negative forward premium, that is, the difference between the foreign and the US
 change in the Sharpe ratio from adding the mean term, and \Cref{tab:mean-risk} reports the performance
 metrics.
 
-\begin{table}[tbp]
+\begin{table}[htbp]
   \centering
   \setlength{\tabcolsep}{8pt}
   \begin{tabular}{l*{6}{c}}
@@ -583,7 +581,7 @@ ratios confirm this, with the joint optimizer performing better, by $0.02$ to $0
 \Cref{fig:mean-risk-top50,fig:mean-risk-top100} show that this advantage builds up gradually over the sample rather than in
 a single period, with the cumulative return difference reaching about $0.18$ for semi-variance in the large universe and
 $0.19$ for second-order Expected Shortfall in the medium universe by the end of the sample. At the same time, the joint optimizer attains
-a lower volatility than the overlay optimizer for all risk measures, by up to $0.44$ percentage
+a lower volatility than the overlay optimizer for almost all risk measures, by up to $0.44$ percentage
 points. The lower volatility of the joint optimizers is a persistent finding across all backtests in
 \Cref{sec:baseline-backtests,sec:effects-of-regularization}. Intuitively, the joint program can choose assets 
 and currencies that offset each other's risk, while the overlay program picks its assets before considering the currencies.

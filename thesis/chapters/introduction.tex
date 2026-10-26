@@ -45,10 +45,10 @@ the risk measure, the size of the investable universe, regularization, and a mea
 In this thesis, we make four contributions. First, we compare joint and sequential optimization under five risk
 measures, in three investable universes of increasing size, with and without regularization. Without a mean term,
 the joint and the overlay optimizers achieve very similar risk-adjusted returns, and the main difference is that the
-joint optimizers achieve a lower risk. Their advantage in the risk measure they minimize is realized out of sample only
-in the smallest universe, where the currency exposures make up a larger share of the decision variables. In the larger
-universes, the asset step of the overlay program has enough weights to fit the objective on its own, and the advantage
-drops to zero.
+joint optimizers achieve a lower risk. Out of sample, their advantage in the risk measure they minimize 
+is largest in the smallest universe, where the currency exposures make up a larger share of the decision 
+variables. In the larger universes, the asset step of the overlay program has more weights to fit 
+the objective on its own, and the advantage shrinks until it disappears in the largest universe.
 
 Second, we add a mean term to the programs of all five risk measures, with expected asset returns that are pooled by
 economy and expected currency returns that are derived from the forward premia. The mean term raises the

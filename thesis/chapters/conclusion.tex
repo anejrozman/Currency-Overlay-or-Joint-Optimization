@@ -57,9 +57,10 @@ than the overlay optimizers for every risk measure in the medium and large unive
 
 Since the lower volatility of the joint optimizers is the most consistent difference between the two approaches, we
 compare them in \Cref{chap:joint-vs-sequential} on the risk measure they minimize. In sample, the joint program has an
-advantage by construction, since the solution of the overlay program is feasible for it. Out of sample, this advantage
-is realized only in the small universe, where the currency weights represent a larger share of the decision variables. In the 
-medium and large universes it drops to zero, as the asset step of the overlay program has enough weights to fit the objective on its own. 
+advantage by construction, since the solution of the overlay program is feasible for it. Out of sample, 
+this advantage is largest in the small universe, where the currency weights represent a larger 
+share of the decision variables. It shrinks to 1\% in the medium universe and 
+disappears in the large universe, as the asset step of the overlay program has more weights to fit the objective on its own.
 Since the dependence
 between asset and currency returns barely changes across universe sizes, this decline is driven by the
 number of assets relative to the number of currencies and not by a change in the dependence structure.
