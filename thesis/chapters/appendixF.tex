@@ -20,7 +20,20 @@ The total transaction costs are computed as the sum of the costs incurred from t
 \end{equation*}
 where $\tau^{asset}_{i,t+1}$ and $\tau^{curr}_{c,t+1}$ are the per-unit transaction costs for asset $i$ and currency $c$. The terms $x^{-}_{i,t+1}$ and $w^{-}_{c,t+1}$ denote the asset weights and implied currency weights immediately prior to rebalancing at time $t+1$ (i.e., the drifted weights).
 
-Asset transaction costs are incurred only when rebalancing individual asset holdings. Currency transaction costs, however, arise from two sources, adjustments in forward hedge positions (assuming the forward contract maturity matches the rebalancing frequency, the old contract expires and a new contract of full notional size $\upphi_{c,t+1}$ must be established at each rebalancing date) and currency exchanges required to fund purchases of assets denominated in different currencies $(w_{c,t+1} - w^{-}_{c,t+1})$. If the portfolio is rebalanced more frequently than the forward contract maturity, existing forward contracts are kept open and only incremental adjustments are traded. In this case, the forward transaction cost term is modeled as the absolute difference, replacing $\sum_{c=1}^{M} \tau^{curr}_{c,t+1} \upphi_{c,t+1}$ with $\sum_{c=1}^{M} \tau^{curr}_{c,t+1} (\upphi_{c,t+1} - \upphi^{-}_{c,t+1})$, where $\upphi^{-}_{c,t+1}$ represents the drifted hedge weight. Following Burkhardt and Ulrych \cite{SparseAndStableInternationalPortfolioOptimization}, these costs are aggregated at the currency level, operating under the assumption that proceeds from selling assets denominated in currency $c$ can fund the purchase of other assets in the same currency without incurring currency conversion fees.
+Asset transaction costs are incurred only when rebalancing individual asset holdings. Currency 
+transaction costs, however, arise from two sources, adjustments in forward hedge positions 
+(assuming the forward contract maturity matches the rebalancing frequency, 
+the old contract expires and a new contract of full notional size $\upphi_{c,t+1}$ 
+must be established at each rebalancing date) and currency exchanges required to fund 
+purchases of assets denominated in different currencies $(w_{c,t+1} - w^{-}_{c,t+1})$. 
+If the portfolio is rebalanced more frequently than the forward contract maturity, 
+existing forward contracts are kept open and only incremental adjustments are traded. 
+In this case, the forward transaction cost term is modeled as the absolute difference, 
+replacing $\sum_{c=1}^{M} \tau^{curr}_{c,t+1} \upphi_{c,t+1}$ with $\sum_{c=1}^{M} \tau^{curr}_{c,t+1} (\upphi_{c,t+1} - \upphi^{-}_{c,t+1})$, where $\upphi^{-}_{c,t+1}$ 
+represents the drifted hedge weight. Following Burkhardt and Ulrych \cite{SparseAndStableInternationalPortfolioOptimization}, 
+these costs are aggregated at the currency level, under the assumption that proceeds from selling assets 
+denominated in currency $c$ can fund the purchase of other assets in the same currency without incurring currency 
+conversion fees.
 
 To define the individual per-unit costs $\tau^{asset}_{i, t+1}$ and $\tau^{curr}_{c, t+1}$, we consider an asset $i$ denominated in currency $c_i$. Let $P^{ask}_{i,t}$, $P^{bid}_{i,t}$, and $P_{i,t}$ represent the ask, bid, and mid prices of the asset, and let $S^{ask}_{c_i,t}$, $S^{bid}_{c_i,t}$, and $S_{c_i,t}$ represent the corresponding currency prices. If asset $i$ is purchased at time $t$ and sold at time $t+1$, its realized log return is given by
 \begin{align*}
@@ -32,7 +45,7 @@ To define the individual per-unit costs $\tau^{asset}_{i, t+1}$ and $\tau^{curr}
 \end{align*}
 where $\delta^{asset}_{i}$ and $\delta^{curr}_{c_i}$ are the bid-ask spreads. Comparing this to equation \eqref{eq:hedged-portfolio-return-net}, the transaction cost is precisely the difference between the actual realized log return and mid-price returns for the asset and currency. 
 
-Defining half of the bid-ask spreads as 
+With half of the bid-ask spread defined as
 \begin{equation*}
 \chi^{asset}_{i,t} = \frac{\overbrace{P^{ask}_{i,t} - P^{bid}_{i,t}}^{\delta_i^{asset}}}{2P_{i,t}} \quad \text{and} \quad \chi^{curr}_{c,t} = \frac{\overbrace{S^{ask}_{c,t} - S^{bid}_{c,t}}^{\delta_c^{curr}}}{2S_{c,t}},
 \end{equation*}

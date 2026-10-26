@@ -151,8 +151,8 @@ percentage points, and Sharpe ratios by at most $0.07$. However, the sign of the
 \Cref{fig:baseline-top10,fig:baseline-top50,fig:baseline-top100} present the cumulative performance of the overlay and joint optimizers 
 alongside the equally weighted benchmark. In each universe, the top panel shows that the joint optimizers perform better 
 than the equally weighted portfolio during the first major market crashes in the sample, the dot-com crash and the global financial 
-crisis. This advantage is particularly evident in the medium and large universes during the global financial crisis, where the optimizer 
-strategies exhibit a much smaller drawdown compared to the equally weighted portfolio. The equally weighted portfolio recovers quickly 
+crisis. This advantage is particularly evident in the medium and large universes during the global financial crisis, when the optimizer 
+strategies exhibit a much smaller drawdown than the equally weighted portfolio. The equally weighted portfolio recovers quickly 
 after the COVID-19 market shock and ultimately attains the highest terminal wealth across all three universes, albeit at considerably higher 
 volatility and with deeper drawdowns throughout the sample. In contrast, the overlay and joint optimizers follow more stable growth 
 paths, consistent with their lower realized volatility reported in \Cref{tab:baseline}.
@@ -161,7 +161,7 @@ The bottom panels show the cumulative daily return difference between the joint 
 
 Overall, we see a consistent pattern across all the considered risk measures. The overlay and
 joint optimizers reduce volatility and drawdowns substantially relative to the equally weighted portfolio. The Sharpe comparison depends on the 
-universe size. In the small universe, the joint and overlay optimizers do not consistently outperform the equally weighted portfolio, while in the medium and large universes they do. The joint and overlay optimizers produce very similar out-of-sample metrics across all risk measures and universe sizes, with the joint optimizer consistently delivering lower volatility and higher currency turnover but no consistent advantage on risk-adjusted returns.
+universe size. In the small universe, the joint and overlay optimizers do not consistently outperform the equally weighted portfolio, while in the medium and large universes they do. The joint and overlay optimizers produce very similar out-of-sample metrics across all risk measures and universe sizes, with the joint optimizer consistently delivering lower volatility and higher currency turnover but no consistent advantage in risk-adjusted returns.
 
 \section{Regularization} \label{sec:effects-of-regularization}
 
@@ -401,7 +401,7 @@ universes remain small for all risk measures throughout the sample. The main eff
 turnover. Without regularization, the currency turnover of the joint optimizer exceeds that of the overlay optimizer by $11\%$ to $82\%$, while with
 regularization the two differ by at most $7\%$ (see also \Cref{fig:turnover-asset,fig:turnover-currency}). The penalties on the currency weights thus shrink the larger currency
 positions of the joint program to about the size of those of the overlay program. This does not have an effect on their
-risk-adjusted returns, which remain very similar, with no optimizer consistently outperforming the other. 
+risk-adjusted returns, which remain very similar, with neither optimizer consistently outperforming the other. 
 
 The results so far share a common feature. All optimizers minimize a risk measure without any return term in the
 objective, and while this delivers substantially lower volatility and drawdowns than the equally weighted portfolio, it
@@ -470,7 +470,7 @@ measures rise by at most $0.10$.
 This split is in line with how the risk measures handle the mean of the portfolio return. Expected Shortfall and
 second-order Expected Shortfall are translation equivariant, so minimizing them already rewards portfolios with a higher mean. The two tail measures therefore
 carry an implicit mean term, which the explicit one only strengthens. The deviation measures are invariant to a shift in
-the portfolio return, so for them the addition of a mean term introduces new information in the optimization problem. The average currency turnover is
+the portfolio return, so for them the addition of a mean term introduces new information into the optimization problem. The average currency turnover is
 consistent with this interpretation. In the medium and large universes, the mean term raises the currency turnover of
 the variance and semi-variance optimizers to two to three times its previous level, while for the tail-measure
 optimizers it remains stable around its previous level. We analyze the implicit risk-return tradeoff of the tail measures in more detail in
@@ -611,7 +611,7 @@ large relative to the length of the window. Compared with the Full optimizer, wh
 optimizers realize a lower value of the risk measure they minimize, at a similar Sharpe ratio. Without a mean term in the objective, actively trading the currencies therefore
 reduces risk relative to full hedging without giving up risk-adjusted returns but does not raise them either, likely
 because the currency weights are then chosen only to minimize the risk measure and not to earn the excess currency
-returns. Compared with the Zero optimizer, which keeps the full currency exposure, managing
+returns. Compared with leaving the currency exposure unhedged, as the Zero optimizer does, managing 
 the currencies pays off in the medium and large universes, where equity risk is
 reduced further and currency risk makes up a larger share of the portfolio's total risk.
 

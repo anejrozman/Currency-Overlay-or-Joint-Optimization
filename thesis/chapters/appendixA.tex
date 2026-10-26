@@ -45,7 +45,7 @@ We now consider the auxiliary function $F_\beta$ defined as
     &= \alpha + \frac{1}{1-\beta} \int_\alpha^\infty (l - \alpha) f(l) \, dl. \label{eq:aux-function-es}
 \end{align}
  
-Before minimizing \eqref{eq:aux-function-es} with respect to $\alpha$, we verify convexity. Using Leibniz's rule, the first and second derivatives of $F_\beta$ with respect to $\alpha$ are
+Before minimizing \eqref{eq:aux-function-es} with respect to $\alpha$, we verify convexity. By Leibniz's rule, the first and second derivatives of $F_\beta$ with respect to $\alpha$ are
 \begin{align*}
     \frac{\partial F_\beta}{\partial \alpha}
         &= 1 + \frac{1}{1-\beta} \frac{\partial}{\partial \alpha} \int_\alpha^\infty (l - \alpha) f(l) \, dl \\
@@ -85,7 +85,11 @@ Thus, minimizing $\text{ES}_\beta(\bm{x}_t)$ with respect to $\bm{x}_t$ is equiv
     \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} \left( \alpha + \frac{1}{1-\beta} \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+] \right).
 \end{equation}
 
-Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function with an affine map is convex \cite[Section~3.2.2]{boyd2004convex}. Thus, $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator which preserves convexity, and the sum of convex functions is convex.
+Finally, we show that $F_\beta(\bm{x}_t, \alpha)$ is jointly convex in $(\bm{x}_t, \alpha)$. 
+The inner map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)$ is affine and 
+the function $z \mapsto z^+$ is convex and nondecreasing. The composition of a convex function 
+with an affine map is convex \cite[Section~3.2.2]{boyd2004convex}. Thus, $(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is 
+jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator, which preserves convexity, and the sum of convex functions is convex.
 
 
 \subsection{Second-Order Expected Shortfall} \label{app:soes_auxiliary}
@@ -275,7 +279,7 @@ auxiliary variables $\Delta_{i,t}^+ \ge 0$ and $\Delta_{i,t}^- \ge 0$
 \end{equation}
 The second identity holds at the optimum. Minimizing the $L^1$ penalty drives the $\Delta_{i,t}^+$ and $\Delta_{i,t}^-$ to
 their smallest feasible values, so at most one is
-non-zero, giving $\Delta_{i,t}^+ = \max(x_{i,t}, 0)$ and
+nonzero, giving $\Delta_{i,t}^+ = \max(x_{i,t}, 0)$ and
 $\Delta_{i,t}^- = \max(-x_{i,t}, 0)$. Writing the positive and negative parts as
 vectors
 $\bm{\Delta}_t^+ = [\Delta_{1,t}^+, \dots, \Delta_{N,t}^+]^\top$ and
@@ -296,7 +300,7 @@ $\lambda_2 \ge 0$, is quadratic in the weights and is written as a quadratic for
     \lambda_2 \|\bm{x}_t\|_2^2 = \bm{x}_t^\top \bm{Q}\, \bm{x}_t,
     \qquad \bm{Q} = \lambda_2 \bm{I}_N.
 \end{equation*}
-Embedding this in the decision vector $\tilde{\bm{x}}_t$, the penalty becomes
+Embedded in the decision vector $\tilde{\bm{x}}_t$, the penalty becomes
 $\tilde{\bm{x}}_t^\top \tilde{\bm{Q}}\, \tilde{\bm{x}}_t$, where $\tilde{\bm{Q}}$ places the
 block $\lambda_2 \bm{I}_N$ on the asset weights and zeros for the rest of the variables. Adding this term to the linear
 objective of the base problems makes the objective quadratic, and since $\tilde{\bm{Q}}$ is positive semi-definite, it
@@ -305,7 +309,7 @@ remains convex.
 \subsection{Leverage Constraint} \label{app:leverage}
 
 The leverage constraint $\|\bm{x}_t\|_1 \le \ell^a$, with $\ell^a \ge 1$, bounds the portfolio's
-gross exposure and guarantees a bounded feasible region even when $\lambda_1 = 0$. Reusing
+gross exposure and guarantees a bounded feasible region even when $\lambda_1 = 0$. With
 the decomposition \eqref{eq:l1_decomp}, it is expressed as a single linear inequality
 \begin{equation} \label{eq:leverage_constraint}
     \|\bm{x}_t\|_1 = \bm{1}_N^\top (\bm{\Delta}_t^+ + \bm{\Delta}_t^-) \le \ell^a.
@@ -572,7 +576,7 @@ matrix of jointly sampled asset and currency returns, whose $k$-th row
 $(\bm{R}^{\text{all}}_k)^\top = [(\bm{R}^{fh}_k)^\top, (\bm{e}_k - \bm{f}_k)^\top]$ is the $k$-th historical
 realization of $\bm{R}^{\text{all}}_{t+1}$. We replace the expectation in $F_\beta$ and the $L^2$ norm in $G_\beta$
 by their empirical counterparts as in \Cref{app:linear-program-representation}, with the joint return
-$\bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1}$ in place of $\bm{x}_t^\top \bm{R}_{t+1}$.  Introducing $\alpha$ and
+$\bm{\theta}_t^\top \bm{R}^{\text{all}}_{t+1}$ in place of $\bm{x}_t^\top \bm{R}_{t+1}$.  With $\alpha$ and
 the auxiliary variables $u_k \ge 0$ for $k = 1, \dots, q$ as in \Cref{app:linear-program-representation}, the slack constraint \eqref{eq:slack_constraint} becomes
 \begin{equation*}
     u_k \ge -\bm{\theta}_t^\top \bm{R}^{\text{all}}_k - \alpha

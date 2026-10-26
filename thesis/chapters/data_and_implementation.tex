@@ -106,10 +106,10 @@ The resulting heatmaps are shown in \Cref{fig:asset-currency-corr-top-10,fig:ass
 
 Across all three universes the correlations range from $-0.2$ to
 $0.4$ and remain mostly positive. The results are intuitive and agree with known empirical findings. The strongest positive correlations belong to commodity and risk-sensitive currencies such as the AUD, CAD, NZD, and ZAR, whose equity markets and
-currencies rise together in good times and fall together in bad \citep{CHEN2003133, common_risk_factors_currency_markets, MenkhoffSarnoSchmelingSchrimpf2012}. The JPY and CHF are the only negatively correlated currencies with most other economies (ranging from $-0.2$ to $0.03$), in line with their role as safe havens that strengthen when equities fall \cite{safe_haven_currencies}. The EUR, DKK, and HKD are minimally correlated, reflecting the HKD's peg to the US dollar and the DKK's peg to the EUR. This split between risky and safe-haven currencies is well
+currencies rise together in good times and fall together in bad \citep{CHEN2003133, common_risk_factors_currency_markets, MenkhoffSarnoSchmelingSchrimpf2012}. The JPY and CHF are the only currencies negatively correlated with most other economies (ranging from $-0.2$ to $0.03$), in line with their role as safe havens that strengthen when equities fall \cite{safe_haven_currencies}. The EUR, DKK, and HKD are minimally correlated, reflecting the HKD's peg to the US dollar and the DKK's peg to the EUR. This split between risky and safe-haven currencies is well
 documented \citep{global_currency_hedging, safe_haven_currencies}.
 
-This is the dependence structure the overlay program discards when it optimizes the asset weights. It sets the asset weights first, using only equity information, and adds the currency hedge afterwards, whereas the joint program can act on it
+This is the dependence structure the overlay program discards when it optimizes the asset weights. It sets the asset weights first, using only equity information, and adds the currency hedge afterward, whereas the joint program can act on it
 directly. The structure barely changes across universe sizes, and this matters for the
 results that follow. A shift in the relative performance of the joint and overlay programs across universe sizes in
 \Cref{chap:backtest-analysis,chap:joint-vs-sequential} is therefore not due to a change in the underlying
@@ -365,7 +365,7 @@ the realized daily out-of-sample portfolio return, $\bar R_{\mathcal P}$ its
 sample mean, $\sigma_{\mathcal P}$ its annualized volatility, $\sigma_{\mathcal{P}, \text{down}}$ its annualized downside volatility, $R_{f, t}$ the
 daily risk-free
 rate, and $\bar R_f$ the
-average daily risk-free rate. Daily figures are annualized using the standard $252$ trading days per year assumption. The metrics we report are
+average daily risk-free rate. Daily figures are annualized using the standard assumption of $252$ trading days per year. The metrics we report are
 the annualized excess return, annualized volatility, maximum drawdown, the Sharpe ratio, the Sortino ratio, and average asset
 and currency turnover.
 

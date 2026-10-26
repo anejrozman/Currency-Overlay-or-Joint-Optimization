@@ -18,7 +18,7 @@ acts as an interface between the problem written in Python and an external numer
 solver, which in this thesis is the Gurobi solver. In this section, we summarize the parts of
 the CVXPY library needed to understand the implementation of the programs. Further details can be found in the CVXPY documentation \cite{CVXPYDocs}.
 
-When defining a program in CVXPY, variables, created with
+In a CVXPY program, variables, created with
 \texttt{cp.Variable}, are the decision variables of the problem and can be scalars, vectors, or matrices. Parameters,
 created with \texttt{cp.Parameter}, are symbolic representations of constants, whose purpose is to change the value of a
 constant in a problem without reconstructing the entire problem. Variables, parameters, and numerical constants are combined into
