@@ -94,10 +94,13 @@ costs, more frequent rebalancing, and market impact would likely reduce the adva
 over the overlay optimizers. A more realistic analysis could include a dynamic transaction cost model and 
 multiple rebalancing frequencies, and test the sensitivity of the results to these assumptions.
 
-Two further extensions follow from the results. First, the tail measures are estimated from the empirical distribution
+Three further extensions follow from the results. First, the tail measures are estimated from the empirical distribution
 of the lookback window and are sensitive to estimation error. Estimators or formulations that
 stabilize the tail, such as the extreme value approach proposed by McNeil and Frey \cite{McNeilFrey2000}, could improve the out-of-sample performance.
-Second, the explanations given for the optimizers' performance, a lower market
+Second, we do not test whether the differences in Sharpe ratios between the joint and overlay optimizers 
+are statistically significant. Since the return series of the two approaches are highly correlated, applying a
+paired test such as that of Ledoit and Wolf \cite{LedoitWolf2008} is a natural next step.
+Third, the explanations given for the optimizers' performance, a lower market
 exposure, a tilt toward low-risk stocks, and currency carry, could be further investigated by
 regressing their returns on market, low-volatility, carry, and other factors.
 
