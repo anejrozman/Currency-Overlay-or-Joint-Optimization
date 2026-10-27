@@ -2,8 +2,8 @@
 
 In this chapter, we describe the data and the backtest implementation with which we evaluate the optimization programs
 of \Cref{chap:optimization-framework} in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. In \Cref{sec:data}
-we describe the data sources and the construction of three investable universes of different sizes from the largest
-stocks of 14 global economies, and analyze the fully hedged asset returns, the excess currency returns, and the
+we describe the data sources and the construction of three investable universes and analyze the fully hedged asset returns, 
+the excess currency returns, and the
 correlations between them. In \Cref{sec:backtest-implementation} we describe the implementation of the backtest. We
 first present in \Cref{sec:backtesting-framework} the modular structure of the backtesting framework. In
 \Cref{sec:backtest-configuration} we present the backtested strategies and their benchmarks, and specify the
@@ -96,7 +96,7 @@ South African rand.
 
 To quantify the dependence between asset and currency returns, we compute Pearson
 correlations between economy-level fully hedged equity returns and excess currency returns.
-For each economy we form an equally weighted daily portfolio of the fully hedged returns of
+For each economy we form an equally weighted portfolio of the fully hedged returns of
 its constituent stocks, resetting the constituents at each annual universe reconstitution. 
 Correlating each economy's series
 with each currency's excess return over the full sample gives a $14 \times 13$ correlation matrix. The
@@ -145,7 +145,7 @@ dependence structure, and we analyze its causes in \Cref{chap:joint-vs-sequentia
 In \Cref{chap:backtest-analysis} we evaluate a range of optimization strategies under different risk measures (variance, semi-variance, mean absolute deviation, Expected Shortfall, and second-order
 Expected Shortfall), their treatment of
 currency exposure (overlay or joint), and the size of the investable
-universe. To keep these comparisons fair, the
+universe (small, medium, large). To keep these comparisons fair, the
 backtesting framework separates between the
 orchestration of the backtest and the optimization logic it evaluates.\footnote{The full codebase with the backtest implementation is publicly available on GitHub: \url{https://github.com/anejrozman/Currency-Overlay-or-Joint-Optimization}.}  
 The main backtesting loop that ingests data, rolls the estimation window forward, selects

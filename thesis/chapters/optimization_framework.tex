@@ -27,12 +27,12 @@ diversification is more than offset by estimation error. Following Lucescu and U
 measure of risk alone and require no explicit estimates of expected returns. We consider the expected portfolio return later in
 this chapter.
 
-We initially formulate the portfolio optimization problem for an investor who holds $N$ assets denominated in a single currency and extend the setting
+We initially formulate the portfolio optimization problem for an investor who holds $N\in\mathbb{N}$ assets at time $t\in\mathbb{N}_0$ denominated in a single currency and extend the setting
 to multiple currencies in the next section. Let $\bm{x}_t \in \R^N$ denote the portfolio weights chosen at time $t$ and
 held until $t+1$, and $\bm{R}_{t+1} \in \R^N$ the vector of simple asset returns over the period from $t$ to $t+1$. The
 portfolio return at time $t+1$ is then $\bm{x}_t^\top \bm{R}_{t+1}$, and the weights satisfy the budget constraint
-$\bm{x}_t^\top \bm{1}_N = 1$, where $\bm{1}_N \in \R^N$ is the vector of ones. A risk measure $\rho$ assigns to the
-random portfolio return a real number that quantifies its risk. We write
+$\bm{x}_t^\top \bm{1}_N = 1$, where $\bm{1}_N \in \R^N$ denotes the vector of ones. A risk measure $\rho \ : \ \mathcal{L}^2\to\mathbb{R}$ assigns to the
+random portfolio return a real number that quantifies its risk. We write 
 $\rho$ as a function of the portfolio return $\bm{x}_t^\top \bm{R}_{t+1}$, so that the risk-based portfolio optimization problem is
 \begin{equation} \label{eq:risk-based-problem}
     \bm{x}_t^* = \argmin_{\bm{x}_t} \rho\bigl( \bm{x}_t^\top \bm{R}_{t+1} \bigr), \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
@@ -60,9 +60,9 @@ $\bm{x}_t^\top \bm{\Sigma}_t \bm{x}_t$. Since $\bm{\Sigma}_t$ is positive semi-d
 weights, and the problem is a convex quadratic program, which standard solvers handle efficiently
 \cite{boyd2004convex}. If $\bm{\Sigma}_t$ is positive definite, the first-order conditions of the Lagrangian further give
 the unique solution in closed form
-\begin{equation*}
+\begin{equation} \label{eq:var-closed-form-solution}
     \bm{x}_t^* = \frac{\bm{\Sigma}_t^{-1} \bm{1}_N}{\bm{1}_N^\top \bm{\Sigma}_t^{-1} \bm{1}_N},
-\end{equation*}
+\end{equation}
 which is known as the global minimum-variance portfolio. The closed form is a particularity of the variance, since the
 problems under the other risk measures we consider have no closed-form solution in general and must be solved
 numerically. It no longer applies once we add the leverage constraint and the penalties later in this chapter, although
@@ -82,7 +82,7 @@ The natural estimate of $\bm{\Sigma}_t$ is the sample covariance matrix of the r
 It has $N(N+1)/2$ distinct
 entries, all estimated from the same $q$ observations, and when $N$ is large relative to $q$, its eigenvalues are more
 dispersed than those of $\bm{\Sigma}_t$, with the smallest eigenvalues biased downward \cite{LedoitWolf2004}. Through
-the inverse in the closed form, the minimum-variance portfolio then concentrates on the combinations of assets whose
+the inverse in the closed form solution \eqref{eq:var-closed-form-solution}, the minimum-variance portfolio then concentrates on the combinations of assets whose
 risk is most underestimated, and its in-sample variance understates its out-of-sample variance \cite{ElKaroui2010}.
 When $N \ge q$, the sample covariance matrix is singular, and the closed form does not exist.
 
@@ -90,11 +90,11 @@ We therefore estimate $\bm{\Sigma}_t$ with the shrinkage estimator of Ledoit and
 combines the sample covariance matrix with a structured target. The sample covariance matrix imposes no structure but
 has a large estimation error when $N$ is large relative to $q$, while a structured target has few parameters and
 therefore a small estimation error but is biased whenever its structure does not hold. A weighted average of the two
-trades off the estimation error of the one against the bias of the other. Ledoit and Wolf use the constant-correlation
+trades off the estimation error of the estimate with the bias of the structured target. Ledoit and Wolf use the constant-correlation
 target, which keeps the sample variances of the assets and replaces every pairwise correlation by the average sample
 correlation.
 
-To define the estimator, let $y_{k,i}$ denote the $i$-th entry of $\bm{y}_k$, $\bar{y}_i$ the $i$-th entry of
+To define the estimator, let $y_{k,i}$ denote the $i$-th entry of $\bm{y}_k$, $k \in \{1, \ldots, q\}$, $\bar{y}_i$ the $i$-th entry of
 $\bar{\bm{y}}$, and $\mathring{y}_{k,i} = y_{k,i} - \bar{y}_i$ the demeaned return of asset $i$ in realization $k$. We
 suppress the dependence on $t$ of the scalar quantities that follow. The sample covariance matrix $\bar{\bm{\Sigma}}_t$
 has the entries
@@ -222,7 +222,7 @@ the empirical average over the realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref
 sample mean absolute deviation $\frac{1}{q} \sum_{k=1}^q \lvert \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k
 \rvert$. Since the deviations $\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k$ sum to zero over the sample, the sum
 of their positive parts equals the sum of their negative parts, and the absolute value of each deviation is the sum of
-its two parts. The sample mean absolute deviation is therefore twice the average shortfall of the portfolio return below
+the two. The sample mean absolute deviation is therefore twice the average shortfall of the portfolio return below
 its sample mean \cite{Speranza1993, OgryczakRuszczynski1999}
 \begin{equation*}
     \frac{1}{q} \sum_{k=1}^q \lvert \bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k \rvert
@@ -249,7 +249,7 @@ estimation error than those optimized under the variance, and that their weights
 sample.
 
 The three risk measures considered so far measure the dispersion of the portfolio return around its mean. Expected
-Shortfall, which we consider next, instead measures the size of the largest losses.
+Shortfall, which we consider next, instead measures the average size of the largest losses.
 
 \subsection{Expected Shortfall}\label{sec:risk-es}
 
@@ -265,12 +265,10 @@ the loss exceeds VaR
 \begin{equation*}
     \text{ES}_\beta(\bm{x}_t) = \mathbb{E}_t\bigl[ L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t) \bigr],
 \end{equation*}
-so that it accounts for both the probability and the size of the losses in the tail. For loss distributions with atoms,
-such as the empirical distribution used below, Expected Shortfall is defined as the average of the quantiles of the loss
-distribution above $\beta$, which is equivalent to the conditional expectation for continuous distributions
-\cite{acerbi2002coherenceexpectedshortfall}. In its capital requirements for market risk, the Basel Committee on Banking
+so that it accounts for both the probability and the size of the losses in the tail. 
+In its capital requirements for market risk, the Basel Committee on Banking
 Supervision has replaced VaR at the $99\%$ level by Expected Shortfall at the $97.5\%$ level \cite{BCBS2019}, indicating
-that it is a more appropriate measure of risk than VaR.
+that it is a more appropriate measure of risk.
 
 Since $\text{VaR}_\beta(\bm{x}_t)$ itself depends on the portfolio weights, the conditional expectation in the definition is not
 in a suitable form for optimization. Rockafellar and Uryasev \cite{RockafellarUryasev2000, RockafellarUryasev2002} show
@@ -318,7 +316,7 @@ Furthermore, Ciliberti et
 al.~\cite{ciliberti2007feasibility} show that, without bounds on the portfolio weights, the program is unbounded in some samples. 
 For large portfolios, it
 has no finite solution once $N/q$ exceeds a critical value, which is about $0.5$ for high confidence levels, and the weights fluctuate from sample to sample as $N/q$ approaches this value. In the large
-universe of the empirical analysis, which contains up to $1{,}400$ stocks, $N/q$ can exceed this value. The leverage
+universe of our empirical analysis in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}, which contains up to $1{,}400$ stocks, $N/q$ can exceed this value. The leverage
 constraint that we add later in this chapter bounds the positions and thereby ensures that the program has a solution.
 
 Expected Shortfall weighs all losses beyond VaR equally, so that the largest losses in the tail count no more
@@ -385,11 +383,11 @@ The five risk measures can be divided into two classes, which differ in how they
 distribution.
 
 Artzner et al.~\cite{CoherentMeasuresOfRisk} call a risk measure $\mathcal{R}$ coherent if it satisfies four
-properties. Adding a riskless amount to the return reduces the risk by that amount,
+properties. Adding a riskless amount to the return reduces the risk by that amount (translation invariance),
 $\mathcal{R}(X + C) = \mathcal{R}(X) - C$, scaling the position by a positive factor scales the risk by the same
-factor, the risk of a combined position is at most the sum of the risks of its parts, so that diversification does not
-increase risk, and a return that is higher in every state of the world carries no more risk. VaR violates the third
-property, subadditivity, in general, whereas Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
+factor (positive homogeneity), the risk of a combined position is at most the sum of the risks of its parts (subadditivity),
+so that diversification does not
+increase risk, and a same return that is higher carries no more risk. Out of the five risk measures we define in this chapter, only Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
 second-order Expected Shortfall \cite{Krokhmal2007} are coherent. Additionally, they are both strictly expectation bounded, that
 is, their risk exceeds the expected loss of every nonconstant return.
 
@@ -405,8 +403,8 @@ the standard deviation and the semi-deviation.
 The two translation properties capture the difference between the classes. A deviation measure depends only on the
 dispersion of the return around its mean and is unaffected by a shift of the whole distribution, whereas a coherent
 risk measure decreases when the distribution shifts upward. This fundamental difference between the two classes of risk measures is reflected 
-in our empirical results in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. More technical details on coherent risk measures 
-and deviation measures are given in Appendix~\ref{app:demeaning}. For brevity, we refer in the remainder of the thesis to
+in our empirical results in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. The reader can find the technical definitions and results we use for coherent risk measures 
+and deviation measures in Appendix~\ref{app:demeaning}. For brevity, we refer in the remainder of the thesis to
 the variance, the semi-variance, and the mean absolute deviation as the deviation measures, and to Expected Shortfall
 and second-order Expected Shortfall as the tail measures.
  
@@ -580,7 +578,7 @@ Regularization reduces these fluctuations at the cost of introducing bias in the
 toward the portfolios that the penalty favors.
 Empirically it tends to improve out-of-sample performance. DeMiguel et
 al.~\cite{DeMiguelGarlappiNogalesUppal2009} find that minimum-variance portfolios with a constraint on the norm of the
-weights often have higher out-of-sample Sharpe ratios than portfolios based on shrinkage estimators. 
+weights often have higher out-of-sample Sharpe ratios than portfolios based only on shrinkage estimators. 
 Brodie et al.~\cite{BrodieDaubechiesDeMolGiannoneLoris2009} find that mean-variance
 portfolios with an $L^1$ penalty consistently outperform the equally weighted portfolio out of sample, and Li
 \cite{Li2015} finds that portfolios with constraints that induce sparsity and stability have better
@@ -621,11 +619,11 @@ defines the set of feasible asset weights
 
 In the multi-currency programs that follow, the asset weights and the currency exposures have separate penalty weights,
 $\lambda_1^a$ and $\lambda_2^a$ for the assets and $\lambda_1^c$ and $\lambda_2^c$ for the currencies, since the two
-differ in their constraints and transaction costs \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}. The
+differ in their constraints and transaction costs. The
 currency exposures carry neither a budget constraint nor a leverage constraint, so both penalties shrink them toward
 zero, that is, toward the fully hedged portfolio, and the $L^1$ penalty sets the exposures to some currencies exactly to
 zero. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} note that the sparsity that the
-$L^1$ penalty promotes may be desirable for the selection of assets but less so for the currencies. The penalty weights
+$L^1$ penalty promotes may be desirable for the selection of assets but less so for the currencies. In our backtests the penalty weights
 are selected at every rebalancing date by the grid search described in \Cref{sec:backtest-configuration}.
 
 
@@ -682,14 +680,14 @@ Appendices~\ref{app:joint-optimization}, \ref{app:mv_joint}, and~\ref{app:mad_jo
 
 All programs of this section are convex. Since the $L^1$ penalties and the leverage constraint can be written with
 linear constraints, the regularized programs are quadratic programs under the variance, the semi-variance, the mean
-absolute deviation, and Expected Shortfall, and second-order cone programs with a convex quadratic objective under
+absolute deviation, and Expected Shortfall, and a second-order cone program with a convex quadratic objective under
 second-order Expected Shortfall. Without the $L^2$ penalties, the programs under the mean absolute deviation and Expected
 Shortfall are linear programs. Standard solvers handle all of these programs efficiently~\cite{boyd2004convex}.
 
 \section{Mean-Risk Portfolio Optimization} \label{sec:mean-risk-portfolio-optimization}
 
 The programs of the previous section minimize a measure of risk without an explicit estimate of the expected returns,
-since such estimates are imprecise. The resulting portfolios,
+and we argue why such estimates are imprecise. The resulting portfolios,
 however, may give up excess returns that a moderately riskier allocation would earn. A mean term in the objective lets
 the programs trade off expected return against risk explicitly. With it, the joint program can also weigh the expected
 returns of the assets and the currencies against each other, whereas the overlay program considers the expected
@@ -699,15 +697,14 @@ Mean-risk optimization goes back to Markowitz \cite{Markowitz1952}, and the work
 four risk measures are based also trade off risk against expected return. Markowitz et al.~\cite{Markowitz1993} compute
 the portfolios that are efficient with respect to the expected return and the semi-variance, and Konno and Yamazaki
 \cite{KonnoYamazaki1991}, Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and Krokhmal \cite{Krokhmal2007}
-minimize the mean absolute deviation, Expected Shortfall, and the higher-moment coherent risk measures, respectively,
-subject to a required expected return. In the multi-currency setting, Burkhardt and Ulrych
-\cite{SparseAndStableInternationalPortfolioOptimization} use a mean-variance objective with a risk aversion coefficient
-of $3$ and estimate the expected returns with the Bayes--Stein estimator of Jorion \cite{Jorion1986BayesStein}.
+minimize the mean absolute deviation, Expected Shortfall, and the higher-moment coherent risk measures, respectively. 
+In the multi-currency setting, Burkhardt and Ulrych
+\cite{SparseAndStableInternationalPortfolioOptimization} use a mean-variance objective and estimate the expected returns with 
+the Bayes--Stein estimator of Jorion \cite{Jorion1986BayesStein}.
 Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} formulate their programs with an objective
 that trades off the expected return against Expected Shortfall but evaluate them out of sample under infinite risk
-aversion, which removes the expected return from the objective, since estimates of expected returns are highly
-sensitive to estimation error \cite{Merton1980, DeMiguelGarlappiUppal2009}. We add the mean term back to the programs
-of the previous section and specify the expected returns so that they are less affected by estimation error.
+aversion, which removes the expected return from the objective. We add the mean term back to the programs
+of the previous section and estimate the expected returns in a way that they are more stable and less affected by estimation error.
 
 \subsection{Mean-Risk Programs}\label{sec:mean-risk-programs}
 
@@ -749,7 +746,7 @@ where the expected return of the fixed asset portfolio is a constant and is remo
 \end{equation}
 where the matrix $\bm{L}^c \in \R^{(N+M) \times (N+M)}$ is diagonal with zeros in the asset positions and ones in the
 currency positions. Both the currency step and the joint program thus contain a currency leverage constraint, which
-the programs of \Cref{sec:regularized-multi-currency} do not have. We give the mean-risk programs for the five risk
+the programs of \Cref{sec:regularized-multi-currency} do not have. We derive the mean-risk programs for the five risk
 measures in Appendices~\ref{app:mean-risk}, \ref{app:mv_mean_risk}, and~\ref{app:mad_mean_risk}.
 
 We use the same risk aversion coefficient in the asset step, the currency step, and the joint program. It determines
@@ -767,8 +764,8 @@ leverage constraint of \Cref{sec:regularization}, and for the currency exposures
 \subsection{Expected Asset Returns}\label{sec:expected-asset-returns}
 
 The natural estimate of $\bm{\mu}^{fh}_t$ is the vector of sample means of the historical realizations of
-$\bm{R}^{fh}_{t+1}$. As discussed at the beginning of this chapter, however, the precision of an estimated expected
-return depends only on the length of the sample period \cite{Merton1980}. For example, if the returns of a stock with an annual volatility of $30\%$ are independent and normally distributed, 
+$\bm{R}^{fh}_{t+1}$. As discussed at the beginning of this chapter, the precision of an estimated expected
+return depends on the length of the sample period \cite{Merton1980}. For example, if the returns of a stock with an annual volatility of $30\%$ are independent and normally distributed, 
 the standard error of its sample mean over ten years is $30\% / \sqrt{10} \approx 9.5\%$ per year, and a
 $95\%$ confidence interval for its expected return is about $37$ percentage points wide. 
 
@@ -782,7 +779,7 @@ realization $k$ is the equally weighted return of its $N_c$ assets
     z_{k,c} = \frac{1}{N_c} \sum_{i \,:\, c_i = c} y^{fh}_{k,i},
 \end{equation*}
 with the sample mean $\bar{z}_c = \frac{1}{q} \sum_{k=1}^q z_{k,c}$. Pooling reduces the number of estimated means
-from $N$ to the number of economies $M + 1$, while the number of realizations stays the same. The equally weighted economy
+from $N$ to the number of economies $M + 1$. The equally weighted economy
 return also diversifies part of the volatility of its assets, so its mean is estimated more precisely than the means of
 the individual assets. Every asset then uses the expected return of its economy, so the mean term depends on the
 asset weights only through the total weight of each economy. 
@@ -816,8 +813,8 @@ which is known as the carry. Since $f_{c,t}$ is known at time $t$, the expected 
     \mathbb{E}_t[e_{c,t+1} - f_{c,t}] = \mathbb{E}_t[e_{c,t+1}] - f_{c,t}.
 \end{equation*}
 Under uncovered interest parity, the expected change of the spot rate offsets the interest rate differential,
-$\mathbb{E}_t[e_{c,t+1}] = f_{c,t}$, and the expected excess return is zero, in which case the currency exposures would
-not enter the mean term. We instead set the expected excess currency returns to the negative forward premia
+$\mathbb{E}_t[e_{c,t+1}] = f_{c,t}$, and the expected excess return is zero. We 
+instead set the expected excess currency returns to the negative forward premia
 \begin{equation*}
     \bm{\mu}^c_t = -\bm{f}_t,
 \end{equation*}
