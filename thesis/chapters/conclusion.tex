@@ -36,7 +36,7 @@ Shortfall and second-order Expected Shortfall already reward a higher mean.
 A possible further source of the gain is currency carry. Since the expected excess currency returns are set to the
 interest rate differential, the mean term rewards exposure to higher-yielding currencies, so the currency positions may
 earn part of the carry premium that pure risk minimization gives up. The optimizers earn higher risk-adjusted returns than the equally weighted portfolio in the medium and large
-universes, and the deviation measures also in the small universe, at about $40\%$ to $75\%$ of its volatility and
+universes, and the deviation measure optimizers also do so in the small universe, at about $40\%$ to $75\%$ of its volatility and
 maximum drawdown.
 
 Across all backtests in Tables~\ref{tab:baseline}, \ref{tab:regularized-top10} to~\ref{tab:regularized-top100},
@@ -87,7 +87,7 @@ an investor based in another currency, such as the euro, the Swiss franc, or the
 and their dependence with the asset returns differ, and repeating the analysis for other base currencies would show how
 much the results depend on this structure.
 
-The backtests are also based on simplified trading assumptions, namely constant transaction costs, no market impact, and quarterly
+The backtests are also based on simplified trading assumptions, such as constant transaction costs, no market impact, and quarterly
 rebalancing, among others.
 Since the unregularized and mean-risk joint optimizers have a much higher currency turnover than the overlay optimizers in most cases, higher trading
 costs, more frequent rebalancing, and market impact would likely reduce the advantage of the joint optimizers

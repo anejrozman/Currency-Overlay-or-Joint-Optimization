@@ -104,7 +104,8 @@ we look at the drawdowns in more detail over the whole out-of-sample period.
 
 For excess returns, we observe the opposite effect. The overlay and joint optimizers deliver lower excess returns than
 the equally weighted portfolio for every risk measure and universe size. This is partially due to the fact that the optimizers are
-minimizing risk without any explicit return term in the objective function. We address this in more detail in \Cref{sec:effects-of-adding-a-mean-term}. Secondly, much of the volatility reduction achieved by the risk-minimizing portfolios may come from a
+minimizing risk without any explicit return term in the objective function. We address this in more detail in \Cref{sec:effects-of-adding-a-mean-term}. 
+In addition, much of the volatility reduction achieved by the risk-minimizing portfolios may come from a
 lower exposure to the common movement of the equity markets, in which case the optimizers also earn a smaller share of the equity risk
 premium. But excess returns alone say little about performance when the portfolios carry different levels of risk, so we focus on comparing them on a risk-adjusted basis.
 
@@ -423,7 +424,7 @@ minimizes the risk measure with an added expected portfolio return scaled by $1/
 coefficient, as introduced in \Cref{sec:mean-risk-portfolio-optimization}. In the overlay program, the asset step includes the
 expected asset returns and the currency step the expected excess currency returns. The expected asset returns are averaged
 across the stocks of each economy and shrunk toward zero, while the expected excess currency returns are set to the
-negative forward premium, that is, the difference between the foreign and the US interest rate. The calibration of $\gamma$ for each optimizer is described in
+negative forward premium, that is, the difference between the foreign and the US interest rate. The calibration of $\gamma$ for each risk measure is described in
 \Cref{app:risk-aversion-calibration}. In both programs, we also introduce a currency leverage constraint. \Cref{tab:mean-sharpe-change} reports the
 change in the Sharpe ratio from adding the mean term, and \Cref{tab:mean-risk} reports the performance
 metrics.

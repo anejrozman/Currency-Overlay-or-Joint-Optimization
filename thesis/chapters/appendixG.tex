@@ -166,7 +166,7 @@ The unregularized optimizers have no such degree of freedom. Besides the budget 
 restricted by the leverage limit $\|\bm{x}_t\|_1 \le \ell^a$, which promotes sparsity in the same way as the $L^1$ penalty. 
 As a result, the share of the assets they hold falls with the size of the universe. For variance,
 semi-variance, mean absolute deviation, and Expected Shortfall, it falls from $91$--$99\%$ in the small universe to $60$--$73\%$
-in the large universe. And for second-order Expected Shortfall optimizers, it falls from $70$--$78\%$ in 
+in the large universe. For the second-order Expected Shortfall optimizers, it falls from $70$--$78\%$ in 
 the small universe to around $50\%$ in the large universe.
 
 For mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
@@ -336,7 +336,7 @@ annualized like the volatility
     \mathrm{ESR}_{\mathcal P} = 252\, \frac{\bar R_{\mathcal P} - \bar R_f}{\sqrt{252}\, \mathrm{ES}_{\beta,\mathcal P}},
 \end{equation*}
 and measures the excess return per unit of tail risk.\footnote{In recent literature, this ratio is also referred to as
-the STARR ratio (stable tail-adjusted return ratio).}
+the STAR ratio (stable tail-adjusted return ratio).}
 
 As for the volatility in \Cref{sec:baseline-backtests}, the optimizers realize much lower values of all four risk
 measures than the equally weighted portfolio, and the reduction is larger in the medium and large universes than in

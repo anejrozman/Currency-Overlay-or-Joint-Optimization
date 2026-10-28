@@ -82,7 +82,7 @@ The natural estimate of $\bm{\Sigma}_t$ is the sample covariance matrix of the r
 It has $N(N+1)/2$ distinct
 entries, all estimated from the same $q$ observations, and when $N$ is large relative to $q$, its eigenvalues are more
 dispersed than those of $\bm{\Sigma}_t$, with the smallest eigenvalues biased downward \cite{LedoitWolf2004}. Through
-the inverse in the closed form solution \eqref{eq:var-closed-form-solution}, the minimum-variance portfolio then concentrates on the combinations of assets whose
+the inverse in the closed-form solution \eqref{eq:var-closed-form-solution}, the minimum-variance portfolio then concentrates on the combinations of assets whose
 risk is most underestimated, and its in-sample variance understates its out-of-sample variance \cite{ElKaroui2010}.
 When $N \ge q$, the sample covariance matrix is singular, and the closed form does not exist.
 
@@ -383,11 +383,11 @@ The five risk measures can be divided into two classes, which differ in how they
 distribution.
 
 Artzner et al.~\cite{CoherentMeasuresOfRisk} call a risk measure $\mathcal{R}$ coherent if it satisfies four
-properties. Adding a riskless amount to the return reduces the risk by that amount (translation invariance),
+properties. Adding a riskless amount to the return reduces the risk by that amount (translation equivariance),
 $\mathcal{R}(X + C) = \mathcal{R}(X) - C$, scaling the position by a positive factor scales the risk by the same
 factor (positive homogeneity), the risk of a combined position is at most the sum of the risks of its parts (subadditivity),
 so that diversification does not
-increase risk, and a same return that is higher carries no more risk. Out of the five risk measures we define in this chapter, only Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
+increase risk, and a same return that is higher carries no more risk (monotonicity). Out of the five risk measures we define in this chapter, only Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
 second-order Expected Shortfall \cite{Krokhmal2007} are coherent. Additionally, they are both strictly expectation bounded, that
 is, their risk exceeds the expected loss of every nonconstant return.
 
@@ -685,9 +685,9 @@ second-order Expected Shortfall. Without the $L^2$ penalties, the programs under
 Shortfall are linear programs. Standard solvers handle all of these programs efficiently~\cite{boyd2004convex}.
 
 \section{Mean-Risk Portfolio Optimization} \label{sec:mean-risk-portfolio-optimization}
-
+ 
 The programs of the previous section minimize a measure of risk without an explicit estimate of the expected returns,
-and we argue why such estimates are imprecise. The resulting portfolios,
+and we argued in \Cref{sec:risk-based-optimization} why such estimates are imprecise. The resulting portfolios,
 however, may give up excess returns that a moderately riskier allocation would earn. A mean term in the objective lets
 the programs trade off expected return against risk explicitly. With it, the joint program can also weigh the expected
 returns of the assets and the currencies against each other, whereas the overlay program considers the expected
@@ -704,7 +704,7 @@ the Bayes--Stein estimator of Jorion \cite{Jorion1986BayesStein}.
 Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} formulate their programs with an objective
 that trades off the expected return against Expected Shortfall but evaluate them out of sample under infinite risk
 aversion, which removes the expected return from the objective. We add the mean term back to the programs
-of the previous section and estimate the expected returns in a way that they are more stable and less affected by estimation error.
+of the previous section and estimate the expected returns in a way that makes them more stable and less affected by estimation error.
 
 \subsection{Mean-Risk Programs}\label{sec:mean-risk-programs}
 

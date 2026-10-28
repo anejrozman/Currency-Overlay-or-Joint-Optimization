@@ -79,7 +79,7 @@ stocks.
 
 We can see that as the investable universe becomes larger, the average returns tend to fall. In the small universe every economy has a positive average return, ranging from
 $2.76\%$ (the United Kingdom) to $12.59\%$ (the United States). In the medium universe, the range
-drops from $-1.99\%$ (Singapore) to $7.99\%$ (the United States), and in the
+is from $-1.99\%$ (Singapore) to $7.99\%$ (the United States), and in the
 large universe the range goes from $-4.84\%$ (Singapore) to $6.86\%$ (the United States), with many
 economies now having negative average returns. The
 trend reflects the firm size, the largest stocks post the strongest returns, and the smaller
@@ -146,8 +146,8 @@ In \Cref{chap:backtest-analysis} we evaluate a range of optimization strategies 
 Expected Shortfall), their treatment of
 currency exposure (overlay or joint), and the size of the investable
 universe (small, medium, large). To keep these comparisons fair, the
-backtesting framework separates between the
-orchestration of the backtest and the optimization logic it evaluates.\footnote{The full codebase with the backtest implementation is publicly available on GitHub: \url{https://github.com/anejrozman/Currency-Overlay-or-Joint-Optimization}.}  
+backtesting framework separates the
+orchestration of the backtest from the optimization logic it evaluates.\footnote{The full codebase with the backtest implementation is publicly available on GitHub: \url{https://github.com/anejrozman/Currency-Overlay-or-Joint-Optimization}.}  
 The main backtesting loop that ingests data, rolls the estimation window forward, selects
 hyperparameters, and records performance is fixed, while the optimizer that
 produces portfolio weights is a swappable component. Any optimizer that conforms
@@ -236,7 +236,7 @@ interaction is summarized in \Cref{fig:backtest}.
     \text{OOS Returns}\\[2pt]
     {\text{Performance metrics}}
   }; 
-
+ 
   \draw[arr] (bt.south) -- (oos.north);
 
 \end{tikzpicture}
@@ -244,9 +244,9 @@ interaction is summarized in \Cref{fig:backtest}.
 \caption{Schematic of the backtesting framework.}
 \label{fig:backtest}
 \end{figure} 
-
+ 
 Data ingestion and alignment are implemented in the \texttt{DataHandler}.
-It loads the input data, the local unhedged asset returns $R^u$, the currency returns
+It loads the input data, the unhedged asset returns $R^u$, the currency returns
 $R^c$, the forward premia $f$, and the universe mask that identifies which
 assets constitute the investable universe at each date. It then aligns them into a
 \texttt{data\_bundle}, which is passed to the backtester. The optimizers operate only on the
