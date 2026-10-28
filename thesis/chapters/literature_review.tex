@@ -85,10 +85,30 @@ methods are developed for portfolios of assets in a single currency. Burkhardt a
 \cite{SparseAndStableInternationalPortfolioOptimization} carry them over to the mean-variance optimization of assets and
 currencies, and Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to Expected Shortfall.
 
-In this thesis we extend this literature in four directions. First, we compare joint and sequential optimization under
-five risk measures, the variance, the semi-variance, the mean absolute deviation, Expected Shortfall, and second-order
-Expected Shortfall, in the same out-of-sample framework with and without regularization. Second, we study how the
-comparison depends on the size of the investable universe. Third,
-we add a mean term to the programs of all five risk measures, with expected asset returns that are pooled by economy and
-shrunk, and expected currency returns that are derived from the forward premia. Finally, we distinguish the advantage that
-joint optimization has in sample from what is realized out of sample.
+In this thesis we extend this literature in four directions. First, we compare joint and sequential optimization 
+under five risk measures, the variance, the semi-variance, the mean absolute deviation, Expected Shortfall, and 
+second-order Expected Shortfall, in the same out-of-sample framework with and without regularization. 
+When the programs only minimize risk, the joint and overlay optimizers earn very similar risk-adjusted 
+returns under all five measures. Second, we study how the comparison depends on the size of the 
+investable universe. The lower risk of the joint optimizers is realized out of sample mainly in the 
+small universe, where the currencies make up a larger share of the decision variables. 
+Third, we add a mean term to the programs of all five risk measures, 
+with expected asset returns that are pooled by economy and shrunk, and expected 
+currency returns that are derived from the forward premia. With the mean term, 
+the joint optimizers achieve higher Sharpe ratios than the overlay optimizers 
+for every risk measure in the larger universes. 
+Finally, we distinguish the advantage that joint optimization has in sample from 
+what is realized out of sample. For the deviation measures, most of the in-sample advantage 
+is realized, whereas for the tail measures it is larger but mostly lost out of sample.
+
+% Intuitive explanation for the thesis presentation conclusion. 
+
+% For a manager who only minimizes risk, joint optimization lowers the risk of the portfolio 
+% most when the investable universe is small relative to the number of currencies, 
+% while in large universes a currency overlay performs just as well. 
+% A manager who also uses expected returns
+% benefits from choosing the asset and the currency positions together in larger universes. 
+% With either approach, managing the currencies actively lowers risk relative to full hedging 
+% at similar risk-adjusted returns and, in the larger universes, outperforms leaving the currency exposure unhedged.
+
+
