@@ -10,13 +10,15 @@ combining assets whose returns do not move together lowers the risk of the portf
 optimization has become a standard tool in asset management. An important difficulty in practice is that the expected
 returns and the risks of the assets are unknown and have to be estimated from historical data.
 
-Investing abroad gives an investor access to more assets and therefore more diversification. At the same time, it
-exposes the portfolio to changes in exchange rates. If a foreign currency loses value against the domestic currency,
-the investor loses money on the assets in that currency, even if the assets themselves do well. The investor can manage
-this currency risk with currency forward contracts. An international portfolio is therefore described by two sets of decisions,
-how to allocate the assets and how to set the currency exposures. In practice, many investors make these decisions in two steps. They first
-choose the asset portfolio and then add a portfolio of currency positions, called a currency overlay, to manage its
-currency risk, often through a separate overlay manager \cite{SparseAndStableInternationalPortfolioOptimization}.
+Investing abroad gives an investor access to assets from more economies and industries. Their returns depend in part
+on risk factors that do not drive the domestic market, so adding them to the portfolio can improve its risk-return
+profile. At the same time, these assets expose the portfolio to changes in exchange rates. If a foreign currency loses
+value against the domestic currency, the investor can lose money on the assets in that currency, even if they earn a
+positive return in their local currency. The investor can manage this currency risk with currency forward contracts.
+An international portfolio is therefore described by two sets of decisions: how to allocate the assets and how to set
+the currency exposures. In practice, many investors make these decisions in two steps. They first choose the asset
+portfolio and then add a portfolio of currency positions, called a currency overlay, to manage its currency risk, often
+through a separate overlay manager \cite{SparseAndStableInternationalPortfolioOptimization}.
 
 The alternative to this sequential approach is joint optimization, which chooses the asset weights and the currency
 exposures together in one step. Jorion \cite{Jorion1994} argues that the two-step approach is suboptimal, since it
@@ -40,6 +42,11 @@ on the number of assets that make up the investable universe. This thesis builds
 the currency exposures jointly improves on the sequential currency overlay out of sample, and how the answer depends on
 the risk measure, the size of the investable universe, regularization, and a mean term in the objective.
 
+We study this question for a US investor, using daily stock and currency data for 14 economies from 1990 to 2023.
+We form three investable universes from the 10, 50, and 100 largest stocks of each economy, up to $140$, $700$, and
+$1{,}400$ stocks in total.
+
+
 \section{Contributions}
 
 In this thesis, we make four contributions. First, we compare joint and sequential optimization under five risk
@@ -51,7 +58,7 @@ variables. In the larger universes, the asset step of the overlay program has mo
 the objective on its own, and the advantage shrinks until it disappears in the largest universe.
 
 Second, we add a mean term to the programs of all five risk measures, with expected asset returns that are pooled by
-economy and expected currency returns that are derived from the forward premia. The mean term raises the
+economy, and expected currency returns that are derived from the forward premia. The mean term raises the
 risk-adjusted returns of almost all optimizers, and most for the variance, the semi-variance, and the mean absolute
 deviation, which are unaffected by a shift of the portfolio return, whereas Expected Shortfall and second-order Expected
 Shortfall already reward a higher mean return implicitly. Once a mean term is added to the unregularized programs, the joint optimizers
@@ -74,8 +81,20 @@ to choose from. Regularization improves the risk-adjusted returns,
 most in the largest universe, since it limits the extreme positions that the programs fit to noise. The regularized
 joint and overlay optimizers, which manage the currencies actively, realize a lower value of the risk measure they
 minimize than the fully hedged benchmark at similar risk-adjusted returns, and they outperform the unhedged benchmark in
-the two larger universes. Overall, the
-mean-variance joint optimizer performs best.
+the two larger universes. 
+
+Taken together, our results translate into practical advice for asset managers who invest internationally. For a
+manager who uses a currency overlay, switching to joint optimization is beneficial in two situations. The first is
+when the manager optimizes for both risk and return. In the two larger universes, the joint optimizers then achieve higher
+Sharpe ratios than the overlay optimizers for every risk measure. The second is when the manager only minimizes risk but holds
+few assets per currency, as in the smallest universe, where joint optimization lowers the risk of the portfolio at
+similar risk-adjusted returns. For the choice of the risk measure, our results favor the variance, since the mean-variance joint optimizer performs
+best overall. Whichever approach is chosen, regularization
+raises the risk-adjusted returns, most in the largest universe. Managing the currencies actively 
+lowers the risk relative to full hedging without giving up risk-adjusted returns, and in the 
+two larger universes it also outperforms leaving
+the currency exposure unhedged.
+
 
 \section{Thesis Structure}
 
