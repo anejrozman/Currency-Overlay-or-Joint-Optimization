@@ -27,14 +27,14 @@ international portfolio optimization model, and Konno and Li \cite{KonnoLi1998, 
 and bonds of several countries in a single mean-variance or mean absolute deviation program instead of the usual
 two-stage allocation, and hedge the currency risk with forward contracts. Topaloglou et
 al.~\cite{TopaloglouVladimirouZenios2002} choose the asset weights and the currency hedge of each market together by
-minimizing Expected Shortfall over simulated scenarios, and Mhiri and Prigent \cite{MhiriPrigent2010} consider the
+minimizing expected shortfall over simulated scenarios, and Mhiri and Prigent \cite{MhiriPrigent2010} consider the
 higher moments of the returns in international portfolio optimization. Burkhardt and Ulrych
 \cite{SparseAndStableInternationalPortfolioOptimization} point out that the evidence for joint optimization was mostly
 established in sample, where the joint program can only improve on the overlay program, whereas out of sample the
 advantage can be lost to overfitting. They add regularization to joint and sequential mean-variance optimization and
 find that the regularized joint programs achieve on average higher out-of-sample Sharpe ratios than the overlay
 programs. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} apply $L^1$ and $L^2$ penalties
-to Expected Shortfall optimization and find that joint optimization performs better in the smaller of their two
+to expected shortfall optimization and find that joint optimization performs better in the smaller of their two
 investable universes. 
 
 Whatever the risk measure, the optimized portfolio depends on estimates from a finite sample. Merton \cite{Merton1980}
@@ -58,14 +58,14 @@ The estimation error also depends on the risk measure one chooses to optimize. M
 mean as much as returns below it, and in his later book \cite{Markowitz1959} he proposes the semi-variance as a downside
 alternative. Konno and Yamazaki
 \cite{KonnoYamazaki1991} propose the mean absolute deviation, which turns portfolio optimization into a linear program.
-Artzner et al.~\cite{CoherentMeasuresOfRisk} define coherent risk measures, a class to which Expected Shortfall belongs
+Artzner et al.~\cite{CoherentMeasuresOfRisk} define coherent risk measures, a class to which expected shortfall belongs
 \cite{acerbi2002coherenceexpectedshortfall}, and Rockafellar and Uryasev \cite{RockafellarUryasev2000,
-RockafellarUryasev2002} show that Expected Shortfall can be minimized by a linear program. Krokhmal \cite{Krokhmal2007}
-extends Expected Shortfall to higher-moment coherent risk measures, which put more weight on the largest losses, and
+RockafellarUryasev2002} show that expected shortfall can be minimized by a linear program. Krokhmal \cite{Krokhmal2007}
+extends expected shortfall to higher-moment coherent risk measures, which put more weight on the largest losses, and
 Rockafellar et al.~\cite{RockafellarUryasevZabarankin2006} introduce deviation measures, which quantify the dispersion of
 a return rather than its losses. Since these measures depend on different parts of the return distribution, they are
 affected differently by estimation error, and the measures of tail risk, which depend only on the largest losses, are
-particularly affected. Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under Expected Shortfall are
+particularly affected. Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under expected shortfall are
 more sensitive to estimation error than those optimized under the variance, and Ciliberti et
 al.~\cite{ciliberti2007feasibility} show that, without bounds on the weights, the optimization has no finite solution in
 some samples, and that for large portfolios a solution ceases to exist once the ratio of the number of assets to the
@@ -83,11 +83,11 @@ of the weights of minimum-variance portfolios, Brodie et al.~\cite{BrodieDaubech
 penalty, which yields sparse and stable portfolios, and Li \cite{Li2015} combines the $L^1$ and the $L^2$ penalty. These
 methods are developed for portfolios of assets in a single currency. Burkhardt and Ulrych
 \cite{SparseAndStableInternationalPortfolioOptimization} carry them over to the mean-variance optimization of assets and
-currencies, and Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to Expected Shortfall.
+currencies, and Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} to expected shortfall.
 
 In this thesis we extend this literature in four directions. First, we compare joint and sequential optimization 
-under five risk measures, the variance, the semi-variance, the mean absolute deviation, Expected Shortfall, and 
-second-order Expected Shortfall, in the same out-of-sample framework with and without regularization. 
+under five risk measures, the variance, the semi-variance, the mean absolute deviation, expected shortfall, and 
+second-order expected shortfall, in the same out-of-sample framework with and without regularization. 
 When the programs only minimize risk, the joint and overlay optimizers earn very similar risk-adjusted 
 returns under all five measures. Second, we study how the comparison depends on the size of the 
 investable universe. The lower risk of the joint optimizers is realized out of sample mainly in the 

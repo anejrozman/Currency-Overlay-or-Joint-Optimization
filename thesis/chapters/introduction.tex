@@ -35,7 +35,7 @@ existing evidence, however, does not give a clear answer. Burkhardt and Ulrych
 \cite{SparseAndStableInternationalPortfolioOptimization} study regularized mean-variance portfolios, which include the
 expected returns in the objective, and find that joint optimization achieves on average higher risk-adjusted returns
 out of sample than the overlay. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} minimize
-Expected Shortfall instead, which measures the average of the largest losses of a portfolio, and find that joint
+expected shortfall instead, which measures the average of the largest losses of a portfolio, and find that joint
 optimization performs better in the smaller of their two investable universes. The two studies differ in the risk
 measure and in whether expected returns are used in the optimization, and the second study shows that the answer can also depend
 on the number of assets that make up the investable universe. This thesis builds on their frameworks and studies whether optimizing the asset weights and
@@ -60,15 +60,15 @@ the objective on its own, and the advantage shrinks until it disappears in the l
 Second, we add a mean term to the programs of all five risk measures, with expected asset returns that are pooled by
 economy, and expected currency returns that are derived from the forward premia. The mean term raises the
 risk-adjusted returns of almost all optimizers, and most for the variance, the semi-variance, and the mean absolute
-deviation, which are unaffected by a shift of the portfolio return, whereas Expected Shortfall and second-order Expected
-Shortfall already reward a higher mean return implicitly. Once a mean term is added to the unregularized programs, the joint optimizers
+deviation, which are unaffected by a shift of the portfolio return, whereas expected shortfall and second-order 
+expected shortfall already reward a higher mean return implicitly. Once a mean term is added to the unregularized programs, the joint optimizers
 achieve higher Sharpe ratios than the overlay optimizers for every risk measure in the two larger universes, since the
 joint program can weigh the expected returns of the assets and the currencies against each other.
 
 Third, we show that the joint program has an advantage over the overlay program in sample by construction, and we
 measure how much of this advantage is realized out of sample. For the variance, the semi-variance, and the mean
-absolute deviation, the in-sample advantage is small, and most of it is realized out of sample. For Expected Shortfall
-and second-order Expected Shortfall, it is larger but mostly not realized. By varying the confidence level and by
+absolute deviation, the in-sample advantage is small, and most of it is realized out of sample. For expected shortfall
+and second-order expected shortfall, it is larger but mostly not realized. By varying the confidence level and by
 de-meaning the two measures, we explain their in-sample advantage with two mechanisms, the fitting of the currency positions
 to the specific worst days of the lookback window and an implicit risk-return tradeoff that rewards a high realized
 mean, and neither of them generalizes out of sample.
