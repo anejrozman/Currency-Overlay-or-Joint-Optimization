@@ -95,7 +95,7 @@ so that the portfolio optimization problem under semi-variance becomes
     \bm{x}_t^* = \argmin_{\bm{x}_t} \frac{1}{q} \sum_{k=1}^q \bigl( (\bm{x}_t^\top \bar{\bm{y}} - \bm{x}_t^\top \bm{y}_k)^+ \bigr)^2,
     \quad \text{s.t. } \bm{x}_t^\top \bm{1}_N = 1.
 \end{equation}
-Each summand is only piecewise quadratic in $\bm{x}_t$. Following Markowitz et al.~\cite{Markowitz1993}, and as for Expected Shortfall in \Cref{app:lp_es},
+Each summand is only piecewise quadratic in $\bm{x}_t$. Following Markowitz et al.~\cite{Markowitz1993}, and as for expected shortfall in \Cref{app:lp_es},
 we modify it by introducing, for each observation $k$, an auxiliary variable
 $u_k \ge 0$ subject to
 \begin{equation} \label{eq:svar_slack}
@@ -145,7 +145,7 @@ unregularized portfolio optimization problem under semi-variance.
 
 The base problems \eqref{eq:var_base_qp} and \eqref{eq:svar_base_qp} are known to be unstable in high-dimensional
 settings, where the programs are prone to producing extreme and concentrated weights \citep{Michaud1989, kondor2007noise}. As for
-Expected Shortfall, we stabilize them with the $L^1$ penalty, the $L^2$ penalty, and the asset leverage constraint of
+expected shortfall, we stabilize them with the $L^1$ penalty, the $L^2$ penalty, and the asset leverage constraint of
 Sections~\ref{app:l1}--\ref{app:leverage}, using the decomposition \eqref{eq:l1_decomp} of the weights into positive
 and negative parts and the leverage constraint \eqref{eq:leverage_constraint}.
 
@@ -246,7 +246,7 @@ leverage constraint \eqref{eq:leverage_constraint}.
 
 \section{Sequential Optimization} \label{app:mv_separate}
 
-As we have considered for Expected Shortfall in \Cref{app:separate-optimization}, constructing an international portfolio also requires
+As we have considered for expected shortfall in \Cref{app:separate-optimization}, constructing an international portfolio also requires
 selecting currency exposures. In the sequential portfolio optimization approach, the asset weights and currency
 exposures are optimized in two steps. First, the asset weights $\bm{x}_t$ are optimized on the fully hedged returns.
 Then, conditional on the optimal $\bm{x}_t^*$, the currency exposures $\bm{\psi}_t \in \mathbb{R}^M$ are optimized. The
@@ -401,7 +401,7 @@ and the $q$ rows of $\tilde{\bm{A}}$ encode the slack constraints of the currenc
 \section{Joint Optimization} \label{app:mv_joint}
 
 In the joint portfolio optimization approach, the asset weights and currency exposures are optimized simultaneously
-rather than sequentially. As for Expected Shortfall in \Cref{app:joint-optimization}, we stack the weights into the combined
+rather than sequentially. As for expected shortfall in \Cref{app:joint-optimization}, we stack the weights into the combined
 decision vector $\bm{\theta}_t = [\bm{x}_t^\top, \bm{\psi}_t^\top]^\top \in \mathbb{R}^{N+M}$ and the corresponding
 returns into the combined return vector
 $\bm{R}^{\text{all}}_{t+1} = [\bm{R}^{fh\top}_{t+1},\, (\bm{e}_{t+1} - \bm{f}_t)^\top]^\top \in \mathbb{R}^{N+M}$,
@@ -550,7 +550,7 @@ a zero block added for $\bm{u}$, and the first $q$ rows of $\tilde{\bm{A}}$ enco
 \section{Mean-Risk Optimization} \label{app:mv_mean_risk}
 
 The programs of Sections~\ref{app:mv_representation}--\ref{app:mv_joint} minimize the risk measure only. As for
-Expected Shortfall in \Cref{app:mean-risk}, a mean-risk program subtracts the expected portfolio return, scaled by
+expected shortfall in \Cref{app:mean-risk}, a mean-risk program subtracts the expected portfolio return, scaled by
 $1/\gamma$, from the risk measure, where $\gamma > 0$ is the risk aversion coefficient. For problem
 \eqref{eq:mv_risk_min}, this gives
 \begin{equation}

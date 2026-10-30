@@ -1,10 +1,10 @@
 \chapter{Optimization Derivation: Expected Shortfall and Second-Order Expected Shortfall} \label{app:es_derivation}
 
 In this appendix, we derive the portfolio optimization problems used in the main text, building up from the definitions of
-Expected Shortfall and second-order Expected Shortfall to the programs solved in the empirical analysis.
+expected shortfall and second-order expected shortfall to the programs solved in the empirical analysis.
 In \Cref{app:es_auxiliary_formulation} we derive the auxiliary formulation of
-Expected Shortfall and introduce second-order Expected Shortfall. In \Cref{app:linear-program-representation} we write the portfolio optimization problem as a linear program for Expected Shortfall
-and as a second-order cone program for second-order Expected Shortfall. In \Cref{app:regularization} we regularize the programs by adding an $L^1$
+expected shortfall and introduce second-order expected shortfall. In \Cref{app:linear-program-representation} we write the portfolio optimization problem as a linear program for expected shortfall
+and as a second-order cone program for second-order expected shortfall. In \Cref{app:regularization} we regularize the programs by adding an $L^1$
 penalty, an $L^2$ penalty, and a leverage constraint. We
 then extend the programs to the multi-currency setting, for sequential optimization in \Cref{app:separate-optimization}
 and for joint optimization in \Cref{app:joint-optimization}. Finally, in \Cref{app:mean-risk} we add the expected
@@ -12,20 +12,20 @@ portfolio return to the objectives of the sequential and joint problems.
 
 \section{Auxiliary Formulations of Expected Shortfall and Second-Order Expected Shortfall} \label{app:es_auxiliary_formulation}
 
-We derive the equivalence between the direct minimization of Expected Shortfall and the auxiliary formulation proposed
-by Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and introduce second-order Expected Shortfall, which Krokhmal
+We derive the equivalence between the direct minimization of expected shortfall and the auxiliary formulation proposed
+by Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and introduce second-order expected shortfall, which Krokhmal
 \cite{Krokhmal2007} defines directly through an auxiliary formulation of the same type. The two formulations
-allow for writing the portfolio optimization problem as a linear program for Expected Shortfall and as a second-order cone
-program for second-order Expected Shortfall in \Cref{app:linear-program-representation}.
+allow for writing the portfolio optimization problem as a linear program for expected shortfall and as a second-order cone
+program for second-order expected shortfall in \Cref{app:linear-program-representation}.
 
 \subsection{Expected Shortfall} \label{app:es_auxiliary}
 
 We assume that the loss distribution is continuous and has a strictly increasing cumulative distribution function and additionally that its probability density
-function exists. Under these assumptions, the Value-at-Risk (VaR) defined below is the unique point at which the
+function exists. Under these assumptions, the value-at-risk (VaR) defined below is the unique point at which the
 cumulative distribution function equals the confidence level \cite{QuantitativeRiskManagement2016}. The assumptions
 simplify the derivation but are not needed for the result. Rockafellar and Uryasev \cite{RockafellarUryasev2002} show
 that the equivalence derived below holds for general loss distributions, including the empirical distribution used in
-\Cref{app:linear-program-representation}, when Expected Shortfall is defined as the average of the quantiles of the loss
+\Cref{app:linear-program-representation}, when expected shortfall is defined as the average of the quantiles of the loss
 distribution over all levels above the confidence level \cite{acerbi2002coherenceexpectedshortfall}.
 
 \newpage
@@ -34,7 +34,7 @@ Define the loss random variable at time $t+1$, given portfolio weights $\bm{x}_t
     \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha \mid \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
 \end{equation*}
 
-The Expected Shortfall at confidence level $\beta$ is defined as the conditional expectation of losses exceeding $\text{VaR}_\beta$
+The expected shortfall at confidence level $\beta$ is defined as the conditional expectation of losses exceeding $\text{VaR}_\beta$
 \begin{equation*}
     \text{ES}_\beta(\bm{x}_t) = \mathbb{E}_t[L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t)] = \frac{1}{1-\beta} \int_{\text{VaR}_\beta(\bm{x}_t)}^\infty l f(l) \, dl.
 \end{equation*}
@@ -65,7 +65,7 @@ Setting the derivative to zero gives the optimal $\alpha^*$
     \mathbb{P}_t(L(\bm{x}_t) \le \alpha^*) &= \beta.
 \end{align*}
 
-We see that the optimal $\alpha^*$ that minimizes the auxiliary function for a fixed $\bm{x}_t$ is exactly the Value-at-Risk at level $\beta$.
+We see that the optimal $\alpha^*$ that minimizes the auxiliary function for a fixed $\bm{x}_t$ is exactly the value-at-risk at level $\beta$.
 
 Substituting $\alpha^* = \text{VaR}_\beta(\bm{x}_t)$ back into \eqref{eq:aux-function-es} we obtain
 \begin{align*}
@@ -94,21 +94,21 @@ jointly convex in $(\bm{x}_t, \alpha)$. Expectation is a linear operator, which 
 
 \subsection{Second-Order Expected Shortfall} \label{app:soes_auxiliary}
 
-Second-order Expected Shortfall belongs to the family of higher-moment risk measures introduced by Krokhmal
+Second-order expected shortfall belongs to the family of higher-moment risk measures introduced by Krokhmal
 \cite{Krokhmal2007}. It is obtained from the auxiliary function $F_\beta$ by replacing the expectation of the excess
 loss $(L(\bm{x}_t) - \alpha)^+$ with its $L^2$ norm.\footnote{ We define the $L^2$ norm in the standard way as $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$ for a random variable
 $Z$.} This gives the auxiliary function
 \begin{equation*}
     G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta} \big\| (L(\bm{x}_t) - \alpha)^+ \big\|_{L^2},
 \end{equation*}
-and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
+and second-order expected shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
 \begin{equation} \label{eq:soes_def}
     \text{SOES}_\beta(\bm{x}_t) = \min_{\alpha} G_\beta(\bm{x}_t, \alpha).
 \end{equation}
 The $L^2$ norm squares the excess losses, so large losses 
-receive more weight than in Expected Shortfall. Second-order Expected Shortfall is a coherent risk measure, which we prove in Proposition~\ref{prop:soes-coherent}.
+receive more weight than in expected shortfall. Second-order expected shortfall is a coherent risk measure, which we prove in Proposition~\ref{prop:soes-coherent}.
 
-Unlike Expected Shortfall, second-order Expected Shortfall is defined directly through the minimization over $\alpha$,
+Unlike expected shortfall, second-order expected shortfall is defined directly through the minimization over $\alpha$,
 so there is no equivalence to derive. Instead, we only have to verify that $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$.  
 
 We argued for the case of $F_\beta$ that the map $(\bm{x}_t, \alpha) \mapsto (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+$ is convex. The $L^2$ norm is a convex function \cite[Section~3.1.5]{boyd2004convex} and nondecreasing for non-negative random variables.  The composition of a convex nondecreasing function with a convex
@@ -147,7 +147,7 @@ $\bm{R}_{t+1}$. We approximate the conditional expectation in $F_\beta$ by the e
     \mathbb{E}_t[(-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+]
     \approx \frac{1}{q} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+,
 \end{equation*}
-so that the portfolio optimization problem under Expected Shortfall becomes
+so that the portfolio optimization problem under expected shortfall becomes
 \begin{equation} \label{eq:empirical_es}
     \bm{x}_t^*, \alpha^* = \argmin_{\bm{x}_t, \alpha} \left\{ \alpha
     + \frac{1}{q(1-\beta)} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \right\},
@@ -196,7 +196,7 @@ row, $\bm{0}_q$ is the $q$-dimensional zero vector, and $\bm{I}_q$ the $q$-dimen
 
 Problem \eqref{eq:base_lp} has a linear objective subject to one linear equality and $q$
 linear inequalities, and is thus a linear program solvable with standard methods. This
-formulation serves as the base unregularized portfolio optimization problem under Expected Shortfall.
+formulation serves as the base unregularized portfolio optimization problem under expected shortfall.
 
 \subsection{Second-Order Expected Shortfall} \label{app:socp_soes}
 
@@ -206,7 +206,7 @@ empirical average over the sample
     \big\| (-\bm{x}_t^\top \bm{R}_{t+1} - \alpha)^+ \big\|_{L^2}
     \approx \left( \frac{1}{q} \sum_{k=1}^q \big( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \big)^2 \right)^{1/2},
 \end{equation*}
-so that the portfolio optimization problem under second-order Expected Shortfall becomes
+so that the portfolio optimization problem under second-order expected shortfall becomes
 \begin{equation} \label{eq:empirical_soes}
 \begin{gathered}
     \bm{x}_t^*, \alpha^* = \argmin_{\bm{x}_t, \alpha} \left\{ \alpha
@@ -219,7 +219,7 @@ As in \Cref{app:lp_es}, we replace each term $(-\bm{x}_t^\top \bm{y}_k - \alpha)
 \eqref{eq:slack_constraint}. The empirical norm then becomes
 $\big( \frac{1}{q} \sum_{k=1}^q u_k^2 \big)^{1/2} = \frac{1}{\sqrt{q}} \|\bm{u}\|_2$, and the objective becomes
 $\alpha + \frac{1}{(1-\beta)\sqrt{q}} \|\bm{u}\|_2$. The Euclidean norm is strictly increasing in
-every positive $u_k$, so, as for Expected Shortfall, every $u_k$ is driven to its lower bound at the optimum,
+every positive $u_k$, so, as for expected shortfall, every $u_k$ is driven to its lower bound at the optimum,
 $u_k^* = (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$.
 
 The objective is still not linear, so we introduce one more auxiliary variable $s$ subject to the constraint
@@ -256,7 +256,7 @@ the portfolio optimization problem \eqref{eq:empirical_soes} can be written as a
 \end{equation}
 Here $\bm{D} \in \mathbb{R}^{1 \times (N+q+2)}$ and $\bm{A} \in \mathbb{R}^{q \times (N+q+2)}$ are the constraint
 matrices of \eqref{eq:base_lp} with a zero column added for the variable $s$. This formulation serves as the base unregularized portfolio optimization problem under
-second-order Expected Shortfall.
+second-order expected shortfall.
 
 \section{Regularization} \label{app:regularization}
 
@@ -335,7 +335,7 @@ and the penalty matrix
         \bm{0}_{(2N+q+1) \times N} & \bm{0}_{(2N+q+1) \times (2N+q+1)}
     \end{bmatrix}.
 \end{equation*}
-The portfolio optimization problem under Expected Shortfall then becomes a quadratic program with linear constraints
+The portfolio optimization problem under expected shortfall then becomes a quadratic program with linear constraints
 \begin{equation} \label{eq:reg_qp}
 \begin{aligned}
     \tilde{\bm{x}}_t^* &= \argmin_{\tilde{\bm{x}}_t} \quad
@@ -377,7 +377,7 @@ and the penalty matrix
         \bm{0}_{(2N+q+2) \times N} & \bm{0}_{(2N+q+2) \times (2N+q+2)}
     \end{bmatrix}.
 \end{equation*}
-The portfolio optimization problem under second-order Expected Shortfall then becomes a second-order cone program
+The portfolio optimization problem under second-order expected shortfall then becomes a second-order cone program
 with a convex quadratic objective
 \begin{equation} \label{eq:reg_socp}
 \begin{aligned}
@@ -424,8 +424,8 @@ and currencies ($\lambda_1^c, \lambda_2^c$).
 
 The fully hedged return vector $\bm{R}^{fh}_{t+1}$ (defined in \Cref{sec:matrix-representation}) takes the place of the asset return vector $\bm{R}_{t+1}$ of
 Sections~\ref{app:es_auxiliary_formulation}--\ref{app:regularization}, so the asset step \eqref{eq:sep_asset_obj} is
-identical to the regularized programs \eqref{eq:reg_qp} for Expected Shortfall and
-\eqref{eq:reg_socp} for second-order Expected Shortfall, and is obtained from them by
+identical to the regularized programs \eqref{eq:reg_qp} for expected shortfall and
+\eqref{eq:reg_socp} for second-order expected shortfall, and is obtained from them by
 substituting the matrix of historically sampled fully hedged returns $\bm{R}^{fh}\in \mathbb{R}^{q \times N}$ for
 $\bm{R}^{\text{data}}$ and the asset-specific penalties $\lambda_1^a, \lambda_2^a$ for $\lambda_1, \lambda_2$.
 
@@ -453,7 +453,7 @@ a quadratic form with the block $\lambda_2^c \bm{I}_M$ as in \Cref{app:l2}.
 
 \subsection{Currency Overlay under Expected Shortfall} \label{app:sep_curr_es}
 
-For Expected Shortfall, the decision vector of the currency step is
+For expected shortfall, the decision vector of the currency step is
 \begin{equation*}
     \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \alpha_\psi,& \bm{u}_\psi^\top,&
     (\bm{\Delta}_{\psi,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^+)^\top \end{bmatrix}^\top \in \mathbb{R}^{3M+q+1},
@@ -470,7 +470,7 @@ and the penalty matrix
         \bm{0}_{(2M+q+1) \times M} & \bm{0}_{(2M+q+1) \times (2M+q+1)}
     \end{bmatrix}.
 \end{equation*}
-The currency overlay optimization under Expected Shortfall then becomes a quadratic program with linear constraints
+The currency overlay optimization under expected shortfall then becomes a quadratic program with linear constraints
 \begin{equation} \label{eq:sep_curr_qp}
 \begin{aligned}
     \tilde{\bm{\psi}}_t^* &= \argmin_{\tilde{\bm{\psi}}_t} \quad
@@ -492,7 +492,7 @@ asset-portfolio returns $\bm{R}^{fh}_{\mathcal{P}}$ on the right-hand side.
 
 \subsection{Currency Overlay under Second-Order Expected Shortfall} \label{app:sep_curr_soes}
 
-For second-order Expected Shortfall, we introduce, as in \Cref{app:socp_soes}, one more auxiliary variable $s_\psi$
+For second-order expected shortfall, we introduce, as in \Cref{app:socp_soes}, one more auxiliary variable $s_\psi$
 subject to the cone constraint $\|\bm{u}_\psi\|_2 \le s_\psi$, which extends the decision vector to
 \begin{equation*}
     \tilde{\bm{\psi}}_t = \begin{bmatrix} \bm{\psi}_t^\top,& \alpha_\psi,& \bm{u}_\psi^\top,&
@@ -510,7 +510,7 @@ and the penalty matrix
         \bm{0}_{(2M+q+2) \times M} & \bm{0}_{(2M+q+2) \times (2M+q+2)}
     \end{bmatrix}.
 \end{equation*}
-The currency overlay optimization under second-order Expected Shortfall then becomes a second-order cone program with
+The currency overlay optimization under second-order expected shortfall then becomes a second-order cone program with
 a convex quadratic objective
 \begin{equation}
 \begin{aligned}
@@ -598,7 +598,7 @@ penalty matrix $\tilde{\bm{Q}}$ of the two programs below.
 
 \subsection{Joint Optimization under Expected Shortfall} \label{app:joint_es}
 
-For Expected Shortfall, the decision vector is
+For expected shortfall, the decision vector is
 \begin{equation*}
     \tilde{\bm{\theta}}_t = \begin{bmatrix}\, \bm{x}_t^\top,& \bm{\psi}_t^\top,& \alpha,& \bm{u}^\top,&
     (\bm{\Delta}_{x,t}^-)^\top,& (\bm{\Delta}_{\psi,t}^-)^\top,&
@@ -621,7 +621,7 @@ and the penalty matrix
         \bm{0}_{(2N+2M+q+1) \times N} & \bm{0}_{(2N+2M+q+1) \times M} & \bm{0}_{(2N+2M+q+1) \times (2N+2M+q+1)}
     \end{bmatrix}.
 \end{equation*}
-The joint portfolio optimization problem under Expected Shortfall then becomes a quadratic program with linear
+The joint portfolio optimization problem under expected shortfall then becomes a quadratic program with linear
 constraints
 \begin{equation} \label{eq:joint_qp}
 \begin{aligned}
@@ -650,7 +650,7 @@ The final row imposes the asset-only leverage constraint
 
 \subsection{Joint Optimization under Second-Order Expected Shortfall} \label{app:joint_soes}
 
-For second-order Expected Shortfall, we introduce, as in \Cref{app:socp_soes}, one more auxiliary variable $s$
+For second-order expected shortfall, we introduce, as in \Cref{app:socp_soes}, one more auxiliary variable $s$
 subject to the cone constraint $\|\bm{u}\|_2 \le s$, which extends the decision vector to
 \begin{equation*}
     \tilde{\bm{\theta}}_t = \begin{bmatrix}\, \bm{x}_t^\top,& \bm{\psi}_t^\top,& \alpha,& \bm{u}^\top,&
@@ -673,7 +673,7 @@ and the penalty matrix
         \bm{0}_{(2N+2M+q+2) \times N} & \bm{0}_{(2N+2M+q+2) \times M} & \bm{0}_{(2N+2M+q+2) \times (2N+2M+q+2)}
     \end{bmatrix}.
 \end{equation*}
-The joint portfolio optimization problem under second-order Expected Shortfall then becomes a second-order cone
+The joint portfolio optimization problem under second-order expected shortfall then becomes a second-order cone
 program with a convex quadratic objective
 \begin{equation}
 \begin{aligned}

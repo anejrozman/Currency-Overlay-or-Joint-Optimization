@@ -7,7 +7,7 @@ penalties are selected. In
 hold and how regularization influences the portfolio construction. In \Cref{app:risk-aversion-calibration} we describe how the risk
 aversion coefficients of the mean-risk optimizers are calibrated. \Cref{app:drawdown-analysis} analyzes the drawdowns
 of the optimizers, with a focus on the main market crashes of the out-of-sample period, and
-\Cref{app:additional-backtest-results} reports the realized values of the risk measures and the Expected Shortfall
+\Cref{app:additional-backtest-results} reports the realized values of the risk measures and the expected shortfall
 ratios of the optimizers, together with their turnover at each rebalancing date.
 
 \section{Hyperparameter Grids} \label{app:hyperparameter-sensitivity}
@@ -17,7 +17,7 @@ the currency penalties $\lambda_1^c$ and $\lambda_2^c$, while the asset-only opt
 two asset penalties. In the backtests, the penalties are selected at every rebalancing date by the grid search described in
 \Cref{sec:backtesting-framework}. The grid we optimize over is the Cartesian product of the penalty values, with $256$ points for the overlay and
 joint programs and $16$ points for the Full and Zero programs. The asset leverage
-limit is fixed at $\ell^a = 2$ for all the programs, and the confidence level of Expected Shortfall and second-order Expected Shortfall at
+limit is fixed at $\ell^a = 2$ for all the programs, and the confidence level of expected shortfall and second-order expected shortfall at
 $\beta = 0.8$.
  
 As the penalty sizes are increased, the optimal weights approach a limiting
@@ -99,7 +99,7 @@ exposures at a finite value, and the currency $L^2$ penalty shrinks them smoothl
 On the basis of this analysis, we construct the grids reported in \Cref{tab:hypergrid}. 
 The upper bounds of the asset $L^1$ penalty for variance and
 semi-variance are set to $5 \times 10^{-5}$
-and $10^{-4}$, while those for mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$, and $10^{-1}$.
+and $10^{-4}$, while those for mean absolute deviation, expected shortfall, and second-order expected shortfall are set to $2.5 \times 10^{-3}$, $5 \times 10^{-3}$, and $10^{-1}$.
 The asset penalty grids
 of the variance and semi-variance programs lie one to three orders of magnitude below those of the other risk measures. This 
 is because they are measured in squared returns.
@@ -165,11 +165,11 @@ the rebalancing quarters, not an instability of the optimizers themselves.
 The unregularized optimizers have no such degree of freedom. Besides the budget constraint, their asset weights are only
 restricted by the leverage limit $\|\bm{x}_t\|_1 \le \ell^a$, which promotes sparsity in the same way as the $L^1$ penalty. 
 As a result, the share of the assets they hold falls with the size of the universe. For variance,
-semi-variance, mean absolute deviation, and Expected Shortfall, it falls from $91$--$99\%$ in the small universe to $60$--$73\%$
-in the large universe. For the second-order Expected Shortfall optimizers, it falls from $70$--$78\%$ in 
+semi-variance, mean absolute deviation, and expected shortfall, it falls from $91$--$99\%$ in the small universe to $60$--$73\%$
+in the large universe. For the second-order expected shortfall optimizers, it falls from $70$--$78\%$ in 
 the small universe to around $50\%$ in the large universe.
 
-For mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall, the unregularized overlay optimizers hold almost no
+For mean absolute deviation, expected shortfall, and second-order expected shortfall, the unregularized overlay optimizers hold almost no
 currency exposure in the medium and large universes, unlike the joint optimizers. With several hundred
 assets, the asset step of the overlay program likely already fits the in-sample risk so closely that no currency position can
 lower it further. The joint program instead chooses the asset weights and currency exposures together.
@@ -238,7 +238,7 @@ SOES          & $0.5$ \\
 \end{table}
 
 The values in \Cref{tab:risk-aversion} are one to two orders of magnitude larger for variance and semi-variance than
-for mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall. As for the penalty grids in
+for mean absolute deviation, expected shortfall, and second-order expected shortfall. As for the penalty grids in
 \Cref{app:hyperparameter-sensitivity}, this is because variance and semi-variance are measured in squared returns.
 
 \newpage
@@ -270,7 +270,7 @@ The small-universe backtests differ in two respects. First, the overlay and join
 as in the global financial crisis, between $26.0\%$ and $36.2\%$ against $23.3\%$ to $34.1\%$, whereas in the medium and
 large universes they lose at most $10.2\%$ in the dot-com crash. With ten stocks per economy, there are fewer low-risk assets for the optimizers to move into, as
 discussed in \Cref{sec:baseline-backtests}. Second, six of the ten unregularized overlay and joint optimizers and both
-second-order Expected Shortfall mean-risk optimizers reach their maximum drawdown, between $28.2\%$ and $37.1\%$, in
+second-order expected shortfall mean-risk optimizers reach their maximum drawdown, between $28.2\%$ and $37.1\%$, in
 October 2022, and have not regained their early-2020 peak by the end of the sample in April 2023. The equally weighted
 portfolio had already regained its pre-COVID-19 peak in January 2021.
 
@@ -302,22 +302,22 @@ the overlay and joint optimizers.
 In this section, we report additional out-of-sample performance metrics for the optimizers of
 \Cref{chap:backtest-analysis}. \Cref{tab:additional-baseline,tab:additional-regularized,tab:additional-mean-risk}
 report, for the baseline, regularized, and mean-risk optimizers, the realized values of the risk measures the optimizers
-minimize and the Expected Shortfall ratio.
+minimize and the expected shortfall ratio.
 \Cref{fig:turnover-asset,fig:turnover-currency} show the asset and currency turnover of the overlay and joint
 optimizers at each rebalancing date.
 
 The risk measures are evaluated on the empirical distribution of the realized daily out-of-sample returns, and we report
 them as daily values, unlike the annualized metrics of \Cref{chap:backtest-analysis}. When defining the sample estimates of the 
 risk measures, we use the notation of
-\Cref{sec:performance-evaluation-metrics}. The realized Expected Shortfall is the average loss on the days with a
-loss of at least the realized Value-at-Risk
+\Cref{sec:performance-evaluation-metrics}. The realized expected shortfall is the average loss on the days with a
+loss of at least the realized value-at-risk
 \begin{equation*}
     \mathrm{ES}_{\beta,\mathcal P} = -\frac{1}{|\mathcal T_{\mathcal P}|} \sum_{t \in \mathcal T_{\mathcal P}} R_{\mathcal P,t},
     \qquad \mathcal T_{\mathcal P} = \left\{ t \mid -R_{\mathcal P,t} \ge \mathrm{VaR}_{\beta,\mathcal P} \right\},
 \end{equation*}
 where $\mathrm{VaR}_{\beta,\mathcal P}$ is the empirical $\beta$-quantile of the daily losses $-R_{\mathcal P,t}$. 
 The realized
-second-order Expected Shortfall is the sample estimate of \eqref{eq:soes_def}
+second-order expected shortfall is the sample estimate of \eqref{eq:soes_def}
 \begin{equation*}
     \mathrm{SOES}_{\beta,\mathcal P} = \min_{\alpha} \left\{ \alpha + \frac{1}{1-\beta} \left( \frac{1}{T}
     \sum_{t=1}^{T} \left( \left( -R_{\mathcal P,t} - \alpha \right)^+ \right)^2 \right)^{1/2} \right\},
@@ -330,7 +330,7 @@ and the realized semi-deviation and mean absolute deviation, the sample estimate
     \mathrm{MAD}_{\mathcal P} = \frac{1}{T} \sum_{t=1}^{T} \bigl| R_{\mathcal P,t}
     - \bar R_{\mathcal P} \bigr|.
 \end{equation*}
-The Expected Shortfall ratio replaces the volatility in the Sharpe ratio with the realized Expected Shortfall,
+The expected shortfall ratio replaces the volatility in the Sharpe ratio with the realized expected shortfall,
 annualized like the volatility
 \begin{equation*}
     \mathrm{ESR}_{\mathcal P} = 252\, \frac{\bar R_{\mathcal P} - \bar R_f}{\sqrt{252}\, \mathrm{ES}_{\beta,\mathcal P}},
@@ -354,14 +354,14 @@ comparisons, while with a mean term, they do so in all comparisons in the small 
 in the large universe.
 
 Leaving the currency exposure unhedged raises the risk measures by a similar factor as the volatility. The Zero
-optimizer optimizes the same objective as the Full optimizer but is evaluated on unhedged returns. Its Expected
-Shortfall is $1.34$ to $2.33$ times larger than that of the Full optimizer, its semi-deviation $1.34$ to $1.94$ times larger, and its mean
+optimizer optimizes the same objective as the Full optimizer but is evaluated on unhedged returns. Its expected
+shortfall is $1.34$ to $2.33$ times larger than that of the Full optimizer, its semi-deviation $1.34$ to $1.94$ times larger, and its mean
 absolute deviation $1.37$ to $2.40$ times larger. The increase in risk when leaving the currency exposure unhedged rises proportionally with the 
 volatility. The increase in volatility is $1.35$ to $2.09$ times larger for the Zero optimizer than for the Full optimizer. 
 
-The Expected Shortfall ratios lead to the same comparison with the equally weighted portfolio as the Sharpe ratios in
+The expected shortfall ratios lead to the same comparison with the equally weighted portfolio as the Sharpe ratios in
 \Cref{chap:backtest-analysis}. In the small universe, fewer than half of the unregularized optimizers but most of the
-regularized and mean-risk optimizers achieve a higher Expected Shortfall ratio than the equally weighted portfolio, and
+regularized and mean-risk optimizers achieve a higher expected shortfall ratio than the equally weighted portfolio, and
 in the medium and large universes all of them do. In every case, these are the optimizers with a higher Sharpe ratio
 than the equally weighted portfolio.
 
@@ -417,7 +417,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
     \bottomrule
   \end{tabular}
   }
-  \caption{Realized risk measures and Expected Shortfall ratios of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure. ES, SOES, SD, and MAD are daily values in percent, and ESR is the Expected Shortfall ratio. All are computed from returns net of transaction costs.}
+  \caption{Realized risk measures and expected shortfall ratios of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure. ES, SOES, SD, and MAD are daily values in percent, and ESR is the expected shortfall ratio. All are computed from returns net of transaction costs.}
   \label{tab:additional-baseline}
 \end{table}
 
@@ -489,7 +489,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
     \bottomrule
   \end{tabular}
   }
-  \caption{Realized risk measures and Expected Shortfall ratios of the regularized overlay (Overlay) and joint (Joint) optimizers and of the benchmarks, the equally weighted portfolio (EW) and the asset-only optimizers Full and Zero, in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure. ES, SOES, SD, and MAD are daily values in percent, and ESR is the Expected Shortfall ratio. All are computed from returns net of transaction costs.}
+  \caption{Realized risk measures and expected shortfall ratios of the regularized overlay (Overlay) and joint (Joint) optimizers and of the benchmarks, the equally weighted portfolio (EW) and the asset-only optimizers Full and Zero, in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure. ES, SOES, SD, and MAD are daily values in percent, and ESR is the expected shortfall ratio. All are computed from returns net of transaction costs.}
   \label{tab:additional-regularized}
 \end{table}
 
@@ -537,7 +537,7 @@ currency turnover in \Cref{sec:effects-of-regularization}, where the two optimiz
     \bottomrule
   \end{tabular}
   }
-  \caption{Realized risk measures and Expected Shortfall ratios of the mean-risk overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the risk measure in the objective. ES, SOES, SD, and MAD are daily values in percent, and ESR is the Expected Shortfall ratio. All are computed from returns net of transaction costs.}
+  \caption{Realized risk measures and expected shortfall ratios of the mean-risk overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the risk measure in the objective. ES, SOES, SD, and MAD are daily values in percent, and ESR is the expected shortfall ratio. All are computed from returns net of transaction costs.}
   \label{tab:additional-mean-risk}
 \end{table}
 

@@ -31,8 +31,8 @@ regularized joint and overlay optimizers achieve better risk-adjusted performanc
 Adding a mean term to the optimizers transforms the problem into a risk-return optimization problem. 
 It has a large effect on risk-adjusted performance, increasing the Sharpe ratios by $0.16$ to $0.24$ on average for the deviation
 measures and by $0.01$ to $0.10$ for the tail measures. This is not surprising, as deviation measures are
-invariant to a shift in the portfolio return, so minimizing them ignores expected returns entirely, whereas Expected
-Shortfall and second-order Expected Shortfall already reward a higher mean. 
+invariant to a shift in the portfolio return, so minimizing them ignores expected returns entirely, whereas expected
+shortfall and second-order expected shortfall already reward a higher mean. 
 A possible further source of the gain is currency carry. Since the expected excess currency returns are set to the
 interest rate differential, the mean term rewards exposure to higher-yielding currencies, so the currency positions may
 earn part of the carry premium that pure risk minimization gives up. The optimizers earn higher risk-adjusted returns than the equally weighted portfolio in the medium and large

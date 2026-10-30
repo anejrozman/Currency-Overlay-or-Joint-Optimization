@@ -1,6 +1,6 @@
 \chapter{Coherent Risk Measures and Deviation Measures} \label{app:demeaning}
 
-In this appendix, we define the notions of a deviation measure and a coherent risk measure, and prove that a strictly expectation bounded coherent risk measure can be transformed into a deviation measure by a simple de-meaning operation. This result is used in \Cref{sec:mechanism-level} to de-mean the Expected Shortfall and second-order Expected Shortfall risk measures and transform them into deviation measures. Throughout this appendix, let $X \in L^2(\Omega)$ denote a square-integrable
+In this appendix, we define the notions of a deviation measure and a coherent risk measure, and prove that a strictly expectation bounded coherent risk measure can be transformed into a deviation measure by a simple de-meaning operation. This result is used in \Cref{sec:mechanism-level} to de-mean the expected shortfall and second-order expected shortfall risk measures and transform them into deviation measures. Throughout this appendix, let $X \in L^2(\Omega)$ denote a square-integrable
 random variable on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$.
 
 \begin{definition}[Deviation measure]\label{def:deviation}
@@ -67,10 +67,10 @@ The proof uses the properties \emph{(R2)}, \emph{(R3)}, and \emph{(R5)} only. Mo
 original theorem in Rockafellar et al.~\cite{RockafellarUryasevZabarankin2006} is stated more generally for strictly expectation bounded risk
 measures rather than coherent risk measures.
 
-We now show that both Expected Shortfall and second-order Expected Shortfall are strictly expectation bounded coherent risk measures, and we can therefore apply    
+We now show that both expected shortfall and second-order expected shortfall are strictly expectation bounded coherent risk measures, and we can therefore apply    
 \Cref{thm:demeaning} to transform them into deviation measures. Write $z^{+} = \max\{z, 0\}$ and $z^{-} = \max\{-z, 0\}$, fix a confidence level
 $\beta \in (0,1)$, and set $\kappa \coloneqq (1-\beta)^{-1} > 1$. 
-In the Rockafellar--Uryasev form \cite{RockafellarUryasev2002} the Expected Shortfall is
+In the Rockafellar--Uryasev form \cite{RockafellarUryasev2002} the expected shortfall is
 \begin{equation}
 \mathrm{ES}_\beta(X) = \min_{\alpha \in \mathbb{R}} F_\beta(X, \alpha),
 \label{eq:es-ru-form} 
@@ -90,7 +90,7 @@ G_\beta(X, \alpha) = \alpha + \kappa\, \big\| (-X-\alpha)^{+} \big\|_{L^2}
 are the auxiliary functions of \Cref{app:es_auxiliary_formulation}. Both $F_\beta(X, \cdot)$ and $G_\beta(X, \cdot)$ are convex, and both diverge as $|\alpha| \to \infty$, so
 the minima in \eqref{eq:es-ru-form} and \eqref{eq:soes-ru-form} are attained. It is well known that $\mathrm{ES}_\beta$ is a coherent risk measure, see, for example, Proposition 3.1 and Corollary 4.3 in Acerbi and Tasche \cite{acerbi2002coherenceexpectedshortfall}. We show it is strictly expectation bounded. 
 
-\begin{proposition}[Expected Shortfall]\label{prop:es-seb}
+\begin{proposition}[Expected shortfall]\label{prop:es-seb}
 $\mathrm{ES}_\beta$ is strictly expectation bounded.
 \end{proposition}
 
@@ -112,7 +112,7 @@ minimum is attained, $\mathrm{ES}_\beta(X) > \mathbb{E}[-X]$. If $X \equiv C$, t
 so $\mathrm{ES}_\beta(X) = \mathbb{E}[-X]$.
 \end{proof}
 
-\begin{proposition}[Second-order Expected Shortfall]\label{prop:soes-coherent}
+\begin{proposition}[Second-order expected shortfall]\label{prop:soes-coherent}
 $\mathrm{SOES}_\beta$ is a coherent, strictly expectation bounded risk measure.
 \end{proposition}
 

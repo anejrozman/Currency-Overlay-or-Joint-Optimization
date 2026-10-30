@@ -13,7 +13,7 @@ programs and analyze how it changes their performance.
 We first report the baseline backtests of the 
 unregularized joint and overlay optimizers across the five 
 risk measures and three universe sizes considered in the thesis. We compare them against the equally weighted portfolio,
-which serves as the no-optimization benchmark. For Expected Shortfall and second-order Expected Shortfall, we use the
+which serves as the no-optimization benchmark. For expected shortfall and second-order expected shortfall, we use the
 $80\%$ confidence level throughout the chapter.
 
 For the small, medium, and large universes, we report in \Cref{tab:baseline} the out-of-sample annualized excess return over the risk-free rate,
@@ -26,7 +26,7 @@ equally weighted benchmark, and in the lower panel of each figure the
 cumulative difference between the joint and overlay optimizers for each risk 
 measure. The latter helps us visualize the realized return difference  
 between the two optimization approaches over time. In \Cref{app:additional-backtest-results}, we also report the
-realized semi-deviation, mean absolute deviation, Expected Shortfall, and second-order Expected Shortfall of all
+realized semi-deviation, mean absolute deviation, expected shortfall, and second-order expected shortfall of all
 optimizers in this chapter.
 
 \begin{table}[tbp]
@@ -79,7 +79,7 @@ optimizers in this chapter.
     \bottomrule
   \end{tabular}%
 }
-  \caption{Out-of-sample performance of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-baseline}.}
+  \caption{Out-of-sample performance of the unregularized overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), expected shortfall (ES), and second-order expected shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-baseline}.}
   \label{tab:baseline}
 \end{table}
 
@@ -116,7 +116,7 @@ $0.41$ and $0.56$ against $0.33$, and between $0.51$ and $0.76$ against $0.37$, 
 In the small universe, the optimizers lose more excess return than they reduce
 volatility, while in larger universes they can diversify across more low-risk stocks,
 and the reduction in volatility outweighs the lost return.
-Sortino ratios follow the same pattern, as do the Expected Shortfall ratios in \Cref{app:additional-backtest-results}, so accounting only
+Sortino ratios follow the same pattern, as do the expected shortfall ratios in \Cref{app:additional-backtest-results}, so accounting only
 for downside risk does not change the comparison. 
 
 Both the overlay and joint optimizers have higher asset and currency turnover than the equally weighted portfolio. This is expected since the equally weighted portfolio has fixed target weights and only trades to undo the price drift.
@@ -161,7 +161,7 @@ after the COVID-19 market shock and ultimately attains the highest terminal weal
 volatility and with deeper drawdowns throughout the sample. In contrast, the overlay and joint optimizers follow more stable growth 
 paths, consistent with their lower realized volatility reported in \Cref{tab:baseline}.
 
-The bottom panels show the cumulative daily return difference between the joint and overlay optimizers for each risk measure, and confirm that the two optimization approaches track each other closely throughout the sample in terms of returns. The cumulative differences oscillate around zero in every universe size and for every measure, with the exception of second-order Expected Shortfall in the small universe, where the joint optimizer drifts persistently below the overlay optimizer from the early $2010$s onward. 
+The bottom panels show the cumulative daily return difference between the joint and overlay optimizers for each risk measure, and confirm that the two optimization approaches track each other closely throughout the sample in terms of returns. The cumulative differences oscillate around zero in every universe size and for every measure, with the exception of second-order expected shortfall in the small universe, where the joint optimizer drifts persistently below the overlay optimizer from the early $2010$s onward. 
 
 Overall, we see a consistent pattern across all the considered risk measures. The overlay and
 joint optimizers reduce volatility and drawdowns substantially relative to the equally weighted portfolio. The Sharpe comparison depends on the 
@@ -221,7 +221,7 @@ to the low unregularized Sharpe ratios of the small universe, the gain there is 
 for the overlay optimizers and $24\%$ for the joint optimizers, against $28\%$ and $26\%$ in the large universe and at most $4\%$
 in the medium universe. The penalties stabilize the weights by limiting the extreme positions that the unregularized programs fit to noise in the
 lookback window, which becomes more important when the number of assets increases relative to the length of the lookback
-window. The unregularized second-order Expected Shortfall optimizers are the least stable, since the measure is driven by
+window. The unregularized second-order expected shortfall optimizers are the least stable, since the measure is driven by
 the squared losses of the few most extreme observations in the lookback window. Accordingly, regularization benefits them the most, raising their Sharpe ratios by $0.38$ in the large universe.
 \Cref{app:portfolio-sparsity} shows how many of the available assets and currencies the optimizers hold with and
 without regularization.
@@ -262,7 +262,7 @@ without regularization.
     \bottomrule
   \end{tabular}%
 }
-  \caption{Out-of-sample performance of the regularized overlay (Overlay) and joint (Joint) optimizers (Panel A1) and of the benchmarks (Panel B1) in the small investable universe (top 10 stocks per economy). The benchmarks are the equally weighted portfolio (EW) and the regularized asset-only optimizers Assets-Full (Full), which fully hedges the currency exposure of its assets, and Assets-Zero (Zero), which leaves it unhedged. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-regularized}.}
+  \caption{Out-of-sample performance of the regularized overlay (Overlay) and joint (Joint) optimizers (Panel A1) and of the benchmarks (Panel B1) in the small investable universe (top 10 stocks per economy). The benchmarks are the equally weighted portfolio (EW) and the regularized asset-only optimizers Assets-Full (Full), which fully hedges the currency exposure of its assets, and Assets-Zero (Zero), which leaves it unhedged. Columns are grouped by the minimized risk measure: variance, semi-variance, mean absolute deviation (MAD), expected shortfall (ES), and second-order expected shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-regularized}.}
   \label{tab:regularized-top10}
 \end{table}
 
@@ -472,8 +472,8 @@ of the excess return the optimizers otherwise give up, though we can see that th
 risk measures. The Sharpe ratios of the deviation measures rise by $0.16$ to $0.24$ on average, while those of the tail
 measures rise by at most $0.10$.
 
-This split is in line with how the risk measures handle the mean of the portfolio return. Expected Shortfall and
-second-order Expected Shortfall are translation equivariant, so minimizing them already rewards portfolios with a higher mean. The two tail measures therefore
+This split is in line with how the risk measures handle the mean of the portfolio return. Expected shortfall and
+second-order expected shortfall are translation equivariant, so minimizing them already rewards portfolios with a higher mean. The two tail measures therefore
 carry an implicit mean term, which the explicit one only strengthens. The deviation measures are invariant to a shift in
 the portfolio return, so for them the addition of a mean term introduces new information into the optimization problem. The average currency turnover is
 consistent with this interpretation. In the medium and large universes, the mean term raises the currency turnover of
@@ -531,7 +531,7 @@ optimizers it remains stable around its previous level. We analyze the implicit 
     \bottomrule
   \end{tabular}%
 }
-  \caption{Out-of-sample performance of the mean-risk overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. The mean-risk optimizers are the unregularized optimizers of \Cref{tab:baseline} with a mean term added to the objective. Columns are grouped by the risk measure in the objective: variance, semi-variance, mean absolute deviation (MAD), Expected Shortfall (ES), and second-order Expected Shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-mean-risk}.}
+  \caption{Out-of-sample performance of the mean-risk overlay (Overlay) and joint (Joint) optimizers and the equally weighted portfolio (EW) in the small (Panel A), medium (Panel B), and large (Panel C) investable universes. The mean-risk optimizers are the unregularized optimizers of \Cref{tab:baseline} with a mean term added to the objective. Columns are grouped by the risk measure in the objective: variance, semi-variance, mean absolute deviation (MAD), expected shortfall (ES), and second-order expected shortfall (SOES). The metrics are the annualized excess return over the risk-free rate (ER), volatility (Vol), maximum drawdown (MD), Sharpe ratio (SR), Sortino ratio (SOR), and average asset (Turnover$^a$) and currency (Turnover$^c$) turnover. Portfolios are rebalanced quarterly, returns are net of transaction costs, and the out-of-sample period runs from July 2000 to April 2023. Additionally, the realized semi-deviation, MAD, ES, and SOES for the optimizers are reported in \Cref{tab:additional-mean-risk}.}
   \label{tab:mean-risk}
 \end{table}
 
@@ -586,7 +586,7 @@ the overlay optimizer for every risk measure in the medium and large universes, 
 ratios confirm this, with the joint optimizer performing better, by $0.02$ to $0.25$. The bottom panels of
 \Cref{fig:mean-risk-top50,fig:mean-risk-top100} show that this advantage builds up gradually over the sample rather than in
 a single period, with the cumulative return difference reaching about $0.18$ for semi-variance in the large universe and
-$0.19$ for second-order Expected Shortfall in the medium universe by the end of the sample. At the same time, the joint optimizer attains
+$0.19$ for second-order expected shortfall in the medium universe by the end of the sample. At the same time, the joint optimizer attains
 a lower volatility than the overlay optimizer for almost all risk measures, by up to $0.44$ percentage
 points. The lower volatility of the joint optimizers is a persistent finding across all backtests in
 \Cref{sec:baseline-backtests,sec:effects-of-regularization}. Intuitively, the joint program can choose assets 
@@ -625,7 +625,7 @@ while the volatility and drawdowns stay well below those of the equally weighted
 portfolio. The most significant improvement is for the deviation measures. Since they are
 invariant to a shift in the portfolio return, minimizing them ignores expected returns
 entirely, and the mean term adds information the optimizers did not use before.
-Expected Shortfall and second-order Expected Shortfall are translation equivariant and
+Expected shortfall and second-order expected shortfall are translation equivariant and
 already reward a higher mean, so the explicit mean term changes them much less. 
 
 The joint and overlay optimizers perform very similarly when they only minimize a risk measure. The joint optimizer achieves a lower volatility and, without regularization, a higher currency

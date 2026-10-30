@@ -249,34 +249,34 @@ estimation error than those optimized under the variance, and that their weights
 sample.
 
 The three risk measures considered so far measure the dispersion of the portfolio return around its mean. Expected
-Shortfall, which we consider next, instead measures the average size of the largest losses.
+shortfall, which we consider next, instead measures the average size of the largest losses.
 
 \subsection{Expected Shortfall}\label{sec:risk-es}
 
-Expected Shortfall measures the risk of a portfolio by the average of its largest losses. Let
+Expected shortfall measures the risk of a portfolio by the average of its largest losses. Let
 $L(\bm{x}_t) = -\bm{x}_t^\top \bm{R}_{t+1}$ denote the loss of the portfolio at time $t+1$ and $\mathbb{P}_t(\cdot)$
-the probability conditional on the information available at time $t$. The Value-at-Risk (VaR) at confidence level
+the probability conditional on the information available at time $t$. The value-at-risk (VaR) at confidence level
 $\beta \in (0, 1)$ is the $\beta$-quantile of the loss distribution
 \begin{equation*}
     \text{VaR}_\beta(\bm{x}_t) = \min \{ \alpha \mid \mathbb{P}_t(L(\bm{x}_t) \le \alpha) \ge \beta \}.
 \end{equation*}
-VaR does not take into account how large the losses beyond it are. Expected Shortfall is the expected loss given that
+VaR does not take into account how large the losses beyond it are. Expected shortfall is the expected loss given that
 the loss exceeds VaR
 \begin{equation*}
     \text{ES}_\beta(\bm{x}_t) = \mathbb{E}_t\bigl[ L(\bm{x}_t) \mid L(\bm{x}_t) \ge \text{VaR}_\beta(\bm{x}_t) \bigr],
 \end{equation*}
 so that it accounts for both the probability and the size of the losses in the tail. 
 In its capital requirements for market risk, the Basel Committee on Banking
-Supervision has replaced VaR at the $99\%$ level by Expected Shortfall at the $97.5\%$ level \cite{BCBS2019}, indicating
+Supervision has replaced VaR at the $99\%$ level by expected shortfall at the $97.5\%$ level \cite{BCBS2019}, indicating
 that it is a more appropriate measure of risk.
 
 Since $\text{VaR}_\beta(\bm{x}_t)$ itself depends on the portfolio weights, the conditional expectation in the definition is not
 in a suitable form for optimization. Rockafellar and Uryasev \cite{RockafellarUryasev2000, RockafellarUryasev2002} show
-that Expected Shortfall is the minimum over $\alpha \in \R$ of the auxiliary function
+that expected shortfall is the minimum over $\alpha \in \R$ of the auxiliary function
 \begin{equation*}
     F_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta}\, \mathbb{E}_t\bigl[ (L(\bm{x}_t) - \alpha)^+ \bigr],
 \end{equation*}  
-and that the minimizing $\alpha$ is $\text{VaR}_\beta(\bm{x}_t)$. Minimizing Expected Shortfall over the portfolio weights $\bm{x}_t$ is
+and that the minimizing $\alpha$ is $\text{VaR}_\beta(\bm{x}_t)$. Minimizing expected shortfall over the portfolio weights $\bm{x}_t$ is
 therefore equivalent to minimizing $F_\beta$ jointly over $\bm{x}_t$ and $\alpha$
 \begin{equation*}
     \min_{\bm{x}_t} \text{ES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} F_\beta(\bm{x}_t, \alpha),
@@ -288,7 +288,7 @@ expectation in $F_\beta$ by the empirical average, which gives the objective
 $\alpha + \frac{1}{q(1-\beta)} \sum_{k=1}^q (-\bm{x}_t^\top \bm{y}_k - \alpha)^+$. As for the semi-variance and the
 mean absolute deviation, we introduce for each realization $k$ an auxiliary variable $u_k \ge 0$ subject to
 $u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha$. Since the objective increases in every $u_k$, each $u_k$ equals
-$(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ at the optimum, and the Expected Shortfall program is the linear program
+$(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ at the optimum, and the expected shortfall program is the linear program
 \begin{equation*}
 \begin{aligned}
     \bm{x}_t^*, \alpha^*, \bm{u}^* = \argmin_{\bm{x}_t,\, \alpha,\, \bm{u}} \quad
@@ -297,20 +297,20 @@ $(-\bm{x}_t^\top \bm{y}_k - \alpha)^+$ at the optimum, and the Expected Shortfal
     & \bm{x}_t^\top \bm{y}_k + \alpha + u_k \ge 0, \quad u_k \ge 0, \quad k = 1, \dots, q.
 \end{aligned}
 \end{equation*}
-Since Expected Shortfall measures losses rather than deviations from the mean, the constraints contain the realizations
+Since expected shortfall measures losses rather than deviations from the mean, the constraints contain the realizations
 $\bm{y}_k$ themselves instead of their deviations from the sample mean. We write the program in the standard form of a
 linear program in Appendix~\ref{app:lp_es}.
 
 At the optimum, only the realizations whose loss exceeds $\alpha^*$, which are the $(1-\beta) q$ realizations with
-the largest losses, contribute to the objective. The estimate of Expected Shortfall is therefore based on a fraction of the
-sample, and Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under Expected Shortfall are more
+the largest losses, contribute to the objective. The estimate of expected shortfall is therefore based on a fraction of the
+sample, and Kondor et al.~\cite{kondor2007noise} show that portfolios optimized under expected shortfall are more
 sensitive to estimation error than those optimized under the variance and the mean absolute deviation. Goldberg et
-al.~\cite{goldberg2013minimizingshortfall} note that estimation error matters more for Expected Shortfall than for the
+al.~\cite{goldberg2013minimizingshortfall} note that estimation error matters more for expected shortfall than for the
 variance, since most realizations only serve to determine which losses are the largest. The confidence level thus
 trades off the focus on the tail against the number of realizations that determine the estimate. We set $\beta = 0.8$,
 at which about $500$ of the $q \approx 2{,}500$ daily realizations contribute to the objective. Testing confidence levels from $60\%$ to $99\%$, Goldberg et al.~\cite{goldberg2013minimizingshortfall} also find
-that minimum Expected Shortfall portfolios outperform minimum-variance portfolios most at relatively low confidence
-levels, at which Expected Shortfall captures the asymmetry of the return distribution rather than its extreme losses.
+that minimum expected shortfall portfolios outperform minimum-variance portfolios most at relatively low confidence
+levels, at which expected shortfall captures the asymmetry of the return distribution rather than its extreme losses.
 
 Furthermore, Ciliberti et
 al.~\cite{ciliberti2007feasibility} show that, without bounds on the portfolio weights, the program is unbounded in some samples. 
@@ -319,31 +319,31 @@ has no finite solution once $N/q$ exceeds a critical value, which is about $0.5$
 universe of our empirical analysis in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}, which contains up to $1{,}400$ stocks, $N/q$ can exceed this value. The leverage
 constraint that we add later in this chapter bounds the positions and thereby ensures that the program has a solution.
 
-Expected Shortfall weighs all losses beyond VaR equally, so that the largest losses in the tail count no more
-than the losses just beyond the quantile. Second-order Expected Shortfall, which we consider next, puts more weight on
+Expected shortfall weighs all losses beyond VaR equally, so that the largest losses in the tail count no more
+than the losses just beyond the quantile. Second-order expected shortfall, which we consider next, puts more weight on
 the largest losses.
 
 \subsection{Second-Order Expected Shortfall}\label{sec:risk-soes}
 
-Second-order Expected Shortfall belongs to the family of higher-moment coherent risk measures of Krokhmal
+Second-order expected shortfall belongs to the family of higher-moment coherent risk measures of Krokhmal
 \cite{Krokhmal2007}, which measure the risk in the tail of the loss distribution through its higher moments and also contain
-Expected Shortfall. The second-order formulation replaces the expectation of the excess loss in the auxiliary
+expected shortfall. The second-order formulation replaces the expectation of the excess loss in the auxiliary
 function $F_\beta$ of \Cref{sec:risk-es} by the $L^2$ norm $\|Z\|_{L^2} = (\mathbb{E}_t[Z^2])^{1/2}$ of the excess loss, which gives the
 auxiliary function
 \begin{equation*}
     G_\beta(\bm{x}_t, \alpha) = \alpha + \frac{1}{1-\beta}\, \bigl\| (L(\bm{x}_t) - \alpha)^+ \bigr\|_{L^2},
 \end{equation*}
-and second-order Expected Shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
+and second-order expected shortfall at confidence level $\beta$ is defined as its minimum over $\alpha$
 \begin{equation*}
     \text{SOES}_\beta(\bm{x}_t) = \min_{\alpha \in \R} G_\beta(\bm{x}_t, \alpha).
 \end{equation*}
-Since the $L^2$ norm squares the excess losses, large losses beyond $\alpha$ receive more weight than in Expected
-Shortfall. Krokhmal notes that second-order Expected Shortfall measures the risk in the tail through the second moment
+Since the $L^2$ norm squares the excess losses, large losses beyond $\alpha$ receive more weight than in expected
+shortfall. Krokhmal notes that second-order expected shortfall measures the risk in the tail through the second moment
 of the losses, which relates it to the mean-variance framework. In a case study on fifty S\&P~500 stocks, he finds that 
 portfolios minimizing the higher-moment measures at the $90\%$ level outperform
-those minimizing Expected Shortfall or the variance out of sample \cite{Krokhmal2007}.
+those minimizing expected shortfall or the variance out of sample \cite{Krokhmal2007}.
 
-By definition, minimizing second-order Expected Shortfall is
+By definition, minimizing second-order expected shortfall is
 \begin{equation*}
     \min_{\bm{x}_t} \text{SOES}_\beta(\bm{x}_t) = \min_{\bm{x}_t, \alpha} G_\beta(\bm{x}_t, \alpha),
 \end{equation*}
@@ -351,11 +351,11 @@ where $G_\beta$ is jointly convex in $(\bm{x}_t, \alpha)$, which we show in Appe
 
 With the historical realizations $\bm{y}_1, \dots, \bm{y}_q$ of \Cref{sec:risk-variance}, we replace the $L^2$ norm in
 $G_\beta$ by its empirical estimate
-$\bigl( \frac{1}{q} \sum_{k=1}^q \bigl( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \bigr)^2 \bigr)^{1/2}$. As for Expected
-Shortfall, we introduce for each realization $k$ an auxiliary variable $u_k \ge 0$ subject to
+$\bigl( \frac{1}{q} \sum_{k=1}^q \bigl( (-\bm{x}_t^\top \bm{y}_k - \alpha)^+ \bigr)^2 \bigr)^{1/2}$. As for expected
+shortfall, we introduce for each realization $k$ an auxiliary variable $u_k \ge 0$ subject to
 $u_k \ge -\bm{x}_t^\top \bm{y}_k - \alpha$, so that the empirical norm becomes $\frac{1}{\sqrt{q}} \|\bm{u}\|_2$. Since the objective is still not linear, we introduce
 one more auxiliary variable $s$ subject to $\|\bm{u}\|_2 \le s$, which equals $\|\bm{u}\|_2$ at the optimum, and the
-second-order Expected Shortfall program is
+second-order expected shortfall program is
 \begin{equation*}
 \begin{aligned}
     \bm{x}_t^*, \alpha^*, \bm{u}^*, s^* = \argmin_{\bm{x}_t,\, \alpha,\, \bm{u},\, s} \quad
@@ -371,13 +371,13 @@ so that the program is a second-order cone program \cite[Section~4.4.2]{boyd2004
 Appendix~\ref{app:socp_soes}.
 
 The cone constraint makes the program harder to solve than the linear and quadratic programs of the other risk
-measures, and the second-order Expected Shortfall programs are computationally the most expensive programs in our
-backtests (see Appendix~\ref{sec:computational-complexity}). We use the same confidence level $\beta = 0.8$ as for Expected
-Shortfall, so that the two tail measures can be compared, and as for Expected Shortfall, the leverage constraint that we
+measures, and the second-order expected shortfall programs are computationally the most expensive programs in our
+backtests (see Appendix~\ref{sec:computational-complexity}). We use the same confidence level $\beta = 0.8$ as for expected
+shortfall, so that the two tail measures can be compared, and as for expected shortfall, the leverage constraint that we
 add later in this chapter bounds the positions and thereby ensures that the program has a solution.
 
 \subsection{Coherent Risk Measures and Deviation Measures}\label{sec:coherent-and-deviation-measures}
-Expected Shortfall and second-order Expected Shortfall measure the size of the largest losses, whereas the variance,
+Expected shortfall and second-order expected shortfall measure the size of the largest losses, whereas the variance,
 the semi-variance, and the mean absolute deviation measure deviations from the mean.
 The five risk measures can be divided into two classes, which differ in how they treat the return
 distribution.
@@ -387,8 +387,8 @@ properties. Adding a riskless amount to the return reduces the risk by that amou
 $\mathcal{R}(X + C) = \mathcal{R}(X) - C$, scaling the position by a positive factor scales the risk by the same
 factor (positive homogeneity), the risk of a combined position is at most the sum of the risks of its parts (subadditivity),
 so that diversification does not
-increase risk, and a same return that is higher carries no more risk (monotonicity). Out of the five risk measures we define in this chapter, only Expected Shortfall \cite{acerbi2002coherenceexpectedshortfall} and
-second-order Expected Shortfall \cite{Krokhmal2007} are coherent. Additionally, they are both strictly expectation bounded, that
+increase risk, and a same return that is higher carries no more risk (monotonicity). Out of the five risk measures we define in this chapter, only expected shortfall \cite{acerbi2002coherenceexpectedshortfall} and
+second-order expected shortfall \cite{Krokhmal2007} are coherent. Additionally, they are both strictly expectation bounded, that
 is, their risk exceeds the expected loss of every nonconstant return.
 
 Rockafellar et al.~\cite{RockafellarUryasevZabarankin2006} define deviation measures $\mathcal{D}$, which quantify
@@ -405,8 +405,8 @@ dispersion of the return around its mean and is unaffected by a shift of the who
 risk measure decreases when the distribution shifts upward. This fundamental difference between the two classes of risk measures is reflected 
 in our empirical results in \Cref{chap:backtest-analysis,chap:joint-vs-sequential}. The reader can find the technical definitions and results we use for coherent risk measures 
 and deviation measures in Appendix~\ref{app:demeaning}. For brevity, we refer in the remainder of the thesis to
-the variance, the semi-variance, and the mean absolute deviation as the deviation measures, and to Expected Shortfall
-and second-order Expected Shortfall as the tail measures.
+the variance, the semi-variance, and the mean absolute deviation as the deviation measures, and to expected shortfall
+and second-order expected shortfall as the tail measures.
  
 So far, we have treated the asset returns as given and denominated in the investor's domestic currency. An
 international investor, however, holds assets denominated in several currencies, whose returns in the domestic currency
@@ -421,7 +421,7 @@ Burkhardt and Ulrych \cite{SparseAndStableInternationalPortfolioOptimization} ex
 portfolio in the domestic currency in terms of its asset weights and currency positions, and use this representation for
 regularized mean-variance optimization, with the currency positions chosen either jointly with the asset weights or after
 them. Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} apply the same representation to
-Expected Shortfall portfolios, and we follow their derivation and notation.
+expected shortfall portfolios, and we follow their derivation and notation.
 
 \subsection{Unhedged Portfolio Returns}\label{sec:unhedged-returns}
 
@@ -553,7 +553,7 @@ often by a specialized overlay manager \cite{SparseAndStableInternationalPortfol
 assets in the underlying portfolio and the exchange rates. In his simulations, a currency overlay adds value to global
 equity and bond portfolios, but improves their performance less than an integrated approach to currency management.
 Burkhardt and Ulrych \cite{SparseAndStableInternationalPortfolioOptimization} find that regularized joint
-mean-variance optimization of assets and currencies also outperforms its currency overlay counterpart out of sample. For Expected Shortfall, Lucescu and Ulrych
+mean-variance optimization of assets and currencies also outperforms its currency overlay counterpart out of sample. For expected shortfall, Lucescu and Ulrych
 \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} report that joint optimization performs better in the
 smaller of their two investable universes. 
 
@@ -586,7 +586,7 @@ out-of-sample performance and lower turnover than many other strategies. In the 
 Ulrych \cite{SparseAndStableInternationalPortfolioOptimization} find that their regularized joint mean-variance programs
 outperform unregularized benchmarks, and Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}
 find that regularization lowers the realized risk and raises the risk-adjusted returns of both the sequential and the
-joint optimization approach under Expected Shortfall.
+joint optimization approach under expected shortfall.
 
 Following Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios}, we regularize the programs with
 an $L^1$ penalty, an $L^2$ penalty, and a leverage constraint. The $L^1$ penalty
@@ -599,7 +599,7 @@ Under the budget constraint, the long positions exceed the short positions by on
 \end{equation*}
 The $L^1$ penalty therefore acts only on the short positions. Once $\lambda_1$ is large enough to remove them, the
 penalty becomes constant, and the solution is the long-only minimizer of the risk measure
-\cite{BrodieDaubechiesDeMolGiannoneLoris2009}. For Expected Shortfall, Papp et al.~\cite{PappKondorCaccioli2021} show
+\cite{BrodieDaubechiesDeMolGiannoneLoris2009}. For expected shortfall, Papp et al.~\cite{PappKondorCaccioli2021} show
 that removing short positions tends to remove the most volatile assets from the portfolio.
 
 The $L^2$ penalty $\lambda_2 \|\bm{x}_t\|_2^2 = \lambda_2 \sum_{i=1}^N x_{i,t}^2$, with $\lambda_2 \ge 0$, penalizes large
@@ -680,9 +680,9 @@ Appendices~\ref{app:joint-optimization}, \ref{app:mv_joint}, and~\ref{app:mad_jo
 
 All programs of this section are convex. Since the $L^1$ penalties and the leverage constraint can be written with
 linear constraints, the regularized programs are quadratic programs under the variance, the semi-variance, the mean
-absolute deviation, and Expected Shortfall, and a second-order cone program with a convex quadratic objective under
-second-order Expected Shortfall. Without the $L^2$ penalties, the programs under the mean absolute deviation and Expected
-Shortfall are linear programs. Standard solvers handle all of these programs efficiently~\cite{boyd2004convex}.
+absolute deviation, and expected shortfall, and a second-order cone program with a convex quadratic objective under
+second-order expected shortfall. Without the $L^2$ penalties, the programs under the mean absolute deviation and expected
+shortfall are linear programs. Standard solvers handle all of these programs efficiently~\cite{boyd2004convex}.
 
 \section{Mean-Risk Portfolio Optimization} \label{sec:mean-risk-portfolio-optimization}
  
@@ -697,12 +697,12 @@ Mean-risk optimization goes back to Markowitz \cite{Markowitz1952}, and the work
 four risk measures are based also trade off risk against expected return. Markowitz et al.~\cite{Markowitz1993} compute
 the portfolios that are efficient with respect to the expected return and the semi-variance, and Konno and Yamazaki
 \cite{KonnoYamazaki1991}, Rockafellar and Uryasev \cite{RockafellarUryasev2000}, and Krokhmal \cite{Krokhmal2007}
-minimize the mean absolute deviation, Expected Shortfall, and the higher-moment coherent risk measures, respectively. 
+minimize the mean absolute deviation, expected shortfall, and the higher-moment coherent risk measures, respectively. 
 In the multi-currency setting, Burkhardt and Ulrych
 \cite{SparseAndStableInternationalPortfolioOptimization} use a mean-variance objective and estimate the expected returns with 
 the Bayes--Stein estimator of Jorion \cite{Jorion1986BayesStein}.
 Lucescu and Ulrych \cite{RegularizedMultiCurrencyExpectedShortfallPortfolios} formulate their programs with an objective
-that trades off the expected return against Expected Shortfall but evaluate them out of sample under infinite risk
+that trades off the expected return against expected shortfall but evaluate them out of sample under infinite risk
 aversion, which removes the expected return from the objective. We add the mean term back to the programs
 of the previous section and estimate the expected returns in a way that makes them more stable and less affected by estimation error.
 
