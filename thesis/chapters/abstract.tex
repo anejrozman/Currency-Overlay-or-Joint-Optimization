@@ -2,20 +2,21 @@
 Investing internationally exposes a portfolio to exchange rate risk. A common way to manage this risk is a currency
 overlay, in which the investor first chooses the asset portfolio and then adds a separate set of currency positions to
 hedge or adjust its currency exposure. This thesis studies whether optimizing the asset and currency positions jointly
-improves on the sequential currency overlay out of sample, and under which conditions. We compare the two approaches
-under five risk measures, variance, semi-variance, mean absolute deviation, Expected Shortfall, and second-order
-Expected Shortfall. We consider three formulations, unregularized risk minimization, regularized risk minimization,
-and a mean-risk formulation that also rewards expected returns. We backtest each of them in three investable universes
-of increasing size. When the optimizers only minimize risk, with or without regularization, the joint and overlay
-optimizers earn very similar risk-adjusted returns. Joint optimization attains lower risk in sample, but out of sample
-this advantage is largest in the smallest universe, where currencies make up a larger share of the decision
-variables. Under Expected Shortfall and second-order Expected Shortfall, the in-sample advantage is larger. It is
-driven by two mechanisms. The joint program fits the currency positions to the worst past days and favors portfolios
-that happened to earn high returns. Neither mechanism generalizes out of sample. Both approaches manage the currencies
-actively. Compared with full hedging, this lowers risk at similar risk-adjusted returns, and in the larger universes
-it also outperforms leaving the currencies unhedged. In the mean-risk formulation, by contrast, the joint optimizers
-achieve higher Sharpe ratios than the overlay optimizers for every risk measure in the larger universes, because they
-can weigh the expected returns of assets and currencies against each other. These results indicate that, for pure risk
-minimization, joint optimization is beneficial in small investable universes, although the benefit decreases as the
-universe grows, and that it is preferable when expected returns are part of the objective.
+improves on the sequential currency overlay out of sample, and under which conditions. We compare the two approaches in 
+three investable universes that contain up to $140$, $700$, and $1{,}400$ stocks
+from 14 global economies, under five risk measures: variance, semi-variance, mean absolute deviation, expected
+shortfall, and second-order expected shortfall.
+An investor who only minimizes risk earns very similar risk-adjusted returns with both approaches, with or without
+regularization. Joint optimization attains lower risk in sample, and out of sample
+its advantage is largest in the smallest universe, where currencies make up a larger share of the decision
+variables. Whichever approach is used, managing the currencies actively lowers risk compared with full hedging at similar
+risk-adjusted returns, and in the larger universes it also raises risk-adjusted returns compared with leaving the
+currencies unhedged. An investor who also uses expected returns, by contrast, earns higher Sharpe ratios with joint optimization than with
+an overlay for every risk measure in the larger universes because only the joint program can weigh the expected
+returns of assets and currencies against each other. For asset managers, these results 
+suggest that a separate currency overlay is sufficient when they only minimize
+risk in a portfolio with many assets per currency, whereas optimizing the asset and currency positions jointly is beneficial
+when the portfolio holds few assets per currency and when expected returns are part of the objective.
+
+
 \end{abstract}
