@@ -90,7 +90,7 @@ We therefore estimate $\bm{\Sigma}_t$ with the shrinkage estimator of Ledoit and
 combines the sample covariance matrix with a structured target. The sample covariance matrix imposes no structure but
 has a large estimation error when $N$ is large relative to $q$, while a structured target has few parameters and
 therefore a small estimation error but is biased whenever its structure does not hold. A weighted average of the two
-trades off the estimation error of the estimate with the bias of the structured target. Ledoit and Wolf use the constant-correlation
+trades off the estimation error of the sample covariance matrix with the bias of the structured target. Ledoit and Wolf use the constant-correlation
 target, which keeps the sample variances of the assets and replaces every pairwise correlation by the average sample
 correlation.
 
@@ -387,7 +387,7 @@ properties. Adding a riskless amount to the return reduces the risk by that amou
 $\mathcal{R}(X + C) = \mathcal{R}(X) - C$, scaling the position by a positive factor scales the risk by the same
 factor (positive homogeneity), the risk of a combined position is at most the sum of the risks of its parts (subadditivity),
 so that diversification does not
-increase risk, and a same return that is higher carries no more risk (monotonicity). Out of the five risk measures we define in this chapter, only expected shortfall \cite{acerbi2002coherenceexpectedshortfall} and
+increase risk, and a return that is higher carries no more risk (monotonicity). Out of the five risk measures we define in this chapter, only expected shortfall \cite{acerbi2002coherenceexpectedshortfall} and
 second-order expected shortfall \cite{Krokhmal2007} are coherent. Additionally, they are both strictly expectation bounded, that
 is, their risk exceeds the expected loss of every nonconstant return.
 
